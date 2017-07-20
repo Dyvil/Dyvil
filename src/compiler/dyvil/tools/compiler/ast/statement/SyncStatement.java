@@ -17,7 +17,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public final class SyncStatement extends AbstractValue implements IStatement
+public class SyncStatement extends AbstractValue implements IStatement
 {
 	protected IValue lock;
 	protected IValue action;

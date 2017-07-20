@@ -13,10 +13,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class ImportDeclaration implements ASTNode, IObjectCompilable
+public class ImportDeclaration implements ASTNode, IObjectCompilable
 {
 	protected SourcePosition position;
-	protected IImport       theImport;
+	protected IImport        theImport;
 
 	public ImportDeclaration(SourcePosition position)
 	{
@@ -35,14 +35,14 @@ public final class ImportDeclaration implements ASTNode, IObjectCompilable
 		this.position = position;
 	}
 
-	public void setImport(IImport iimport)
-	{
-		this.theImport = iimport;
-	}
-
 	public IImport getImport()
 	{
 		return this.theImport;
+	}
+
+	public void setImport(IImport iimport)
+	{
+		this.theImport = iimport;
 	}
 
 	public void resolveTypes(MarkerList markers, IContext context)

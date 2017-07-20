@@ -21,7 +21,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public final class RepeatStatement extends AbstractValue implements IStatement, ILoop
+public class RepeatStatement extends AbstractValue implements IStatement, ILoop
 {
 	private static final Name $repeatStart     = Name.fromRaw("$repeatStart");
 	private static final Name $repeatCondition = Name.fromRaw("$repeatCondition");

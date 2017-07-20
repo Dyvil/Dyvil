@@ -10,7 +10,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public final class VariableStatement implements IStatement
+public class VariableStatement implements IStatement
 {
 	protected IVariable variable;
 

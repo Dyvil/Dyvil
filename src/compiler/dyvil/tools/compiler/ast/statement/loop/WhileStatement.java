@@ -22,7 +22,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public final class WhileStatement extends AbstractValue implements IStatement, ILoop
+public class WhileStatement extends AbstractValue implements IStatement, ILoop
 {
 	public static final Name $whileStart = Name.fromRaw("$whileStart");
 	public static final Name $whileEnd   = Name.fromRaw("$whileEnd");
