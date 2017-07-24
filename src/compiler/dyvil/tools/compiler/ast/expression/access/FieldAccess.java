@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression.access;
 
-import dyvil.annotation.internal.NonNull;
-import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -15,7 +13,6 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
@@ -31,16 +28,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class FieldAccess implements IValue, INamed, IReceiverAccess
+public class FieldAccess extends AbstractFieldAccess
 {
-	protected SourcePosition position;
-	protected IValue        receiver;
-	protected Name          name;
-
-	// Metadata
-	protected IDataMember field;
-	protected IType       type;
-
 	public FieldAccess()
 	{
 	}
@@ -52,51 +41,25 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	public FieldAccess(IDataMember field)
 	{
-		this.field = field;
-		this.name = field.getName();
+		super(field);
 	}
 
-	public FieldAccess(SourcePosition position, IValue instance, Name name)
+	public FieldAccess(SourcePosition position, IValue receiver, IDataMember field)
+	{
+		super(position, receiver, field);
+	}
+
+	public FieldAccess(SourcePosition position, IValue receiver, Name name)
 	{
 		this.position = position;
-		this.receiver = instance;
+		this.receiver = receiver;
 		this.name = name;
-	}
-
-	public FieldAccess(SourcePosition position, IValue instance, IDataMember field)
-	{
-		this.position = position;
-		this.receiver = instance;
-		this.field = field;
-		this.name = field.getName();
-	}
-
-	@Override
-	public SourcePosition getPosition()
-	{
-		return this.position;
-	}
-
-	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
 	}
 
 	@Override
 	public int valueTag()
 	{
 		return FIELD_ACCESS;
-	}
-
-	public IValue getInstance()
-	{
-		return this.receiver;
-	}
-
-	public IDataMember getField()
-	{
-		return this.field;
 	}
 
 	@Override
@@ -114,7 +77,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public boolean isResolved()
 	{
-		return this.field != null && this.field.getType().isResolved();
+		return this.field != null;
 	}
 
 	@Override
@@ -163,27 +126,6 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public IType getType()
-	{
-		if (this.type == null)
-		{
-			if (this.field == null)
-			{
-				return Types.UNKNOWN;
-			}
-
-			if (this.receiver == null)
-			{
-				return this.field.getType();
-			}
-
-			final ITypeContext typeContext = this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext);
-		}
-		return this.type;
-	}
-
-	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.field == null)
@@ -207,31 +149,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			return MISMATCH;
 		}
-		return IValue.super.getTypeMatch(type, implicitContext);
-	}
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
-
-	@Override
-	public void setReceiver(IValue receiver)
-	{
-		this.receiver = receiver;
-	}
-
-	@Override
-	public IValue getReceiver()
-	{
-		return this.receiver;
+		return super.getTypeMatch(type, implicitContext);
 	}
 
 	@Override
@@ -272,36 +190,8 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public void resolveReceiver(MarkerList markers, IContext context)
+	protected void reportResolve(MarkerList markers)
 	{
-		if (this.receiver != null)
-		{
-			this.receiver = this.receiver.resolve(markers, context);
-		}
-	}
-
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.resolveReceiver(markers, context);
-
-		if (this.field != null)
-		{
-			return this;
-		}
-
-		final IValue v = this.resolveFieldAccess(markers, context);
-		if (v != null)
-		{
-			return v;
-		}
-
-		// Don't report an error if the receiver is not resolved
-		if (this.receiver != null && !this.receiver.isResolved())
-		{
-			return this;
-		}
-
 		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
 		if (this.receiver != null)
 		{
@@ -309,86 +199,10 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 
 		markers.add(marker);
-		return this;
 	}
 
-	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
-	{
-		// Duplicate in FieldAssignment
-
-		IValue value;
-
-		if (ICall.privateAccess(context, this.receiver))
-		{
-			final IValue implicit;
-			if (this.receiver == null && (implicit = context.resolveImplicit(null)) != null)
-			{
-				value = this.resolveMethod(implicit, markers, context);
-				if (value != null)
-				{
-					return value;
-				}
-
-				value = this.resolveField(implicit, context);
-				if (value != null)
-				{
-					return value;
-				}
-			}
-
-			value = this.resolveField(this.receiver, context);
-			if (value != null)
-			{
-				return value;
-			}
-
-			value = this.resolveMethod(this.receiver, markers, context);
-			if (value != null)
-			{
-				return value;
-			}
-		}
-		else
-		{
-			value = this.resolveMethod(this.receiver, markers, context);
-			if (value != null)
-			{
-				return value;
-			}
-
-			value = this.resolveField(this.receiver, context);
-			if (value != null)
-			{
-				return value;
-			}
-		}
-
-		// Qualified Type Name Resolution
-
-		return this.resolveTypeAccess(context);
-	}
-
-	private IValue resolveTypeAccess(IContext context)
-	{
-		final IType parentType;
-		if (this.receiver == null)
-		{
-			parentType = null;
-		}
-		else if (this.receiver.isClassAccess())
-		{
-			parentType = this.receiver.getType();
-		}
-		else
-		{
-			return null;
-		}
-
-		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
-		return type != null ? new ClassAccess(this.position, type) : null;
-	}
-
-	private IValue resolveField(IValue receiver, IContext context)
+	@Override
+	protected IValue resolveAsField(IValue receiver, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field == null)
@@ -406,11 +220,33 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		return this;
 	}
 
-	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
+	@Override
+	protected IValue resolveAsMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		// We use PostfixCall because it doesn't do implicit-based resolution nor field-apply resolution
 		final PostfixCall call = new PostfixCall(this.position, receiver, this.name);
 		return call.resolveCall(markers, context, false);
+	}
+
+	@Override
+	protected IValue resolveAsType(IContext context)
+	{
+		final IType parentType;
+		if (this.receiver == null)
+		{
+			parentType = null;
+		}
+		else if (this.receiver.isClassAccess())
+		{
+			parentType = this.receiver.getType();
+		}
+		else
+		{
+			return null;
+		}
+
+		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
+		return type != null ? new ClassAccess(this.position, type) : null;
 	}
 
 	@Override
@@ -491,23 +327,5 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 
 		this.field.getType().writeCast(writer, type, lineNumber);
-	}
-
-	@Override
-	public String toString()
-	{
-		return Formattable.toString(this);
-	}
-
-	@Override
-	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
-	{
-		if (this.receiver != null)
-		{
-			this.receiver.toString(indent, buffer);
-			buffer.append('.');
-		}
-
-		buffer.append(this.name);
 	}
 }

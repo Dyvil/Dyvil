@@ -170,7 +170,7 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 
 		final IValue access = new FieldAccess(this.position, this.receiver, this.name)
-			                      .resolveFieldAccess(markers, context);
+			                      .resolveAccess(markers, context);
 		if (access == null)
 		{
 			return null;
