@@ -53,7 +53,7 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,enum,";
+	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,enum,implicit,";
 
 	/**
 	 * The modifiers that can be used on methods.
@@ -69,7 +69,7 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that cna be applied to variables.
 	 */
-	public static final String VARIABLE_MODIFIERS = "final,";
+	public static final String VARIABLE_MODIFIERS = "final,implicit,";
 
 	/**
 	 * The modifiers that can be used on parameters.
