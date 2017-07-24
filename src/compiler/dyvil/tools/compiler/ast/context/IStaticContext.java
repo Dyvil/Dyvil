@@ -116,7 +116,7 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	default IValue getImplicit()
+	default IValue resolveImplicit(IType type)
 	{
 		return null;
 	}

@@ -770,7 +770,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IValue getImplicit()
+	public IValue resolveImplicit(IType type)
 	{
 		return null;
 	}

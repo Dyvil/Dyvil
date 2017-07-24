@@ -185,7 +185,7 @@ public class MethodCall extends AbstractCall implements INamed
 
 	protected IValue resolveImplicitCall(MarkerList markers, IContext context)
 	{
-		final IValue implicit = context.getImplicit();
+		final IValue implicit = context.resolveImplicit(null);
 		if (implicit == null)
 		{
 			return null;

@@ -74,9 +74,9 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	}
 
 	@Override
-	public IValue getImplicit()
+	public IValue resolveImplicit(IType type)
 	{
-		return this.implicitAccess;
+		return type == null ? this.implicitAccess : null;
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		}
 		else
 		{
-			this.value = context.getImplicit();
+			this.value = context.resolveImplicit(null);
 		}
 
 		if (this.value == null)

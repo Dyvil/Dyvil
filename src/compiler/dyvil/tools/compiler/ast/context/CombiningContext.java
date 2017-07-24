@@ -197,10 +197,10 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IValue getImplicit()
+	public IValue resolveImplicit(IType type)
 	{
-		final IValue innerImplicit = this.inner.getImplicit();
-		return innerImplicit == null ? this.outer.getImplicit() : innerImplicit;
+		final IValue innerImplicit = this.inner.resolveImplicit(type);
+		return innerImplicit == null ? this.outer.resolveImplicit(type) : innerImplicit;
 	}
 
 	@Override

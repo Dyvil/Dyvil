@@ -396,7 +396,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		final ArgumentList arguments = new ArgumentList(resolvedValue);
 
-		final IValue implicitValue = context.getImplicit();
+		final IValue implicitValue = context.resolveImplicit(null);
 		if (implicitValue != null)
 		{
 			final IValue call = resolveApplyStatement(markers, context, arguments, implicitValue);

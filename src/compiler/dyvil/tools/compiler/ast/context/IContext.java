@@ -100,7 +100,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IAccessible getAccessibleThis(IClass type);
 
-	IValue getImplicit();
+	IValue resolveImplicit(IType type);
 
 	static IOperator resolveOperator(IContext context, Name name, byte type)
 	{

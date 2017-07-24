@@ -253,7 +253,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		if (ICall.privateAccess(context, this.receiver))
 		{
 			final IValue implicit;
-			if (this.receiver == null && (implicit = context.getImplicit()) != null)
+			if (this.receiver == null && (implicit = context.resolveImplicit(null)) != null)
 			{
 				value = this.resolveMethod(implicit, markers, context);
 				if (value != null)

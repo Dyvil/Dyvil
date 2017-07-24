@@ -321,7 +321,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		if (ICall.privateAccess(context, this.receiver))
 		{
 			final IValue implicit;
-			if (this.receiver == null && (implicit = context.getImplicit()) != null)
+			if (this.receiver == null && (implicit = context.resolveImplicit(null)) != null)
 			{
 				value = this.resolveMethod(implicit, markers, context);
 				if (value != null)
