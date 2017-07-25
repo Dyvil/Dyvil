@@ -215,18 +215,16 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			final IParameter parameter = this.parameters.get(i);
 			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, 0, i, parameter, list);
 
-			if (partialVarargs >= 0)
+			switch (partialVarargs)
 			{
-				varargs += partialVarargs;
-				continue;
-			}
-			if (parameter.getValue() != null)
-			{
+			case ArgumentList.MISMATCH:
+				return;
+			case ArgumentList.DEFAULT:
 				defaults++;
 				continue;
+			default:
+				varargs += partialVarargs;
 			}
-
-			return; // Mismatch
 		}
 
 		for (int matchValue : matchValues)

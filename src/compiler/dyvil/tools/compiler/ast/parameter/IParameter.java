@@ -71,6 +71,11 @@ public interface IParameter extends IVariable, IClassMember
 
 	void setVarargs();
 
+	default boolean isDefault()
+	{
+		return this.hasModifier(Modifiers.DEFAULT);
+	}
+
 	@Override
 	default void writeInit(MethodWriter writer) throws BytecodeException
 	{

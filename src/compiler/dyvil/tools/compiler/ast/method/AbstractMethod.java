@@ -490,18 +490,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			final IParameter parameter = parameters.get(parameterStartIndex + argumentIndex);
 			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex,
 			                                                parameter, list);
-			if (partialVarargs >= 0)
+			switch (partialVarargs)
 			{
-				varargs += partialVarargs;
-				continue;
-			}
-			if (parameter.hasModifier(Modifiers.DEFAULT))
-			{
+			case ArgumentList.MISMATCH:
+				return;
+			case ArgumentList.DEFAULT:
 				defaults++;
 				continue;
+			default:
+				varargs += partialVarargs;
 			}
-
-			return; // Mismatch
 		}
 
 		for (int matchValue : matchValues)

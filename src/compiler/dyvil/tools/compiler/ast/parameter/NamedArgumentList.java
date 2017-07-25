@@ -228,11 +228,11 @@ public class NamedArgumentList extends ArgumentList
 		{
 			// No argument for parameter name
 
-			return param.isVarargs() ? 0 : -1;
+			return param.isVarargs() ? 0 : checkDefault(param);
 		}
 		if (this.keys[argIndex] == null && param.hasModifier(Modifiers.EXPLICIT))
 		{
-			return -1;
+			return checkDefault(param);
 		}
 
 		if (!param.isVarargs())
@@ -240,7 +240,7 @@ public class NamedArgumentList extends ArgumentList
 			// Not a varargs parameter
 
 			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex],
-			                               param.getCovariantType(), implicitContext) ? 0 : -1;
+			                               param.getCovariantType(), implicitContext) ? 0 : MISMATCH;
 		}
 
 		// Varargs Parameter

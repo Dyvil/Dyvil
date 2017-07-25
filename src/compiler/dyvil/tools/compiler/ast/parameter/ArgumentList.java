@@ -28,6 +28,9 @@ public class ArgumentList implements IResolvable, IValueList
 {
 	public static final ArgumentList EMPTY = empty();
 
+	public static final int MISMATCH = -1;
+	public static final int DEFAULT  = -2;
+
 	protected IValue[] values;
 	protected int      size;
 
@@ -288,26 +291,32 @@ public class ArgumentList implements IResolvable, IValueList
 	{
 		if (argumentIndex >= this.size)
 		{
-			return param.isVarargs() && this != EMPTY ? 0 : -1;
+			return param.isVarargs() && this != EMPTY ? 0 : checkDefault(param);
 		}
 		if (param.hasModifier(Modifiers.EXPLICIT))
 		{
-			return -1;
+			// explicit parameters require a named argument list
+			return checkDefault(param);
 		}
 
 		if (!param.isVarargs())
 		{
 			return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
-			                  param.getCovariantType(), implicitContext) ? 0 : -1;
+			                  param.getCovariantType(), implicitContext) ? 0 : MISMATCH;
 		}
 
 		if (this == EMPTY)
 		{
-			return -1;
+			return MISMATCH;
 		}
 
 		return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
 		                         implicitContext);
+	}
+
+	protected static int checkDefault(IParameter param)
+	{
+		return param.isDefault() ? DEFAULT : MISMATCH;
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
@@ -321,7 +330,7 @@ public class ArgumentList implements IResolvable, IValueList
 		                                  IType type, IImplicitContext implicitContext)
 	{
 		final int result = TypeChecker.getTypeMatch(argument, type, implicitContext);
-		if (result == 0)
+		if (result == IValue.MISMATCH)
 		{
 			return false;
 		}
@@ -340,7 +349,7 @@ public class ArgumentList implements IResolvable, IValueList
 		final int matchIndex = matchStartIndex + startIndex;
 		if (argument.checkVarargs(false))
 		{
-			return checkMatch_(matchValues, matchTypes, matchIndex, argument, paramType, implicitContext) ? 0 : -1;
+			return checkMatch_(matchValues, matchTypes, matchIndex, argument, paramType, implicitContext) ? 0 : MISMATCH;
 		}
 
 		if (startIndex == endIndex)
@@ -353,7 +362,7 @@ public class ArgumentList implements IResolvable, IValueList
 
 		if (!checkMatch_(matchValues, matchTypes, matchIndex, arrayExpr, paramType, implicitContext))
 		{
-			return -1;
+			return MISMATCH;
 		}
 
 		// We fill the remaining entries that are reserved for the (now wrapped) varargs values with the match value
