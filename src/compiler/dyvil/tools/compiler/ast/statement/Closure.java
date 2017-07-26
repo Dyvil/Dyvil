@@ -99,7 +99,7 @@ public class Closure extends StatementList
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		return type == null ? this.implicitValue : null;
+		return type == null ? this.implicitValue : super.resolveImplicit(type);
 	}
 
 	@Override

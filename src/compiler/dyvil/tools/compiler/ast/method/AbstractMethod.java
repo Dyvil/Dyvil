@@ -648,7 +648,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					           .convertValue(receiver, this.getReceiverType(), receiver.getType(), markers, context,
 					                         TypeChecker.markerSupplier("method.access.receiver_type", this.name));
 			}
-			updateReceiverType(receiver, genericData);
+
+			if (receiver != null)
+			{
+				updateReceiverType(receiver, genericData);
+			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{

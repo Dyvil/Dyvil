@@ -411,9 +411,9 @@ public class ArgumentList implements IResolvable, IValueList
 		{
 			return convertValue(new ArrayExpr(position, EMPTY), param, genericData, markers, context);
 		}
-		if (param.hasModifier(Modifiers.IMPLICIT))
+		if (param.isImplicit())
 		{
-			final IValue implicit = context.resolveImplicit(param.getCovariantType());
+			final IValue implicit = context.resolveImplicit(param.getCovariantType().getConcreteType(genericData));
 			if (implicit != null)
 			{
 				return implicit;
