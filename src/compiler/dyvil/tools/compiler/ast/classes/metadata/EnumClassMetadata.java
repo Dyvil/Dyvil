@@ -26,6 +26,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -101,7 +102,8 @@ public class EnumClassMetadata extends ClassMetadata
 	private void updateConstructor(IConstructor constructor)
 	{
 		// Prepend parameters and set super initializer
-		final CodeParameter nameParam = new CodeParameter(constructor, null, Names.name, Types.STRING,
+		final CodeParameter nameParam = new CodeParameter(constructor, null, Names.name,
+		                                                  new ImplicitNullableType(Types.STRING),
 		                                                  new FlagModifierSet(Modifiers.SYNTHETIC), null);
 		final CodeParameter ordParam = new CodeParameter(constructor, null, Names.ordinal, Types.INT,
 		                                                 new FlagModifierSet(Modifiers.SYNTHETIC), null);

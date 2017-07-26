@@ -39,7 +39,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 
 		this.parameterIndex++;
 
-		if (name != null)
+		if (name != null && !name.isEmpty())
 		{
 			final Name name1 = Name.fromQualified(name);
 			parameter.setName(name1);

@@ -143,7 +143,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	@Override
 	public String getQualifiedLabel()
 	{
-		return this.label == null ? null : this.label.qualified;
+		return this.label == null ? "" : this.label.qualified;
 	}
 
 	@Override
