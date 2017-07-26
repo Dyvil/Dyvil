@@ -597,7 +597,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 				for (int i = 1, count = parameters.size(); i < count; i++)
 				{
-					arguments.checkValue(i - 1, parameters.get(i), genericData, markers, context);
+					arguments.checkValue(i - 1, parameters.get(i), genericData, position, markers, context);
 				}
 
 				if (genericData != null)
@@ -679,7 +679,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			arguments.checkValue(i, parameters.get(i), genericData, markers, context);
+			arguments.checkValue(i, parameters.get(i), genericData, position, markers, context);
 		}
 
 		if (genericData != null)

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.constant.IConstantValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -8,15 +9,25 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
+
+import java.util.function.BiConsumer;
 
 public class DummyValue implements IConstantValue
 {
 	private final IType type;
 
+	private final BiConsumer<MethodWriter, IType> writer;
+
 	public DummyValue(IType type)
 	{
 		this.type = type;
+		this.writer = null;
+	}
+
+	public DummyValue(IType type, BiConsumer<MethodWriter, IType> writer)
+	{
+		this.type = type;
+		this.writer = writer;
 	}
 
 	@Override
@@ -69,6 +80,8 @@ public class DummyValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		assert this.writer != null : "Dummy value did not specify writer";
+		this.writer.accept(writer, type);
 	}
 
 	@Override

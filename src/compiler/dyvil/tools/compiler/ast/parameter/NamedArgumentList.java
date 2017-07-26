@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.type.IType;
@@ -250,18 +250,19 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, SourcePosition position, MarkerList markers, IContext context)
 	{
 		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex < 0)
 		{
-			if (param.isVarargs())
+			final IValue missing = resolveMissing(param, genericData, position, markers, context);
+			if (missing != null)
 			{
-				final ArrayExpr arrayExpr = new ArrayExpr(ArgumentList.EMPTY);
-				final IValue converted = convertValue(arrayExpr, param, genericData, markers, context);
-				this.add(param.getLabel(), converted);
+				this.add(param.getLabel(), missing);
+				return;
 			}
 
+			markers.add(Markers.semanticError(position, "method.access.argument.missing", param.getName()));
 			return;
 		}
 
