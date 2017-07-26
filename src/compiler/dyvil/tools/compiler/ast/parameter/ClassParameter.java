@@ -123,12 +123,6 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public boolean isVarargs()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
 	public void setVarargs()
 	{
 		this.modifiers.addIntModifier(Modifiers.VARARGS);

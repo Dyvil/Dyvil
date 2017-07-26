@@ -109,15 +109,15 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-		this.modifiers = modifiers;
-	}
-
-	@Override
 	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
+	}
+
+	@Override
+	public void setModifiers(ModifierSet modifiers)
+	{
+		this.modifiers = modifiers;
 	}
 
 	@Override
@@ -133,27 +133,27 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
 
 	@Override
-	public void setName(Name name)
+	public void setType(IType type)
 	{
-		this.name = name;
+		this.type = type;
 	}
 
 	@Override
 	public Name getName()
 	{
 		return this.name;
+	}
+
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
 	}
 
 	@Override

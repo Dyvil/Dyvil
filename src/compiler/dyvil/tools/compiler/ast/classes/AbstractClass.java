@@ -157,39 +157,21 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-		this.modifiers = modifiers;
-	}
-
-	@Override
 	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
 	}
 
 	@Override
-	public boolean isAbstract()
+	public void setModifiers(ModifierSet modifiers)
 	{
-		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT);
+		this.modifiers = modifiers;
 	}
 
 	@Override
-	public boolean isInterface()
+	public boolean hasModifier(int mod)
 	{
-		return this.modifiers.hasIntModifier(Modifiers.INTERFACE);
-	}
-
-	@Override
-	public boolean isAnnotation()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.ANNOTATION);
-	}
-
-	@Override
-	public boolean isObject()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.OBJECT);
+		return this.modifiers.hasIntModifier(mod);
 	}
 
 	@Override
@@ -678,6 +660,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		return null;
+	}
+
+	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
@@ -767,12 +755,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public IAccessible getAccessibleThis(IClass type)
 	{
 		return type == this || Types.isSuperClass(type, this) ? VariableThis.DEFAULT : null;
-	}
-
-	@Override
-	public IValue resolveImplicit(IType type)
-	{
-		return null;
 	}
 
 	@Override

@@ -63,11 +63,6 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		return TypeChecker.convertValue(newValue, type, typeContext, markers, context, markerSupplier);
 	}
 
-	default boolean isEnumConstant()
-	{
-		return this.hasModifier(Modifiers.ENUM_CONST);
-	}
-
 	default IClass getEnclosingClass()
 	{
 		return null;

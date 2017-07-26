@@ -34,8 +34,6 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 	void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance, ArgumentList arguments, ITypeContext typeContext);
 	
 	// Misc
-	
-	boolean isAbstract();
 
 	boolean isImplicitConversion();
 

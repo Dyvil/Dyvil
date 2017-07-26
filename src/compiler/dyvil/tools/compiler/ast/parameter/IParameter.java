@@ -67,19 +67,7 @@ public interface IParameter extends IVariable, IClassMember
 	@Override
 	boolean isLocal();
 
-	boolean isVarargs();
-
 	void setVarargs();
-
-	default boolean isDefault()
-	{
-		return this.hasModifier(Modifiers.DEFAULT);
-	}
-
-	default boolean isImplicit()
-	{
-		return this.hasModifier(Modifiers.IMPLICIT);
-	}
 
 	@Override
 	default void writeInit(MethodWriter writer) throws BytecodeException

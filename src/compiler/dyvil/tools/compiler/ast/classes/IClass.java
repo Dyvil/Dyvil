@@ -53,14 +53,6 @@ public interface IClass
 		return false;
 	}
 
-	boolean isAbstract();
-
-	boolean isInterface();
-
-	boolean isAnnotation();
-
-	boolean isObject();
-
 	// Full Name
 
 	@Override
