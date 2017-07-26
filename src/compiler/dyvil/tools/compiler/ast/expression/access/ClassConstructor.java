@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -20,17 +21,12 @@ import dyvil.source.position.SourcePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private AnonymousClass nestedClass;
-
-	public ClassConstructor(SourcePosition position)
-	{
-		this.position = position;
-		this.nestedClass = new AnonymousClass(position);
-	}
+	private @NonNull AnonymousClass nestedClass;
 
 	public ClassConstructor(SourcePosition position, IType type, ArgumentList arguments)
 	{
 		super(position, type, arguments);
+		this.nestedClass = new AnonymousClass(position);
 	}
 
 	public AnonymousClass getNestedClass()
@@ -155,14 +151,14 @@ public class ClassConstructor extends ConstructorCall
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
+		super.toString(indent, buffer);
 
 		ClassBody body = this.nestedClass.getBody();
 		if (body != null)
 		{
-			body.toString(prefix, buffer);
+			body.toString(indent, buffer);
 		}
 		else
 		{

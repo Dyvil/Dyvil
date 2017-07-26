@@ -18,6 +18,7 @@ public class PostfixCall extends MethodCall
 	public PostfixCall(SourcePosition position, IValue receiver, Name name)
 	{
 		super(position, receiver, name);
+		this.arguments = ArgumentList.empty();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -26,15 +27,22 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ConstructorCall implements ICall
 {
+	protected @NonNull IType        type;
+	protected @NonNull ArgumentList arguments;
+
+	// Metadata
 	protected SourcePosition position;
-	protected IType         type;
-	protected ArgumentList    arguments;
+	protected IConstructor   constructor;
 
-	protected IConstructor constructor;
-
-	public ConstructorCall()
+	public ConstructorCall(SourcePosition position)
 	{
-		this.arguments = ArgumentList.EMPTY;
+		this.position = position;
+	}
+
+	public ConstructorCall(SourcePosition position, ArgumentList arguments)
+	{
+		this.position = position;
+		this.arguments = arguments;
 	}
 
 	public ConstructorCall(IConstructor constructor, ArgumentList arguments)
@@ -42,12 +50,6 @@ public class ConstructorCall implements ICall
 		this.constructor = constructor;
 		this.type = constructor.getType();
 		this.arguments = arguments;
-	}
-
-	public ConstructorCall(SourcePosition position)
-	{
-		this.position = position;
-		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public ConstructorCall(SourcePosition position, IType type, ArgumentList arguments)
@@ -120,10 +122,8 @@ public class ConstructorCall implements ICall
 
 	public ClassConstructor toClassConstructor()
 	{
-		ClassConstructor cc = new ClassConstructor(this.position);
-		cc.type = this.type;
+		ClassConstructor cc = new ClassConstructor(this.position, this.type, this.arguments);
 		cc.constructor = this.constructor;
-		cc.arguments = this.arguments;
 		return cc;
 	}
 
@@ -136,7 +136,7 @@ public class ConstructorCall implements ICall
 		}
 		else
 		{
-			markers.add(Markers.semantic(this.position, "constructor.invalid"));
+			markers.add(Markers.semanticError(this.position, "constructor.access.type.missing"));
 			this.type = Types.UNKNOWN;
 		}
 
@@ -374,10 +374,10 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append("new ");
 		this.type.toString("", buffer);
-		this.arguments.toString(prefix, buffer);
+		this.arguments.toString(indent, buffer);
 	}
 }

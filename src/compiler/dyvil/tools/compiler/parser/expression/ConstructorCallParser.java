@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.expression.access.ClassConstructor;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
@@ -43,7 +44,9 @@ public class ConstructorCallParser extends Parser
 				pm.reparse();
 			}
 
-			this.call = new ConstructorCall(token);
+			final ArgumentList arguments =
+				token.next().type() == BaseSymbols.OPEN_PARENTHESIS ? null : ArgumentList.empty();
+			this.call = new ConstructorCall(token.raw(), arguments);
 			this.mode = CONSTRUCTOR_PARAMETERS;
 			pm.pushParser(new TypeParser(this.call));
 			return;
