@@ -4,10 +4,12 @@ import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Formattable;
+import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -249,6 +251,27 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			if (variable.getName() == name)
 			{
 				return variable;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		if (type == null || this.variables == null)
+		{
+			return null;
+		}
+
+		// Intentionally start at the last variable, so the last declared implicit variable has precedence
+		for (int i = this.variables.size() - 1; i >= 0; i--)
+		{
+			final IVariable variable = this.variables.get(i);
+			if (variable.hasModifier(Modifiers.IMPLICIT) && Types.isSuperType(type, variable.getType()))
+			{
+				return new FieldAccess(variable);
 			}
 		}
 
