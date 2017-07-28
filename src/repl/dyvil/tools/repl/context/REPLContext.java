@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -404,6 +405,30 @@ public class REPLContext extends AbstractHeader
 	public IDataMember resolveField(Name name)
 	{
 		return this.fields.get(name);
+	}
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		if (type == null || this.fields.isEmpty())
+		{
+			return null;
+		}
+
+		IValue candidate = null;
+		for (IField field : this.fields.values())
+		{
+			if (!field.hasModifier(Modifiers.IMPLICIT) || !Types.isSuperType(type, field.getType()))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // more than one match -> ambiguous
+			}
+			candidate = new FieldAccess(field);
+		}
+		return candidate;
 	}
 
 	@Override

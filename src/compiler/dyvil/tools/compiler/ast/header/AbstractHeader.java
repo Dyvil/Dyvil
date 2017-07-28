@@ -673,6 +673,12 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		return this.header.resolveImplicit(type);
+	}
+
+	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		// For ordinary headers, this is a no-op, since they (currently) cannot host any free-standing functions
