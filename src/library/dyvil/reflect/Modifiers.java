@@ -279,7 +279,8 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be applied to class parameters.
 	 */
-	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | DEFAULT;
+	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | IMPLICIT | EXPLICIT // denotable
+	                                | DEFAULT;
 
 	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
 

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -662,7 +663,30 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		return this.body.resolveImplicit(type);
+		if (type == null)
+		{
+			return null;
+		}
+
+		IParameter candidate = null;
+		for (IParameter param : this.parameters)
+		{
+			if (!param.isImplicit() || !Types.isSuperType(param.getType(), type))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous -> pick none
+			}
+			candidate = param;
+		}
+		if (candidate != null)
+		{
+			return new FieldAccess(candidate);
+		}
+
+		return this.body == null ? null : this.body.resolveImplicit(type);
 	}
 
 	@Override
