@@ -416,7 +416,9 @@ public class ArgumentList implements IResolvable, IValueList
 			final IValue implicit = context.resolveImplicit(param.getCovariantType().getConcreteType(genericData));
 			if (implicit != null)
 			{
-				return implicit;
+				// make sure to resolve and type-check the implicit value
+				// (implicit values should be only field accesses, but might need some capture or "this<Outer" resolution)
+				return convertValue(implicit.resolve(markers, context), param, genericData, markers, context);
 			}
 		}
 		if (param.isDefault())
