@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -24,6 +25,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -205,6 +207,37 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			}
 		}
 		return null;
+	}
+
+	public IValue resolveImplicit(IType type)
+	{
+		if (type == null)
+		{
+			return null;
+		}
+
+		IField candidate = null;
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IField field = this.fields[i];
+			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous -> pick none
+			}
+			candidate = field;
+		}
+
+		if (candidate == null)
+		{
+			return null;
+		}
+
+		// this<Class> is added automatically later
+		return new FieldAccess(candidate);
 	}
 
 	// endregion

@@ -662,7 +662,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		return null;
+		return this.body.resolveImplicit(type);
 	}
 
 	@Override
