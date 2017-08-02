@@ -421,9 +421,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	}
 
 	/**
-	 * Returns {@code true} iff the given token is a symbol token that starts with {@code <}.
-	 * This includes the special left-arrow token {@code <-}.
+	 * Returns {@code true} iff the given token is a symbol token that starts with {@code <}. This includes the special
+	 * left-arrow token {@code <-}.
 	 */
+	public static boolean isGenericStart(IToken token)
+	{
+		return isGenericStart(token, token.type());
+	}
+
 	public static boolean isGenericStart(IToken token, int type)
 	{
 		switch (type)
@@ -440,6 +445,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	/**
 	 * Returns {@code true} iff the given token is a symbol token that starts with {@code >}.
 	 */
+	public static boolean isGenericEnd(IToken token)
+	{
+		return isGenericEnd(token, token.type());
+	}
+
 	public static boolean isGenericEnd(IToken token, int type)
 	{
 		switch (type)
@@ -452,9 +462,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	}
 
 	/**
-	 * Returns {@code true} iff the given token is a symbol token that ends with {@code >}.
-	 * This includes the special right-arrow {@code ->} and double-right-arrow {@code =>} tokens.
+	 * Returns {@code true} iff the given token is a symbol token that ends with {@code >}. This includes the special
+	 * right-arrow {@code ->} and double-right-arrow {@code =>} tokens.
 	 */
+	public static boolean isGenericEnd2(IToken token)
+	{
+		return isGenericEnd2(token, token.type());
+	}
+
 	public static boolean isGenericEnd2(IToken token, int type)
 	{
 		switch (type)

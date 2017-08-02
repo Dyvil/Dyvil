@@ -566,7 +566,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// IDENTIFIER < ...
 			return false;
 		}
-		final int endTokenType = endToken.type();
+
 		final IToken endTokenNext = endToken.next();
 		final int endTokenNextType = endTokenNext.type();
 
@@ -575,7 +575,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		// IDENTIFIER < ... SYMBOL>
 		// IDENTIFIER < ... SYMBOL>SYMBOL
 
-		if (!TypeParser.isGenericEnd2(endToken, endTokenType))
+		if (!TypeParser.isGenericEnd2(endToken))
 		{
 			// The end token ends with more symbols
 			// IDENTIFIER < ... SYMBOL>SYMBOL

@@ -92,6 +92,11 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			return;
 		case GENERICS:
+			if (type == BaseSymbols.SEMICOLON && token.isInferred() && TypeParser.isGenericStart(token.next()))
+			{
+				// allow an implicit semicolon / line break between name and generic argument list
+				return;
+			}
 			if (TypeParser.isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
