@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 
 public class InfixType extends NamedGenericType

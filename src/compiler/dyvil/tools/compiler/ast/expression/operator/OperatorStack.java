@@ -7,7 +7,7 @@ import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ASTNode;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class OperatorStack<T extends ASTNode> implements ASTNode

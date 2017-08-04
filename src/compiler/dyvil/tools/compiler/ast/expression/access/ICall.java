@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 

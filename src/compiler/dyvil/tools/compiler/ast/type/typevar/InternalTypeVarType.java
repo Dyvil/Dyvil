@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class InternalTypeVarType extends InternalType

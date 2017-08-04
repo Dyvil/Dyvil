@@ -2,7 +2,7 @@ package dyvil.tools.gensrc.ast.expression;
 
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class VarAccess implements Expression
 {

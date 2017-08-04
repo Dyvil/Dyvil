@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IValueList extends Iterable<IValue>, IValueConsumer
 {

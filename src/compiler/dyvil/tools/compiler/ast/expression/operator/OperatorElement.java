@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.expression.operator;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;

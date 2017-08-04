@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 
 public interface IClassConsumer

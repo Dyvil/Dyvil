@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 
 public interface IProperty extends IClassMember

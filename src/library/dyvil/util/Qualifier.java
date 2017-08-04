@@ -1,4 +1,4 @@
-package dyvil.tools.parsing.name;
+package dyvil.util;
 
 public class Qualifier
 {

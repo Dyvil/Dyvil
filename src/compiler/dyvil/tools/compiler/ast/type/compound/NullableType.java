@@ -24,7 +24,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;

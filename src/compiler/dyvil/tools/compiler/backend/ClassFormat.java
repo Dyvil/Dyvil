@@ -27,7 +27,7 @@ import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.InternalGenericType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.ast.type.typevar.InternalTypeVarType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 @SuppressWarnings( { "UnnecessaryBoxing", "unused" })
 public final class ClassFormat

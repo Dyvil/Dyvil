@@ -23,7 +23,7 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public final class Types
 {

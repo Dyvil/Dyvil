@@ -24,7 +24,7 @@ import dyvil.tools.compiler.ast.type.compound.IntersectionType;
 import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -2,7 +2,7 @@ package dyvil.tools.parsing.token;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IToken extends SourcePosition
 {

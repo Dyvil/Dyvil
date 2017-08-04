@@ -3,7 +3,6 @@ package dyvil.tools.dpf.converter
 import dyvil.tools.dpf.ast.builder.Builder
 import dyvil.tools.dpf.ast.value._
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.Name
 
 abstract class DPFValueVisitor implements ValueVisitor
 {

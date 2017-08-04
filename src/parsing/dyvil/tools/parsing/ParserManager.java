@@ -1,5 +1,6 @@
 package dyvil.tools.parsing;
 
+import dyvil.lang.Name;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.lexer.Symbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -111,7 +112,7 @@ public class ParserManager implements IParserManager
 			return new SymbolToken(this.symbols, keyword, line, start);
 		}
 
-		return new IdentifierToken(Name.from(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+		return new IdentifierToken(dyvil.lang.Name.from(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
 	}
 
 	@Override

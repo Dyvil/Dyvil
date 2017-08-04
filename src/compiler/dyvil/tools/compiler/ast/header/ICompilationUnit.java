@@ -4,7 +4,7 @@ import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.sources.IFileType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.source.FileSource;

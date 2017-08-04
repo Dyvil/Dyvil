@@ -4,7 +4,6 @@ import dyvil.collection.Map
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tools.parsing.Name
 import dyvil.tools.parsing.ASTNode
 
 import java.util.Objects

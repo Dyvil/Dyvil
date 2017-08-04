@@ -20,7 +20,7 @@ import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.InputStream;

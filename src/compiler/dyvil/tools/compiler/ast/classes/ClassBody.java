@@ -33,7 +33,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ASTNode;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsumer<IField>

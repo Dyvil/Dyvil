@@ -4,7 +4,7 @@ import dyvil.tools.gensrc.ast.directive.*;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
 import dyvil.tools.gensrc.parser.expression.ExpressionListParser;
 import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class DyvilNameVisitor implements AnnotationVisitor
 {

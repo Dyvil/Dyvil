@@ -2,7 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.expression.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 import static dyvil.tools.compiler.ast.expression.IValue.*;
 

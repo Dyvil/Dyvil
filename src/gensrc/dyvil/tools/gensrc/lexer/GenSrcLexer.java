@@ -1,7 +1,7 @@
 package dyvil.tools.gensrc.lexer;
 
 import dyvil.tools.gensrc.ast.Util;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;

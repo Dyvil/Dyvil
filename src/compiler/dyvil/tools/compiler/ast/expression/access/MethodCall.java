@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 

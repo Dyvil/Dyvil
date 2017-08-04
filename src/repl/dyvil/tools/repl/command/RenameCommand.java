@@ -2,7 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.lang.I18n;
 

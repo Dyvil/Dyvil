@@ -4,7 +4,6 @@ import dyvil.collection.Map
 import dyvil.tools.dpf.converter.DyvilValueVisitor
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tools.parsing.Name
 
 class FlatMapConverter
 (

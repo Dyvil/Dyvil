@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 
 public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IDataMemberConsumer<F>

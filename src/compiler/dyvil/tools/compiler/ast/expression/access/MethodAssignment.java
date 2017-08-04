@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 
 public class MethodAssignment extends MethodCall

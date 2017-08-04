@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;

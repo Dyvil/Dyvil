@@ -1,6 +1,6 @@
 package dyvil.tools.parsing.lexer;
 
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.*;

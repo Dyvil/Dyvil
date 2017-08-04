@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IOperatorMap
 {

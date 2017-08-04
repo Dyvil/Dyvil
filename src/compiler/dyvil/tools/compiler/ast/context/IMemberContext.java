@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IMemberContext extends IImplicitContext
 {

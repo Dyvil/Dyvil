@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IContext extends IMemberContext, IImportContext
 {

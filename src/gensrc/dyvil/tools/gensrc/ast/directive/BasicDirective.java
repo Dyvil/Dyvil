@@ -3,7 +3,7 @@ package dyvil.tools.gensrc.ast.directive;
 import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.expression.ExpressionList;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public abstract class BasicDirective implements Directive
 {

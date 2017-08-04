@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 import java.util.Comparator;
 

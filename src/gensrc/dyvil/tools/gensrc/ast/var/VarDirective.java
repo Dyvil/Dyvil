@@ -4,7 +4,7 @@ import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.directive.Directive;
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public abstract class VarDirective implements Directive
 {

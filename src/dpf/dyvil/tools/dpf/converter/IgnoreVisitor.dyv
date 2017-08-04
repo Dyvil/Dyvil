@@ -1,7 +1,6 @@
 package dyvil.tools.dpf.converter
 
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.Name
 
 final object IgnoreVisitor
 	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor

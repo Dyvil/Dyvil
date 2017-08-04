@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package

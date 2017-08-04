@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class Intrinsics
 {

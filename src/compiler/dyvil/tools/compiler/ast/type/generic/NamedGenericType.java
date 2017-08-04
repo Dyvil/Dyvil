@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
 import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;

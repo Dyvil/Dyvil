@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
 {

@@ -1,7 +1,6 @@
 package dyvil.tools.dpf.ast
 
 import dyvil.tools.dpf.visitor.NodeVisitor
-import dyvil.tools.parsing.Name
 import dyvil.source.position.SourcePosition
 import dyvil.tools.parsing.ASTNode
 

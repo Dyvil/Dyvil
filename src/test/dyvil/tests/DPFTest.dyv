@@ -6,7 +6,6 @@ using dyvil.Test
 
 import dyvil.collection.mutable.TreeMap
 
-import dyvil.tools.parsing.Name
 import dyvil.tools.dpf.ast._
 import dyvil.tools.dpf.ast.value.Value
 import dyvil.tools.dpf.model._

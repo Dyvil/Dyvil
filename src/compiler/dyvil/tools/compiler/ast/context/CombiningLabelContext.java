@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.context;
 
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class CombiningLabelContext implements ILabelContext
 {

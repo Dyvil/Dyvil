@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement.control;
 
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class Label
 {

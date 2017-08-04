@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.member;
 
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface INamed
 {

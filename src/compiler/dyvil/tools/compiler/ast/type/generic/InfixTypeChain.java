@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.type.compound.IntersectionType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;

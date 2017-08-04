@@ -28,7 +28,7 @@ import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;

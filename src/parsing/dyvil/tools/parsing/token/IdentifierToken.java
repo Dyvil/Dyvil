@@ -1,7 +1,7 @@
 package dyvil.tools.parsing.token;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class IdentifierToken implements IToken
 {

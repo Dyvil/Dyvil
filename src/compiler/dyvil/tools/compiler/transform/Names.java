@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.transform;
 
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public final class Names
 {

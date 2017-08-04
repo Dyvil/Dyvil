@@ -27,7 +27,7 @@ import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.name.Qualifier;
+import dyvil.util.Qualifier;
 import dyvil.tools.parsing.source.LineSource;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;

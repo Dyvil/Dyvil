@@ -1,9 +1,8 @@
-package dyvil.tools.parsing;
+package dyvil.lang;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
-import dyvil.lang.LiteralConvertible;
-import dyvil.tools.parsing.name.Qualifier;
+import dyvil.util.Qualifier;
 
 import java.io.DataInput;
 import java.io.DataOutput;

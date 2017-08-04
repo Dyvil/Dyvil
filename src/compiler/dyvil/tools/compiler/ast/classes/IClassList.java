@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public interface IClassList extends IClassConsumer
 {

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class SideEffectHelper
 {

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.parsing.Name;
+import dyvil.lang.Name;
 
 public class AnnotationReader implements AnnotationVisitor
 {
