@@ -5,7 +5,11 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
 import dyvil.runtime.TypeConverter;
-import dyvil.tools.asm.*;
+import dyvilx.tools.asm.ClassWriter;
+import dyvilx.tools.asm.FieldVisitor;
+import dyvilx.tools.asm.MethodVisitor;
+import dyvilx.tools.asm.Type;
+import dyvilx.tools.asm.ASMConstants;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Constructor;

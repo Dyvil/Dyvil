@@ -6,7 +6,7 @@ import dyvil.collection.Map
 import dyvil.collection.mutable.ArrayList
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tools.parsing.ASTNode
+import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
 public class Node(

@@ -2,7 +2,7 @@ package dyvil.tools.dpf.ast
 
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.source.position.SourcePosition
-import dyvil.tools.parsing.ASTNode
+import dyvilx.tools.parsing.ASTNode
 
 interface NodeElement extends ASTNode, dyvil.tools.dpf.model.NodeElement
 {

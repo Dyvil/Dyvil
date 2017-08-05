@@ -1,7 +1,7 @@
 package dyvil.tools.dpf.ast
 
 import dyvil.collection.Map
-import dyvil.tools.{ dpf.visitor.NodeVisitor, parsing.Name }
+import dyvil.tools.dpf.visitor.NodeVisitor
 
 public class RootNode extends Node
 {
@@ -9,7 +9,7 @@ public class RootNode extends Node
 
 	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor)
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> RootNode
+	override func expand(mappings: [String: Object], mutate: boolean) -> RootNode
 	{
 		if (mutate)
 		{

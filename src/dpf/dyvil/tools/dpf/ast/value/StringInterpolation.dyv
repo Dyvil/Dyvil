@@ -7,8 +7,8 @@ import dyvil.tools.dpf.model.Expandable;
 import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.ASTNode;
-import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.ASTNode;
+import dyvilx.tools.parsing.lexer.LexerUtil;
 
 public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {

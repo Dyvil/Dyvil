@@ -21,9 +21,9 @@ class Constants
 
 	public static final String devStage = 'delta'
 
-	public static final String replMainClass = 'dyvil.tools.repl.Main'
-	public static final String compilerMainClass = 'dyvil.tools.compiler.Main'
-	public static final String genSrcMainClass = 'dyvil.tools.gensrc.Main'
+	public static final String replMainClass = 'dyvilx.tools.repl.Main'
+	public static final String compilerMainClass = 'dyvilx.tools.compiler.Main'
+	public static final String genSrcMainClass = 'dyvilx.tools.gensrc.Main'
 
 	public static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 	public static final List<String> javaFilters = [ '**/*.java' ]
@@ -63,14 +63,14 @@ sourceSets {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
-			srcDir 'src/parsing'
+			srcDir 'src/tools'
 
 			srcDir "$buildDir/gensrc/library"
 		}
 
 		resources {
 			srcDir 'src/library'
-			srcDir 'src/parsing'
+			srcDir 'src/tools'
 
 			include resourceFilters
 		}
@@ -197,7 +197,7 @@ compileLibraryJava.source = "$buildDir/src/java/library"
 
 task copyLibraryDyvil(type: Sync, dependsOn: 'genLibrary') {
 	from 'src/library'
-	from 'src/parsing'
+	from 'src/tools'
 	from "$buildDir/gensrc/library"
 	into "$buildDir/src/dyvil/library"
 

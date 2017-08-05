@@ -3,7 +3,7 @@ package dyvil.tools.dpf.ast
 import dyvil.tools.dpf.visitor.{ NodeVisitor, ValueVisitor }
 import dyvil.tools.dpf.model.Expandable
 import dyvil.source.position.SourcePosition
-import dyvil.tools.parsing.{ Name, ASTNode }
+import dyvilx.tools.parsing.ASTNode
 
 public class NodeAccess
 (

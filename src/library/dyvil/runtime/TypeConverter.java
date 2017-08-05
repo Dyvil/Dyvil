@@ -2,8 +2,8 @@ package dyvil.runtime;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Type;
+import dyvilx.tools.asm.MethodVisitor;
+import dyvilx.tools.asm.Type;
 
 import java.lang.invoke.MethodHandleInfo;
 

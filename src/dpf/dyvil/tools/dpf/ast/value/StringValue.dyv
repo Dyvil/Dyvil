@@ -1,8 +1,8 @@
 package dyvil.tools.dpf.ast.value;
 
 import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.ASTNode;
-import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.ASTNode;
+import dyvilx.tools.parsing.lexer.LexerUtil;
 
 case class StringValue(protected let value: String) implements Constant
 {
