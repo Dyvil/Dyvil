@@ -1,0 +1,10 @@
+package dyvilx.tools.parsing
+
+import dyvil.source.position.Positioned
+
+interface ASTNode extends Formattable, Positioned
+{
+	override func toString(buffer: StringBuilder) -> void = this.toString("", buffer)
+
+	func toString(indent: String, buffer: StringBuilder) -> void
+}

@@ -45,7 +45,7 @@ public abstract class Ints
 	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
 	infix func *(lhs: int, rhs: int) -> int = lhs * rhs
 
-	infix func **(lhs: int, rhs: int) -> long = dyvil.math.PowImpl.pow(lhs, rhs)
+	infix func **(lhs: int, rhs: int) -> int = dyvil.math.PowImpl.pow(lhs, rhs) as int
 
 	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
 	infix func /(lhs: int, rhs: int) -> float = lhs / rhs

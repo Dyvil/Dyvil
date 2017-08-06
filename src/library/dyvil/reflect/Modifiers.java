@@ -255,7 +255,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY | ENUM // denotable
+	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY | ENUM | IMPLICIT // denotable
 		                      | TRANSIENT | VOLATILE;
 
 	/**
@@ -266,20 +266,21 @@ public interface Modifiers
 			| NATIVE | STRICT | BRIDGE | ACC_VARARGS;
 
 	/**
+	 * The modifiers that can be applied to variables and method parameters.
+	 */
+	int VARIABLE_MODIFIERS = FINAL | IMPLICIT;
+
+	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
+	int PARAMETER_MODIFIERS = VARIABLE_MODIFIERS | EXPLICIT // denotable
 		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | ACC_VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
 	 */
-	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | DEFAULT;
-
-	/**
-	 * The modifiers that cna be applied to variables.
-	 */
-	int VARIABLE_MODIFIERS = FINAL;
+	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | IMPLICIT | EXPLICIT // denotable
+	                                | DEFAULT;
 
 	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
 

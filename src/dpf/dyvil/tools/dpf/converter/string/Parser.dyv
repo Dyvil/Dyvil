@@ -3,16 +3,16 @@ package dyvil.tools.dpf.converter.string
 import dyvil.io.FileUtils
 import dyvil.tools.dpf.ast.RootNode
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.marker.BaseMarkers
-import dyvil.tools.parsing.{ TokenIterator, TokenList }
-import dyvil.tools.parsing.lexer.BaseSymbols
-import dyvil.tools.parsing.lexer.DyvilLexer
-import dyvil.tools.parsing.lexer.Tokens
-import dyvil.tools.parsing.marker.MarkerList
-import dyvil.tools.parsing.marker.SyntaxError
-import dyvil.tools.parsing.token.IToken
+import dyvilx.tools.parsing.marker.BaseMarkers
+import dyvilx.tools.parsing.{ TokenIterator, TokenList }
+import dyvilx.tools.parsing.lexer.BaseSymbols
+import dyvilx.tools.parsing.lexer.DyvilLexer
+import dyvilx.tools.parsing.lexer.Tokens
+import dyvilx.tools.parsing.marker.MarkerList
+import dyvilx.tools.parsing.marker.SyntaxError
+import dyvilx.tools.parsing.token.IToken
 
-using dyvil.tools.parsing.token.IToken.`type` as ttype
+using dyvilx.tools.parsing.token.IToken.`type` as ttype
 
 import java.io.File
 

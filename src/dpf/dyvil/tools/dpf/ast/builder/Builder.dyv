@@ -4,9 +4,8 @@ import dyvil.tools.{
 	dpf.model.Expandable
 	dpf.ast.{ Node, value.Value }
 	dpf.visitor.{ BuilderVisitor, NodeVisitor, ValueVisitor }
-
-	parsing.{ Name, ASTNode }
 }
+import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
 public class Builder

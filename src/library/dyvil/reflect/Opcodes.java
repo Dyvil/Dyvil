@@ -2,8 +2,8 @@ package dyvil.reflect;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.internal.NonNull;
-import dyvil.tools.asm.Label;
-import dyvil.tools.asm.util.Printer;
+import dyvilx.tools.asm.Label;
+import dyvilx.tools.asm.util.Printer;
 
 /**
  * The <b>Opcodes</b> interface declares all opcodes that can be used in <i>Dyvil</i> Bytecode Expressions.

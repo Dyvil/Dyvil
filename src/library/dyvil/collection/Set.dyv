@@ -1,0 +1,196 @@
+package dyvil.collection
+
+import java.util.{ Iterator, Spliterator, Spliterators, Arrays, Comparator }
+import java.util.function.{ Function, Predicate }
+
+@LiteralConvertible.FromArray
+interface Set<type E> extends Collection<E>
+{
+	static func empty<type E>() -> ImmutableSet<E> = ImmutableSet<E>()
+
+	static func apply<type E>() -> MutableSet<E> = MutableSet<E>()
+
+	static func apply<type E>(element: E) -> ImmutableSet<E> = ImmutableSet(element)
+
+	@SafeVarargs
+	static func apply<type E>(elements: E...) -> ImmutableSet<E> = ImmutableSet(elements...)
+
+	@BytecodeName("from")
+	static func apply<type E>(explicit from array: [E]) -> ImmutableSet<E> = ImmutableSet.from(array)
+
+	@BytecodeName("from")
+	static func apply<type E>(explicit from iterable: Iterable<+E>) -> ImmutableSet<E> = ImmutableSet.from(iterable)
+
+	@BytecodeName("from")
+	static func apply<type E>(explicit from collection: Collection<+E>) -> ImmutableSet<E> = ImmutableSet.from(collection)
+
+	// Accessors
+
+	override func size() -> int
+
+	override func isDistinct() -> boolean = true
+
+	override func iterator() -> Iterator<E>
+
+	override func spliterator() -> Spliterator<E> = Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT)
+
+	override func added(element: E) -> Set<E>
+
+	override func removed(element: Object!) -> Set<E>
+
+	override func union(collection: Collection<+E>) -> Set<E>
+
+	override func difference(collection: Collection<_>) -> Set<E>
+
+	override func intersection(collection: Collection<+E>) -> Set<E>
+
+	/**
+	 * Returns a collection that contains all elements that are present in either this or the given {@code collection},
+	 * but not in both. This operator represents the 'symmetric difference' Set operation.
+	 *
+	 * @param collection
+	 * 	the collection
+	 *
+	 * @return a collection that contains all elements that are present in either this or the given collection, but not
+	 * in both.
+	 */
+	func symmetricDifference(collection: Collection<+E>) -> Set<E>
+
+	override func mapped<type R>(mapper: Function<-E, +R>) -> Set<R>
+
+	override func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Set<R>
+
+	override func filtered(predicate: Predicate<-E>) -> Set<E>
+
+	// Mutating Operations
+
+	override func clear() -> void
+
+	override func add(element: E) -> boolean
+
+	override func remove(element: Object!) -> boolean
+
+	func unionInplace(collection: Collection<+E>) -> boolean = this.addAll(collection)
+
+	/**
+	 * Changed the contents of this set to the symmetric difference of this set and the given `collection`.
+	 * After this operation, this set will contain all items that were previously present in either collection, but no
+	 * elements that were present in both. The implementation first computes the union and stores in in a separate set,
+	 * then adds all elements of the collection to this set, and lastly removes all elements of the union.
+	 *
+	 * @param collection the collection to XOR with
+	 * @return `true`, iff this operation changed the elements of this set
+	 */
+	func symmetricDifferenceInplace(collection: Collection<+E>) -> boolean
+	{
+		let union = this.union(collection)
+		return this.addAll(collection) | this.removeAll(union)
+	}
+
+	override func map(mapper: Function<-E, +E>) -> void
+
+	override func flatMap(mapper: Function<-E, +Iterable<+E>>) -> void
+
+	override func copy() -> Set<E>
+
+	override func emptyCopy<type RE>() -> MutableSet<RE>
+
+	override func emptyCopy<type RE>(capacity: int) -> MutableSet<RE>
+
+	override func mutable() -> MutableSet<E>
+
+	override func mutableCopy() -> MutableSet<E>
+
+	override func immutable() -> ImmutableSet<E>
+
+	override func immutableCopy() -> ImmutableSet<E>
+
+	override func immutableBuilder<type RE>() -> ImmutableSet.Builder<RE>
+
+	override func immutableBuilder<type RE>(capacity: int) -> ImmutableSet.Builder<RE>
+
+	override func view() -> ImmutableSet<E>
+
+	override func toJava() -> java.util.Set<E>
+
+	// Utility Methods
+
+	static func setEquals(set: Set<_>, o: any!) -> boolean = o is Set && setEquals(set, o as Set)
+
+	static func setEquals(set1: Set<_>, set2: Set<_>) -> boolean = Collection.unorderedEquals(set1, set2)
+
+	static func setHashCode(set: Set<_>) -> int = Collection.unorderedHashCode(set)
+
+	static func distinct(array: [Object!], size: int) -> int
+	{
+		if (size < 2) return size
+
+		for (var i = 0; i < size; i++)
+		{
+			for (var j = i + 1; j < size; j++)
+			{
+				if (array[i] == array[j])
+				{
+					array[j--] = array[--size]
+				}
+			}
+		}
+
+		return size
+	}
+
+	static func sortDistinct(array: [Object!], size: int) -> int
+	{
+		if (size < 2) return size
+		Arrays.sort(array, 0, size)
+		return distinctSorted(array, size)
+	}
+
+	static func sortDistinct<type T>(array: [T], size: int, comparator: Comparator<-T>) -> int
+	{
+		if (size < 2) return size
+		Arrays.sort(array, 0, size, comparator)
+		return distinctSorted(array, size)
+	}
+
+	static func distinctSorted(array: [Object!], size: int) -> int
+	{
+		if (size < 2) return size
+
+		var len = 0
+		var i = 1
+
+		while (i < size)
+		{
+			if (array[i] == array[len])
+			{
+				i++
+			}
+			else
+			{
+				array[++len] = array[i++]
+			}
+		}
+
+		return len + 1
+	}
+
+	static func isDistinct(array: [Object!], size: int) -> boolean
+	{
+		if (size < 2) return true
+
+		for (i <- 0 ..< size)
+		{
+			let o = array[i]
+			for (j <- 0 ..< i) if (o == array[j]) return false
+		}
+		return true
+	}
+
+	static func isDistinctSorted(array: [Object!], size: int) -> boolean
+	{
+		if (size < 2) return true
+		for (i <- 1 ..< size) if (array[i - 1] == array[i]) return false
+		return true
+	}
+}

@@ -1,7 +1,6 @@
 package dyvil.tools.dpf.converter.binary
 
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.Name
 
 import java.io.DataOutput
 import java.io.IOException

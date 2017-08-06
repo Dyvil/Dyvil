@@ -31,10 +31,11 @@ public final class PowImpl
 				return 1 - 2 * (exponent & 1);
 			}
 
-			return 0;
+			// this will overflow anyway, but we at least want the "correct" overflow value
+			return pow_rec(base, exponent);
 		}
 
-		int result = 1;
+		long result = 1;
 		switch (HIGHEST_SET_BIT[exponent])
 		{
 		case 6:
@@ -103,20 +104,15 @@ public final class PowImpl
 		}
 
 		// Use recursive pow definition, with time complexity O(log n)
-		if ((exponent & 1) == 0) // the exponent is even
-		{
-			return pow_rec(base * base, exponent / 2);
-		}
-		else
-		{
-			return base * pow_rec(base * base, exponent / 2);
-		}
+		return ((exponent & 1) == 0 ? 1 : base) * pow_rec(base * base, exponent >> 1);
 	}
+
+	// Implementation note:
+	// Both BigDecimal pow algorithms calculate base^(A+B) as base^A * base^B,
+	// where A is the integer part of the exponent, and B is the decimal part.
 
 	public static BigDecimal pow(@NonNull BigDecimal base, double exponent)
 	{
-		// Performs X^(A+B)=X^A*X^B (B = remainder)
-
 		final boolean negativeExponent;
 
 		if (exponent < 0)
@@ -131,6 +127,7 @@ public final class PowImpl
 		}
 
 		final double exponentRemainder = exponent % 1;
+		// approximate as int
 		final int exponentInt = (int) (exponent - exponentRemainder);
 
 		final BigDecimal intPow = base.pow(exponentInt);
@@ -140,15 +137,13 @@ public final class PowImpl
 		// Fix negative power
 		if (negativeExponent)
 		{
-			return BigDecimal.ONE.divide(result, RoundingMode.HALF_UP);
+			return BigDecimal.ONE.divide(result, RoundingMode.HALF_EVEN);
 		}
 		return result;
 	}
 
 	public static BigDecimal pow(@NonNull BigDecimal base, @NonNull BigDecimal exponent)
 	{
-		// Performs X^(A+B)=X^A*X^B (B = remainder)
-
 		final int exponentSign = exponent.signum();
 		if (exponentSign < 0)
 		{
@@ -165,7 +160,7 @@ public final class PowImpl
 		// Fix negative power
 		if (exponentSign < 0)
 		{
-			return BigDecimal.ONE.divide(result, RoundingMode.HALF_UP);
+			return BigDecimal.ONE.divide(result, RoundingMode.HALF_EVEN);
 		}
 		return result;
 	}

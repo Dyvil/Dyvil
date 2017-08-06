@@ -6,13 +6,22 @@ public class ArrayPatternTest
 		let arr = [ 1, 2, 3, 4, 5 ]
 
 		arr match {
-			case [                   ] => false
-			case [ 1, 2, 3           ] => false
-			case [          ...      ] => true
-			case [ 1, 2, 3, ...      ] => true
-			case [ ...,      3, 4, 5 ] => true
-			case [ 1,    ...     , 5 ] => true
-			case [ 1, ..., 2, ..., 5 ] => true
+			case [ ] => false // empty
+			case [ 1, 2, 3 ] => false // exact
+			case [ ... ] => true // any array
+			case [ 1, 2, 3, ... ] => true // starts with
+			case [ ..., 3, 4, 5 ] => true // ends with
+			case [ 1, ..., 5 ] => true // starts with 1 and ends with 5
+			case [ 1, ..., 2, ..., 5 ] => true // starts with 1, contains 2, and ends with 5
+
+			case [ var head, var tail... ] => true // capture the head and the tail
+			case [ var first..., var last] => true // capture the first elements and the last element
+			case [ var first, var middle..., var last ] => true
+			case [ var all... ] => true // captures all
+			case [ var first..., var last... ] => false // invalid - ambiguous
+			case [ 1, var middle..., 2] => true
+			case [ 1, ..., var middle, ..., 2] => false // invalid
+			case [ 1, var middle, 2] => false // valid, matches 3-element array
 		}
 	}
 }

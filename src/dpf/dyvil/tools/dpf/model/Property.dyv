@@ -1,6 +1,5 @@
 package dyvil.tools.dpf.model
 
-import dyvil.tools.parsing.Name
 import dyvil.tools.dpf.model.value.Value
 
 public interface Property extends NodeElement

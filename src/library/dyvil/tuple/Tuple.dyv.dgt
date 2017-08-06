@@ -1,3 +1,6 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
 package dyvil.tuple
 
 abstract class Tuple
@@ -19,18 +22,19 @@ abstract class Tuple
 		}
 	}
 
-	static case class Of1<type +T1>(public let _1: T1)
+	static case class Of1
+		<type +T1>
+		(public let _1: T1)
 	{
 		func unapply() -> Of1<T1> = this
 
 		override func toString() -> String = "Tuple(\(this._1))"
 	}
 
-	static case class Of2<type +T1, type +T2>
-	(
-		public let _1: T1
-		public let _2: T2
-	) implements Entry<T1, T2>
+	static case class Of2
+		<type +T1, type +T2>
+		(public let _1: T1, public let _2: T2)
+		implements Entry<T1, T2>
 	{
 		func unapply() -> (T1, T2) = this
 
@@ -45,12 +49,10 @@ abstract class Tuple
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
 
-	static case class Of3<type +T1, type +T2, type +T3>
-	(
-		public let _1: T1
-		public let _2: T2
-		public let _3: T3
-	) implements Cell<T1, T2, T3>
+	static case class Of3
+		<type +T1, type +T2, type +T3>
+		(public let _1: T1, public let _2: T2, public let _3: T3)
+		implements Cell<T1, T2, T3>
 	{
 		func unapply() -> (T1, T2, T3) = this
 
@@ -67,19 +69,19 @@ abstract class Tuple
 		override func hashCode() -> int = Cell.cellHashCode(this)
 	}
 
+	// --- Auto-generated classes ---
 	#import("Base.dgs")
 	#for (ARITY <- 4 .. MAX_ARITY) {
-		@Immutable
-		static case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
-		(
-			public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)}
 
-		)
+		@Immutable
+		static case class Of#(ARITY)
+
+			<type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
+			(public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)})
 		{
 			func unapply() -> (T1#for (INDEX <- 2 .. ARITY) {, T#(INDEX)}) = this
 
 			override func toString() -> String = "(\(this._1)#for (INDEX <- 2 .. ARITY) {, \(this._#(INDEX))})"
 		}
-
 	}
 }

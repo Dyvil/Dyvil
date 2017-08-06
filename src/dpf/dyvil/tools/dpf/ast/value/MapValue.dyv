@@ -3,7 +3,7 @@ package dyvil.tools.dpf.ast.value
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.{ MapVisitor, ValueVisitor }
-import dyvil.tools.parsing.ASTNode
+import dyvilx.tools.parsing.ASTNode
 
 import java.util.function.BiFunction
 

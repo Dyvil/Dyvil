@@ -12,7 +12,7 @@ final class Objects
 	static func cast<T>(value: any) -> T = value as T
 
 	@Intrinsic([ LOAD_0 ])
-	static func convert<T>(value: T) -> T= value
+	static func convert<T>(value: T) -> T = value
 
 	// Useful globals
 
@@ -23,6 +23,9 @@ final class Objects
 	infix inline func use<T>(self: T, f: T.() -> void) -> T { f self; self }
 
 	static inline func with<T, R>(receiver: T, f: T -> R) -> R = f(receiver)
+
+	@Intrinsic([ LOAD_0 ])
+	static func implicitly<type T>(implicit value: T) -> T = value
 
 	// Errors and Stubs
 

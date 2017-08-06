@@ -5,7 +5,6 @@ import dyvil.collection.Map
 import dyvil.collection.mutable.ArrayList
 import dyvil.collection.mutable.HashMap
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.Name
 
 /**
  * An abstract {@link ValueVisitor} that converts nodes to Dyvil and Java objects / wrappers according to the following

@@ -2,7 +2,7 @@ package dyvil.tests
 
 using dyvil.Test
 
-import func dyvil.tools.parsing.name.Qualifier.unqualify
+import func dyvil.util.Qualifier.unqualify
 
 public class SymbolTest
 {
