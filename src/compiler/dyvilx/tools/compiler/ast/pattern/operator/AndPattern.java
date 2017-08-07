@@ -1,13 +1,13 @@
 package dyvilx.tools.compiler.ast.pattern.operator;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
 
 public class AndPattern extends BinaryPattern implements IPattern
 {
@@ -63,30 +63,6 @@ public class AndPattern extends BinaryPattern implements IPattern
 	public int subPatterns()
 	{
 		return -1;
-	}
-
-	@Override
-	public boolean switchCheck()
-	{
-		return false;
-	}
-
-	@Override
-	public int switchValue()
-	{
-		return 0;
-	}
-
-	@Override
-	public int minValue()
-	{
-		return 0;
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return 0;
 	}
 
 	@Override

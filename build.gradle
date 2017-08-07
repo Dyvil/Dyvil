@@ -265,6 +265,8 @@ task copyTestDyvil(type: Sync) {
 
 // ---------------------------------------- Compilation Tasks ----------------------------------------
 
+idea.module.inheritOutputDirs = true
+
 tasks.withType(JavaCompile) {
 	it.options.compilerArgs.addAll(
 			'-parameters',          // generates parameter attributes and names
