@@ -14,25 +14,3 @@ ARRAY_LOAD_INSN=BALOAD
 ARRAY_STORE_INSN=BASTORE
 
 FROM_LITERAL=FromBoolean
-
-MAPPER=Predicate<Boolean>
-MAPPER_APPLY=test
-
-FLAT_MAPPER=Function<Boolean, boolean[]>
-FLAT_MAPPER_APPLY=apply
-
-TO_MAPPER=Function<Boolean,
-TO_MAPPER_END=>
-TO_MAPPER_APPLY=apply
-
-PREDICATE=Predicate<Boolean>
-PREDICATE_TEST=test
-
-SUPPLIER=Supplier<Boolean>
-SUPPLIER_GET=get
-
-INDEXED_SUPPLIER=IntFunction<Boolean>
-INDEXED_SUPPLIER_APPLY=apply
-
-CONSUMER=Consumer<Boolean>
-CONSUMER_ACCEPT=accept
