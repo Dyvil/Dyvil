@@ -116,12 +116,13 @@ public class CodeMethod extends AbstractMethod
 
 		context = context.push(this);
 
-		super.resolveTypes(markers, context);
-
 		if (this.typeParameters != null)
 		{
 			this.typeParameters.resolveTypes(markers, context);
 		}
+
+		// Return type has to be resolved after type parameters
+		super.resolveTypes(markers, context);
 
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
