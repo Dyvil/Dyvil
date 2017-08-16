@@ -42,7 +42,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			pm.report(token, "while.while");
+			pm.report(token, "while.while_keyword");
 			// Fallthrough
 		case CONDITION:
 			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
@@ -56,10 +56,6 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				return;
 			case BaseSymbols.SEMICOLON:
 				pm.popParser(true);
-				return;
-			case BaseSymbols.COLON:
-				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
 

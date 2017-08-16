@@ -50,7 +50,7 @@ public class MatchExpressionParser extends Parser
 				return;
 			}
 
-			pm.report(token, "match.match");
+			pm.report(token, "match.match_keyword");
 			// Fallthrough
 		case EXPRESSION:
 			this.mode = EXPRESSION_END;

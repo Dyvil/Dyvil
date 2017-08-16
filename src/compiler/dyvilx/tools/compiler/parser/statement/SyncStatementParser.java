@@ -57,10 +57,6 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			case BaseSymbols.SEMICOLON:
 				pm.popParser(true);
 				return;
-			case BaseSymbols.COLON:
-				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
-				return;
 			}
 
 			this.mode = END;

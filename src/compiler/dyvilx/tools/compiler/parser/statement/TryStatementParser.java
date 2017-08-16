@@ -110,10 +110,6 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			case BaseSymbols.SEMICOLON:
 				this.mode = CATCH;
 				return;
-			case BaseSymbols.COLON:
-				this.mode = CATCH;
-				pm.pushParser(new ExpressionParser(this.catchBlock));
-				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.mode = CATCH;
 				pm.pushParser(new StatementListParser(this.catchBlock), true);

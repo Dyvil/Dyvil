@@ -73,7 +73,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			if (type != DyvilKeywords.FOR)
 			{
 				pm.reparse();
-				pm.report(token, "for.for");
+				pm.report(token, "for.for_keyword");
 			}
 			return;
 		case FOR_START:
@@ -201,10 +201,6 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 		case Tokens.EOF:
 			pm.popParser();
 			this.field.setValue(this.forStatement);
-			return;
-		case BaseSymbols.COLON:
-			this.mode = END;
-			pm.pushParser(new ExpressionParser(this));
 			return;
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			pm.pushParser(new StatementListParser(this), true);

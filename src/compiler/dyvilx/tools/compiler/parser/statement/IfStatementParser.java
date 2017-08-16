@@ -46,7 +46,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			pm.report(token, "if.if");
+			pm.report(token, "if.if_keyword");
 			// Fallthrough
 		case CONDITION:
 			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
@@ -60,10 +60,6 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				return;
 			case BaseSymbols.SEMICOLON:
 				pm.popParser(true);
-				return;
-			case BaseSymbols.COLON:
-				this.mode = ELSE;
-				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
 

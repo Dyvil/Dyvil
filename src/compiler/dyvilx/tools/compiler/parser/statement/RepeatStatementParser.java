@@ -35,7 +35,7 @@ public class RepeatStatementParser extends Parser implements IValueConsumer
 			if (type != DyvilKeywords.REPEAT)
 			{
 				pm.reparse();
-				pm.report(token, "repeat.repeat");
+				pm.report(token, "repeat.repeat_keyword");
 			}
 			return;
 		case ACTION:
