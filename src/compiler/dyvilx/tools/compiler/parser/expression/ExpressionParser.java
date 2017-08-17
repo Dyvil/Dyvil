@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.parser.expression;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
 import dyvilx.tools.compiler.ast.annotation.AnnotationValue;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
@@ -10,7 +12,6 @@ import dyvilx.tools.compiler.ast.expression.operator.InfixCallChain;
 import dyvilx.tools.compiler.ast.expression.operator.PostfixCall;
 import dyvilx.tools.compiler.ast.expression.operator.PrefixCall;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.statement.IfStatement;
 import dyvilx.tools.compiler.ast.statement.ReturnStatement;
 import dyvilx.tools.compiler.ast.statement.SyncStatement;
 import dyvilx.tools.compiler.ast.statement.control.BreakStatement;
@@ -31,11 +32,9 @@ import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.ParserUtil.*;
@@ -844,11 +843,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		case DyvilKeywords.IF:
 		{
 			// if ...
-
-			final IfStatement ifStatement = new IfStatement(token.raw());
-			this.value = ifStatement;
-
-			pm.pushParser(new IfStatementParser(ifStatement));
+			pm.pushParser(new IfStatementParser(this), true);
 			this.mode = END;
 			return true;
 		}

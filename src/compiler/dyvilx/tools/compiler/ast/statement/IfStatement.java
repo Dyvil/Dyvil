@@ -22,9 +22,6 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class IfStatement implements IValue
 {
-	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
-		"if.condition.type");
-
 	protected IValue condition;
 	protected IValue then;
 	protected IValue elseThen;
@@ -45,16 +42,40 @@ public class IfStatement implements IValue
 		this.elseThen = elseThen;
 	}
 
+	public IValue getCondition()
+	{
+		return this.condition;
+	}
+
+	public void setCondition(IValue condition)
+	{
+		this.condition = condition;
+	}
+
+	public IValue getThen()
+	{
+		return this.then;
+	}
+
+	public void setThen(IValue then)
+	{
+		this.then = then;
+	}
+
+	public IValue getElse()
+	{
+		return this.elseThen;
+	}
+
+	public void setElse(IValue elseThen)
+	{
+		this.elseThen = elseThen;
+	}
+
 	@Override
 	public int valueTag()
 	{
 		return IF;
-	}
-
-	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
 	}
 
 	@Override
@@ -64,40 +85,16 @@ public class IfStatement implements IValue
 	}
 
 	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
 	public boolean isUsableAsStatement()
 	{
 		return (this.then == null || this.then.isUsableAsStatement()) //
-			       && (this.elseThen == null || this.elseThen.isUsableAsStatement());
-	}
-
-	public void setCondition(IValue condition)
-	{
-		this.condition = condition;
-	}
-
-	public void setThen(IValue then)
-	{
-		this.then = then;
-	}
-
-	public void setElse(IValue elseThen)
-	{
-		this.elseThen = elseThen;
-	}
-
-	public IValue getCondition()
-	{
-		return this.condition;
-	}
-
-	public IValue getThen()
-	{
-		return this.then;
-	}
-
-	public IValue getElse()
-	{
-		return this.elseThen;
+		       && (this.elseThen == null || this.elseThen.isUsableAsStatement());
 	}
 
 	@Override
@@ -149,9 +146,9 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isVoid(type) // void is always valid
-			       || (this.then != null && this.elseThen != null // both branches are present and conforming
-				           && this.then.isType(type) && this.elseThen.isType(type));
+		// requires both branches to be present and conforming if the type is not void
+		return Types.isVoid(type) || this.then != null && this.elseThen != null && this.then.isType(type)
+		                             && this.elseThen.isType(type);
 	}
 
 	@Override
@@ -206,7 +203,7 @@ public class IfStatement implements IValue
 		{
 			this.condition = this.condition.resolve(markers, context);
 			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
-			                                          CONDITION_MARKER_SUPPLIER);
+			                                          TypeChecker.markerSupplier("if.condition.type"));
 		}
 		if (this.then != null)
 		{
