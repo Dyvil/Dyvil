@@ -1,8 +1,18 @@
 package dyvilx.tools.compiler.parser.statement;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.field.Variable;
+import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.IfStatement;
+import dyvilx.tools.compiler.ast.statement.VariableStatement;
+import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.transform.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
@@ -13,15 +23,17 @@ import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
-public class IfStatementParser extends Parser implements IValueConsumer
+public class IfStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
 {
-	protected static final int IF        = 0;
-	protected static final int CONDITION = 1;
-	protected static final int THEN      = 2;
-	protected static final int ELSE      = 3;
+	protected static final int IF             = 0;
+	protected static final int VARIABLE_VALUE = 1;
+	protected static final int THEN           = 2;
+	protected static final int ELSE           = 3;
 
 	protected final IValueConsumer consumer;
+
 	protected IfStatement statement;
+	private   IVariable   variable;
 
 	public IfStatementParser(IValueConsumer consumer)
 	{
@@ -41,12 +53,34 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				pm.report(token, "if.if_keyword");
 				return;
 			}
-			this.mode = CONDITION;
+
 			this.statement = new IfStatement(token.raw());
-			return;
-		case CONDITION:
-			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
+			if (token.next().type() == DyvilKeywords.LET)
+			{
+				// if let ...
+				this.mode = VARIABLE_VALUE;
+				pm.pushParser(new DataMemberParser<>(this));
+				return;
+			}
+
 			this.mode = THEN;
+			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT));
+			return;
+		case VARIABLE_VALUE:
+			this.mode = THEN;
+			if (this.variable != null)
+			{
+				this.statement.setCondition(new VariableStatement(this.variable));
+			}
+
+			if (type != BaseSymbols.EQUALS)
+			{
+				pm.report(token, "if.binding.assignment");
+				pm.reparse();
+				return;
+			}
+
+			pm.pushParser(new ExpressionParser(this.variable).withFlags(IGNORE_STATEMENT));
 			return;
 		case THEN:
 			switch (type)
@@ -95,5 +129,18 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		case END:
 			this.statement.setElse(value);
 		}
+	}
+
+	@Override
+	public void addDataMember(IVariable dataMember)
+	{
+		this.variable = dataMember;
+	}
+
+	@Override
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
+	{
+		return new Variable(position, name, type, modifiers, annotations);
 	}
 }
