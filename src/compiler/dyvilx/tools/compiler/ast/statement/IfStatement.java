@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.statement;
 import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
@@ -130,7 +131,7 @@ public class IfStatement implements IValue
 
 		if (this.then != null)
 		{
-			this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, context,
+			this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, this.thenContext(context),
 			                                     TypeChecker.markerSupplier("if.then.type"));
 		}
 
@@ -170,12 +171,10 @@ public class IfStatement implements IValue
 		{
 			this.condition.resolveTypes(markers, context);
 		}
-
 		if (this.then != null)
 		{
-			this.then.resolveTypes(markers, context);
+			this.then.resolveTypes(markers, this.thenContext(context));
 		}
-
 		if (this.elseThen != null)
 		{
 			this.elseThen.resolveTypes(markers, context);
@@ -189,7 +188,6 @@ public class IfStatement implements IValue
 		{
 			this.then.resolveStatement(context, markers);
 		}
-
 		if (this.elseThen != null)
 		{
 			this.elseThen.resolveStatement(context, markers);
@@ -202,18 +200,23 @@ public class IfStatement implements IValue
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
-			                                          TypeChecker.markerSupplier("if.condition.type"));
+			this.checkConditionType(markers, context);
 		}
 		if (this.then != null)
 		{
-			this.then = this.then.resolve(markers, context);
+			this.then = this.then.resolve(markers, this.thenContext(context));
 		}
 		if (this.elseThen != null)
 		{
 			this.elseThen = this.elseThen.resolve(markers, context);
 		}
 		return this;
+	}
+
+	protected void checkConditionType(MarkerList markers, IContext context)
+	{
+		this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+		                                          TypeChecker.markerSupplier("if.condition.type"));
 	}
 
 	@Override
@@ -225,7 +228,7 @@ public class IfStatement implements IValue
 		}
 		if (this.then != null)
 		{
-			this.then.checkTypes(markers, context);
+			this.then.checkTypes(markers, this.thenContext(context));
 		}
 		if (this.elseThen != null)
 		{
@@ -242,16 +245,26 @@ public class IfStatement implements IValue
 		}
 		else
 		{
-			markers.add(Markers.semantic(this.position, "if.condition.invalid"));
+			markers.add(Markers.semanticError(this.position, "if.condition.missing"));
 		}
+
 		if (this.then != null)
 		{
-			this.then.check(markers, context);
+			this.then.check(markers, this.thenContext(context));
 		}
+		else {
+			markers.add(Markers.semanticError(this.position, "if.then.missing"));
+		}
+
 		if (this.elseThen != null)
 		{
 			this.elseThen.check(markers, context);
 		}
+	}
+
+	protected IContext thenContext(IContext context)
+	{
+		return context;
 	}
 
 	@Override
@@ -330,9 +343,10 @@ public class IfStatement implements IValue
 		final dyvilx.tools.asm.Label elseStart = new dyvilx.tools.asm.Label();
 		final dyvilx.tools.asm.Label elseEnd = new dyvilx.tools.asm.Label();
 		final Object commonFrameType = type.getFrameType();
+		final int varCount = writer.localCount();
 
 		// Condition
-		this.condition.writeInvJump(writer, elseStart);
+		this.writeCondition(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer, type);
 
@@ -360,17 +374,12 @@ public class IfStatement implements IValue
 		}
 
 		writer.visitTargetLabel(elseEnd);
+		writer.resetLocals(varCount);
 	}
 
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		if (this.then == null)
-		{
-			this.condition.writeExpression(writer, Types.BOOLEAN);
-			writer.visitInsn(Opcodes.POP);
-			return;
-		}
-
+		final int varCount = writer.localCount();
 		final dyvilx.tools.asm.Label elseStart = new dyvilx.tools.asm.Label();
 
 		if (this.elseThen != null)
@@ -378,7 +387,7 @@ public class IfStatement implements IValue
 			final dyvilx.tools.asm.Label elseEnd = new dyvilx.tools.asm.Label();
 
 			// Condition
-			this.condition.writeInvJump(writer, elseStart);
+			this.writeCondition(writer, elseStart);
 			// If Block
 			this.then.writeExpression(writer, Types.VOID);
 
@@ -395,11 +404,18 @@ public class IfStatement implements IValue
 		else
 		{
 			// Condition
-			this.condition.writeInvJump(writer, elseStart);
+			this.writeCondition(writer, elseStart);
 			// If Block
 			this.then.writeExpression(writer, Types.VOID);
 			writer.visitTargetLabel(elseStart);
 		}
+
+		writer.resetLocals(varCount);
+	}
+
+	protected void writeCondition(MethodWriter writer, Label elseStart)
+	{
+		this.condition.writeInvJump(writer, elseStart);
 	}
 
 	@Override
@@ -409,37 +425,32 @@ public class IfStatement implements IValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(String indent, StringBuilder buffer)
 	{
 		buffer.append("if");
 
-		Formatting.appendSeparator(buffer, "if.open_paren", '(');
-		if (this.condition != null)
-		{
-			this.condition.toString(prefix, buffer);
-		}
-		Formatting.appendSeparator(buffer, "if.close_paren", ')');
+		this.headToString(indent, buffer);
 
-		if (this.then != null && !Util.formatStatementList(prefix, buffer, this.then))
+		if (this.then != null && !Util.formatStatementList(indent, buffer, this.then))
 		{
-			String actionPrefix = Formatting.getIndent("if.indent", prefix);
+			final String thenIndent = Formatting.getIndent("if.indent", indent);
 			if (Formatting.getBoolean("if.close_paren.newline_after"))
 			{
-				buffer.append('\n').append(actionPrefix);
+				buffer.append('\n').append(thenIndent);
 			}
 			else if (Formatting.getBoolean("if.close_paren.space_after"))
 			{
 				buffer.append(' ');
 			}
 
-			this.then.toString(actionPrefix, buffer);
+			this.then.toString(thenIndent, buffer);
 		}
 
 		if (this.elseThen != null)
 		{
 			if (Formatting.getBoolean("if.else.newline_before"))
 			{
-				buffer.append('\n').append(prefix);
+				buffer.append('\n').append(indent);
 			}
 			else if (Formatting.getBoolean("if.else.space_before"))
 			{
@@ -447,21 +458,31 @@ public class IfStatement implements IValue
 			}
 			buffer.append("else");
 
-			if (Util.formatStatementList(prefix, buffer, this.elseThen))
+			if (Util.formatStatementList(indent, buffer, this.elseThen))
 			{
 				return;
 			}
 
 			if (Formatting.getBoolean("if.else.newline_after"))
 			{
-				buffer.append('\n').append(prefix);
+				buffer.append('\n').append(indent);
 			}
 			else if (Formatting.getBoolean("if.else.space_after"))
 			{
 				buffer.append(' ');
 			}
 
-			this.elseThen.toString(prefix, buffer);
+			this.elseThen.toString(indent, buffer);
 		}
+	}
+
+	protected void headToString(String indent, StringBuilder buffer)
+	{
+		Formatting.appendSeparator(buffer, "if.open_paren", '(');
+		if (this.condition != null)
+		{
+			this.condition.toString(indent, buffer);
+		}
+		Formatting.appendClose(buffer, "if.close_paren", ')');
 	}
 }

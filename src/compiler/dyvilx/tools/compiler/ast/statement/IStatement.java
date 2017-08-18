@@ -47,7 +47,7 @@ public interface IStatement extends IValue
 	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.writeStatement(writer);
-		if (type != Types.VOID)
+		if (type != null && type != Types.VOID)
 		{
 			type.writeDefaultValue(writer);
 		}

@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
+import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
 import dyvilx.tools.compiler.ast.statement.IfStatement;
 import dyvilx.tools.compiler.ast.statement.VariableStatement;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -54,16 +55,17 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 				return;
 			}
 
-			this.statement = new IfStatement(token.raw());
 			if (token.next().type() == DyvilKeywords.LET)
 			{
 				// if let ...
 				this.mode = VARIABLE_VALUE;
+				this.statement = new BindingIfStatement(token.raw());
 				pm.pushParser(new DataMemberParser<>(this));
 				return;
 			}
 
 			this.mode = THEN;
+			this.statement = new IfStatement(token.raw());
 			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT));
 			return;
 		case VARIABLE_VALUE:
