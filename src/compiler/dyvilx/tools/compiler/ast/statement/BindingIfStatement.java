@@ -49,6 +49,14 @@ public class BindingIfStatement extends IfStatement implements IDefaultContext
 	@Override
 	protected void checkConditionType(MarkerList markers, IContext context)
 	{
+		final IType type = this.variable.getType();
+		if (type.getLoadOpcode() != Opcodes.ALOAD)
+		{
+			// TODO maybe remove this limitation
+			final Marker marker = Markers.semanticError(this.variable.getPosition(), "if.binding.primitive");
+			marker.addInfo(Markers.getSemantic("variable.type", type));
+			markers.add(marker);
+		}
 	}
 
 	@Override
