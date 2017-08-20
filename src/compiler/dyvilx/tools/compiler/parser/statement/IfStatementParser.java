@@ -97,8 +97,16 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		case ELSE:
-			if (type == DyvilKeywords.ELSE || token.isInferred() && token.next().type() == DyvilKeywords.ELSE)
+			if (type == DyvilKeywords.ELSE)
 			{
+				pm.pushParser(new ExpressionParser(this));
+				this.mode = END;
+				return;
+			}
+			if (token.isInferred() && token.next().type() == DyvilKeywords.ELSE)
+			{
+				// ... inferred_semicolon else
+				pm.skip();
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = END;
 				return;
