@@ -57,9 +57,9 @@ extends DPFValueVisitor implements Value, Expandable
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
-		if (this.value != null)
+		if let value = this.value
 		{
-			this.value!.toString(indent, buffer)
+			value.toString(indent, buffer)
 			buffer.append('.')
 		}
 		buffer.append(this.name)

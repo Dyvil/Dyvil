@@ -50,9 +50,9 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 		{
 			parameter.value.accept(builderVisitor.visitParameter(parameter.name))
 		}
-		if (this.node != null)
+		if let node = this.node
 		{
-			this.node!!.acceptBody(builderVisitor.visitNode())
+			node.acceptBody(builderVisitor.visitNode())
 		}
 		builderVisitor.visitEnd()
 	}
@@ -103,10 +103,10 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 			return
 		}
 		
-		if (this.node != null)
+		if let node = this.node
 		{
 			buffer.append(" {\n")
-			this.node!!.bodyToString(indent + '\t', buffer)
+			node.bodyToString(indent + '\t', buffer)
 			buffer.append(indent).append('}')
 		}
 	}
