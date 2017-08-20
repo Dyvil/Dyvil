@@ -18,14 +18,41 @@ public class ImplicitTest
 
 	static implicit func b2s(b: boolean) -> String = b.toString
 
-	static func apply() -> Test = test "Implicit Conversions" {
-		let s: String = 123
+	static func implicitS(implicit s: String = "default") -> String = s
 
-		test "Assignment" { s =?= "123" }
-		test "Method Call" { true.toUpperCase =?= "TRUE" }
+	static func implicitly<type T>(implicit value: T) -> T = value
 
-		// Type Check is enough
-		var debug: DebugPrintable = "abc"
-		debug = 123
+	static func apply() -> Test = test "Implicit" {
+		test "Conversions" {
+
+			let s: String = 123
+
+			test "Assignment" { s =?= "123" }
+			test "Method Call" { true.toUpperCase =?= "TRUE" }
+
+			// Type Check is enough
+			var debug: DebugPrintable = "abc"
+			debug = 123
+		}
+
+		test "Arguments" {
+			test "Default" {
+				implicitS =?= "default"
+				implicitS() =?= "default"
+			}
+
+			test "Provided" { implicitS("provided") =?= "provided" }
+
+			test "Implicit Let" {
+				implicit let s = "implicit let"
+				implicitS =?= s
+			}
+		}
+
+		test "Generic Arguments" {
+			implicit let s = "implicit"
+
+			implicitly<String>() =?= s
+		}
 	}
 }

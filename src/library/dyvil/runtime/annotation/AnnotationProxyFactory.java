@@ -3,7 +3,11 @@ package dyvil.runtime.annotation;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
-import dyvil.tools.asm.*;
+import dyvilx.tools.asm.ClassWriter;
+import dyvilx.tools.asm.FieldVisitor;
+import dyvilx.tools.asm.MethodVisitor;
+import dyvilx.tools.asm.Type;
+import dyvilx.tools.asm.ASMConstants;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
@@ -231,7 +235,7 @@ public final class AnnotationProxyFactory
 			                                     .visitMethod(PUBLIC, "annotationType", "()Ljava/lang/Class;", null,
 			                                                  null);
 		annotationType.visitCode();
-		annotationType.visitLdcInsn(dyvil.tools.asm.Type.getType(this.annotationType));
+		annotationType.visitLdcInsn(Type.getType(this.annotationType));
 		annotationType.visitInsn(Opcodes.ARETURN);
 		annotationType.visitMaxs(-1, -1);
 		annotationType.visitEnd();

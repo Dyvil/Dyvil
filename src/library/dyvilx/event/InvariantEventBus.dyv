@@ -36,12 +36,9 @@ public class InvariantEventBus implements EventBus
 
 		for (entry <- this.handlers)
 		{
-			let handler = entry.handler
-			let method = entry.getHandler(eventType)
-
-			if (method != null)
+			if let method = entry.getHandler(eventType)
 			{
-				this.invoke(method!!, handler, event)
+				this.invoke(method, entry.handler, event)
 			}
 		}
 	}

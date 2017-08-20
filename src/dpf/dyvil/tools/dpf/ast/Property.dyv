@@ -4,8 +4,7 @@ import dyvil.tools.dpf.ast.value.Value
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.model.Expandable
-import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ASTNode
+import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
 public class Property

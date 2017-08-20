@@ -18,9 +18,21 @@ public class ArrayTest
 			[[1]]  .nestedElementType =?= class int
 			[["a"]].nestedElementType =?= class String
 		}
+
+		test "Boxed" {
+			let array: [String] = [ 'a', 'b', 'c' ]
+			let obj: [Object] = boxed<Object>(array)
+			let nobj: [Object!] = genericTest(array)
+
+			obj =?= nobj
+		}
 	}
 
 	postfix func elementType <@Reified(Reified.Type.ANY_CLASS) T>(array: [T]) -> Class<T> = class T
 
 	postfix func nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>(array: [[T]]) -> Class<T> = class T
+
+	static func genericTest<type T: any!>(array: [T]) -> [Object!] = boxed<Object!>(array)
+
+	static func boxed<@Reified(.ANY_CLASS) type T: any!>(array: [T]) -> [T & Object!] = array
 }

@@ -42,11 +42,10 @@ class HanoiTest
 
 	func move(from: Tower, to: Tower) -> void
 	{
-		let item = from.pop()
-		if (item != null)
+		if let item = from.pop()
 		{
 			this.moves.add "Move \(item) from \(from.id) to \(to.id)"
-			to.push(item!!)
+			to.push(item)
 		}
 	}
 

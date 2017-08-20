@@ -1,7 +1,6 @@
 package dyvil.tools.dpf.converter.string
 
 import dyvil.tools.dpf.visitor._
-import dyvil.tools.parsing.Name
 
 public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, BuilderVisitor, StringInterpolationVisitor
 {

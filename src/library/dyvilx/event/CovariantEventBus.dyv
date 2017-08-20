@@ -14,19 +14,17 @@ class CovariantEventBus extends InvariantEventBus
 
 	private func invokeRecursively(entry: HandlerEntry, handler: Object!, event: Object, eventType: Class<_>) -> void
 	{
-		let handlerMethod = entry.getHandler(eventType)
-		if (handlerMethod != null)
+		if let handlerMethod = entry.getHandler(eventType)
 		{
 			this.invoke(handlerMethod!!, handler, event)
 		}
 
-		let superClass: Class<_>? = eventType.getSuperclass()
-		if (superClass != null)
+		if let superClass = eventType.getSuperclass()
 		{
 			this.invokeRecursively(entry, handler, event, superClass!!)
 		}
 
-		for (itf: Class<_>? <- eventType.getInterfaces())
+		for (itf <- eventType.getInterfaces())
 		{
 			this.invokeRecursively(entry, handler, event, itf!!)
 		}
