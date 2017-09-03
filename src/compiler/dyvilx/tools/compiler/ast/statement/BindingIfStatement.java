@@ -7,18 +7,17 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class BindingIfStatement extends IfStatement implements IDefaultContext
 {
 	private IVariable variable;
+	private IValue    nullable;
 
 	public BindingIfStatement(SourcePosition position)
 	{
@@ -35,7 +34,8 @@ public class BindingIfStatement extends IfStatement implements IDefaultContext
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.variable = ((VariableStatement) this.condition).variable;
-		this.variable.setValue(new OptionalUnwrapOperator(this.variable.getValue(), true));
+		this.nullable = this.variable.getValue();
+		this.variable.setValue(new OptionalUnwrapOperator(this.nullable, true));
 
 		super.resolveTypes(markers, context);
 	}
@@ -49,23 +49,29 @@ public class BindingIfStatement extends IfStatement implements IDefaultContext
 	@Override
 	protected void checkConditionType(MarkerList markers, IContext context)
 	{
-		final IType type = this.variable.getType();
-		if (type.getLoadOpcode() != Opcodes.ALOAD)
-		{
-			// TODO maybe remove this limitation
-			final Marker marker = Markers.semanticError(this.variable.getPosition(), "if.binding.primitive");
-			marker.addInfo(Markers.getSemantic("variable.type", type));
-			markers.add(marker);
-		}
 	}
 
 	@Override
 	protected void writeCondition(MethodWriter writer, Label elseStart)
 	{
-		this.condition.writeExpression(writer, null);
+		this.nullable.writeExpression(writer, null);
+		final int varIndex = writer.localCount();
 
-		writer.visitVarInsn(Opcodes.ALOAD, this.variable.getLocalIndex());
+		// first store the nullable value in the variable
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+
+		// branch if necessary
 		writer.visitJumpInsn(Opcodes.IFNULL, elseStart);
+
+		// load and unwrap the variable
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.resetLocals(varIndex);
+
+		this.nullable.getType().writeCast(writer, this.variable.getType(), this.nullable.lineNumber());
+
+		// store, but this time with the right type
+		this.variable.writeInit(writer, null);
 	}
 
 	@Override

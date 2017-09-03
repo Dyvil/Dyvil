@@ -310,7 +310,7 @@ public class NullableType implements IObjectType
 			return;
 		}
 
-		this.type.appendDescriptor(buffer, type);
+		this.type.appendDescriptor(buffer, this.type.isPrimitive() ? NAME_SIGNATURE_GENERIC_ARG : type);
 	}
 
 	@Override
@@ -348,11 +348,6 @@ public class NullableType implements IObjectType
 		if (withAnnotation == null)
 		{
 			return null;
-		}
-
-		if (withAnnotation.isPrimitive())
-		{
-			return withAnnotation;
 		}
 
 		this.type = withAnnotation;
