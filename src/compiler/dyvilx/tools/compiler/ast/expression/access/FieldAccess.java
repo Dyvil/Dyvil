@@ -279,20 +279,12 @@ public class FieldAccess extends AbstractFieldAccess
 		if (this.receiver != null)
 		{
 			this.receiver = this.receiver.foldConstants();
+			return this;
 		}
-		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
+		if (this.field != null && this.field.hasConstantValue())
 		{
-			if (this.receiver != null && this.receiver.valueTag() == IValue.POP_EXPR)
-			{
-				// Cannot constant-fold
-				return this;
-			}
-
-			final IValue value = this.field.getValue();
-			if (value != null && value.isConstantOrField())
-			{
-				return value;
-			}
+			// inline constant fields
+			return this.field.getValue();
 		}
 		return this;
 	}

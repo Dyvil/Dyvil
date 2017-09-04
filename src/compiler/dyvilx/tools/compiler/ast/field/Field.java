@@ -411,9 +411,10 @@ public class Field extends Member implements IField
 		}
 	}
 
-	private boolean hasConstantValue()
+	@Override
+	public boolean hasConstantValue()
 	{
-		return this.hasModifier(Modifiers.FINAL) && this.value.isConstant() //
+		return this.value != null && this.hasModifier(Modifiers.CONST) && this.value.isConstant() //
 		       && (this.type.isPrimitive() || this.type.getInternalName().equals("java/lang/String"));
 	}
 
@@ -547,16 +548,7 @@ public class Field extends Member implements IField
 	@Nullable
 	public Object getObjectValue()
 	{
-		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
-		{
-			value = this.value.toObject();
-		}
-		else
-		{
-			value = null;
-		}
-		return value;
+		return this.hasConstantValue() ? this.value.toObject() : null;
 	}
 
 	@Override

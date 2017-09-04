@@ -70,6 +70,11 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 	boolean isLocal();
 
+	default boolean hasConstantValue()
+	{
+		return false;
+	}
+
 	// Compilation
 
 	@Override

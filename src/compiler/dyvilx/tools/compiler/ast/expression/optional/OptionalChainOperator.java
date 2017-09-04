@@ -9,14 +9,13 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.compound.NullableType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class OptionalChainOperator extends OptionalUnwrapOperator implements IValue, OptionalChainAware
 {
 	// Metadata
-	protected Label         elseLabel;
+	protected Label elseLabel;
 
 	public OptionalChainOperator(IValue receiver)
 	{
@@ -50,9 +49,9 @@ public class OptionalChainOperator extends OptionalUnwrapOperator implements IVa
 	}
 
 	@Override
-	protected TypeChecker.MarkerSupplier getMarkerSupplier()
+	protected String getTypeError()
 	{
-		return TypeChecker.markerSupplier("optional.chain.type.incompatible");
+		return "optional.chain.type.incompatible";
 	}
 
 	@Override
