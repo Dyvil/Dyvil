@@ -125,7 +125,10 @@ public class NullCoalescingOperator implements IValue
 
 	private void applyLabel()
 	{
-		this.lhs.setOptionalElseLabel(this.elseLabel, true);
+		if (this.lhs instanceof OptionalChainAware)
+		{
+			((OptionalChainAware) this.lhs).setOptionalElseLabel(this.elseLabel, true);
+		}
 	}
 
 	@Override

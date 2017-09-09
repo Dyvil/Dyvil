@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -16,16 +18,13 @@ import dyvilx.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.ast.type.compound.NullableType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalChainAware
 {
@@ -52,24 +51,18 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	}
 
 	@Override
-	public void setReceiver(IValue receiver)
-	{
-		this.receiver = receiver;
-	}
-
-	@Override
 	public IValue getReceiver()
 	{
 		return this.receiver;
 	}
 
-	public abstract Name getName();
-
 	@Override
-	public void setArguments(ArgumentList arguments)
+	public void setReceiver(IValue receiver)
 	{
-		this.arguments = arguments;
+		this.receiver = receiver;
 	}
+
+	public abstract Name getName();
 
 	@Override
 	public ArgumentList getArguments()
@@ -77,9 +70,10 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		return this.arguments;
 	}
 
-	public void setGenericData(GenericData data)
+	@Override
+	public void setArguments(ArgumentList arguments)
 	{
-		this.genericData = data;
+		this.arguments = arguments;
 	}
 
 	public GenericData getGenericData()
@@ -93,6 +87,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 			return this.genericData = new GenericData();
 		}
 		return this.genericData = this.method.getGenericData(null, this.receiver, this.arguments);
+	}
+
+	public void setGenericData(GenericData data)
+	{
+		this.genericData = data;
 	}
 
 	@Override
@@ -113,33 +112,6 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	}
 
 	@Override
-	public boolean needsOptionalElseLabel()
-	{
-		return this.receiver != null && this.receiver.needsOptionalElseLabel();
-	}
-
-	@Override
-	public Label getOptionalElseLabel()
-	{
-		return this.receiver == null ? null : this.receiver.getOptionalElseLabel();
-	}
-
-	@Override
-	public boolean setOptionalElseLabel(Label label, boolean top)
-	{
-		if (this.receiver == null || !this.receiver.setOptionalElseLabel(label, false))
-		{
-			return false;
-		}
-
-		if (!top)
-		{
-			this.type = NullableType.apply(this.getType());
-		}
-		return true;
-	}
-
-	@Override
 	public IType getType()
 	{
 		if (this.method == null)
@@ -151,6 +123,12 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 			this.type = this.method.getType().getConcreteType(this.getGenericData());
 		}
 		return this.type;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 
 	@Override

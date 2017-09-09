@@ -77,6 +77,11 @@ public class OptionalUnwrapOperator implements IValue
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+	}
+
+	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		this.receiver = TypeChecker.convertValue(this.receiver, NullableType.apply(type), typeContext, markers, context,

@@ -43,7 +43,11 @@ public class OptionalChainOperator extends OptionalUnwrapOperator implements IVa
 	@Override
 	public boolean setOptionalElseLabel(Label label, boolean top)
 	{
-		this.receiver.setOptionalElseLabel(label, false);
+		if (this.receiver instanceof OptionalChainAware)
+		{
+			((OptionalChainAware) this.receiver).setOptionalElseLabel(label, false);
+		}
+
 		this.elseLabel = label;
 		return true;
 	}
