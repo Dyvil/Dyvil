@@ -275,26 +275,13 @@ public class Frame
 		}
 	}
 
-	public void pop() throws StackUnderflowException
+	public Object pop() throws StackUnderflowException
 	{
 		if (this.stackCount == 0)
 		{
 			throw new StackUnderflowException();
 		}
 
-		Object o = this.stack[--this.stackCount];
-		if (o == LONG || o == DOUBLE)
-		{
-			this.actualStackCount -= 2;
-		}
-		else
-		{
-			this.actualStackCount--;
-		}
-	}
-
-	public Object popAndGet() throws StackUnderflowException
-	{
 		Object o = this.stack[--this.stackCount];
 		if (o == LONG || o == DOUBLE)
 		{
@@ -772,11 +759,7 @@ public class Frame
 			this.pop();
 			return;
 		case ASTORE:
-			if (index >= this.localCount)
-			{
-				this.setLocal(index, this.peek());
-			}
-			this.pop();
+			this.setLocal(index, this.pop());
 			return;
 		}
 	}

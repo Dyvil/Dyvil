@@ -12,15 +12,15 @@ public interface BackendUtil
 	{
 		return type == LONG || type == DOUBLE;
 	}
-	
+
 	static void swap(MethodWriterImpl writer) throws BytecodeException
 	{
-		Object t1 = writer.frame.popAndGet();
-		Object t2 = writer.frame.popAndGet();
-		
+		Object t1 = writer.frame.pop();
+		Object t2 = writer.frame.pop();
+
 		writer.frame.push(t1);
 		writer.frame.push(t2);
-		
+
 		if (twoWord(t2))
 		{
 			if (twoWord(t1))
@@ -54,11 +54,11 @@ public interface BackendUtil
 			}
 		}
 	}
-	
+
 	static void pop(MethodWriterImpl writer) throws BytecodeException
 	{
-		Object t = writer.frame.popAndGet();
-		
+		Object t = writer.frame.pop();
+
 		if (twoWord(t))
 		{
 			// { value2, value1 } ->
@@ -70,43 +70,7 @@ public interface BackendUtil
 			writer.mv.visitInsn(POP);
 		}
 	}
-	
-	static void pop2(MethodWriterImpl writer) throws BytecodeException
-	{
-		Object t1 = writer.frame.popAndGet();
-		Object t2 = writer.frame.popAndGet();
-		
-		if (twoWord(t2))
-		{
-			if (twoWord(t1))
-			{
-				// { value4, value3 }, { value2, value1 } ->
-				writer.mv.visitInsn(POP2);
-				writer.mv.visitInsn(POP2);
-			}
-			else
-			{
-				// { value3, value2 }, value1 ->
-				writer.mv.visitInsn(POP);
-				writer.mv.visitInsn(POP2);
-			}
-		}
-		else
-		{
-			if (twoWord(t1))
-			{
-				// value3, { value2, value1 } ->
-				writer.mv.visitInsn(POP2);
-				writer.mv.visitInsn(POP);
-			}
-			else
-			{
-				// value2, value1 ->
-				writer.mv.visitInsn(POP2);
-			}
-		}
-	}
-	
+
 	static void dup(MethodWriterImpl writer)
 	{
 		Object t = writer.frame.peek();
@@ -122,12 +86,12 @@ public interface BackendUtil
 			writer.mv.visitInsn(DUP);
 		}
 	}
-	
+
 	static void dupX1(MethodWriterImpl writer) throws BytecodeException
 	{
-		Object t1 = writer.frame.popAndGet();
-		Object t2 = writer.frame.popAndGet();
-		
+		Object t1 = writer.frame.pop();
+		Object t2 = writer.frame.pop();
+
 		writer.frame.push(t1);
 		writer.frame.push(t2);
 		writer.frame.push(t1);

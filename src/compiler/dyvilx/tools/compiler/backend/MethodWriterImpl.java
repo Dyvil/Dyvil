@@ -506,9 +506,6 @@ public final class MethodWriterImpl implements MethodWriter
 			case Opcodes.AUTO_POP:
 				BackendUtil.pop(this);
 				return;
-			case Opcodes.AUTO_POP2:
-				BackendUtil.pop2(this);
-				return;
 			case Opcodes.AUTO_DUP:
 				BackendUtil.dup(this);
 				return;
