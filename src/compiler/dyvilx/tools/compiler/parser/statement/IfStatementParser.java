@@ -5,13 +5,11 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.annotation.AnnotationList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
 import dyvilx.tools.compiler.ast.statement.IfStatement;
-import dyvilx.tools.compiler.ast.statement.VariableStatement;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
@@ -24,17 +22,21 @@ import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
-public class IfStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
+public class IfStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
 	protected static final int IF             = 0;
-	protected static final int VARIABLE_VALUE = 1;
-	protected static final int THEN           = 2;
-	protected static final int ELSE           = 3;
+	protected static final int OPEN_PAREN     = 1;
+	protected static final int CONDITION_PART = 2;
+	protected static final int VARIABLE_VALUE = 3;
+	protected static final int SEPARATOR      = 4;
+	protected static final int THEN           = 5;
+	protected static final int ELSE           = 6;
 
 	protected final IValueConsumer consumer;
 
 	protected IfStatement statement;
-	private   IVariable   variable;
+	protected IVariable   lastVariable;
+	protected boolean     parentheses;
 
 	public IfStatementParser(IValueConsumer consumer)
 	{
@@ -55,35 +57,62 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 				return;
 			}
 
-			if (token.next().type() == DyvilKeywords.LET)
+			this.mode = OPEN_PAREN;
+			this.statement = new IfStatement(token.raw());
+			return;
+		case OPEN_PAREN:
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				// if let ...
+				this.parentheses = true;
+				this.mode = CONDITION_PART;
+				return;
+			}
+			// Fallthrough
+		case CONDITION_PART:
+			if (type == DyvilKeywords.LET)
+			{
+				pm.pushParser(new DataMemberParser<>(this), true);
 				this.mode = VARIABLE_VALUE;
-				this.statement = new BindingIfStatement(token.raw());
-				pm.pushParser(new DataMemberParser<>(this));
 				return;
 			}
 
-			this.mode = THEN;
-			this.statement = new IfStatement(token.raw());
-			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT));
+			this.mode = SEPARATOR;
+			pm.pushParser(this.expressionParser(this.statement::setCondition), true);
 			return;
 		case VARIABLE_VALUE:
-			this.mode = THEN;
-			if (this.variable != null)
+			if (type == BaseSymbols.EQUALS)
 			{
-				this.statement.setCondition(new VariableStatement(this.variable));
-			}
-
-			if (type != BaseSymbols.EQUALS)
-			{
-				pm.report(token, "if.binding.assignment");
-				pm.reparse();
+				pm.pushParser(this.expressionParser(this.lastVariable));
+				this.mode = SEPARATOR;
 				return;
 			}
+			pm.report(token, "if.binding.assignment");
+			// Fallthrough
+		case SEPARATOR:
+			switch (type)
+			{
+			case BaseSymbols.COMMA:
+			case BaseSymbols.SEMICOLON:
+				if (this.parentheses && !this.hasCondition())
+				{
+					this.mode = CONDITION_PART;
+					return;
+				}
+				break; // then
+			case BaseSymbols.CLOSE_PARENTHESIS:
+				if (this.parentheses)
+				{
+					this.mode = THEN;
+					return;
+				}
+				break; // then
+			}
 
-			pm.pushParser(new ExpressionParser(this.variable).withFlags(IGNORE_STATEMENT));
-			return;
+			if (this.parentheses)
+			{
+				pm.report(token, "if.close_paren");
+			}
+			// Fallthrough
 		case THEN:
 			switch (type)
 			{
@@ -94,12 +123,12 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 			}
 
 			this.mode = ELSE;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setThen), true);
 			return;
 		case ELSE:
 			if (type == DyvilKeywords.ELSE)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
 				return;
 			}
@@ -107,7 +136,7 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 			{
 				// ... inferred_semicolon else
 				pm.skip();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
 				return;
 			}
@@ -119,6 +148,16 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 		}
 	}
 
+	private boolean hasCondition()
+	{
+		return this.statement.getCondition() != null;
+	}
+
+	private ExpressionParser expressionParser(IValueConsumer consumer)
+	{
+		return new ExpressionParser(consumer).withFlags(this.parentheses ? 0 : IGNORE_STATEMENT);
+	}
+
 	private void end(IParserManager pm)
 	{
 		this.consumer.setValue(this.statement);
@@ -126,25 +165,19 @@ public class IfStatementParser extends Parser implements IValueConsumer, IDataMe
 	}
 
 	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case THEN:
-			this.statement.setCondition(value);
-			return;
-		case ELSE:
-			this.statement.setThen(value);
-			return;
-		case END:
-			this.statement.setElse(value);
-		}
-	}
-
-	@Override
 	public void addDataMember(IVariable dataMember)
 	{
-		this.variable = dataMember;
+		BindingIfStatement statement;
+		if (!(this.statement instanceof BindingIfStatement))
+		{
+			this.statement = statement = new BindingIfStatement(this.statement.getPosition());
+		}
+		else
+		{
+			statement = (BindingIfStatement) this.statement;
+		}
+		this.lastVariable = dataMember;
+		statement.addVariable(dataMember);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -164,13 +165,15 @@ public class IfStatement implements IValue
 		                TypeChecker.getTypeMatch(this.elseThen, type, implicitContext));
 	}
 
+	protected IContext thenContext(IContext context)
+	{
+		return context;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.condition != null)
-		{
-			this.condition.resolveTypes(markers, context);
-		}
+		this.resolveConditionTypes(markers, context);
 		if (this.then != null)
 		{
 			this.then.resolveTypes(markers, this.thenContext(context));
@@ -179,6 +182,17 @@ public class IfStatement implements IValue
 		{
 			this.elseThen.resolveTypes(markers, context);
 		}
+	}
+
+	protected void resolveConditionTypes(MarkerList markers, IContext context)
+	{
+		if (this.condition == null)
+		{
+			this.condition = BooleanValue.TRUE;
+			markers.add(Markers.semanticError(this.position, "if.condition.missing"));
+		}
+
+		this.condition.resolveTypes(markers, context);
 	}
 
 	@Override
@@ -197,11 +211,7 @@ public class IfStatement implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.condition != null)
-		{
-			this.condition = this.condition.resolve(markers, context);
-			this.checkConditionType(markers, context);
-		}
+		this.resolveCondition(markers, context);
 		if (this.then != null)
 		{
 			this.then = this.then.resolve(markers, this.thenContext(context));
@@ -213,8 +223,9 @@ public class IfStatement implements IValue
 		return this;
 	}
 
-	protected void checkConditionType(MarkerList markers, IContext context)
+	protected void resolveCondition(MarkerList markers, IContext context)
 	{
+		this.condition = this.condition.resolve(markers, context);
 		this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
 		                                          TypeChecker.markerSupplier("if.condition.type"));
 	}
@@ -222,10 +233,7 @@ public class IfStatement implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.condition != null)
-		{
-			this.condition.checkTypes(markers, context);
-		}
+		this.checkConditionTypes(markers, context);
 		if (this.then != null)
 		{
 			this.then.checkTypes(markers, this.thenContext(context));
@@ -236,23 +244,21 @@ public class IfStatement implements IValue
 		}
 	}
 
+	protected void checkConditionTypes(MarkerList markers, IContext context)
+	{
+		this.condition.checkTypes(markers, context);
+	}
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.condition != null)
-		{
-			this.condition.check(markers, context);
-		}
-		else
-		{
-			markers.add(Markers.semanticError(this.position, "if.condition.missing"));
-		}
-
+		this.checkCondition(markers, context);
 		if (this.then != null)
 		{
 			this.then.check(markers, this.thenContext(context));
 		}
-		else {
+		else
+		{
 			markers.add(Markers.semanticError(this.position, "if.then.missing"));
 		}
 
@@ -262,19 +268,15 @@ public class IfStatement implements IValue
 		}
 	}
 
-	protected IContext thenContext(IContext context)
+	protected void checkCondition(MarkerList markers, IContext context)
 	{
-		return context;
+		this.condition.check(markers, context);
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.condition != null)
-		{
-			this.condition = this.condition.foldConstants();
-		}
-
+		this.condition = this.condition.foldConstants();
 		if (this.then != null)
 		{
 			this.then = this.then.foldConstants();
@@ -283,37 +285,13 @@ public class IfStatement implements IValue
 		{
 			this.elseThen = this.elseThen.foldConstants();
 		}
-		return this;
+		return this.foldWithCondition();
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.condition != null)
-		{
-			if (this.condition.valueTag() == BOOLEAN)
-			{
-				if (this.condition.booleanValue())
-				{
-					// Condition is true -> Return the action
-					return this.then.cleanup(compilableList, classCompilableList);
-				}
-				else if (this.elseThen != null)
-				{
-					// Condition is false, else clause exists -> Return else
-					// clause
-					return this.elseThen.cleanup(compilableList, classCompilableList);
-				}
-				else
-				{
-					// Condition is false, no else clause -> Return default value
-					return this.commonType.getDefaultValue();
-				}
-			}
-
-			this.condition = this.condition.cleanup(compilableList, classCompilableList);
-		}
-
+		this.condition = this.condition.cleanup(compilableList, classCompilableList);
 		if (this.then != null)
 		{
 			this.then = this.then.cleanup(compilableList, classCompilableList);
@@ -322,7 +300,25 @@ public class IfStatement implements IValue
 		{
 			this.elseThen = this.elseThen.cleanup(compilableList, classCompilableList);
 		}
+		return this.foldWithCondition();
+	}
 
+	protected IValue foldWithCondition()
+	{
+		if (this.condition.valueTag() == BOOLEAN)
+		{
+			if (this.condition.booleanValue())
+			{
+				// Condition is true -> Return the action
+				return this.then;
+			}
+			else if (this.elseThen != null)
+			{
+				// Condition is false, else clause exists -> Return else
+				// clause
+				return this.elseThen;
+			}
+		}
 		return this;
 	}
 
@@ -429,7 +425,9 @@ public class IfStatement implements IValue
 	{
 		buffer.append("if");
 
-		this.headToString(indent, buffer);
+		Formatting.appendSeparator(buffer, "if.open_paren", '(');
+		this.conditionToString(indent, buffer);
+		Formatting.appendClose(buffer, "if.close_paren", ')');
 
 		if (this.then != null && !Util.formatStatementList(indent, buffer, this.then))
 		{
@@ -476,13 +474,8 @@ public class IfStatement implements IValue
 		}
 	}
 
-	protected void headToString(String indent, StringBuilder buffer)
+	protected void conditionToString(String indent, StringBuilder buffer)
 	{
-		Formatting.appendSeparator(buffer, "if.open_paren", '(');
-		if (this.condition != null)
-		{
-			this.condition.toString(indent, buffer);
-		}
-		Formatting.appendClose(buffer, "if.close_paren", ')');
+		this.condition.toString(indent, buffer);
 	}
 }
