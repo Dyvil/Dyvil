@@ -18,5 +18,14 @@ public class OptionalTest
 		let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
 
 		optUppercaseFirst =?= 65
+
+		test "Optional Binding" {
+			if let uppercase = optUppercase { } else { fail }
+			if (let u = optUppercase; !u.isEmpty) { } else { fail }
+			if (let u = optUppercase, let s = u.substring(0, 1)) { s =?= "A" } else { fail }
+
+			let s = Optional "a"
+			if let s = s { s.staticType.toString =?= "java.lang.String" } else { fail }
+		}
 	}
 }
