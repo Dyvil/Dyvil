@@ -30,9 +30,9 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 {
 	protected SourcePosition position;
 
-	protected IValue receiver;
+	protected IValue       receiver;
 	protected ArgumentList arguments;
-	protected GenericData genericData;
+	protected GenericData  genericData;
 
 	// Metadata
 	protected IMethod method;
@@ -270,6 +270,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		marker.addInfo(sb.toString());
 	}
 
+	// every resolveCall implementation calls this
 	protected final IValue checkArguments(MarkerList markers, IContext context, IMethod method)
 	{
 		this.method = method;
@@ -278,8 +279,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		final int code;
 		final IValue intrinsic;
 		if (intrinsicData != null // Intrinsic annotation
-			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
-			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
+		    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
+		    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
 		{
 			Deprecation.checkAnnotations(method, this.position, markers);
 			intrinsic.setPosition(this.position);

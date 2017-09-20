@@ -30,6 +30,7 @@ public class BindingIfStatement extends IfStatement
 	public BindingIfStatement(SourcePosition position)
 	{
 		super(position);
+		this.condition = BooleanValue.TRUE;
 	}
 
 	// region Variables
@@ -88,11 +89,6 @@ public class BindingIfStatement extends IfStatement
 			final IVariable var = this.variables.get(i);
 			var.setValue(new OptionalUnwrapOperator(var.getValue(), true));
 			var.resolveTypes(markers, this.varContext(i, context));
-		}
-
-		if (this.condition == null)
-		{
-			this.condition = BooleanValue.TRUE;
 		}
 
 		super.resolveConditionTypes(markers, this.varContext(size, context));

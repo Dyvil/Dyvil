@@ -62,6 +62,7 @@ public class IfStatement implements IValue
 	public void setThen(IValue then)
 	{
 		this.then = then;
+		this.commonType = null; // invalidate type cache
 	}
 
 	public IValue getElse()
@@ -72,6 +73,7 @@ public class IfStatement implements IValue
 	public void setElse(IValue elseThen)
 	{
 		this.elseThen = elseThen;
+		this.commonType = null; // invalidate type cache
 	}
 
 	@Override
