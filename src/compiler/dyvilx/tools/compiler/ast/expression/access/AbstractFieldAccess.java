@@ -119,6 +119,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 		}
 	}
 
+	// make sure to consider Optional Chain Awareness when overriding this method
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -126,28 +127,41 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		if (this.field != null)
 		{
-			return this;
+			return OptionalChainAware.transform(this);
 		}
 
 		final IValue v = this.resolveAccess(markers, context);
 		if (v != null)
 		{
+			// resolveAccess is Optional Chain Aware
 			return v;
 		}
 
 		// Don't report an error if the receiver is not resolved
-		if (this.receiver != null && !this.receiver.isResolved())
+		if (this.receiver == null || this.receiver.isResolved())
 		{
-			return this;
+			this.reportResolve(markers);
 		}
 
-		this.reportResolve(markers);
-		return this;
+		return OptionalChainAware.transform(this);
 	}
 
 	protected abstract void reportResolve(MarkerList markers);
 
 	protected IValue resolveAccess(MarkerList markers, IContext context)
+	{
+		IValue access = this.resolveAsFieldOrMethod(markers, context);
+		if (access != null)
+		{
+			return OptionalChainAware.transform(access);
+		}
+
+		// Qualified Type Name Resolution
+
+		return this.resolveAsType(context);
+	}
+
+	private IValue resolveAsFieldOrMethod(MarkerList markers, IContext context)
 	{
 		IValue value;
 
@@ -195,10 +209,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 				return value;
 			}
 		}
-
-		// Qualified Type Name Resolution
-
-		return this.resolveAsType(context);
+		return null;
 	}
 
 	protected abstract IValue resolveAsField(IValue receiver, IContext context);

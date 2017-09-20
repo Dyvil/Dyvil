@@ -6,23 +6,38 @@ public class OptionalTest
 {
 	static func apply() -> Test = test "Optionals" {
 		let optString = Optional("abc")
-		let string = optString ?? "def" // = "abc"
 
-		string.staticType.toString =?= "java.lang.String"
+		test "Null Coalescing" {
+			let string = optString ?? "def" // = "abc"
 
-		let optUppercase = optString?.toUpperCase ?? null
-		// = optString == null ? null : optString!!.toUpperCase
+			test "With Optional Chain" {
+				string.staticType.toString =?= "java.lang.String"
 
-		optUppercase =?= "ABC"
+				let optUppercase = optString?.toUpperCase ?? null
+				// = optString == null ? null : optString!!.toUpperCase
 
-		let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
+				optUppercase =?= "ABC"
+			}
 
-		optUppercaseFirst =?= 65
+			test "With Subscript" {
+				let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
+
+				optUppercaseFirst =?= 65
+			}
+
+			test "With non-OptionalChainAware lhs" {
+				let a = (null as String?) ?? "a"
+
+				a =?= "a"
+			}
+		}
 
 		test "Optional Binding" {
-			if let uppercase = optUppercase { } else { fail }
-			if (let u = optUppercase; !u.isEmpty) { } else { fail }
-			if (let u = optUppercase, let s = u.substring(0, 1)) { s =?= "A" } else { fail }
+			let opt = Optional "ABC"
+
+			if let abc = opt { } else { fail }
+			if (let abc = opt; !a.isEmpty) { } else { fail }
+			if (let abc = opt, let a = a.substring(0, 1)) { a =?= "A" } else { fail }
 
 			let s = Optional "a"
 			if let s = s { s.staticType.toString =?= "java.lang.String" } else { fail }

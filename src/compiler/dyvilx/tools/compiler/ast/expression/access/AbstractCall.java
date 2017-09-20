@@ -189,6 +189,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		}
 	}
 
+	// every override of this method should call checkArguments on the result; among others to ensure Optional Chain Awareness.
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
@@ -303,7 +304,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		this.type = null;
 		this.type = this.getType();
 
-		return this;
+		return OptionalChainAware.transform(this);
 	}
 
 	@Override

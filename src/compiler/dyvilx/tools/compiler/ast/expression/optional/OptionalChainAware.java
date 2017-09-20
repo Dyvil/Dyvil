@@ -1,42 +1,136 @@
 package dyvilx.tools.compiler.ast.expression.optional;
 
-import dyvilx.tools.asm.Label;
+import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.expression.constant.NullValue;
+import dyvilx.tools.compiler.ast.field.Variable;
+import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.compound.NullableType;
 
-public interface OptionalChainAware
+public interface OptionalChainAware extends IValue
 {
 	IValue getReceiver();
 
+	void setReceiver(IValue value);
+
+	@Override
 	IType getType();
 
+	@Override
 	void setType(IType type);
 
-	default boolean needsOptionalElseLabel()
+	static IValue transform(IValue value)
 	{
-		final IValue receiver = this.getReceiver();
-		return receiver instanceof OptionalChainAware && ((OptionalChainAware) receiver).needsOptionalElseLabel();
+		if (value instanceof OptionalChainAware)
+		{
+			return transform((OptionalChainAware) value);
+		}
+		return value;
 	}
 
-	default Label getOptionalElseLabel()
+	static IValue transform(OptionalChainAware oca)
 	{
-		final IValue receiver = this.getReceiver();
-		return receiver instanceof OptionalChainAware ? ((OptionalChainAware) receiver).getOptionalElseLabel() : null;
+		// oca = receiver?.access
+		//       <- oco ->
+
+		final IValue oco = oca.getReceiver();
+
+		if (oco == null || oco.valueTag() != IValue.OPTIONAL_CHAIN)
+		{
+			// no transformation needed as it is actually not an optional chain
+			return oca;
+		}
+
+		final SourcePosition position = oca.getPosition();
+		final IValue receiver = ((OptionalChainOperator) oco).getReceiver();
+		// receiver is now the actual receiver of the optional chain operator
+
+		if (receiver instanceof BindingIfStatement)
+		{
+			final BindingIfStatement bindingIf = (BindingIfStatement) receiver;
+			if (bindingIf.getElse() == NullValue.NULL)
+			{
+				// safe bet that the receiver used to be an optional chain
+
+				// Perform the following transformation (the entire statement is the receiver):
+				// if let $0 = oldReceiver { $0.oldAccess } else null
+				// becomes
+				// if (let $0 = oldReceiver, let $1 = $0.oldAccess) { $1.access } else null
+
+				final Variable var = newVar(position, bindingIf.getThen());
+				bindingIf.addVariable(var);
+				oca.setReceiver(new FieldAccess(var));
+				bindingIf.setThen(oca);
+				return bindingIf;
+			}
+		}
+
+		// oca = receiver?.access, and receiver is not an optional chain
+		// receiver?.access
+		// becomes
+		// if let $0 = receiver { $0.access } else null
+
+		final Variable var = newVar(position, receiver);
+
+		final BindingIfStatement bindingIf = new BindingIfStatement(position);
+		bindingIf.addVariable(var);
+		oca.setReceiver(new FieldAccess(var));
+		bindingIf.setThen(oca);
+		bindingIf.setElse(NullValue.NULL);
+		return bindingIf;
 	}
 
-	default boolean setOptionalElseLabel(Label label, boolean top)
+	static IValue nullCoalescing(IValue lhs, IValue rhs)
 	{
-		final IValue receiver = this.getReceiver();
-		if (!(receiver instanceof OptionalChainAware) || !((OptionalChainAware) receiver).setOptionalElseLabel(label, false))
+		if (lhs instanceof BindingIfStatement)
 		{
-			return false;
+			final BindingIfStatement bindingIf = (BindingIfStatement) lhs;
+			if (bindingIf.getElse() == NullValue.NULL)
+			{
+				// safe bet that the rhs used to be an optional chain
+				// this branch is actually an optimization and technically not necessary, but it is very common
+				// to use the null coalescing operator after an optional chain.
+
+				// Perform the following transformation:
+				// if let $0 = oldReceiver { $0.oldAccess } else null
+				// becomes
+				// if (let $0 = oldReceiver, let $1 = $0.oldAccess) { $1 } else { <rhs> }
+
+				final Variable var = newVar(bindingIf.getPosition(), bindingIf.getThen());
+				bindingIf.addVariable(var);
+				bindingIf.setThen(new FieldAccess(var));
+				bindingIf.setElse(rhs);
+				return bindingIf;
+			}
 		}
 
-		if (!top)
-		{
-			this.setType(NullableType.apply(this.getType()));
-		}
-		return true;
+		// the lhs was not an optional chain, so we set up an impromptu null coalescing inline implementation
+
+		final SourcePosition position = lhs.getPosition();
+
+		// let l = <lhs>
+		final Variable var = newVar(position, lhs);
+
+		// if let l = <lhs> { l } else { <rhs> }
+		final BindingIfStatement bindingIf = new BindingIfStatement(position);
+		bindingIf.addVariable(var);
+		bindingIf.setThen(new FieldAccess(var));
+		bindingIf.setElse(rhs);
+		return bindingIf;
+	}
+
+	/**
+	 * Creates a new variable for use in binding if statements. The lhs automatically gets wrapped in an optional unwrap
+	 * operator.
+	 */
+	static Variable newVar(SourcePosition position, IValue lhs)
+	{
+		final IValue value = new OptionalUnwrapOperator(lhs, true);
+		final Variable var = new Variable(position, null, value.getType(), new FlagModifierSet(Modifiers.FINAL), null);
+		var.setValue(value);
+		return var;
 	}
 }
