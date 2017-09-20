@@ -44,18 +44,21 @@ interface Test
 
 	static case class RequireTest(
 		let predicate: -> boolean
+		let message: String
 	) implements Test
 	{
 		override func passes() -> boolean = this.predicate.apply()
 
-		override func addErrors(errors: List<String>) -> void
-		{
-			if (this.passes) return
-			errors.add("Generic Requirement failed")
-		}
+		override func addErrors(errors: List<String>) -> void = if (!this.passes) errors.add(this.message)
 	}
 
-	static func require(predicate: -> boolean) -> RequireTest = RequireTest(predicate)
+	static func require(predicate: -> boolean) -> RequireTest = RequireTest(predicate, "Generic Requirement failed")
+
+	static func require(predicate: -> boolean, message: String) -> RequireTest = RequireTest(predicate, message)
+
+	static func fail() -> RequireTest = fail("Generic Failure")
+
+	static func fail(message: String) -> RequireTest = RequireTest(false, message)
 
 	// Equality Tests
 
