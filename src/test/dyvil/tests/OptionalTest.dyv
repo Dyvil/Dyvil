@@ -7,17 +7,16 @@ public class OptionalTest
 	static func apply() -> Test = test "Optionals" {
 		let optString = Optional("abc")
 
+		test "Optional Chains" {
+			let optUppercase = optString?.toUpperCase
+			// = optString == null ? null : optString!!.toUpperCase
+
+			optUppercase =?= "ABC"
+		}
+
 		test "Null Coalescing" {
 			let string = optString ?? "def" // = "abc"
-
-			test "With Optional Chain" {
-				string.staticType.toString =?= "java.lang.String"
-
-				let optUppercase = optString?.toUpperCase ?? null
-				// = optString == null ? null : optString!!.toUpperCase
-
-				optUppercase =?= "ABC"
-			}
+			string.staticType.toString =?= "java.lang.String"
 
 			test "With Subscript" {
 				let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
@@ -25,10 +24,19 @@ public class OptionalTest
 				optUppercaseFirst =?= 65
 			}
 
-			test "With non-OptionalChainAware lhs" {
+			test "With non-optional-chain lhs" {
 				let a = (null as String?) ?? "a"
 
 				a =?= "a"
+			}
+
+			test "With Primitives" { // see bug #357
+				let optTuple = Optional((1, 2))
+				let optFirst = optTuple?._1
+				optFirst =?= 1
+
+				let optSecond = optTuple?._2 ?? 0
+				optSecond =?= 2
 			}
 		}
 
