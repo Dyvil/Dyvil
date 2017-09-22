@@ -16,7 +16,7 @@ extends DyvilValueVisitor implements Expandable
 
 	protected override func visitObject(o: Object!) -> void = this.value = o
 	
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object = mappings[this.toString] ?? this
+	override func expand(mappings: [String:Object], mutate: boolean) -> Object = mappings[this.toString] ?? this
 
 	override func toString() -> String
 	{
