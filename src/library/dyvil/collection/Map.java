@@ -75,6 +75,7 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return true, if this map contains no mappings
 	 */
+	@Override
 	default boolean isEmpty()
 	{
 		return this.size() == 0;
@@ -337,7 +338,7 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return the value
 	 */
-	default V subscript(Object key)
+	default @Nullable V subscript(Object key)
 	{
 		return this.get(key);
 	}
@@ -371,7 +372,7 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return the value
 	 */
-	default V get(Object key)
+	default @Nullable V get(Object key)
 	{
 		final Entry<? extends K, ? extends V> entry = this.getEntry(key);
 		return entry == null ? null : entry.getValue();
