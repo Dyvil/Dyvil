@@ -44,8 +44,8 @@ public class OptionalTest
 			let opt = Optional "ABC"
 
 			if let abc = opt { } else { fail }
-			if (let abc = opt; !a.isEmpty) { } else { fail }
-			if (let abc = opt, let a = a.substring(0, 1)) { a =?= "A" } else { fail }
+			if (let abc = opt; !abc.isEmpty) { } else { fail }
+			if (let abc = opt, let a = abc.substring(0, 1)) { a =?= "A" } else { fail }
 
 			let s = Optional "a"
 			if let s = s { s.staticType.toString =?= "java.lang.String" } else { fail }

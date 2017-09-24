@@ -5,6 +5,8 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.annotation.AnnotationList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
@@ -150,7 +152,8 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 
 	private boolean hasCondition()
 	{
-		return this.statement.getCondition() != null;
+		final IValue condition = this.statement.getCondition();
+		return condition != null && condition != BooleanValue.TRUE;
 	}
 
 	private ExpressionParser expressionParser(IValueConsumer consumer)
