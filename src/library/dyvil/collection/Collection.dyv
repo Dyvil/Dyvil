@@ -467,13 +467,18 @@ interface Collection<type E> extends Queryable<E>
 
 	static func iterableContains(iterable: Iterable<_>, element: any!) -> boolean
 	{
+		return iteratorContains(iterable.iterator, element)
+	}
+
+	static func iteratorContains(iterator: Iterator<_>, element: any!) -> boolean
+	{
 		if (element == null)
 		{
-			for (e <- iterable) if (e == null) return true
+			for (e <- iterator) if (e == null) return true
 			return false
 		}
 
-		for (e <- iterable) if (element.equals(e)) return true
+		for (e <- iterator) if (element.equals(e)) return true
 		return false
 	}
 
