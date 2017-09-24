@@ -7,7 +7,6 @@ import dyvil.annotation.internal.Nullable;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 import dyvil.util.Option;
 
@@ -102,7 +101,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 
 	@Override
-	public V get(Object key)
+	public @Nullable V get(Object key)
 	{
 		return null;
 	}

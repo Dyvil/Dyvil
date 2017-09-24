@@ -1,0 +1,330 @@
+package dyvil.collection
+
+import dyvil.array.ObjectArray
+import dyvil.collection.view.{ MapKeys, MapValues }
+import dyvil.ref.ObjectRef
+
+import java.util.{ Iterator, Spliterator, Spliterators, Comparator }
+import java.util.stream.{ Stream, StreamSupport }
+import java.util.function.{ Function, BiFunction, Predicate, BiPredicate, Consumer, BiConsumer }
+
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromMap
+interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V>>, java.io.Serializable
+{
+	static func empty<type K: Object!, type V: Object!>() -> [final K:V] = ImmutableMap<K, V>()
+
+	static func apply<type K: Object!, type V: Object!>() -> [var K:V] = MutableMap<K, V>()
+
+	static func singleton<type K: Object!, type V: Object!>(key: K, value: V) -> [final K:V] = ImmutableMap.singleton(key, value)
+
+	static func apply<type K: Object!, type V: Object!>(entry: Entry<+K, +V>) -> [final K:V] = ImmutableMap(entry)
+
+	@SafeVarargs
+	static func apply<type K: Object!, type V: Object!>(entries: Entry<+K, +V>...) -> [final K:V] = ImmutableMap(entries...)
+
+	static func apply<type K: Object!, type V: Object!>(keys: [K], values: [V]) -> [final K:V] = ImmutableMap(keys, values)
+
+	abstract func isImmutable() -> boolean
+
+	override abstract func size() -> int
+
+	override func isEmpty() -> boolean = this.size == 0
+
+	func isSorted() -> boolean = this.size < 2 || Collection.iteratorSorted(this.keyIterator)
+
+	func isSorted(comparator: Comparator<-K>) -> boolean = this.size < 2 || Collection.iteratorSorted(this.keyIterator, comparator)
+
+	override abstract func iterator() -> Iterator<Entry<K, V>>
+
+	override func spliterator() -> Spliterator<Entry<K, V>> = Spliterators.spliterator(this.iterator, this.size, 0)
+
+	func stream() -> Stream<Entry<K, V>> = StreamSupport.stream(this.spliterator, false)
+
+	func parallelStream() -> Stream<Entry<K, V>> = StreamSupport.stream(this.spliterator, true)
+
+	func keys() -> Queryable<K> = new MapKeys(this)
+
+	abstract func keyIterator() -> Iterator<K>
+
+	func keySpliterator() -> Spliterator<K> = Spliterators.spliterator(this.keyIterator, this.size, 0)
+
+	func keyStream() -> Stream<K> = StreamSupport.stream(this.keySpliterator, false)
+
+	func parallelKeyStream() -> Stream<K> = StreamSupport.stream(this.keySpliterator, true)
+
+	func values() -> Queryable<V> = new MapValues(this)
+
+	abstract func valueIterator() -> Iterator<V>
+
+	func valueSpliterator() -> Spliterator<V> = Spliterators.spliterator(this.valueIterator, this.size, 0)
+
+	func valueStream() -> Stream<V> = StreamSupport.stream(this.valueSpliterator, false)
+
+	func parallelValueStream() -> Stream<V> = StreamSupport.stream(this.valueSpliterator, true)
+
+	func forEach(action: Consumer<-Entry<K, V>>) -> void = for (e <- this) action.accept(e)
+
+	func forEach(action: BiConsumer<-K, -V>) -> void = for (e <- this) action.accept(e.getKey(), e.getValue())
+
+	func forEachKey(action: Consumer<-K>) -> void = for (e <- this) action.accept(e.getKey())
+
+	func forEachValue(action: Consumer<-V>) -> void = for (e <- this) action.accept(e.getValue())
+
+	func allMatch(predicate: BiPredicate<-K, -V>) -> boolean
+	{
+		for (e <- this) if (!predicate.test(e.getKey(), e.getValue())) return false
+		return true
+	}
+
+	func exists(predicate: BiPredicate<-K, -V>) -> boolean
+	{
+		for (e <- this) if (predicate.test(e.getKey(), e.getValue())) return true
+		return false
+	}
+
+	func find(predicate: BiPredicate<-K, -V>) -> Entry<K, V>?
+	{
+		for (e <- this) if (predicate.test(e.getKey(), e.getValue())) return e
+		return null
+	}
+
+	func containsKey(key: any!) -> boolean = Collection.iteratorContains(this.keyIterator, key)
+
+	func containsValue(value: any!) -> boolean = Collection.iteratorContains(this.valueIterator, value)
+
+	func contains(key: any!, value: any!) -> boolean
+	{
+		for (e <- this) if (e.getKey() == key && e.getValue() == value) return true
+		return false
+	}
+
+	func contains(entry: Entry<_, _>) -> boolean = this.contains(entry.getKey(), entry.getValue())
+
+	func subscript(key: any!) -> V? = this.get(key)
+
+	func subscript_&(key: K) -> ObjectRef<V> = new ObjectRef<V>()
+	{
+		override func get() -> V = this<Map>.get(key)
+
+		override func set(value: V) -> void = this<Map>.put(key, value)
+	}
+
+	func get(key: any!) -> V? = if (let e = this.getEntry(key)) { return e.getValue() } else { return null }
+
+	abstract func getEntry(key: any!) -> Entry<K, V>?
+
+	abstract func getOption(key: any!) -> Option<V>
+
+	abstract func withEntry(key: K, value: V) -> [K:V]
+
+	abstract func withEntry(entry: Entry<+K, +V>) -> [K:V]
+
+	abstract func union(with map: Map<+K, +V>) -> [K:V]
+
+	abstract func removed(key: any!, value: any!) -> [K:V]
+
+	abstract func removed(entry: Entry<_, _>) -> [K:V]
+
+	abstract func keyRemoved(key: any!) -> [K:V]
+
+	abstract func valueRemoved(value: any!) -> [K:V]
+
+	abstract func difference(with map: [_ : _]) -> [K:V]
+
+	abstract func keyDifference(with keys: Collection<_>) -> [K:V]
+
+	abstract func keyMapped<type NK: Object!>(by mapper: Function<-K, +NK>) -> [NK:V]
+
+	abstract func keyMapped<type NK: Object!>(by mapper: BiFunction<-K, -V, +NK>) -> [NK:V]
+
+	abstract func valueMapped<type NV: Object!>(by mapper: Function<-V, +NV>) -> [K:NV]
+
+	abstract func valueMapped<type NV: Object!>(by mapper: BiFunction<-K, -V, +NV>) -> [K:NV]
+
+	abstract func entryMapped<type NK: Object!, type NV: Object!>(by mapper: BiFunction<-K, -V, +Entry<+NK, +NV>>) -> [NK:NV]
+
+	abstract func flatMapped<type NK: Object!, type NV: Object!>(by mapper: BiFunction<-K, -V, +Iterable<+Entry<+NK, +NV>>>) -> [NK:NV]
+
+	abstract func filtered(by predicate: BiPredicate<-K, -V>) -> [K:V]
+
+	abstract func filteredByKey(by predicate: Predicate<-K>) -> [K:V]
+
+	abstract func filteredByValue(by predicate: Predicate<-V>) -> [K:V]
+
+	abstract func inverted() -> [V:K]
+
+	abstract func clear() -> void
+
+	abstract func subscript_=(key: K, newValue: V) -> void
+
+	abstract func put(key: K, value: V) -> V?
+
+	abstract func put(entry: Entry<+K, +V>) -> V?
+
+	abstract func putIfAbsent(key: K, value: V) -> V?
+
+	abstract func putIfAbsent(entry: Entry<+K, +V>) -> V?
+
+	abstract func putAll(entries: Map<+K, +V>) -> void
+
+	abstract func replace(key: K, oldValue: V, with newValue: V) -> boolean
+
+	abstract func replace(key: K, newValue: V) -> V?
+
+	abstract func replace(entry: Entry<+K, +V>) -> V?
+
+	abstract func remap(oldKey: any!, newKey: K) -> V?
+
+	abstract func removeKey(key: any!) -> V?
+
+	abstract func removeValue(value: any!) -> boolean
+
+	abstract func remove(key: any!, value: any!) -> boolean
+
+	abstract func remove(entry: Entry<_, _>) -> boolean
+
+	abstract func removeKeys(keys: Collection<_>) -> boolean
+
+	abstract func removeAll(entries: [_ : _]) -> boolean
+
+	abstract func mapKeys(by mapper: Function<-K, +K>) -> void
+
+	abstract func mapKeys(by mapper: BiFunction<-K, -V, +K>) -> void
+
+	abstract func mapValues(by mapper: Function<-V, +V>) -> void
+
+	abstract func mapValues(by mapper: BiFunction<-K, -V, +V>) -> void
+
+	abstract func mapEntries(by mapper: BiFunction<-K, -V, +Entry<+K, +V>>) -> void
+
+	abstract func flatMap(by mapper: BiFunction<-K, -V, +Iterable<+Entry<+K, +V>>>) -> void
+
+	abstract func filter(by predicate: BiPredicate<-K, -V>) -> void
+
+	abstract func filterByKey(by predicate: Predicate<-K>) -> void
+
+	abstract func filterByValue(by predicate: Predicate<-V>) -> void
+
+	func toArray() -> [Entry<K, V>] = new [Entry<K, V>](this.size).{ this.toArray(0, $0); $0 }
+
+	func toArray(store: [Entry<K, V>]) -> void = this.toArray(0, store)
+
+	func toArray(index: int, store: [Entry<K, V>]) -> void = for (e <- this) store[index++] = e
+
+	func toKeyArray() -> [any!] = new [any!](this.size).{ this.toKeyArray(0, $0); $0 }
+
+	func toKeyArray(of keyType: Class<K>) -> [K] = ObjectArray<K>(this.size, of: keyType).{ this.toKeyArray(0, $0); $0 }
+
+	func toKeyArray(store: [any!]) -> void = this.toKeyArray(0, store)
+
+	func toKeyArray(index: int, store: [any!]) -> void = for (k <- this.keyIterator) store[index++] = k
+
+	func toValueArray() -> [any!] = new [any!](this.size).{ this.toValueArray(0, $0); $0 }
+
+	func toValueArray(of valueType: Class<V>) -> [V] = ObjectArray<V>(this.size, of: valueType).{ this.toValueArray(0, $0); $0 }
+
+	func toValueArray(store: [any!]) -> void = this.toValueArray(0, store)
+
+	func toValueArray(index: int, store: [any!]) -> void = for (v <- this.valueIterator) store[index++] = v
+
+	abstract func copy() -> [K:V]
+
+	abstract func emptyCopy<type RK: Object!, type RV: Object!>() -> MutableMap<RK, RV>
+
+	abstract func emptyCopy<type RK: Object!, type RV: Object!>(capacity: int) -> MutableMap<RK, RV>
+
+	abstract func mutable() -> [var K:V]
+
+	abstract func mutableCopy() -> [var K:V]
+
+	abstract func immutable() -> [final K:V]
+
+	abstract func immutableCopy() -> [final K:V]
+
+	abstract func immutableBuilder<type RK: Object!, type RV: Object!>() -> ImmutableMap.Builder<RK, RV>
+
+	abstract func immutableBuilder<type RK: Object!, type RV: Object!>(capacity: int) -> ImmutableMap.Builder<RK, RV>
+
+	abstract func view() -> [final K:V]
+
+	abstract func toJava() -> java.util.Map<K, V>
+
+	override abstract func toString() -> String
+
+	const EMPTY_STRING: String = '[]'
+	const START_STRING: String = '['
+	const END_STRING:   String = ']'
+
+	const ENTRY_SEPARATOR_STRING:     String = ', '
+	const KEY_VALUE_SEPARATOR_STRING: String = ': '
+
+	func toString(builder: StringBuilder) -> void = this.toString(builder, START_STRING, ENTRY_SEPARATOR_STRING, KEY_VALUE_SEPARATOR_STRING, END_STRING)
+
+	func toString(open: String, entrySeparator: String, keyValueSeparator: String, close: String) -> String
+	{
+		let builder = new StringBuilder
+		this.toString(builder, open, entrySeparator, keyValueSeparator, close)
+		return builder.toString
+	}
+
+	func toString(builder: StringBuilder, open: String, entrySeparator: String, keyValueSeparator: String, close: String) -> void
+	{
+		builder.append(open)
+		if (this.isEmpty())
+		{
+			builder.append(close)
+			return
+		}
+
+		let iterator = this.iterator
+		var entry = iterator.next()
+
+		builder.append(entry.getKey()).append(keyValueSeparator).append(entry.getValue())
+		while (iterator.hasNext())
+		{
+			entry = iterator.next()
+			builder.append(entrySeparator).append(entry.getKey()).append(keyValueSeparator).append(entry.getValue())
+		}
+		builder.append(close)
+	}
+
+	override abstract func equals(obj: any!) -> boolean
+
+	override abstract func hashCode() -> int
+
+	static func mapToString(map: [_ : _]) -> String
+	{
+		let builder = new StringBuilder
+		map.toString(builder)
+		return builder.toString()
+	}
+
+	static func mapEquals(map: [_ : _], obj: any!) -> boolean
+	{
+		return obj is Map && mapEquals(map, obj as Map)
+	}
+
+	static func mapEquals(map: [_ : _], other: [_ : _]) -> boolean
+	{
+		if (map.size != other.size) return false
+
+		for (e <- map) if (!other.contains(e)) return false
+		return true
+	}
+
+	static func mapHashCode(map: [_ : _]) -> int
+	{
+		var sum = 0
+		var product = 1
+		for (e <- map)
+		{
+			let keyHash = e.getKey()?.hashCode ?? 0
+			let valueHash = e.getValue()?.hashCode ?? 0
+			let hash = keyHash * 31 + valueHash
+			sum += hash
+			product += hash
+		}
+		return sum * 31 + product
+	}
+}

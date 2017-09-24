@@ -2,20 +2,22 @@ package dyvilx.tools.compiler.ast.field;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.FieldVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
-import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvilx.tools.compiler.ast.annotation.AnnotationList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
+import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.Member;
@@ -34,10 +36,8 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -411,9 +411,11 @@ public class Field extends Member implements IField
 		}
 	}
 
-	private boolean hasConstantValue()
+	@Override
+	public boolean hasConstantValue()
 	{
-		return this.hasModifier(Modifiers.FINAL) && this.value.isConstant();
+		return this.value != null && this.hasModifier(Modifiers.CONST) && this.value.isConstant() //
+		       && (this.type.isPrimitive() || this.type.getInternalName().equals("java/lang/String"));
 	}
 
 	@Override
@@ -546,16 +548,7 @@ public class Field extends Member implements IField
 	@Nullable
 	public Object getObjectValue()
 	{
-		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
-		{
-			value = this.value.toObject();
-		}
-		else
-		{
-			value = null;
-		}
-		return value;
+		return this.hasConstantValue() ? this.value.toObject() : null;
 	}
 
 	@Override

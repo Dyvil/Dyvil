@@ -74,7 +74,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 
 		return new Builder(this.name
 		                   this.parameters.mapped(parameter => parameter.expand(mappings, false))
-		                   this.node?.expand(mappings, false) ?? null)
+		                   this.node?.expand(mappings, false))
 	}
 
 	override func toString() -> String = String(this)

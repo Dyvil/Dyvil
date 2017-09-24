@@ -557,7 +557,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public V get(Object key)
+	public @Nullable V get(Object key)
 	{
 		HashEntry<K, V> entry = this.getEntryInternal(key);
 		return entry == null ? null : entry.value;

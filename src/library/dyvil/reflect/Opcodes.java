@@ -927,7 +927,6 @@ public interface Opcodes
 
 	int AUTO_SWAP   = 411;
 	int AUTO_POP    = 412;
-	int AUTO_POP2   = 413;
 	int AUTO_DUP    = 414;
 	int AUTO_DUP_X1 = 415;
 

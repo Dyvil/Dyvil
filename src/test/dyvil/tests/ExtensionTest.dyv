@@ -75,7 +75,7 @@ public class ExtensionTest
 
 	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>()
 
-	postfix func name(value: any) -> String = nameMap[value]
+	postfix func name(value: any) -> String! = nameMap[value]
 
 	infix func name_=(value: any, newName: String) -> void = nameMap[value] = newName
 }

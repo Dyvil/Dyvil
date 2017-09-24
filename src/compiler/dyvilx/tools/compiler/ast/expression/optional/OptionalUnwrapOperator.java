@@ -54,6 +54,16 @@ public class OptionalUnwrapOperator implements IValue
 		this.position = position;
 	}
 
+	public IValue getReceiver()
+	{
+		return this.receiver;
+	}
+
+	public void setReceiver(IValue receiver)
+	{
+		this.receiver = receiver;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
@@ -67,16 +77,21 @@ public class OptionalUnwrapOperator implements IValue
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+	}
+
+	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		this.receiver = TypeChecker.convertValue(this.receiver, NullableType.apply(type), typeContext, markers, context,
-		                                         this.getMarkerSupplier());
+		                                         TypeChecker.markerSupplier(this.getTypeError()));
 		return this;
 	}
 
-	protected TypeChecker.MarkerSupplier getMarkerSupplier()
+	protected String getTypeError()
 	{
-		return TypeChecker.markerSupplier("optional.unwrap.type.incompatible");
+		return "optional.unwrap.type.incompatible";
 	}
 
 	@Override

@@ -45,8 +45,8 @@ import dyvilx.tools.repl.DyvilREPL;
 public class REPLContext extends AbstractHeader
 	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
-	private static final String CLASS_PACKAGE = "repl_classes";
-	public static final  String CLASS_PREFIX  = "Result_";
+	private static final String CLASS_PACKAGE = "replgen";
+	public static final  String CLASS_PREFIX  = "Result";
 
 	protected final DyvilREPL repl;
 

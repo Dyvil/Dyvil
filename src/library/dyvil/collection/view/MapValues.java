@@ -1,4 +1,4 @@
-package dyvil.collection.impl;
+package dyvil.collection.view;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.*;

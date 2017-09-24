@@ -141,7 +141,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	}
 
 	@Override
-	V get(Object key);
+	@Nullable V get(Object key);
 
 	@Nullable
 	@Override

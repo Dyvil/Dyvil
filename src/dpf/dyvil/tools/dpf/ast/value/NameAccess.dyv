@@ -32,25 +32,20 @@ extends DPFValueVisitor implements Value, Expandable
 		this.value!.accept(visitor.visitValueAccess(this.name))
 	}
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
+	override func expand(mappings: [String:Object], mutate: boolean) -> Object
 	{
 		let builder = new StringBuilder()
 
 		var value = this.value
-		while (value != null)
+		while (value is NameAccess)
 		{
-			if (value is NameAccess)
-			{
-				let nameAccess = value as NameAccess
-				builder.insert(0, '.').insert(0, nameAccess.name)
-				value = nameAccess.value
-				continue
-			}
-			break
+			let nameAccess = value as NameAccess
+			builder.insert(0, '.').insert(0, nameAccess.name)
+			value = nameAccess.value
 		}
 
 		builder.append(this.name)
-		return mappings.get(builder.toString()) ?? this
+		return mappings[builder.toString()] ?? this
 	}
 
 	override func toString() -> String = String(this)

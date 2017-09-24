@@ -4,7 +4,7 @@ class Solver
 {
 	interface Context
 	{
-		func resolve(name: String) -> Expr
+		func resolve(name: String) -> Expr?
 	}
 
 	interface Expr
@@ -14,7 +14,7 @@ class Solver
 
 	static case class Var(let name: String) implements Expr
 	{
-		override func solve(c: Context) -> Expr = c.resolve(this.name)
+		override func solve(c: Context) -> Expr = c.resolve(this.name) ?? this
 	}
 
 	static case class Const(let value: double) implements Expr

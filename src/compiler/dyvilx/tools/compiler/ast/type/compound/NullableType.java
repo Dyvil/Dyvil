@@ -45,8 +45,12 @@ public class NullableType implements IObjectType
 		this.type = type.getObjectType();
 	}
 
-	public static NullableType apply(IType type)
+	public static IType apply(IType type)
 	{
+		if (isNullable(type))
+		{
+			return type;
+		}
 		return new NullableType(type);
 	}
 
@@ -310,7 +314,7 @@ public class NullableType implements IObjectType
 			return;
 		}
 
-		this.type.appendDescriptor(buffer, type);
+		this.type.appendDescriptor(buffer, this.type.isPrimitive() ? NAME_SIGNATURE_GENERIC_ARG : type);
 	}
 
 	@Override
@@ -348,11 +352,6 @@ public class NullableType implements IObjectType
 		if (withAnnotation == null)
 		{
 			return null;
-		}
-
-		if (withAnnotation.isPrimitive())
-		{
-			return withAnnotation;
 		}
 
 		this.type = withAnnotation;

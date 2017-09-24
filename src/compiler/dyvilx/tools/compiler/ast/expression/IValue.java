@@ -238,21 +238,6 @@ public interface IValue extends ASTNode, ITyped
 		return false;
 	}
 
-	default boolean needsOptionalElseLabel()
-	{
-		return false;
-	}
-
-	default Label getOptionalElseLabel()
-	{
-		return null;
-	}
-
-	default boolean setOptionalElseLabel(Label label, boolean top)
-	{
-		return false;
-	}
-
 	// Types
 
 	@Override

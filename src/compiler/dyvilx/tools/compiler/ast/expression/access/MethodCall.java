@@ -142,7 +142,6 @@ public class MethodCall extends AbstractCall implements INamed
 
 	protected IValue resolveAlternative(MarkerList markers, IContext context, boolean report)
 	{
-
 		if (this.genericData != null && this.arguments == ArgumentList.EMPTY)
 		{
 			final IType parentType;

@@ -86,6 +86,16 @@ public class MapType extends ResolvedGenericType
 		return MAP;
 	}
 
+	@Override
+	public IClass getTheClass()
+	{
+		if (this.theClass != null)
+		{
+			return this.theClass;
+		}
+		return this.theClass = getClass(this.mutability);
+	}
+
 	public IType getKeyType()
 	{
 		return this.arguments.get(0);
@@ -105,7 +115,7 @@ public class MapType extends ResolvedGenericType
 	public void setMutability(Mutability mutability)
 	{
 		this.mutability = mutability;
-		this.theClass = getClass(mutability);
+		this.theClass = null; // clear class cache
 	}
 
 	private static IClass getClass(Mutability mutability)

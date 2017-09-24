@@ -2,6 +2,7 @@ package dyvil.collection.view;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.ImmutableIterator;
 import dyvil.util.Option;
@@ -89,7 +90,7 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	}
 
 	@Override
-	public V get(Object key)
+	public @Nullable V get(Object key)
 	{
 		return this.map.get(key);
 	}

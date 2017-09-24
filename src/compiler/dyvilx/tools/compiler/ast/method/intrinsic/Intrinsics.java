@@ -1,13 +1,14 @@
 package dyvilx.tools.compiler.ast.method.intrinsic;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.StringInterpolationExpr;
 import dyvilx.tools.compiler.ast.expression.intrinsic.*;
-import dyvilx.tools.compiler.ast.expression.optional.NullCoalescingOperator;
+import dyvilx.tools.compiler.ast.expression.optional.OptionalChainAware;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalChainOperator;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -16,7 +17,6 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.transform.Names;
-import dyvil.lang.Name;
 
 public class Intrinsics
 {
@@ -57,7 +57,7 @@ public class Intrinsics
 		case Intrinsic.OPTIONAL_CHAIN:
 			return new OptionalChainOperator(lhs);
 		case Intrinsic.NULL_COALESCING:
-			return new NullCoalescingOperator(lhs, arguments.getFirst());
+			return OptionalChainAware.nullCoalescing(lhs, arguments.getFirst());
 		// Strings
 		case Intrinsic.STRING_CONCAT:
 			return StringInterpolationExpr.apply(lhs, arguments.getFirst());
