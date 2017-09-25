@@ -162,6 +162,10 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				name = null;
 			}
+			else if (ParserUtil.isKeyword(type))
+			{
+				name = Name.fromRaw(token.stringValue());
+			}
 			else
 			{
 				if (ParserUtil.isCloseBracket(type))

@@ -66,15 +66,21 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		{
 		case NAME:
 			this.mode = VALUE;
-			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
+			this.name = null;
+			if (token.next().type() == BaseSymbols.COLON)
 			{
-				this.name = token.nameValue();
-				pm.skip();
-				return;
-			}
-			else
-			{
-				this.name = null;
+				if (ParserUtil.isIdentifier(type))
+				{
+					this.name = token.nameValue();
+					pm.skip();
+					return;
+				}
+				else if (ParserUtil.isKeyword(type)) // TODO do not accept modifier keywords
+				{
+					this.name = Name.fromRaw(token.stringValue());
+					pm.skip();
+					return;
+				}
 			}
 
 			this.mode = VALUE;

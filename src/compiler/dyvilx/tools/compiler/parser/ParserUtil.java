@@ -15,6 +15,11 @@ public class ParserUtil
 		return (type & Tokens.IDENTIFIER) != 0;
 	}
 
+	public static boolean isKeyword(int type)
+	{
+		return (type & Tokens.KEYWORD) != 0;
+	}
+
 	public static boolean isCloseBracket(int type)
 	{
 		return (type & BaseSymbols.CLOSE_BRACKET) == BaseSymbols.CLOSE_BRACKET;
