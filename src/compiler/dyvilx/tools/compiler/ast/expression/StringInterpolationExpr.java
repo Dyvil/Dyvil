@@ -19,7 +19,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaseClasses;
 import dyvilx.tools.compiler.util.Markers;
 import dyvil.lang.Name;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class StringInterpolationExpr implements IValue
@@ -338,7 +338,7 @@ public final class StringInterpolationExpr implements IValue
 			final int tag = value.valueTag();
 			if (tag == IValue.STRING || tag == IValue.CHAR)
 			{
-				LexerUtil.appendStringLiteralBody(value.stringValue(), buffer);
+				StringLiterals.appendStringLiteralBody(value.stringValue(), buffer);
 			}
 			else
 			{

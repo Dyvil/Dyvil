@@ -127,7 +127,7 @@ public final class DyvilLexer extends Lexer
 		case '.':
 		{
 			final int n = this.nextCodePoint();
-			if (LexerUtil.isIdentifierSymbol(n) || n == '.')
+			if (CharacterTypes.isIdentifierSymbol(n) || n == '.')
 			{
 				this.parseIdentifier('.', MOD_DOT);
 				return;
@@ -165,12 +165,12 @@ public final class DyvilLexer extends Lexer
 			this.advance();
 			return;
 		}
-		if (LexerUtil.isIdentifierSymbol(currentChar))
+		if (CharacterTypes.isIdentifierSymbol(currentChar))
 		{
 			this.parseIdentifier(currentChar, MOD_SYMBOL);
 			return;
 		}
-		if (LexerUtil.isIdentifierPart(currentChar))
+		if (CharacterTypes.isIdentifierPart(currentChar))
 		{
 			this.parseIdentifier(currentChar, MOD_LETTER);
 			return;
@@ -497,7 +497,7 @@ public final class DyvilLexer extends Lexer
 					continue;
 				}
 				// Fallthrough
-				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				if (radix >= 10 && !CharacterTypes.isIdentifierPart(this.nextCodePoint()))
 				{
 					this.advance();
 					type = 3; // double
@@ -505,7 +505,7 @@ public final class DyvilLexer extends Lexer
 				}
 				break;
 			case '.':
-				if (radix == 10 && LexerUtil.isDigit(this.nextCodePoint()))
+				if (radix == 10 && CharacterTypes.isDigit(this.nextCodePoint()))
 				{
 					this.buffer.append('.');
 					this.advance();
@@ -524,7 +524,7 @@ public final class DyvilLexer extends Lexer
 				if (radix == 10)
 				{
 					int n = this.nextCodePoint();
-					if (LexerUtil.isDigit(n))
+					if (CharacterTypes.isDigit(n))
 					{
 						this.buffer.append((char) currentChar);
 						this.advance();
@@ -548,7 +548,7 @@ public final class DyvilLexer extends Lexer
 					this.advance();
 					continue;
 				}
-				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				if (radix >= 10 && !CharacterTypes.isIdentifierPart(this.nextCodePoint()))
 				{
 					this.advance();
 					type = 2; // float
@@ -557,7 +557,7 @@ public final class DyvilLexer extends Lexer
 				break;
 			case 'l':
 			case 'L':
-				if (!LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				if (!CharacterTypes.isIdentifierPart(this.nextCodePoint()))
 				{
 					this.advance();
 					type = 1; // long
@@ -746,7 +746,7 @@ public final class DyvilLexer extends Lexer
 					subtype = MOD_LETTER | MOD_SYMBOL;
 					continue;
 				}
-				if (LexerUtil.isIdentifierPart(currentChar)) // also matches digits
+				if (CharacterTypes.isIdentifierPart(currentChar)) // also matches digits
 				{
 					this.buffer.appendCodePoint(currentChar);
 					this.advance(currentChar);
@@ -780,7 +780,7 @@ public final class DyvilLexer extends Lexer
 					subtype = MOD_LETTER | MOD_SYMBOL;
 					continue;
 				}
-				if (LexerUtil.isIdentifierSymbol(currentChar))
+				if (CharacterTypes.isIdentifierSymbol(currentChar))
 				{
 					this.buffer.appendCodePoint(currentChar);
 					this.advance();
@@ -795,14 +795,14 @@ public final class DyvilLexer extends Lexer
 					this.advance();
 					continue;
 				}
-				if (LexerUtil.isIdentifierPart(currentChar))
+				if (CharacterTypes.isIdentifierPart(currentChar))
 				{
 					this.buffer.appendCodePoint(currentChar);
 					this.advance(currentChar);
 					subtype = MOD_LETTER;
 					continue;
 				}
-				if (LexerUtil.isIdentifierSymbol(currentChar))
+				if (CharacterTypes.isIdentifierSymbol(currentChar))
 				{
 					this.buffer.appendCodePoint(currentChar);
 					this.advance(currentChar);
@@ -902,7 +902,7 @@ public final class DyvilLexer extends Lexer
 					this.advance();
 					break loop;
 				}
-				if (!LexerUtil.isHexDigit(codePoint))
+				if (!CharacterTypes.isHexDigit(codePoint))
 				{
 					this.error("escape.unicode.close_brace");
 					break;

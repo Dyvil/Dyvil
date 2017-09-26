@@ -7,14 +7,12 @@ import dyvilx.tools.compiler.ast.pattern.constant.*;
 import dyvilx.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvilx.tools.compiler.ast.pattern.operator.OrPattern;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -124,7 +122,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				this.mode = ENUM_IDENTIFIER;
 				return;
 			}
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				if (token.nameValue() == Names.minus)
 				{
@@ -137,7 +135,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				pm.popParser(true);
 			}
@@ -169,7 +167,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				return;
 			}
 		case ENUM_IDENTIFIER:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				this.pattern = new EnumPattern(token.raw(), token.nameValue());
 				this.mode = END;
@@ -198,7 +196,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return;
 		case TUPLE_END:
 			this.mode = END;
-			Util.expandPosition(this.pattern, token);
+			this.pattern.expandPosition(token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.tuple.close_paren");
@@ -206,7 +204,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return;
 		case CASE_CLASS_END:
 			this.mode = END;
-			Util.expandPosition(this.pattern, token);
+			this.pattern.expandPosition(token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.case_class.close_paren");
@@ -221,7 +219,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				final Name name = token.nameValue();
 				if (name == Names.bar)

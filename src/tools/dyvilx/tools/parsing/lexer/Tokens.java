@@ -12,18 +12,11 @@ public interface Tokens
 	int IDENTIFIER         = 0x00000001;
 	int LETTER_IDENTIFIER  = IDENTIFIER | MOD_LETTER;
 	int SYMBOL_IDENTIFIER  = IDENTIFIER | MOD_SYMBOL;
-	int DOT_IDENTIFIER     = IDENTIFIER | MOD_DOT;
 	int SPECIAL_IDENTIFIER = 0x00001001;
 
 	int KEYWORD = 0x00000002;
 	int SYMBOL  = 0x00000004;
 	int BRACKET = 0x00000008;
-
-	// NUMBERS
-	int MOD_DEC = 0x00000000;
-	int MOD_BIN = 0x00010000;
-	int MOD_OCT = 0x00020000;
-	int MOD_HEX = MOD_BIN | MOD_OCT;
 
 	int INT    = 0x00000010;
 	int LONG   = 0x00000020;
@@ -38,4 +31,19 @@ public interface Tokens
 	int SINGLE_QUOTED_STRING = 0x00000400;
 	int VERBATIM_STRING      = 0x00000800;
 	int VERBATIM_CHAR        = 0x00001000;
+
+	static boolean isIdentifier(int type)
+	{
+		return (type & IDENTIFIER) != 0;
+	}
+
+	static boolean isKeyword(int type)
+	{
+		return (type & KEYWORD) != 0;
+	}
+
+	static boolean isSymbolic(int type)
+	{
+		return type == SYMBOL_IDENTIFIER || (type & SYMBOL) != 0;
+	}
 }

@@ -5,12 +5,11 @@ import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -95,7 +94,7 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				this.mode = END;
 				return;
 			case DyvilKeywords.CASE:
-				if (!ParserUtil.isIdentifier(token.next().type()))
+				if (!Tokens.isIdentifier(token.next().type()))
 				{
 					break;
 				}

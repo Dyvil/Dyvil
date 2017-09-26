@@ -4,11 +4,10 @@ import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
@@ -131,7 +130,7 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 			return;
 		case SETTER_PARAMETER_NAME:
 			this.mode = SETTER_PARAMETER_END;
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				this.property.setSetterParameterName(token.nameValue());
 			}

@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.transform;
+package dyvilx.tools.compiler.parser;
 
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Symbols;

@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.parser.expression;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.IValueList;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -26,7 +25,7 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (ParserUtil.isCloseBracket(type))
+		if (BaseSymbols.isCloseBracket(type))
 		{
 			pm.popParser(true);
 			return;

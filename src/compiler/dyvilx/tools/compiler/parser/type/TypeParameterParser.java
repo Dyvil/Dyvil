@@ -9,15 +9,15 @@ import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 public final class TypeParameterParser extends Parser implements ITypeConsumer
@@ -78,14 +78,14 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			// Fallthrough
 		case VARIANCE:
 		{
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "type_parameter.identifier");
 				return;
 			}
 
 			final Name name = token.nameValue();
-			if (ParserUtil.isIdentifier(token.next().type()))
+			if (Tokens.isIdentifier(token.next().type()))
 			{
 				if (name == Names.plus)
 				{
@@ -105,7 +105,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			return;
 		}
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				this.createTypeParameter(token, this.variance);
 				return;
@@ -128,7 +128,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
+			if (BaseSymbols.isTerminator(type) || TypeParser.isGenericEnd(token, type))
 			{
 				if (this.typeParameter != null)
 				{

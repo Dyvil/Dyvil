@@ -7,14 +7,14 @@ import dyvilx.tools.compiler.ast.expression.TupleExpr;
 import dyvilx.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.BracketMatcher;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
-import dyvilx.tools.compiler.util.Util;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 public class LambdaOrTupleParser extends Parser
@@ -66,7 +66,7 @@ public class LambdaOrTupleParser extends Parser
 			 * produce syntax errors.
 			 */
 
-			final IToken closeParen = ParserUtil.findMatch(token);
+			final IToken closeParen = BracketMatcher.findMatch(token);
 			if (closeParen != null)
 			{
 				final IToken next = closeParen.next();
@@ -93,7 +93,7 @@ public class LambdaOrTupleParser extends Parser
 			this.mode = TUPLE_END;
 			return;
 		case TUPLE_END:
-			Util.expandPosition(this.value, token);
+			this.value.expandPosition(token);
 			this.consumer.setValue(this.value);
 
 			pm.popParser();
@@ -113,7 +113,7 @@ public class LambdaOrTupleParser extends Parser
 			}
 			return;
 		case SINGLE_PARAMETER:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
 				final IParameter parameter = lambdaExpr.createParameter(token.raw(), token.nameValue(), Types.UNKNOWN,

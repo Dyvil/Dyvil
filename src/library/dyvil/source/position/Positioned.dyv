@@ -12,5 +12,17 @@ interface Positioned
 
 	func setPosition(position: SourcePosition!) -> void
 
+	final func expandPosition(to: SourcePosition) -> void
+	{
+		if let from = this.getPosition()
+		{
+			this.setPosition(from .. to)
+		}
+		else
+		{
+			this.setPosition(to.raw)
+		}
+	}
+
 	func lineNumber() -> int = this.position?.startLine ?? 0
 }

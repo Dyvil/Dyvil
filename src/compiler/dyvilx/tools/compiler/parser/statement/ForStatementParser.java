@@ -12,11 +12,10 @@ import dyvilx.tools.compiler.ast.statement.loop.ForEachStatement;
 import dyvilx.tools.compiler.ast.statement.loop.ForStatement;
 import dyvilx.tools.compiler.ast.statement.loop.IForStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -164,7 +163,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			this.parseEnd(pm, token, type);
 			return;
 		case STATEMENT:
-			if (ParserUtil.isTerminator(type) && !token.isInferred())
+			if (BaseSymbols.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				this.field.setValue(this.forStatement);

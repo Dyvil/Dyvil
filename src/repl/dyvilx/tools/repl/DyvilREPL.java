@@ -5,14 +5,14 @@ import dyvil.collection.mutable.TreeMap;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
-import dyvilx.tools.compiler.transform.SemicolonInference;
+import dyvilx.tools.compiler.parser.SemicolonInference;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.repl.command.*;
 import dyvilx.tools.repl.context.REPLClassLoader;
@@ -167,8 +167,8 @@ public final class DyvilREPL
 		{
 			final String trim = input.trim();
 			if (trim.length() > 1 // not a single colon
-				    && trim.charAt(0) == ':' // first character must be a colon
-				    && LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
+			    && trim.charAt(0) == ':' // first character must be a colon
+			    && CharacterTypes.isIdentifierPart(trim.charAt(1))) // next character must be a letter
 			{
 				this.runCommand(trim);
 				return;

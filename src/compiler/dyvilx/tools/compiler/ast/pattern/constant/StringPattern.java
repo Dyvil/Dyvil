@@ -11,7 +11,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class StringPattern extends Pattern
@@ -118,6 +118,6 @@ public final class StringPattern extends Pattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		LexerUtil.appendStringLiteral(this.value, buffer);
+		StringLiterals.appendStringLiteral(this.value, buffer);
 	}
 }

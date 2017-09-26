@@ -248,7 +248,7 @@ public class TypeParameterList implements IResolvable
 
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (Util.endsWithSymbol(buffer) || Formatting.getBoolean("generics.open_bracket.space_before"))
+		if (Formatting.endsWithSymbol(buffer) || Formatting.getBoolean("generics.open_bracket.space_before"))
 		{
 			buffer.append(' ');
 		}

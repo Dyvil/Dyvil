@@ -3,7 +3,7 @@ package dyvilx.tools.repl.input;
 import dyvilx.tools.compiler.parser.classes.MemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.TryParserManager;

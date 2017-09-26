@@ -5,7 +5,6 @@ import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.NamedArgumentList;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -51,7 +50,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (ParserUtil.isCloseBracket(type) || type == Tokens.EOF)
+		if (BaseSymbols.isCloseBracket(type) || type == Tokens.EOF)
 		{
 			if (this.name != null)
 			{
@@ -69,13 +68,13 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 			this.name = null;
 			if (token.next().type() == BaseSymbols.COLON)
 			{
-				if (ParserUtil.isIdentifier(type))
+				if (Tokens.isIdentifier(type))
 				{
 					this.name = token.nameValue();
 					pm.skip();
 					return;
 				}
-				else if (ParserUtil.isKeyword(type)) // TODO do not accept modifier keywords
+				else if (Tokens.isKeyword(type)) // TODO do not accept modifier keywords
 				{
 					this.name = Name.fromRaw(token.stringValue());
 					pm.skip();
@@ -103,7 +102,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 	{
 		final int nextType = next.type();
 
-		if (ParserUtil.isCloseBracket(nextType))
+		if (BaseSymbols.isCloseBracket(nextType))
 		{
 			consumer.setArguments(ArgumentList.empty());
 			return;

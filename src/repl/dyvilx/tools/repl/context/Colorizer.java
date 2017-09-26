@@ -3,7 +3,7 @@ package dyvilx.tools.repl.context;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.io.Console;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;

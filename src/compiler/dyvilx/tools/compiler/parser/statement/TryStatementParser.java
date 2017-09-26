@@ -10,10 +10,9 @@ import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.exception.CatchBlock;
 import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -65,7 +64,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 				this.mode = END;
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				int nextType = token.next().type();
 				if (nextType == Tokens.EOF)

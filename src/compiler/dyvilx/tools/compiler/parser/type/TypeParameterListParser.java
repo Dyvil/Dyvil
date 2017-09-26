@@ -1,9 +1,9 @@
 package dyvilx.tools.compiler.parser.type;
 
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
+import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
 public class TypeParameterListParser extends Parser
@@ -30,13 +30,13 @@ public class TypeParameterListParser extends Parser
 			pm.pushParser(new TypeParameterParser(this.typeParameterized), true);
 			return;
 		case COMMA:
-			if (ParserUtil.isCloseBracket(type) || TypeParser.isGenericEnd(token, type))
+			if (BaseSymbols.isCloseBracket(type) || TypeParser.isGenericEnd(token, type))
 			{
 				pm.popParser(true);
 				return;
 			}
 			this.mode = TYPE_VARIABLE;
-			if (!ParserUtil.isTerminator(type))
+			if (!BaseSymbols.isTerminator(type))
 			{
 				pm.report(token, "type_parameter.list.comma");
 				pm.reparse();

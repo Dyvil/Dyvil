@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class StringValue implements IConstantValue
@@ -138,6 +138,6 @@ public final class StringValue implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		LexerUtil.appendStringLiteral(this.value, buffer);
+		StringLiterals.appendStringLiteral(this.value, buffer);
 	}
 }

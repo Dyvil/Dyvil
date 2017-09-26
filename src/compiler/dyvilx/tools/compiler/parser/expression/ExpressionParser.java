@@ -21,23 +21,22 @@ import dyvilx.tools.compiler.ast.statement.exception.ThrowStatement;
 import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvilx.tools.compiler.ast.statement.loop.WhileStatement;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.BracketMatcher;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.statement.*;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-import static dyvilx.tools.compiler.parser.ParserUtil.*;
+import static dyvilx.tools.parsing.lexer.Tokens.isSymbolic;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
 {
@@ -222,7 +221,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isExpressionEnd(type))
+			if (isExpressionEnd(type))
 			{
 				// ... ]
 
@@ -231,7 +230,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (isSymbol(type))
+			if (isSymbolic(type))
 			{
 				// EXPRESSION IDENTIFIER
 				// EXPRESSION SYMBOL
@@ -265,7 +264,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				if (this.value == null)
 				{
@@ -282,7 +281,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			pm.report(Markers.syntaxError(token, "expression.access.dot.invalid"));
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				pm.popParser(true);
 				return;
@@ -295,7 +294,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// ... ( ... )
 			//           ^
 			this.mode = ACCESS;
-			Util.expandPosition(this.value, token);
+			this.value.expandPosition(token);
 
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
@@ -308,7 +307,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// ... [ ... ]
 			//           ^
 			this.mode = ACCESS;
-			Util.expandPosition(this.value, token);
+			this.value.expandPosition(token);
 
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
@@ -371,12 +370,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (isSymbol(type))
+		if (isSymbolic(type))
 		{
 			// Identifier is an operator
 			final IToken prev = token.prev();
-			final boolean leftNeighbor = neighboring(prev, token);
-			final boolean rightNeighbor = neighboring(token, next);
+			final boolean leftNeighbor = prev.isNeighboring(token);
+			final boolean rightNeighbor = token.isNeighboring(next);
 
 			if (this.value == null) // prefix
 			{
@@ -535,12 +534,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			return true;
 		}
-		if (isSymbol(nextType) && nextType != DyvilSymbols.UNDERSCORE)
+		if (isSymbolic(nextType) && nextType != DyvilSymbols.UNDERSCORE)
 		{
 			// IDENTIFIER_SYMBOL ...
 			// IDENTIFIER SYMBOL EXPRESSION
 
-			return neighboring(token, next) || isExpressionEnd(next.next().type()) || !neighboring(next, next.next());
+			return token.isNeighboring(next) || isExpressionEnd(next.next().type()) || !next.isNeighboring(next.next());
 		}
 		// IDENTIFIER END
 		// token      next
@@ -558,7 +557,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		// IDENTIFIER <
 
-		final IToken endToken = ParserUtil.findMatch(token, true);
+		final IToken endToken = BracketMatcher.findMatch(token, true);
 		if (endToken == null)
 		{
 			// No closing angle bracket found
@@ -581,7 +580,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// IDENTIFIER < ... >SYMBOL
 
 			// Return true iff the end token and the next token are NOT separated by whitespace
-			return neighboring(endToken, endTokenNext);
+			return endToken.isNeighboring(endTokenNext);
 		}
 
 		// IDENTIFIER < ... >
@@ -607,7 +606,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// Return true iff the symbol token is either followed by a token that ends an expression
 			// or separated from the next token via whitespace.
 			final IToken endTokenNextNext = endTokenNext.next();
-			return isExpressionEnd(endTokenNextNext.type()) || !neighboring(endTokenNext, endTokenNextNext);
+			return isExpressionEnd(endTokenNextNext.type()) || !endTokenNext.isNeighboring(endTokenNextNext);
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			// IDENTIFIER < ... > {
 			return true;
@@ -617,7 +616,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// Return true iff they are NOT separated by whitespace
 			// IDENTIFIER < ... >(
 			// IDENTIFIER < ... >[
-			return neighboring(endToken, endTokenNext);
+			return endToken.isNeighboring(endTokenNext);
 		}
 		return false;
 	}
@@ -875,8 +874,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// while ...
 
 			if (this.parent instanceof RepeatStatementParser // repeat parent
-				    || this.parent instanceof ExpressionParser // repeat grandparent
-					       && this.parent.getParent() instanceof RepeatStatementParser)
+			    || this.parent instanceof ExpressionParser // repeat grandparent
+			       && this.parent.getParent() instanceof RepeatStatementParser)
 			{
 				this.end(pm, true);
 				return true;
@@ -912,7 +911,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = breakStatement;
 
 			final IToken next = token.next();
-			if (isIdentifier(next.type()))
+			if (Tokens.isIdentifier(next.type()))
 			{
 				breakStatement.setName(next.nameValue());
 				pm.skip();
@@ -927,7 +926,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = continueStatement;
 
 			final IToken next = token.next();
-			if (isIdentifier(next.type()))
+			if (Tokens.isIdentifier(next.type()))
 			{
 				continueStatement.setName(next.nameValue());
 				pm.skip();
@@ -942,7 +941,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = statement;
 
 			final IToken next = token.next();
-			if (isIdentifier(next.type()))
+			if (Tokens.isIdentifier(next.type()))
 			{
 				statement.setName(next.nameValue());
 				pm.skip();
@@ -1006,6 +1005,29 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.mode = END;
 			return true;
 		}
+		}
+		return false;
+	}
+
+	public static boolean isExpressionEnd(int type)
+	{
+		if (BaseSymbols.isTerminator(type))
+		{
+			return true;
+		}
+		switch (type)
+		{
+		case BaseSymbols.DOT:
+		case BaseSymbols.EQUALS:
+		case DyvilKeywords.IS:
+		case DyvilKeywords.AS:
+		case DyvilKeywords.MATCH:
+		case DyvilKeywords.ELSE:
+		case DyvilKeywords.FINALLY:
+		case DyvilKeywords.CATCH:
+		case Tokens.STRING_PART:
+		case Tokens.STRING_END:
+			return true;
 		}
 		return false;
 	}

@@ -12,11 +12,10 @@ import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
@@ -137,7 +136,7 @@ public class DyvilHeaderParser extends Parser
 		if (type == DyvilKeywords.HEADER)
 		{
 			IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (Tokens.isIdentifier(next.type()))
 			{
 				pm.skip();
 				if (this.unit.getHeaderDeclaration() != null)

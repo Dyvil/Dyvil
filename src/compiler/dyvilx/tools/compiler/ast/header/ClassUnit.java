@@ -9,7 +9,7 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.parser.header.DyvilUnitParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.ParserManager;
 

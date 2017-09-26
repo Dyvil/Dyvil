@@ -20,13 +20,12 @@ import dyvilx.tools.compiler.ast.statement.MemberStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.statement.VariableStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.classes.MemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -184,7 +183,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			pm.pushParser(new ExpressionParser(this));
 			return;
 		case LABEL_NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				this.label = token.nameValue();
 				this.mode = LABEL_END;
