@@ -1,12 +1,12 @@
 package dyvilx.tools.gensrc.lexer;
 
-import dyvilx.tools.gensrc.ast.Util;
 import dyvil.lang.Name;
+import dyvilx.tools.gensrc.ast.Util;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.lexer.Lexer;
-import dyvilx.tools.parsing.lexer.LexerUtil;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.token.IdentifierToken;
 import dyvilx.tools.parsing.token.StringToken;
@@ -243,7 +243,7 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 		int startIndex = this.cursor;
 
 		int current = this.codePoint();
-		while (current != 0 && LexerUtil.isIdentifierPart(current))
+		while (current != 0 && CharacterTypes.isIdentifierPart(current))
 		{
 			this.advance(current);
 			current = this.codePoint();

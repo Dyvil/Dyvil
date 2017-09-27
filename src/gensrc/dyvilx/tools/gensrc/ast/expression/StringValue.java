@@ -2,7 +2,7 @@ package dyvilx.tools.gensrc.ast.expression;
 
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.gensrc.ast.scope.Scope;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 
 public class StringValue implements Expression
 {
@@ -36,6 +36,6 @@ public class StringValue implements Expression
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		LexerUtil.appendStringLiteral(this.value, builder);
+		StringLiterals.appendStringLiteral(this.value, builder);
 	}
 }
