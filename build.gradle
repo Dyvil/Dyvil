@@ -150,8 +150,6 @@ dependencies {
 	def bootstrap = files('libs/dyvil-bootstrap.jar')
 	def libComp = sourceSets.library.output
 
-	gensrcCompile bootstrap
-
 	libraryRuntime libRun
 	libraryCompile bootstrap
 
@@ -169,6 +167,11 @@ dependencies {
 	replCompile libComp, sourceSets.compiler.output
 	replRuntime libRun, dpfRun, testRun
 	replCompile bootstrap
+
+	// gensrc -> library
+	gensrcCompile libComp
+	gensrcRuntime libRun
+	gensrcCompile bootstrap
 
 	// test -> library, junit
 	testCompile libComp, 'junit:junit:4.12'
@@ -275,11 +278,11 @@ tasks.withType(JavaCompile) {
 	it.options.fork = true
 }
 
-task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+task genLibrary(type: JavaExec) { JavaExec exec ->
 	runGenSrc exec, "$buildDir/gensrc/library/", 'src/library/', 'src/gensrc-base'
 }
 
-task genDPF(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+task genDPF(type: JavaExec) { JavaExec exec ->
 	runGenSrc exec, "$buildDir/gensrc/dpf/", 'src/dpf/', 'src/gensrc-base'
 }
 
@@ -327,7 +330,7 @@ private void runGenSrc(JavaExec exec, String target, String... srcs)
 	exec.outputs.dirs target
 
 	exec.main = genSrcMainClass
-	exec.classpath = sourceSets.gensrc.runtimeClasspath
+	exec.classpath = files("libs/dyvil-bootstrap.jar")
 	exec.args = [ "target=$target", '--ansi' ]
 
 	for (String src : srcs)
@@ -444,9 +447,10 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 /**
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
-task bootstrap(type: Jar, dependsOn: [ 'buildLibrary', 'buildCompiler' ]) {
+task bootstrap(type: Jar, dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildGenSrc' ]) {
 	from zipTree(buildLibrary.archivePath)
 	from zipTree(buildCompiler.archivePath)
+	from zipTree(buildGenSrc.archivePath)
 
 	destinationDir = file("libs/")
 	archiveName = "dyvil-bootstrap.jar"
