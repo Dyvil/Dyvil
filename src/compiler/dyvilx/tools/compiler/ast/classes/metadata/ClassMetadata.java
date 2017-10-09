@@ -275,7 +275,7 @@ public class ClassMetadata implements IClassMetadata
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IParameter parameter = parameters.get(i);
-			if (!parameter.hasModifier(Modifiers.SYNTHETIC))
+			if (!parameter.hasModifier(Modifiers.SYNTHETIC) && !parameter.hasModifier(Modifiers.OVERRIDE))
 			{
 				constructorBody.add(new ClassParameterSetter(this.theClass, parameters.get(i)));
 			}

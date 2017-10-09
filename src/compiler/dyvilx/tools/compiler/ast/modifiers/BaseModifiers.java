@@ -64,7 +64,7 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that can be applied to class parameters.
 	 */
-	public static final String CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS + "final,implicit,explicit,";
+	public static final String CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS + "final,implicit,explicit,override,";
 
 	/**
 	 * The modifiers that cna be applied to variables.

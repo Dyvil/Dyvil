@@ -621,10 +621,17 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
+	protected IParameter resolveClassParameter(Name name)
+	{
+		final IParameter parameter = this.parameters.get(name);
+		// do not expose override class parameters
+		return parameter == null || parameter.hasModifier(Modifiers.OVERRIDE) ? null : parameter;
+	}
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.get(name);
+		final IParameter parameter = this.resolveClassParameter(name);
 		if (parameter != null)
 		{
 			return parameter;

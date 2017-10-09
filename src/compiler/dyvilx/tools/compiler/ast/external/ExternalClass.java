@@ -354,7 +354,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.get(name);
+		final IParameter parameter = this.resolveClassParameter(name);
 		if (parameter != null)
 		{
 			return parameter;

@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.parameter;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.annotation.AnnotationList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -18,16 +20,14 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ClassParameter extends Field implements IParameter
 {
 	// Metadata
-	protected int     index;
-	protected int     localIndex;
-	protected IType   covariantType;
+	protected int   index;
+	protected int   localIndex;
+	protected IType covariantType;
 
 	protected ICallableMember constructor;
 
@@ -208,9 +208,23 @@ public class ClassParameter extends Field implements IParameter
 	{
 		super.resolve(markers, context);
 
-		if (this.value !=null)
+		if (this.value != null)
 		{
 			this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+		}
+
+		if (this.hasModifier(Modifiers.OVERRIDE))
+		{
+			IDataMember superField = this.enclosingClass.getSuperType().resolveField(this.name);
+			if (superField == null)
+			{
+				markers.add(Markers.semanticError(this.position, "class_parameter.override.not_found", this.name));
+			}
+			else if (superField.hasModifier(Modifiers.STATIC))
+			{
+				markers.add(Markers.semanticError(this.position, "class_parameter.override.static", this.name,
+				                                  superField.getEnclosingClass().getFullName()));
+			}
 		}
 	}
 
@@ -223,7 +237,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.enclosingClass.isAnnotation())
+		if (this.enclosingClass.isAnnotation() || this.hasModifier(Modifiers.OVERRIDE))
 		{
 			return;
 		}
