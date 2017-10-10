@@ -6,7 +6,10 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.CodeConstructor;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.access.ClassParameterSetter;
+import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
@@ -218,8 +221,8 @@ public class ClassMetadata implements IClassMetadata
 		{
 			// Generate the constructor signature
 
-			final CodeConstructor constructor = new CodeConstructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC
-				                                                                                           | Modifiers.GENERATED));
+			final FlagModifierSet modifiers = new FlagModifierSet(Modifiers.PUBLIC | Modifiers.GENERATED);
+			final CodeConstructor constructor = new CodeConstructor(this.theClass, modifiers);
 
 			this.copyClassParameters(constructor);
 
@@ -243,7 +246,7 @@ public class ClassMetadata implements IClassMetadata
 			final IParameter classParameter = from.get(i);
 
 			final ModifierSet modifiers = new FlagModifierSet(classParameter.getModifiers().toFlags()
-				                                                  & Modifiers.PARAMETER_MODIFIERS);
+			                                                  & Modifiers.PARAMETER_MODIFIERS);
 
 			ctrParams.add(constructor.createParameter(classParameter.getPosition(), classParameter.getName(),
 			                                          classParameter.getType(), modifiers,
@@ -269,19 +272,26 @@ public class ClassMetadata implements IClassMetadata
 			this.constructor.setInitializer(this.superInitializer);
 		}
 
-		final StatementList constructorBody = new StatementList();
-		final ParameterList parameters = this.constructor.getParameters();
+		final ParameterList classParams = this.theClass.getParameters();
+		final StatementList ctorBody = new StatementList();
+		final ParameterList ctorParams = this.constructor.getParameters();
 
-		for (int i = 0, count = parameters.size(); i < count; i++)
+		for (int i = 0, count = ctorParams.size(); i < count; i++)
 		{
-			final IParameter parameter = parameters.get(i);
-			if (!parameter.hasModifier(Modifiers.SYNTHETIC) && !parameter.hasModifier(Modifiers.OVERRIDE))
+			final IParameter ctorParam = ctorParams.get(i);
+			final IParameter classParam = classParams.get(i);
+			if (ctorParam.hasModifier(Modifiers.SYNTHETIC) || classParam.hasModifier(Modifiers.OVERRIDE))
 			{
-				constructorBody.add(new ClassParameterSetter(this.theClass, parameters.get(i)));
+				continue;
 			}
+
+			final IValue receiver = new ThisExpr(this.theClass);
+			final FieldAccess access = new FieldAccess(ctorParam);
+			final FieldAssignment assignment = new FieldAssignment(null, receiver, classParam, access);
+			ctorBody.add(assignment);
 		}
 
-		this.constructor.setValue(constructorBody);
+		this.constructor.setValue(ctorBody);
 	}
 
 	@Override
@@ -323,7 +333,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
-		if (hasDefaultConstructor())
+		if (this.hasDefaultConstructor())
 		{
 			this.constructor.checkMatch(list, arguments);
 		}
@@ -332,7 +342,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (hasDefaultConstructor())
+		if (this.hasDefaultConstructor())
 		{
 			this.constructor.write(writer);
 		}
