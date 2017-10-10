@@ -194,7 +194,7 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
 
 				if (!this.enclosingClass.isAnonymous())
 				{

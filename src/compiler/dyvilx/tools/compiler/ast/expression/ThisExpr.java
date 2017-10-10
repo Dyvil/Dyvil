@@ -23,6 +23,12 @@ public final class ThisExpr implements IValue
 	// Metadata
 	protected IAccessible getter;
 
+	public ThisExpr(IClass type)
+	{
+		this.type = type.getThisType();
+		this.getter = type.getAccessibleThis(type);
+	}
+
 	public ThisExpr(IType type)
 	{
 		this.type = type;
@@ -39,7 +45,7 @@ public final class ThisExpr implements IValue
 		this.position = position;
 	}
 
-	public ThisExpr(SourcePosition position, IType type, IContext context, MarkerList markers)
+	public ThisExpr(SourcePosition position, IType type, MarkerList markers, IContext context)
 	{
 		this.position = position;
 		this.type = type;

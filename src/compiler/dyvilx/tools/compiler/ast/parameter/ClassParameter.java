@@ -173,7 +173,7 @@ public class ClassParameter extends Field implements IParameter
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
-			return new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
+			return new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
 		}
 
 		ModifierUtil.checkVisibility(this, position, markers, context);

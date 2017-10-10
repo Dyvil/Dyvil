@@ -668,7 +668,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// unqualified call
 				final IType receiverType = this.enclosingClass.getThisType();
-				receiver = new ThisExpr(position, receiverType, context, markers);
+				receiver = new ThisExpr(position, receiverType, markers, context);
 				if (genericData != null)
 				{
 					genericData.setFallbackTypeContext(receiverType);
