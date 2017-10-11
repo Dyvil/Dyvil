@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
@@ -36,8 +36,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	protected IClassConsumer consumer;
 
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
-	protected ModifierSet    modifiers;
-	protected AnnotationList annotations;
+	protected ModifierSet   modifiers;
+	protected AttributeList annotations;
 
 	private IClass theClass;
 
@@ -47,7 +47,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		// this.mode = NAME;
 	}
 
-	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
+	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AttributeList annotations)
 	{
 		this.consumer = consumer;
 

@@ -10,7 +10,7 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -72,7 +72,7 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type, modifiers);
 	}
 
-	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}

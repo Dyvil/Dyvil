@@ -158,7 +158,7 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 		}
 		if (this.annotations != null)
 		{
-			method.setAnnotations(this.annotations);
+			method.setAttributes(this.annotations);
 			this.annotations = null;
 		}
 	}

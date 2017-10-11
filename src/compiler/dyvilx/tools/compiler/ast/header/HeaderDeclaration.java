@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.header;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotated;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.Attributable;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.member.INamed;
@@ -20,14 +20,14 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated, IObjectCompilable
+public class HeaderDeclaration implements ASTNode, INamed, IModified, Attributable, IObjectCompilable
 {
 	protected final IHeaderUnit header;
 
 	protected SourcePosition position;
 
-	protected AnnotationList annotations;
-	protected ModifierSet    modifiers;
+	protected AttributeList annotations;
+	protected ModifierSet   modifiers;
 
 	protected Name name;
 
@@ -44,7 +44,7 @@ public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated
 	}
 
 	public HeaderDeclaration(IHeaderUnit header, SourcePosition position, Name name, ModifierSet modifiers,
-		                        AnnotationList annotations)
+		                        AttributeList annotations)
 	{
 		this.header = header;
 		this.position = position;
@@ -72,19 +72,19 @@ public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		if (this.annotations != null)
 		{
 			return this.annotations;
 		}
-		return this.annotations = new AnnotationList();
+		return this.annotations = new AttributeList();
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.annotations = attributes;
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated
 		out.writeUTF(this.name.unqualified);
 
 		ModifierSet.write(this.modifiers, out);
-		AnnotationList.write(this.annotations, out);
+		AttributeList.write(this.annotations, out);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated
 		this.name = Name.read(in);
 
 		this.modifiers = ModifierSet.read(in);
-		this.annotations = AnnotationList.read(in);
+		this.annotations = AttributeList.read(in);
 	}
 
 	@Override

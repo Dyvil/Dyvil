@@ -10,7 +10,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -114,7 +114,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	public AbstractMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                     AnnotationList annotations)
+		                     AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}

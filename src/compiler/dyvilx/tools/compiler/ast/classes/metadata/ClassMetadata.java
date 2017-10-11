@@ -250,7 +250,7 @@ public class ClassMetadata implements IClassMetadata
 
 			ctrParams.add(constructor.createParameter(classParameter.getPosition(), classParameter.getName(),
 			                                          classParameter.getType(), modifiers,
-			                                          classParameter.getAnnotations()));
+			                                          classParameter.getAttributes()));
 		}
 	}
 

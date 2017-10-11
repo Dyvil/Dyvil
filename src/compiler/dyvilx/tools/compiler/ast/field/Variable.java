@@ -4,7 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -75,7 +75,7 @@ public class Variable extends Member implements IVariable
 		this.type = type;
 	}
 
-	public Variable(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Variable(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}

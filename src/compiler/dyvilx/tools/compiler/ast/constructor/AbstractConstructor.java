@@ -4,7 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -63,7 +63,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}

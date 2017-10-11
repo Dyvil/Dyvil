@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.external;
 
 import dyvil.annotation.Reified;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
@@ -162,10 +162,10 @@ public class ExternalTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override

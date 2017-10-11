@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.external;
 
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -26,7 +26,7 @@ public class ExternalParameter extends AbstractParameter
 		super(callable, null, name, type);
 	}
 
-	public ExternalParameter(ICallableMember callable, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public ExternalParameter(ICallableMember callable, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(callable, null, name, type, modifiers, annotations);
 	}
@@ -81,10 +81,10 @@ public class ExternalParameter extends AbstractParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.field.EnumConstant;
 import dyvilx.tools.compiler.ast.modifiers.ModifierList;
@@ -28,7 +28,7 @@ public class EnumConstantParser extends AbstractMemberParser
 		this.modifiers = new ModifierList();
 	}
 
-	public EnumConstantParser(IMemberConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
+	public EnumConstantParser(IMemberConsumer consumer, ModifierSet modifiers, AttributeList annotations)
 	{
 		this.consumer = consumer;
 		this.modifiers = modifiers;

@@ -9,7 +9,7 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -55,7 +55,7 @@ public class CodeClass extends AbstractClass
 	{
 	}
 
-	public CodeClass(SourcePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+	public CodeClass(SourcePosition position, Name name, ModifierSet modifiers, AttributeList annotations)
 	{
 		this.position = position;
 		this.name = name;
@@ -776,7 +776,7 @@ public class CodeClass extends AbstractClass
 	public void write(DataOutput out) throws IOException
 	{
 		ModifierSet.write(this.modifiers, out);
-		AnnotationList.write(this.annotations, out);
+		AttributeList.write(this.annotations, out);
 
 		out.writeUTF(this.name.unqualified);
 
@@ -804,7 +804,7 @@ public class CodeClass extends AbstractClass
 	public void read(DataInput in) throws IOException
 	{
 		this.modifiers = ModifierSet.read(in);
-		this.annotations = AnnotationList.read(in);
+		this.annotations = AttributeList.read(in);
 
 		this.name = Name.read(in);
 

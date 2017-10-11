@@ -9,7 +9,7 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.FieldVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -76,7 +76,7 @@ public class Field extends Member implements IField
 	}
 
 	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		            AnnotationList annotations)
+		            AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 		this.enclosingClass = enclosingClass;
@@ -532,7 +532,7 @@ public class Field extends Member implements IField
 	{
 		ModifierUtil.writeModifiers(fieldVisitor, this, flags);
 
-		final AnnotationList annotations = this.getAnnotations();
+		final AttributeList annotations = this.getAttributes();
 		if (annotations != null)
 		{
 			int count = annotations.size();

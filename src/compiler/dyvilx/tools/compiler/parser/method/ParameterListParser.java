@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.parser.method;
 
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.modifiers.Modifier;
@@ -47,8 +47,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	protected IParametric consumer;
 
 	// Metadata
-	private ModifierList   modifiers;
-	private AnnotationList annotations;
+	private ModifierList  modifiers;
+	private AttributeList annotations;
 
 	private IType type = Types.UNKNOWN;
 
@@ -124,7 +124,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			case DyvilSymbols.AT:
 				if (this.annotations == null)
 				{
-					this.annotations = new AnnotationList();
+					this.annotations = new AttributeList();
 				}
 
 				final Annotation annotation = new Annotation(token.raw());

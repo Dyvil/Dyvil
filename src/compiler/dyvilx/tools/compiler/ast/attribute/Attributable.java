@@ -1,16 +1,17 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.attribute;
 
+import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 
 import java.lang.annotation.ElementType;
 
-public interface IAnnotated
+public interface Attributable
 {
 	ElementType getElementType();
 
-	AnnotationList getAnnotations();
+	AttributeList getAttributes();
 
-	void setAnnotations(AnnotationList annotations);
+	void setAttributes(AttributeList attributes);
 
 	IAnnotation getAnnotation(IClass type);
 

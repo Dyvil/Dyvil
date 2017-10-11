@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.external;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -68,10 +68,10 @@ public class ExternalClassParameter extends ClassParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override

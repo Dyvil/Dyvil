@@ -28,7 +28,7 @@ public class AnnotationClassVisitor implements MethodVisitor
 		if (this.parameter.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationReader(this.parameter.getAnnotations(), annotation);
+			return new AnnotationReader(this.parameter.getAttributes(), annotation);
 		}
 		return null;
 	}

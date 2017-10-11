@@ -7,7 +7,7 @@ import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.parsing.ASTNode;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
@@ -186,7 +186,7 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 
 	@Override
 	public IField createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                              AnnotationList annotations)
+		                              AttributeList annotations)
 	{
 		return new Field(this.enclosingClass, position, name, type, modifiers, annotations);
 	}

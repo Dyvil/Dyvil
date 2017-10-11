@@ -8,7 +8,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.*;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.AbstractClass;
@@ -249,10 +249,10 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override
@@ -497,11 +497,11 @@ public final class ExternalClass extends AbstractClass
 		{
 			if (this.annotations == null)
 			{
-				this.annotations = new AnnotationList();
+				this.annotations = new AttributeList();
 			}
 
 			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationReader(this.getAnnotations(), annotation);
+			return new AnnotationReader(this.getAttributes(), annotation);
 		}
 		return null;
 	}
@@ -532,7 +532,7 @@ public final class ExternalClass extends AbstractClass
 				return null;
 			}
 
-			typeVar.getAnnotations().add(annotation);
+			typeVar.getAttributes().add(annotation);
 			break;
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:

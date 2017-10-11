@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.header;
 
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.header.*;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
@@ -40,8 +40,8 @@ public class DyvilHeaderParser extends Parser
 	protected IHeaderUnit unit;
 
 	// Parser data
-	protected ModifierSet    modifiers;
-	protected AnnotationList annotations;
+	protected ModifierSet   modifiers;
+	protected AttributeList annotations;
 
 	protected int flags;
 
@@ -210,7 +210,7 @@ public class DyvilHeaderParser extends Parser
 		reportInvalidElement(pm, token);
 	}
 
-	public static boolean hasModifiers(ModifierSet modifiers, AnnotationList annotations)
+	public static boolean hasModifiers(ModifierSet modifiers, AttributeList annotations)
 	{
 		return modifiers != null && !modifiers.isEmpty() || annotations != null && annotations.size() != 0;
 	}
@@ -224,7 +224,7 @@ public class DyvilHeaderParser extends Parser
 	{
 		if (this.annotations == null)
 		{
-			this.annotations = new AnnotationList();
+			this.annotations = new AttributeList();
 		}
 
 		final Annotation annotation = new Annotation(token.raw());

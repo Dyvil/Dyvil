@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.statement;
 
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
@@ -306,7 +306,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 
 	@Override
 	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+		                                 AttributeList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}
@@ -319,7 +319,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 
 	@Override
 	public IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                           AnnotationList annotations)
+		                           AttributeList annotations)
 	{
 		return new NestedMethod(position, name, type, modifiers, annotations);
 	}

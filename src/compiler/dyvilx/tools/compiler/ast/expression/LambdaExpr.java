@@ -5,7 +5,7 @@ import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
@@ -152,7 +152,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	@Override
 	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+		                                 AttributeList annotations)
 	{
 		return new CodeParameter(null, position, name, type, modifiers, annotations);
 	}

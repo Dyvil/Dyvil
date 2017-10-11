@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -44,7 +44,7 @@ public class CodeParameter extends AbstractParameter
 	}
 
 	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                    AnnotationList annotations)
+		                    AttributeList annotations)
 	{
 		super(callable, position, name, type, modifiers, annotations);
 	}

@@ -1,7 +1,9 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.attribute;
 
 import dyvil.annotation.internal.NonNull;
 import dyvilx.tools.asm.AnnotatableVisitor;
+import dyvilx.tools.compiler.ast.annotation.Annotation;
+import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -14,17 +16,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class AnnotationList implements IAnnotationConsumer
+public class AttributeList implements IAnnotationConsumer
 {
 	protected IAnnotation[] annotations;
 	protected int           size;
 
-	public AnnotationList()
+	public AttributeList()
 	{
 		this.annotations = new IAnnotation[2];
 	}
 
-	public AnnotationList(int capacity)
+	public AttributeList(int capacity)
 	{
 		this.annotations = new IAnnotation[capacity];
 	}
@@ -81,7 +83,7 @@ public class AnnotationList implements IAnnotationConsumer
 		}
 	}
 
-	public void addAll(AnnotationList list)
+	public void addAll(AttributeList list)
 	{
 		this.ensureCapacity(this.size + list.size);
 		System.arraycopy(list.annotations, 0, this.annotations, this.size, list.size);
@@ -105,7 +107,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	// Phases
 
-	public void resolveTypes(MarkerList markers, IContext context, IAnnotated annotated)
+	public void resolveTypes(MarkerList markers, IContext context, Attributable annotated)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -170,7 +172,7 @@ public class AnnotationList implements IAnnotationConsumer
 		}
 	}
 
-	public static void write(AnnotationList list, DataOutput out) throws IOException
+	public static void write(AttributeList list, DataOutput out) throws IOException
 	{
 		if (list == null)
 		{
@@ -186,7 +188,7 @@ public class AnnotationList implements IAnnotationConsumer
 		}
 	}
 
-	public static AnnotationList read(DataInput in) throws IOException
+	public static AttributeList read(DataInput in) throws IOException
 	{
 		int annotations = in.readShort();
 
@@ -195,7 +197,7 @@ public class AnnotationList implements IAnnotationConsumer
 			return null;
 		}
 
-		AnnotationList list = new AnnotationList(annotations);
+		AttributeList list = new AttributeList(annotations);
 		list.size = annotations;
 		for (int i = 0; i < annotations; i++)
 		{

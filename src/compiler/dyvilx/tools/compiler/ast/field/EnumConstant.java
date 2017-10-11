@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.field;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -30,13 +30,13 @@ public class EnumConstant extends Field
 		this.modifiers.addIntModifier(Modifiers.ENUM_CONST);
 	}
 
-	public EnumConstant(@NonNull SourcePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+	public EnumConstant(@NonNull SourcePosition position, Name name, ModifierSet modifiers, AttributeList annotations)
 	{
 		this(null, position, name, modifiers, annotations);
 	}
 
 	public EnumConstant(IClass enclosingClass, SourcePosition position, Name name, ModifierSet modifiers,
-		                   AnnotationList annotations)
+		                   AttributeList annotations)
 	{
 		super(enclosingClass, position, name, Types.UNKNOWN, modifiers, annotations);
 		this.modifiers.addIntModifier(Modifiers.ENUM_CONST);

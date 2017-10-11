@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.generic;
 import dyvil.annotation.Reified;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotated;
+import dyvilx.tools.compiler.ast.attribute.Attributable;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -26,7 +26,7 @@ import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends ASTNode, IResolvable, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends ASTNode, IResolvable, INamed, Attributable, IObjectCompilable
 {
 	ITypeParametric getGeneric();
 	

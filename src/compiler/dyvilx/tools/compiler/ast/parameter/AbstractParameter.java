@@ -5,7 +5,7 @@ import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -61,7 +61,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
-		                        ModifierSet modifiers, AnnotationList annotations)
+		                        ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 		this.label = name;

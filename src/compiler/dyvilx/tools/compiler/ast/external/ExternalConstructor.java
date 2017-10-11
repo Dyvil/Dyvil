@@ -5,7 +5,7 @@ import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.AbstractConstructor;
@@ -90,14 +90,14 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new ExternalParameter(this, name, type, modifiers, annotations);
 	}

@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.pattern;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -77,7 +77,7 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 
 	@Override
 	public Variable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                AnnotationList annotations)
+		                                AttributeList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

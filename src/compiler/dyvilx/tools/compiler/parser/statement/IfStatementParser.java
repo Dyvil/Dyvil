@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.parser.statement;
 
 import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -185,7 +185,7 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 
 	@Override
 	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+		                                 AttributeList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

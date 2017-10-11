@@ -4,7 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.array.ObjectArray;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.Field;
@@ -37,7 +37,7 @@ public class REPLVariable extends Field
 	}
 
 	public REPLVariable(REPLContext context, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                   AnnotationList annotations)
+		                   AttributeList annotations)
 	{
 		super(null, position, name, type, modifiers, annotations);
 		this.context = context;

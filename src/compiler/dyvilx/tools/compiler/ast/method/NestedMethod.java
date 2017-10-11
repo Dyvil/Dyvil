@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.method;
 
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.CaptureVariable;
@@ -27,7 +27,7 @@ public class NestedMethod extends CodeMethod
 {
 	private CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 
-	public NestedMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public NestedMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}

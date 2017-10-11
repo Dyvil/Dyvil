@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -48,7 +48,7 @@ public class Property extends Member implements IProperty
 	protected CodeParameter setterParameter;
 	protected SourcePosition initializerPosition;
 
-	public Property(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Property(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -183,7 +183,7 @@ public class Property extends Member implements IProperty
 			// Copy Annotations
 			if (this.annotations != null)
 			{
-				this.getter.getAnnotations().addAll(this.annotations);
+				this.getter.getAttributes().addAll(this.annotations);
 			}
 
 			this.getter.setType(this.type);
@@ -200,7 +200,7 @@ public class Property extends Member implements IProperty
 			// Copy Annotations
 			if (this.annotations != null)
 			{
-				this.setter.getAnnotations().addAll(this.annotations);
+				this.setter.getAttributes().addAll(this.annotations);
 			}
 
 			this.setterParameter.setPosition(this.setter.getPosition());
@@ -482,7 +482,7 @@ public class Property extends Member implements IProperty
 
 		final IValue value = getter.getValue();
 		final ModifierSet modifiers = getter.getModifiers();
-		final AnnotationList annotations = getter.getAnnotations();
+		final AttributeList annotations = getter.getAttributes();
 
 		buffer.append('\n').append(indent);
 		if (annotations != null)
@@ -532,7 +532,7 @@ public class Property extends Member implements IProperty
 
 		final IValue value = setter.getValue();
 		final ModifierSet setterModifiers = setter.getModifiers();
-		final AnnotationList annotations = setter.getAnnotations();
+		final AttributeList annotations = setter.getAttributes();
 		final Name setterParameterName = setter.getParameters().get(0).getName();
 
 		buffer.append('\n').append(indent);

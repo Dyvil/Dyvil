@@ -6,7 +6,7 @@ import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
@@ -90,7 +90,7 @@ public interface IParameter extends IVariable, IClassMember
 
 	default void writeParameter(MethodWriter writer)
 	{
-		final AnnotationList annotations = this.getAnnotations();
+		final AttributeList annotations = this.getAttributes();
 		final IType type = this.getType();
 		final long flags = ModifierUtil.getFlags(this);
 
@@ -167,6 +167,6 @@ public interface IParameter extends IVariable, IClassMember
 
 		IType type = new InternalType(internalType);
 		Annotation annotation = new Annotation(type);
-		return new AnnotationReader(this.getAnnotations(), annotation);
+		return new AnnotationReader(this.getAttributes(), annotation);
 	}
 }

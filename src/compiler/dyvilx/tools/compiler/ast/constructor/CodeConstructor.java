@@ -4,7 +4,7 @@ import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -45,7 +45,7 @@ public class CodeConstructor extends AbstractConstructor
 		super(enclosingClass, modifiers);
 	}
 
-	public CodeConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public CodeConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
 	{
 		super(position, modifiers, annotations);
 	}

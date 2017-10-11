@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.field;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -110,13 +110,13 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
-		return this.variable.getAnnotations();
+		return this.variable.getAttributes();
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
 	}
 

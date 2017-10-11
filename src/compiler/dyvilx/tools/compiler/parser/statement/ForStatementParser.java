@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.statement;
 
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -239,7 +239,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 	}
 
 	@Override
-	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

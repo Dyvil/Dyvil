@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.consumer;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.constructor.CodeConstructor;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
@@ -26,32 +26,32 @@ public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, 
 	void addDataMember(F field);
 
 	@Override
-	F createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
+	F createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations);
 
 	void addProperty(IProperty property);
 
-	default IProperty createProperty(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	default IProperty createProperty(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new Property(position, name, type, modifiers, annotations);
 	}
 
 	void addConstructor(IConstructor constructor);
 
-	default IConstructor createConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
+	default IConstructor createConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new CodeConstructor(position, modifiers, annotations);
 	}
 
 	void addInitializer(IInitializer initializer);
 
-	default IInitializer createInitializer(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
+	default IInitializer createInitializer(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new Initializer(position, modifiers, annotations);
 	}
 
 	void addMethod(IMethod method);
 
-	default IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	default IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		return new CodeMethod(position, name, type, modifiers, annotations);
 	}

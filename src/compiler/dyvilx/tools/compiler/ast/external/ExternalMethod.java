@@ -5,7 +5,7 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
@@ -136,7 +136,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	@Override
 	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+		                                 AttributeList annotations)
 	{
 		return new ExternalParameter(this, name, type, modifiers, annotations);
 	}
@@ -186,10 +186,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override
@@ -274,7 +274,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 				return null;
 			}
 
-			typeVar.getAnnotations().add(annotation);
+			typeVar.getAttributes().add(annotation);
 			break;
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:

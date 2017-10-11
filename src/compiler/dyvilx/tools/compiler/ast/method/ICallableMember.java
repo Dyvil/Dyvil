@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.method;
 
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.member.IClassMember;
@@ -32,7 +32,7 @@ public interface ICallableMember extends IClassMember, IOverloadable, IValueCons
 
 	@Override
 	default IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                  AnnotationList annotations)
+		                                  AttributeList annotations)
 	{
 		return new CodeParameter(this, position, name, type, modifiers, annotations);
 	}

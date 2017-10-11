@@ -8,7 +8,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -36,7 +36,7 @@ import static dyvilx.tools.compiler.ast.type.builtin.Types.isSuperType;
 
 public abstract class TypeParameter implements ITypeParameter
 {
-	protected @Nullable AnnotationList annotations;
+	protected @Nullable AttributeList annotations;
 	protected Variance variance = Variance.INVARIANT;
 
 	protected Name name;
@@ -128,25 +128,25 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		if (this.annotations != null)
 		{
 			return this.annotations;
 		}
-		return this.annotations = new AnnotationList();
+		return this.annotations = new AttributeList();
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.annotations = attributes;
 	}
 
 	@Override
 	public final IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.getAnnotations().get(type);
+		return this.annotations == null ? null : this.getAttributes().get(type);
 	}
 
 	@Override

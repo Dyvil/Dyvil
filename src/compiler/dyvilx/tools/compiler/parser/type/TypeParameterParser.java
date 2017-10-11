@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.type;
 
 import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.CodeTypeParameter;
@@ -36,7 +36,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private int flags;
 	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
-	private AnnotationList annotationList;
+	private AttributeList  attributeList;
 
 	public TypeParameterParser(ITypeParametric typeParameterized)
 	{
@@ -166,17 +166,17 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private void createTypeParameter(IToken token, Variance variance)
 	{
 		this.typeParameter = new CodeTypeParameter(token.raw(), this.typeParameterized, token.nameValue(), variance,
-		                                           this.annotationList);
+		                                           this.attributeList);
 		this.mode = TYPE_BOUNDS;
 	}
 
 	private void addAnnotation(IAnnotation annotion)
 	{
-		if (this.annotationList == null)
+		if (this.attributeList == null)
 		{
-			this.annotationList = new AnnotationList();
+			this.attributeList = new AttributeList();
 		}
-		this.annotationList.add(annotion);
+		this.attributeList.add(annotion);
 	}
 
 	@Override

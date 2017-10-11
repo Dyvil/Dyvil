@@ -6,7 +6,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.CodeClass;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -331,7 +331,7 @@ public class REPLContext extends AbstractHeader
 
 	@Override
 	public REPLVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                    AnnotationList annotations)
+		                                    AttributeList annotations)
 	{
 		return new REPLVariable(this, position, name, type, modifiers, annotations);
 	}

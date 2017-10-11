@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.parameter;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -47,7 +47,7 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                     AnnotationList annotations)
+		                     AttributeList annotations)
 	{
 		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
 	}

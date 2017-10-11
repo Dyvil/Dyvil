@@ -8,7 +8,7 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -52,8 +52,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
-	protected @Nullable AnnotationList annotations;
-	protected @NonNull  ModifierSet    modifiers;
+	protected @Nullable AttributeList annotations;
+	protected @NonNull  ModifierSet   modifiers;
 
 	// Signature
 
@@ -117,25 +117,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		if (this.annotations != null)
 		{
 			return this.annotations;
 		}
-		return this.annotations = new AnnotationList();
+		return this.annotations = new AttributeList();
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.annotations = attributes;
 	}
 
 	@Override
 	public final IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.getAnnotations().get(type);
+		return this.annotations == null ? null : this.getAttributes().get(type);
 	}
 
 	@Override
@@ -235,7 +235,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	@Override
 	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+		                                 AttributeList annotations)
 	{
 		return new ClassParameter(this, position, name, type, modifiers, annotations);
 	}

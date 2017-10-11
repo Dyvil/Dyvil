@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.parameter;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvil.lang.Name;
@@ -20,5 +20,5 @@ public interface IParametric
 		return false;
 	}
 
-	IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
+	IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations);
 }

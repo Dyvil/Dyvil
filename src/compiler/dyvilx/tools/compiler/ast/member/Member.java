@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.member;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.annotation.IAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -24,8 +24,8 @@ public abstract class Member implements IMember
 {
 	protected SourcePosition position;
 
-	protected ModifierSet    modifiers;
-	protected AnnotationList annotations;
+	protected ModifierSet   modifiers;
+	protected AttributeList annotations;
 
 	protected IType type;
 	protected Name  name;
@@ -65,7 +65,7 @@ public abstract class Member implements IMember
 		this.type = type;
 	}
 
-	public Member(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Member(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
 	{
 		this.position = position;
 		this.name = name;
@@ -87,25 +87,25 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		if (this.annotations != null)
 		{
 			return this.annotations;
 		}
-		return this.annotations = new AnnotationList();
+		return this.annotations = new AttributeList();
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.annotations = attributes;
 	}
 
 	@Override
 	public final IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.getAnnotations().get(type);
+		return this.annotations == null ? null : this.getAttributes().get(type);
 	}
 
 	@Override
@@ -260,7 +260,7 @@ public abstract class Member implements IMember
 	protected void writeAnnotations(DataOutput out) throws IOException
 	{
 		ModifierSet.write(this.modifiers, out);
-		AnnotationList.write(this.annotations, out);
+		AttributeList.write(this.annotations, out);
 	}
 
 	public void read(DataInput in) throws IOException
@@ -278,7 +278,7 @@ public abstract class Member implements IMember
 	protected void readAnnotations(DataInput in) throws IOException
 	{
 		this.modifiers = ModifierSet.read(in);
-		this.annotations = AnnotationList.read(in);
+		this.annotations = AttributeList.read(in);
 	}
 
 	@Override

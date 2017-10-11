@@ -31,7 +31,7 @@ public class SimpleFieldVisitor implements FieldVisitor
 		if (this.field.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationReader(this.field.getAnnotations(), annotation);
+			return new AnnotationReader(this.field.getAttributes(), annotation);
 		}
 		return null;
 	}
