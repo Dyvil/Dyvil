@@ -2,10 +2,13 @@ package dyvilx.tools.compiler.ast.constructor;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -20,8 +23,6 @@ import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
@@ -35,10 +36,8 @@ import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -57,15 +56,15 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractConstructor(IClass enclosingClass, ModifierSet modifiers)
+	public AbstractConstructor(IClass enclosingClass, AttributeList attributes)
 	{
-		super(Names.init, Types.VOID, modifiers);
+		super(Names.init, Types.VOID, attributes);
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
+	public AbstractConstructor(SourcePosition position, AttributeList attributes)
 	{
-		super(position, Names.init, Types.VOID, modifiers, annotations);
+		super(position, Names.init, Types.VOID, attributes);
 	}
 
 	@Override
@@ -89,16 +88,16 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
 		{
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
-			return true;
+			this.attributes.addFlag(Modifiers.DEPRECATED);
+			return false;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -115,12 +114,6 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return this.exceptions;
 		}
 		return this.exceptions = new TypeList();
-	}
-
-	@Override
-	public boolean isStatic()
-	{
-		return false;
 	}
 
 	@Override

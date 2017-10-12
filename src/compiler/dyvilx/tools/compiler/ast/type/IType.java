@@ -1,16 +1,18 @@
 package dyvilx.tools.compiler.ast.type;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.expression.constant.IConstantValue;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IMemberContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.IConstantValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -31,10 +33,8 @@ import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.ast.type.raw.PackageType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -68,8 +68,8 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		 */
 		public static final int SUPER_TYPE          = CLASS_FLAG | GENERIC_FLAG | SUPERTYPE_FLAG;
 		/**
-		 * The type arguments of parametric super types. Allows class types, parametric types and
-		 * type variable references.
+		 * The type arguments of parametric super types. Allows class types, parametric types and type variable
+		 * references.
 		 */
 		public static final int SUPER_TYPE_ARGUMENT = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG;
 		/**
@@ -360,7 +360,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 	// IContext
 
-	default IAnnotation getAnnotation(IClass type)
+	default Annotation getAnnotation(IClass type)
 	{
 		final IClass theClass = this.getTheClass();
 		return theClass == null ? null : theClass.getAnnotation(type);
@@ -483,14 +483,14 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 	// Annotations
 
-	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
+	static IType withAnnotation(IType type, Annotation annotation, TypePath typePath)
 	{
 		return typePath == null ?
 			       withAnnotation(type, annotation) :
 			       withAnnotation(type, annotation, typePath, 0, typePath.getLength());
 	}
 
-	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
+	static IType withAnnotation(IType type, Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath != null && step < steps)
 		{
@@ -501,24 +501,28 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		return withAnnotation(type, annotation);
 	}
 
-	static IType withAnnotation(IType type, IAnnotation annotation)
+	static IType withAnnotation(IType type, Annotation annotation)
 	{
-		if (type.useNonNullAnnotation() && AnnotationUtil.NULLABLE_INTERNAL
-			                                   .equals(annotation.getType().getInternalName()))
+		switch (annotation.getTypeDescriptor())
 		{
-			return new NullableType(type);
+		case AnnotationUtil.NULLABLE_INTERNAL:
+			if (type.useNonNullAnnotation())
+			{
+				return NullableType.apply(type);
+			}
+			break;
 		}
 
 		final IType customType = type.withAnnotation(annotation);
 		return customType != null ? customType : new AnnotatedType(type, annotation);
 	}
 
-	default IType withAnnotation(IAnnotation annotation)
+	default IType withAnnotation(Annotation annotation)
 	{
 		return null;
 	}
 
-	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
+	void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps);
 
 	static void writeAnnotations(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{

@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.parser.header;
 
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.compiler.parser.classes.ClassDeclarationParser;
@@ -12,12 +12,12 @@ import dyvilx.tools.parsing.token.IToken;
 public final class DyvilUnitParser extends DyvilHeaderParser
 {
 	private static final int CLASS = 4;
-	
+
 	public DyvilUnitParser(IHeaderUnit unit)
 	{
 		super(unit);
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -30,7 +30,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 		case BaseSymbols.SEMICOLON:
 			return;
 		}
-		
+
 		switch (this.mode)
 		{
 		case PACKAGE:
@@ -50,15 +50,9 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			final int classType;
 			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-
-				this.modifiers.addIntModifier(classType);
-				pm.pushParser(new ClassDeclarationParser(this.unit, this.modifiers, this.annotations));
-				this.modifiers = null;
-				this.annotations = null;
+				this.attributes.addFlag(classType);
+				pm.pushParser(new ClassDeclarationParser(this.unit, this.attributes));
+				this.attributes = new AttributeList(); // reset
 				return;
 			}
 			if (this.parseMetadata(pm, token, type))

@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -11,14 +12,13 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class DoubleValue implements IConstantValue
 {
 	private static DoubleValue NULL;
 
 	protected SourcePosition position;
-	protected double        value;
+	protected double         value;
 
 	public DoubleValue(double value)
 	{
@@ -72,7 +72,7 @@ public class DoubleValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.FROMDOUBLE_CLASS);
+		final Annotation annotation = type.getAnnotation(Types.FROMDOUBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

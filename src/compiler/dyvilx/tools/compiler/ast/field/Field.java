@@ -10,7 +10,8 @@ import dyvilx.tools.asm.FieldVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -22,9 +23,6 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -69,16 +67,15 @@ public class Field extends Member implements IField
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Field(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
+	public Field(IClass enclosingClass, Name name, IType type, AttributeList attributes)
 	{
-		super(name, type, modifiers);
+		super(name, type, attributes);
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		            AttributeList annotations)
+	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 		this.enclosingClass = enclosingClass;
 	}
 
@@ -126,26 +123,26 @@ public class Field extends Member implements IField
 			return this.property;
 		}
 
-		return this.property = new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
+		return this.property = new Property(this.position, this.name, Types.UNKNOWN);
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
 		{
 		case ModifierUtil.TRANSIENT_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.TRANSIENT);
-			return false;
+			this.attributes.addFlag(Modifiers.TRANSIENT);
+			return true;
 		case ModifierUtil.VOLATILE_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.VOLATILE);
-			return false;
+			this.attributes.addFlag(Modifiers.VOLATILE);
+			return true;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
-			return true;
+			this.attributes.addFlag(Modifiers.DEPRECATED);
+			return false;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -159,7 +156,7 @@ public class Field extends Member implements IField
 	{
 		if (receiver != null)
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+			if (this.isStatic())
 			{
 				if (!receiver.isClassAccess())
 				{
@@ -186,9 +183,9 @@ public class Field extends Member implements IField
 					"field.access.receiver_type", this.name));
 			}
 		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
+		else if (!this.isStatic())
 		{
-			if (context.isStatic())
+			if (context.hasStaticAccess())
 			{
 				markers.add(Markers.semantic(position, "field.access.instance", this.name));
 			}
@@ -222,29 +219,30 @@ public class Field extends Member implements IField
 			return;
 		}
 
-		copyModifiers(this.modifiers, this.property.getModifiers());
+		copyModifiers(this.attributes, this.property.getAttributes());
 		this.property.setEnclosingClass(this.enclosingClass);
 
 		this.property.setType(this.type);
 		this.property.resolveTypes(markers, context);
 	}
 
-	public static void copyModifiers(ModifierSet from, ModifierSet to)
+	public static void copyModifiers(AttributeList from, AttributeList to)
 	{
-		final int exisiting = to.toFlags();
+		final int exisiting = to.flags();
 		final int newModifiers;
 		if ((exisiting & Modifiers.ACCESS_MODIFIERS) != 0)
 		{
 			// only transfer static modifiers to the property
-			newModifiers = from.toFlags() & Modifiers.STATIC;
+			newModifiers = from.flags() & Modifiers.STATIC;
 		}
 		else
 		{
 			// only transfer public, static and protected modifiers to the property
-			newModifiers = from.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
+			newModifiers = from.flags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
 		}
 
-		to.addIntModifier(newModifiers);
+		to.addFlag(newModifiers);
+		to.addAll(from.annotations());
 	}
 
 	@Override
@@ -530,7 +528,7 @@ public class Field extends Member implements IField
 
 	private void writeAnnotations(FieldVisitor fieldVisitor, long flags)
 	{
-		ModifierUtil.writeModifiers(fieldVisitor, this, flags);
+		ModifierUtil.writeModifiers(fieldVisitor, flags);
 
 		final AttributeList annotations = this.getAttributes();
 		if (annotations != null)
@@ -602,7 +600,7 @@ public class Field extends Member implements IField
 		String desc = this.getDescriptor();
 
 		writer.visitLineNumber(lineNumber);
-		switch (this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.LAZY))
+		switch (this.attributes.flags() & (Modifiers.STATIC | Modifiers.LAZY))
 		{
 		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
@@ -627,7 +625,7 @@ public class Field extends Member implements IField
 		String name = this.getInternalName();
 		String desc = this.getDescriptor();
 
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (this.isStatic())
 		{
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
 		}

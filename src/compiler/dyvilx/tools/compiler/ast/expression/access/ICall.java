@@ -1,5 +1,8 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -9,16 +12,13 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.ITyped;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public interface ICall extends IValue, IArgumentsConsumer
 {
@@ -99,7 +99,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		for (int i = 0; i < wildcards; i++)
 		{
 			parameters[i] = new CodeParameter(null, position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
-			                                  EmptyModifiers.INSTANCE, null);
+			                                  new AttributeList());
 		}
 
 		int parIndex = 0;

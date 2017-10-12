@@ -2,11 +2,11 @@ package dyvilx.tools.compiler.ast.expression.optional;
 
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.constant.NullValue;
 import dyvilx.tools.compiler.ast.field.Variable;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.compound.NullableType;
@@ -131,7 +131,7 @@ public interface OptionalChainAware extends IValue
 	static Variable newVar(SourcePosition position, IValue lhs)
 	{
 		final IValue value = new OptionalUnwrapOperator(lhs, true);
-		final Variable var = new Variable(position, null, value.getType(), new FlagModifierSet(Modifiers.FINAL), null);
+		final Variable var = new Variable(position, null, value.getType(), AttributeList.of(Modifiers.FINAL));
 		var.setValue(value);
 		return var;
 	}

@@ -1,30 +1,25 @@
 package dyvilx.tools.compiler.parser.header;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
-import dyvilx.tools.compiler.ast.header.*;
+import dyvilx.tools.compiler.ast.expression.operator.Operator;
+import dyvilx.tools.compiler.ast.header.HeaderDeclaration;
+import dyvilx.tools.compiler.ast.header.IHeaderUnit;
+import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.imports.KindedImport;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.expression.operator.Operator;
-import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
-import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
-import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.classes.AbstractMemberParser;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
-import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class DyvilHeaderParser extends Parser
+public class DyvilHeaderParser extends AbstractMemberParser
 {
 	protected static final int PACKAGE  = 1;
 	protected static final int IMPORT   = 2;
@@ -38,10 +33,6 @@ public class DyvilHeaderParser extends Parser
 	// -----
 
 	protected IHeaderUnit unit;
-
-	// Parser data
-	protected ModifierSet   modifiers;
-	protected AttributeList annotations;
 
 	protected int flags;
 
@@ -71,9 +62,8 @@ public class DyvilHeaderParser extends Parser
 
 	private IImportConsumer importConsumer(IToken token)
 	{
-		final ImportDeclaration declaration = new ImportDeclaration(token.raw());
-		return im ->
-		{
+		return im -> {
+			final ImportDeclaration declaration = new ImportDeclaration(token.raw());
 			declaration.setImport(im);
 			this.unit.addImport(declaration);
 		};
@@ -117,15 +107,8 @@ public class DyvilHeaderParser extends Parser
 
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
-		Modifier modifier;
-		if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
+		if (this.parseModifier(pm, token))
 		{
-			if (this.modifiers == null)
-			{
-				this.modifiers = new ModifierList();
-			}
-
-			this.modifiers.addModifier(modifier);
 			return true;
 		}
 		if (type == DyvilSymbols.AT && token.next().type() != DyvilKeywords.INTERFACE)
@@ -146,10 +129,8 @@ public class DyvilHeaderParser extends Parser
 				}
 
 				Name name = next.nameValue();
-				this.unit.setHeaderDeclaration(
-					new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
-				this.modifiers = null;
-				this.annotations = null;
+				this.unit.setHeaderDeclaration(new HeaderDeclaration(this.unit, next.raw(), name, this.attributes));
+				this.attributes = new AttributeList();
 				this.flags &= ~METADATA_FLAG;
 				this.mode = IMPORT;
 				return true;
@@ -165,7 +146,7 @@ public class DyvilHeaderParser extends Parser
 		switch (type)
 		{
 		case Tokens.EOF:
-			if (hasModifiers(this.modifiers, this.annotations))
+			if (!this.attributes.isEmpty())
 			{
 				pm.report(token, "header.element");
 			}
@@ -210,26 +191,9 @@ public class DyvilHeaderParser extends Parser
 		reportInvalidElement(pm, token);
 	}
 
-	public static boolean hasModifiers(ModifierSet modifiers, AttributeList annotations)
-	{
-		return modifiers != null && !modifiers.isEmpty() || annotations != null && annotations.size() != 0;
-	}
-
 	protected static void reportInvalidElement(IParserManager pm, IToken token)
 	{
 		pm.report(Markers.syntaxError(token, "header.element.invalid", token.toString()));
-	}
-
-	private void parseAnnotation(IParserManager pm, IToken token)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new AttributeList();
-		}
-
-		final Annotation annotation = new Annotation(token.raw());
-		this.annotations.add(annotation);
-		pm.pushParser(new AnnotationParser(annotation));
 	}
 
 	@Override

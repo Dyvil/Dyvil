@@ -2,11 +2,13 @@ package dyvilx.tools.compiler.ast.reference;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -26,9 +28,7 @@ import dyvilx.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvilx.tools.compiler.ast.type.raw.IObjectType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -313,9 +313,9 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public IType withAnnotation(IAnnotation annotation)
+	public IType withAnnotation(Annotation annotation)
 	{
-		if (AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL.equals(annotation.getType().getInternalName()))
+		if (annotation.getTypeDescriptor().equals(AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL))
 		{
 			return new ImplicitReferenceType(this.theClass, this.type);
 		}
@@ -323,7 +323,7 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
 		{

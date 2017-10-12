@@ -2,8 +2,8 @@ package dyvilx.tools.compiler.ast.type.compound;
 
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -22,18 +22,18 @@ import java.lang.annotation.ElementType;
 
 public class AnnotatedType extends TypeDelegate
 {
-	private IAnnotation annotation;
+	private Annotation annotation;
 
 	public AnnotatedType()
 	{
 	}
 
-	public AnnotatedType(IAnnotation annotation)
+	public AnnotatedType(Annotation annotation)
 	{
 		this.annotation = annotation;
 	}
 
-	public AnnotatedType(IType type, IAnnotation annotation)
+	public AnnotatedType(IType type, Annotation annotation)
 	{
 		this.type = type;
 		this.annotation = annotation;
@@ -64,17 +64,26 @@ public class AnnotatedType extends TypeDelegate
 			this.type = this.type.resolveType(markers, context);
 		}
 
-		if (AnnotationUtil.DYVIL_TYPE_INTERNAL.equals(this.annotation.getType().getInternalName()))
+		this.annotation.resolveTypes(markers, context);
+
+		switch (this.annotation.getTypeDescriptor())
 		{
+		case AnnotationUtil.DYVIL_TYPE_INTERNAL:
 			// @DyvilType annotation
 			final String desc = this.annotation.getArguments().getFirst().stringValue();
 			return ClassFormat.extendedToType(desc).resolveType(markers, context);
+
+		// duplicate in IType
+		case AnnotationUtil.NULLABLE_INTERNAL:
+			if (this.type.useNonNullAnnotation())
+			{
+				return NullableType.apply(this.type);
+			}
+			// Fallthrough
 		}
 
-		this.annotation.resolveTypes(markers, context);
-
-		final IType withAnnotation = this.type.withAnnotation(this.annotation);
-		return withAnnotation != null ? withAnnotation : this;
+		final IType customType = this.type.withAnnotation(this.annotation);
+		return customType != null ? customType : this;
 	}
 
 	@Override
@@ -113,7 +122,7 @@ public class AnnotatedType extends TypeDelegate
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public Annotation getAnnotation(IClass type)
 	{
 		if (this.annotation.getType().getTheClass() == type)
 		{

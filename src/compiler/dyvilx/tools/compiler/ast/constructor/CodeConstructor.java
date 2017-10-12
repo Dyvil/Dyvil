@@ -5,14 +5,13 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -40,14 +39,14 @@ public class CodeConstructor extends AbstractConstructor
 		super(enclosingClass);
 	}
 
-	public CodeConstructor(IClass enclosingClass, ModifierSet modifiers)
+	public CodeConstructor(IClass enclosingClass, AttributeList attributes)
 	{
-		super(enclosingClass, modifiers);
+		super(enclosingClass, attributes);
 	}
 
-	public CodeConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
+	public CodeConstructor(SourcePosition position, AttributeList attributes)
 	{
-		super(position, modifiers, annotations);
+		super(position, attributes);
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public class CodeConstructor extends AbstractConstructor
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
+			this.attributes.addFlag(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.initializerCall != null)
@@ -244,11 +243,7 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void foldConstants()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
-
+		this.attributes.foldConstants();
 		this.parameters.foldConstants();
 
 		if (this.exceptions != null)
@@ -297,12 +292,9 @@ public class CodeConstructor extends AbstractConstructor
 			this.getInternalExceptions()));
 
 		// Write Modifiers and Annotations
-		ModifierUtil.writeModifiers(methodWriter, this, flags);
+		ModifierUtil.writeModifiers(methodWriter, flags);
 
-		if (this.annotations != null)
-		{
-			this.annotations.write(methodWriter);
-		}
+		this.attributes.write(methodWriter);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

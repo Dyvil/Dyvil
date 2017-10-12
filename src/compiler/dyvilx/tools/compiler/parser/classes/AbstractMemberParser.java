@@ -1,10 +1,10 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
+import dyvil.annotation.internal.NonNull;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.parsing.IParserManager;
@@ -13,18 +13,22 @@ import dyvilx.tools.parsing.token.IToken;
 
 public abstract class AbstractMemberParser extends Parser
 {
-	protected ModifierSet   modifiers;
-	protected AttributeList annotations;
+	protected @NonNull AttributeList attributes;
+
+	public AbstractMemberParser()
+	{
+		this.attributes = new AttributeList();
+	}
+
+	public AbstractMemberParser(@NonNull AttributeList attributes)
+	{
+		this.attributes = attributes;
+	}
 
 	protected void parseAnnotation(IParserManager pm, IToken token)
 	{
-		if (this.annotations == null)
-		{
-			this.annotations = new AttributeList();
-		}
-
-		final Annotation annotation = new Annotation(token.raw());
-		this.annotations.add(annotation);
+		final Annotation annotation = new CodeAnnotation(token.raw());
+		this.attributes.add(annotation);
 		pm.pushParser(new AnnotationParser(annotation));
 	}
 
@@ -36,16 +40,7 @@ public abstract class AbstractMemberParser extends Parser
 			return false;
 		}
 
-		this.getModifiers().addModifier(modifier);
+		this.attributes.add(modifier);
 		return true;
-	}
-
-	protected ModifierSet getModifiers()
-	{
-		if (this.modifiers != null)
-		{
-			return this.modifiers;
-		}
-		return this.modifiers = new ModifierList();
 	}
 }

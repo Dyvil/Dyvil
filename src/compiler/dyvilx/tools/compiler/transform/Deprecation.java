@@ -2,10 +2,13 @@ package dyvilx.tools.compiler.transform;
 
 import dyvil.annotation.Deprecated.Reason;
 import dyvil.annotation.Experimental.Stage;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -18,11 +21,8 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
-import dyvil.util.MarkerLevel;
 
 public final class Deprecation
 {
@@ -78,7 +78,7 @@ public final class Deprecation
 			checkDeprecation(member, position, markers);
 		}
 
-		IAnnotation annotation = member.getAnnotation(EXPERIMENTAL_CLASS);
+		Annotation annotation = member.getAnnotation(EXPERIMENTAL_CLASS);
 		if (annotation != null)
 		{
 			checkExperimental(member, position, markers, annotation);
@@ -93,10 +93,10 @@ public final class Deprecation
 
 	private static void checkDeprecation(IMember member, SourcePosition position, MarkerList markers)
 	{
-		IAnnotation annotation = member.getAnnotation(DEPRECATED_CLASS);
+		Annotation annotation = member.getAnnotation(DEPRECATED_CLASS);
 		if (annotation == null)
 		{
-			annotation = new Annotation(DEPRECATED);
+			annotation = new ExternalAnnotation(DEPRECATED);
 		}
 
 		final ArgumentList arguments = annotation.getArguments();
@@ -192,7 +192,7 @@ public final class Deprecation
 	}
 
 	private static void checkExperimental(IMember member, SourcePosition position, MarkerList markers,
-		                                     IAnnotation annotation)
+		                                     Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
 		final MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, EXP_LEVEL_PARAM, MarkerLevel.class);
@@ -227,7 +227,7 @@ public final class Deprecation
 	}
 
 	private static void checkUsageInfo(IMember member, SourcePosition position, MarkerList markers,
-		                                  IAnnotation annotation)
+		                                  Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
 		final MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, INF_LEVEL_PARAM, MarkerLevel.class);

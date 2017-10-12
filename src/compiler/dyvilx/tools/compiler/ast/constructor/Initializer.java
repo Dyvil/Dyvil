@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.constructor;
 
-import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -8,7 +8,6 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.Member;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -17,7 +16,6 @@ import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -28,9 +26,9 @@ public class Initializer extends Member implements IInitializer
 	// Metadata
 	protected IClass enclosingClass;
 
-	public Initializer(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
+	public Initializer(SourcePosition position, AttributeList attributes)
 	{
-		super(position, Names.init, Types.VOID, modifiers, annotations);
+		super(position, Names.init, Types.VOID, attributes);
 	}
 
 	@Override
@@ -138,8 +136,8 @@ public class Initializer extends Member implements IInitializer
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
-		//  ^ not
+		if (!this.isStatic())
+		//  ^ not static
 		{
 			this.value.writeExpression(writer, Types.VOID);
 		}
@@ -148,7 +146,7 @@ public class Initializer extends Member implements IInitializer
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (this.isStatic())
 		{
 			this.value.writeExpression(writer, Types.VOID);
 		}

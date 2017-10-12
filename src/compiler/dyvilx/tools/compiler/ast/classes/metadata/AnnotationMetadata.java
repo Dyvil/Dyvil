@@ -1,10 +1,10 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.MethodVisitor;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -72,7 +72,7 @@ public final class AnnotationMetadata implements IClassMetadata
 
 	private void readRetention()
 	{
-		final IAnnotation retention = this.theClass.getAnnotation(Annotation.LazyFields.RETENTION_CLASS);
+		final Annotation retention = this.theClass.getAnnotation(Annotation.LazyFields.RETENTION_CLASS);
 		if (retention == null)
 		{
 			return;
@@ -97,7 +97,7 @@ public final class AnnotationMetadata implements IClassMetadata
 
 	private void readTargets()
 	{
-		final IAnnotation target = this.theClass.getAnnotation(Annotation.LazyFields.TARGET_CLASS);
+		final Annotation target = this.theClass.getAnnotation(Annotation.LazyFields.TARGET_CLASS);
 		if (target == null)
 		{
 			return;

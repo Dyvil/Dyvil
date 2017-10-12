@@ -1,23 +1,21 @@
 package dyvilx.tools.compiler.ast.external;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.method.AbstractMethod;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.structure.Package;
@@ -25,12 +23,9 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalCallableMember
 {
@@ -41,9 +36,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private byte resolved;
 
-	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, ModifierSet modifiers)
+	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, AttributeList attributes)
 	{
-		super(enclosingClass, null, null, modifiers);
+		super(enclosingClass, null, null, attributes);
 		this.name = Name.fromQualified(name);
 		this.internalName = name;
 		this.signature = signature;
@@ -54,14 +49,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	public IContext getExternalContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
-	}
-
-	private void resolveAnnotations()
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, Package.rootPackage, this);
-		}
 	}
 
 	private void resolveReturnType()
@@ -100,7 +87,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private void resolveExceptions()
 	{
-		if ((this.resolved & EXCEPTIONS) != 0)
+		if (this.exceptions == null || (this.resolved & EXCEPTIONS) != 0)
 		{
 			return;
 		}
@@ -122,23 +109,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IntrinsicData getIntrinsicData()
-	{
-		this.resolveAnnotations();
-		return super.getIntrinsicData();
-	}
-
-	@Override
 	public void setIntrinsicData(IntrinsicData intrinsicData)
 	{
 		this.intrinsicData = intrinsicData;
 	}
 
 	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AttributeList annotations)
+	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new ExternalParameter(this, name, type, modifiers, annotations);
+		return new ExternalParameter(this, name, type, attributes);
 	}
 
 	@Override
@@ -173,6 +152,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public TypeList getExternalExceptions()
+	{
+		return super.getExceptions();
+	}
+
+	@Override
 	public IType getThisType()
 	{
 		if ((this.resolved & THIS_TYPE) == 0 && this.thisType != null)
@@ -183,13 +168,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			return type;
 		}
 		return super.getThisType();
-	}
-
-	@Override
-	public AttributeList getAttributes()
-	{
-		this.resolveAnnotations();
-		return super.getAttributes();
 	}
 
 	@Override
@@ -229,33 +207,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, ArgumentList arguments, ITypeContext typeContext,
-		                     IType targetType, int lineNumber) throws BytecodeException
-	{
-		this.resolveAnnotations();
-		super.writeCall(writer, instance, arguments, typeContext, targetType, lineNumber);
-	}
-
-	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, ArgumentList arguments,
-		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
-	{
-		this.resolveAnnotations();
-		super.writeJump(writer, dest, instance, arguments, typeContext, lineNumber);
-	}
-
-	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, ArgumentList arguments,
-		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
-	{
-		this.resolveAnnotations();
-		super.writeInvJump(writer, dest, instance, arguments, typeContext, lineNumber);
-	}
-
-	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
 		if (typePath == null)
 		{
 			typePath = TypePath.EMPTY;
@@ -269,7 +223,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
 			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
-			if (!typeVar.addRawAnnotation(desc, annotation))
+			if (typeVar.skipAnnotation(annotation.getTypeDescriptor(), annotation))
 			{
 				return null;
 			}

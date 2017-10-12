@@ -4,6 +4,8 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
+import dyvil.source.LineSource;
+import dyvil.util.Qualifier;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -18,8 +20,8 @@ import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.MemberSorter;
 import dyvilx.tools.compiler.util.Util;
@@ -27,8 +29,6 @@ import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.util.Qualifier;
-import dyvil.source.LineSource;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.context.REPLContext;
 import dyvilx.tools.repl.lang.I18n;
@@ -83,30 +83,31 @@ public class CompleteCommand implements ICommand
 		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenList tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
 
-		new ParserManager(DyvilSymbols.INSTANCE, tokens.iterator(), markers).parse(new ExpressionParser((IValue value) -> {
-			value.resolveTypes(markers, context);
-			value = value.resolve(markers, context);
-			value.checkTypes(markers, context);
+		new ParserManager(DyvilSymbols.INSTANCE, tokens.iterator(), markers)
+			.parse(new ExpressionParser((IValue value) -> {
+				value.resolveTypes(markers, context);
+				value = value.resolve(markers, context);
+				value.checkTypes(markers, context);
 
-			if (!markers.isEmpty())
-			{
-				// Print Errors, if any
-				final boolean colors = repl.getCompiler().config.useAnsiColors();
-				final StringBuilder buffer = new StringBuilder();
-				markers.log(new LineSource(expression), buffer, colors);
+				if (!markers.isEmpty())
+				{
+					// Print Errors, if any
+					final boolean colors = repl.getCompiler().config.useAnsiColors();
+					final StringBuilder buffer = new StringBuilder();
+					markers.log(new LineSource(expression), buffer, colors);
 
-				repl.getOutput().println(buffer);
-			}
+					repl.getOutput().println(buffer);
+				}
 
-			try
-			{
-				this.printCompletions(repl, memberStart, value);
-			}
-			catch (Throwable throwable)
-			{
-				throwable.printStackTrace(repl.getErrorOutput());
-			}
-		}));
+				try
+				{
+					this.printCompletions(repl, memberStart, value);
+				}
+				catch (Throwable throwable)
+				{
+					throwable.printStackTrace(repl.getErrorOutput());
+				}
+			}));
 	}
 
 	private void printREPLMembers(DyvilREPL repl, String start)
@@ -232,7 +233,8 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, boolean statics)
+	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods,
+		                               String start, boolean statics)
 	{
 		final IClass theClass = type.getTheClass();
 		if (theClass == null)
@@ -262,7 +264,8 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, Set<IClass> dejaVu)
+	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties,
+		                                       Set<IMethod> methods, String start, Set<IClass> dejaVu)
 	{
 		final IClass iclass = type.getTheClass();
 		if (iclass == null || dejaVu.contains(iclass))
@@ -293,7 +296,8 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findExtensions(IContext context, IType type, IValue value, Set<IMethod> methods, String start, boolean statics)
+	private static void findExtensions(IContext context, IType type, IValue value, Set<IMethod> methods, String start,
+		                                  boolean statics)
 	{
 		final MatchList<IMethod> matchList = new MatchList<>(context, true);
 
@@ -339,7 +343,7 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 
-		final int modifiers = member.getModifiers().toFlags();
+		final int modifiers = member.getAttributes().flags();
 		if ((modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0))
 		{
 			set.add(member);

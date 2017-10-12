@@ -1,20 +1,18 @@
 package dyvilx.tools.compiler.ast.external;
 
+import dyvil.lang.Name;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.AbstractParameter;
-import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ExternalParameter extends AbstractParameter
@@ -26,9 +24,9 @@ public class ExternalParameter extends AbstractParameter
 		super(callable, null, name, type);
 	}
 
-	public ExternalParameter(ICallableMember callable, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public ExternalParameter(ICallableMember callable, Name name, IType type, AttributeList attributes)
 	{
-		super(callable, null, name, type, modifiers, annotations);
+		super(callable, null, name, type, attributes);
 	}
 
 	private void resolveTypes()
@@ -38,15 +36,7 @@ public class ExternalParameter extends AbstractParameter
 		this.resolveTypes(null, ((IExternalCallableMember) this.method).getExternalContext());
 	}
 
-	private void resolveAnnotations()
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
-	}
-
-	public void addTypeAnnotation(IAnnotation annotation, TypePath path)
+	public void addTypeAnnotation(Annotation annotation, TypePath path)
 	{
 		this.type = IType.withAnnotation(this.type, annotation, path);
 	}
@@ -78,13 +68,6 @@ public class ExternalParameter extends AbstractParameter
 	{
 		// Do not perform type resolution
 		return this.type.getLocalSlots();
-	}
-
-	@Override
-	public AttributeList getAttributes()
-	{
-		this.resolveAnnotations();
-		return super.getAttributes();
 	}
 
 	@Override

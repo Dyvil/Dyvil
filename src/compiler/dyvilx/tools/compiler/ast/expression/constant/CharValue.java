@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.expression.constant;
 
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -21,7 +21,7 @@ public final class CharValue implements IConstantValue
 	private static final byte TYPE_STRING = 2;
 
 	protected SourcePosition position;
-	protected String        value;
+	protected String         value;
 
 	private byte type;
 
@@ -77,7 +77,7 @@ public final class CharValue implements IConstantValue
 				return this;
 			}
 
-			final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
+			final Annotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
 			if (annotation != null)
 			{
 				this.type = TYPE_STRING;
@@ -93,7 +93,7 @@ public final class CharValue implements IConstantValue
 				return this;
 			}
 
-			final IAnnotation annotation = type.getAnnotation(Types.FROMCHAR_CLASS);
+			final Annotation annotation = type.getAnnotation(Types.FROMCHAR_CLASS);
 			if (annotation != null)
 			{
 				this.type = TYPE_CHAR;

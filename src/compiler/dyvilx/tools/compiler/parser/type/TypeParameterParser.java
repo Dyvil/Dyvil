@@ -1,26 +1,25 @@
 package dyvilx.tools.compiler.parser.type;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.CodeTypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
+import dyvilx.tools.compiler.parser.classes.AbstractMemberParser;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
-import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class TypeParameterParser extends Parser implements ITypeConsumer
+public final class TypeParameterParser extends AbstractMemberParser implements ITypeConsumer
 {
 	public static final int ANNOTATIONS = 0;
 	public static final int VARIANCE    = 1;
@@ -36,7 +35,6 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private int flags;
 	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
-	private AttributeList  attributeList;
 
 	public TypeParameterParser(ITypeParametric typeParameterized)
 	{
@@ -54,8 +52,8 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			switch (type)
 			{
 			case DyvilSymbols.AT:
-				final IAnnotation annotation = new Annotation();
-				this.addAnnotation(annotation);
+				final Annotation annotation = new CodeAnnotation(token.raw());
+				this.attributes.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			case DyvilKeywords.TYPE:
@@ -166,17 +164,8 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private void createTypeParameter(IToken token, Variance variance)
 	{
 		this.typeParameter = new CodeTypeParameter(token.raw(), this.typeParameterized, token.nameValue(), variance,
-		                                           this.attributeList);
+		                                           this.attributes);
 		this.mode = TYPE_BOUNDS;
-	}
-
-	private void addAnnotation(IAnnotation annotion)
-	{
-		if (this.attributeList == null)
-		{
-			this.attributeList = new AttributeList();
-		}
-		this.attributeList.add(annotion);
 	}
 
 	@Override

@@ -1,21 +1,20 @@
 package dyvilx.tools.compiler.ast.pattern;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.Variable;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class BindingPattern implements IPattern, IDataMemberConsumer<Variable>
 {
@@ -76,10 +75,9 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public Variable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                AttributeList annotations)
+	public Variable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Variable(position, name, type, modifiers, annotations);
+		return new Variable(position, name, type, attributes);
 	}
 
 	@Override

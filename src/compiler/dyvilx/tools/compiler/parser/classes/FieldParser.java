@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.parser.classes;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -7,16 +8,13 @@ import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IProperty;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
@@ -47,15 +45,13 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 	public FieldParser(IMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
-		this.modifiers = new ModifierList();
 		// this.mode = DECLARATOR;
 	}
 
-	public FieldParser(IMemberConsumer<T> consumer, ModifierSet modifiers, AttributeList annotations)
+	public FieldParser(IMemberConsumer<T> consumer, AttributeList attributes)
 	{
+		super(attributes);
 		this.consumer = consumer;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
 		// this.mode = DECLARATOR;
 	}
 
@@ -78,11 +74,11 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 				this.parseAnnotation(pm, token);
 				return;
 			case DyvilKeywords.CONST:
-				this.getModifiers().addIntModifier(Modifiers.CONST);
+				this.attributes.addFlag(Modifiers.CONST);
 				this.mode = NAME;
 				return;
 			case DyvilKeywords.LET:
-				this.getModifiers().addIntModifier(Modifiers.FINAL);
+				this.attributes.addFlag(Modifiers.FINAL);
 				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = NAME;
@@ -161,8 +157,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 		final IProperty prop;
 		if (this.dataMember == null)
 		{
-			prop = this.consumer
-				       .createProperty(this.position, this.name, this.type, this.getModifiers(), this.annotations);
+			prop = this.consumer.createProperty(this.position, this.name, this.type, this.attributes);
 			this.property = prop;
 		}
 		else
@@ -178,8 +173,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 		{
 			return this.dataMember;
 		}
-		return this.dataMember = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
-		                                                        this.annotations);
+		return this.dataMember = this.consumer.createDataMember(this.position, this.name, this.type, this.attributes);
 	}
 
 	@Override

@@ -1,9 +1,11 @@
-package dyvilx.tools.compiler.ast.modifiers;
+package dyvilx.tools.compiler.ast.attribute.modifiers;
 
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
+import dyvilx.tools.compiler.ast.attribute.Attribute;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.member.IClassMember;
@@ -33,8 +35,8 @@ public final class ModifierUtil
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-		                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
-		                                               & ~GENERATED; // exclude source-only modifiers
+	                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
+	                                               & ~GENERATED; // exclude source-only modifiers
 
 	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
@@ -149,6 +151,49 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
+	public static void checkModifiers(IMember member, MarkerList markers)
+	{
+		final AttributeList attributes = member.getAttributes();
+		final MemberKind memberKind = member.getKind();
+		final int defaultAccess = memberKind.getDefaultAccess(member);
+		StringBuilder errorBuilder = null;
+
+		for (Attribute modifier : attributes)
+		{
+			if (!memberKind.isAttributeAllowed(modifier))
+			{
+				if (errorBuilder == null)
+				{
+					errorBuilder = new StringBuilder();
+				}
+				else
+				{
+					errorBuilder.append(", ");
+				}
+				modifier.toString(errorBuilder);
+			}
+
+			final int visibility = modifier.flags() & Modifiers.VISIBILITY_MODIFIERS;
+			if (visibility != 0 && visibility == defaultAccess)
+			{
+				markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
+				                             Util.memberNamed(member),
+				                             ModifierUtil.accessModifiersToString(visibility)));
+			}
+		}
+
+		if (errorBuilder != null)
+		{
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
+			                                  errorBuilder.toString()));
+		}
+		if (!attributes.hasAnyFlag(Modifiers.VISIBILITY_MODIFIERS))
+		{
+			// If there is no explicit or implicit visibility modifier already, add the default one
+			attributes.addFlag(defaultAccess);
+		}
+	}
+
 	public static void checkVisibility(IMember member, SourcePosition position, MarkerList markers, IContext context)
 	{
 		Deprecation.checkAnnotations(member, position, markers);
@@ -173,7 +218,7 @@ public final class ModifierUtil
 	public static void checkOverride(IMethod member, IMethod overriden, MarkerList markers)
 	{
 		final int accessLevel = member.getAccessLevel() & ~Modifiers.INTERNAL;
-		final int overrideFlags = overriden.getModifiers().toFlags();
+		final int overrideFlags = overriden.getAttributes().flags();
 
 		// Final Modifier Check
 		if ((overrideFlags & Modifiers.FINAL) != 0)
@@ -215,8 +260,7 @@ public final class ModifierUtil
 
 	public static void checkMethodModifiers(MarkerList markers, IMethod member)
 	{
-		final ModifierSet modifiers = member.getModifiers();
-		final int flags = modifiers.toFlags();
+		final int flags = member.getAttributes().flags();
 
 		final boolean hasValue = member.getValue() != null;
 		final boolean isAbstract = (flags & ABSTRACT) != 0;
@@ -265,7 +309,7 @@ public final class ModifierUtil
 
 	public static long getFlags(IClassMember member)
 	{
-		final int flags = member.getModifiers().toFlags();
+		final int flags = member.getAttributes().flags();
 		int javaModifiers = flags & JAVA_MODIFIER_MASK;
 		int dyvilModifiers = flags & DYVIL_MODIFIER_MASK;
 
@@ -305,18 +349,12 @@ public final class ModifierUtil
 		return (int) flags;
 	}
 
-	public static void writeModifiers(AnnotatableVisitor mw, IClassMember member, long flags)
+	public static void writeModifiers(AnnotatableVisitor visitor, long flags)
 	{
-		final ModifierSet modifiers = member.getModifiers();
-		if (modifiers == null)
-		{
-			return;
-		}
-
 		final int dyvilModifiers = (int) (flags >> 32);
 		if (dyvilModifiers != 0)
 		{
-			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(DYVIL_MODIFIERS, true);
+			final AnnotationVisitor annotationVisitor = visitor.visitAnnotation(DYVIL_MODIFIERS, true);
 			annotationVisitor.visit("value", dyvilModifiers);
 			annotationVisitor.visitEnd();
 		}

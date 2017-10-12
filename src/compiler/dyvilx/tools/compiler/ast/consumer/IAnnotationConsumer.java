@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.ast.consumer;
 
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 
 public interface IAnnotationConsumer
 {
-	void setAnnotation(IAnnotation annotation);
+	void setAnnotation(Annotation annotation);
 }

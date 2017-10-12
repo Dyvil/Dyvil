@@ -1,16 +1,17 @@
 package dyvilx.tools.compiler.ast.type.compound;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.expression.constant.IConstantValue;
-import dyvilx.tools.compiler.ast.expression.constant.NullValue;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.IConstantValue;
+import dyvilx.tools.compiler.ast.expression.constant.NullValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -24,7 +25,6 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.IObjectType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -338,9 +338,9 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public IType withAnnotation(IAnnotation annotation)
+	public IType withAnnotation(Annotation annotation)
 	{
-		switch (annotation.getType().getInternalName())
+		switch (annotation.getTypeDescriptor())
 		{
 		case AnnotationUtil.NOTNULL_INTERNAL:
 			return this.type;
@@ -359,7 +359,7 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		this.type = IType.withAnnotation(this.type, annotation, typePath, step, steps);
 	}

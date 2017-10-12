@@ -1,11 +1,11 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.attribute.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -30,7 +30,7 @@ public final class AnnotationUtil
 	public static final String  PRIMITIVE          = "L" + PRIMITIVE_INTERNAL + ";";
 	public static final boolean PRIMITIVE_VISIBLE  = true;
 
-	public static final String INRINSIC = "dyvil/annotation/Intrinsic";
+	public static final String INRINSIC_INTERNAL = "dyvil/annotation/Intrinsic";
 
 	public static final String NOTNULL_INTERNAL  = "dyvil/annotation/internal/NonNull";
 	public static final String NOTNULL           = 'L' + NOTNULL_INTERNAL + ';';

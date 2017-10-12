@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.parser.type;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -11,12 +13,11 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.*;
 import dyvilx.tools.compiler.ast.type.generic.*;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
-import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -98,7 +99,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				switch (type)
 				{
 				case DyvilSymbols.AT:
-					Annotation a = new Annotation();
+					Annotation a = new CodeAnnotation(token.raw());
 					pm.pushParser(new AnnotationParser(a));
 					this.type = new AnnotatedType(a);
 					this.mode = ANNOTATION_END;

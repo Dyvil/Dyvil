@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.method.intrinsic;
 import dyvil.annotation.Intrinsic;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.StringInterpolationExpr;
@@ -74,7 +74,7 @@ public class Intrinsics
 		return null;
 	}
 
-	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
+	public static IntrinsicData readAnnotation(IMethod method, Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
 		final IValue compilerCode = arguments.get(LazyFields.COMPILER_CODE);
@@ -112,7 +112,7 @@ public class Intrinsics
 				i += 3;
 			}
 			else if (Opcodes.isJumpOpcode(opcode) || Opcodes.isLoadOpcode(opcode) || Opcodes.isStoreOpcode(opcode)
-				         || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
+			         || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
 			{
 				ints[i + 1] = values.get(i + 1).intValue();
 				i += 1;

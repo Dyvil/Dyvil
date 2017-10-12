@@ -1,20 +1,17 @@
 package dyvilx.tools.compiler.ast.member;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
-import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -24,38 +21,40 @@ public abstract class Member implements IMember
 {
 	protected SourcePosition position;
 
-	protected ModifierSet   modifiers;
-	protected AttributeList annotations;
+	protected @NonNull AttributeList attributes;
 
 	protected IType type;
 	protected Name  name;
 
 	protected Member()
 	{
+		this.attributes = new AttributeList();
 	}
 
 	protected Member(Name name)
 	{
 		this.name = name;
-		this.modifiers = new ModifierList();
+		this.attributes = new AttributeList();
 	}
 
 	public Member(IType type)
 	{
 		this.type = type;
+		this.attributes = new AttributeList();
 	}
 
 	public Member(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
+		this.attributes = new AttributeList();
 	}
 
-	public Member(Name name, IType type, ModifierSet modifiers)
+	public Member(Name name, IType type, AttributeList attributes)
 	{
 		this.name = name;
 		this.type = type;
-		this.modifiers = modifiers;
+		this.attributes = attributes;
 	}
 
 	public Member(SourcePosition position, Name name, IType type)
@@ -63,15 +62,15 @@ public abstract class Member implements IMember
 		this.position = position;
 		this.name = name;
 		this.type = type;
+		this.attributes = new AttributeList();
 	}
 
-	public Member(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public Member(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
 		this.position = position;
 		this.name = name;
 		this.type = type;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -89,47 +88,19 @@ public abstract class Member implements IMember
 	@Override
 	public AttributeList getAttributes()
 	{
-		if (this.annotations != null)
-		{
-			return this.annotations;
-		}
-		return this.annotations = new AttributeList();
+		return this.attributes;
 	}
 
 	@Override
 	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = attributes;
-	}
-
-	@Override
-	public final IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.getAttributes().get(type);
-	}
-
-	@Override
-	public ModifierSet getModifiers()
-	{
-		return this.modifiers;
-	}
-
-	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-		this.modifiers = modifiers;
-	}
-
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return this.modifiers != null && this.modifiers.hasIntModifier(mod);
+		this.attributes = attributes;
 	}
 
 	@Override
 	public int getAccessLevel()
 	{
-		return this.modifiers.toFlags() & Modifiers.ACCESS_MODIFIERS;
+		return this.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS;
 	}
 
 	@Override
@@ -167,17 +138,12 @@ public abstract class Member implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolveType(this.hasModifier(Modifiers.GENERATED) ? MarkerList.BLACKHOLE : markers, context);
+			this.type = this.type.resolveType(this.hasModifier(Modifiers.GENERATED) ? MarkerList.BLACKHOLE : markers,
+			                                  context);
 		}
 
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-		}
-		if (this.modifiers != null)
-		{
-			this.modifiers.resolveTypes(this, markers);
-		}
+		this.attributes.resolveTypes(markers, context, this);
+		ModifierUtil.checkModifiers(this, markers);
 	}
 
 	@Override
@@ -187,10 +153,7 @@ public abstract class Member implements IMember
 		{
 			this.type.resolve(markers, context);
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-		}
+		this.attributes.resolve(markers, context);
 	}
 
 	@Override
@@ -200,10 +163,7 @@ public abstract class Member implements IMember
 		{
 			this.type.checkType(markers, context, TypePosition.RETURN_TYPE);
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
+		this.attributes.checkTypes(markers, context);
 	}
 
 	@Override
@@ -213,10 +173,7 @@ public abstract class Member implements IMember
 		{
 			this.type.check(markers, context);
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, this.getElementType());
-		}
+		this.attributes.check(markers, context, this.getElementType());
 	}
 
 	@Override
@@ -226,19 +183,13 @@ public abstract class Member implements IMember
 		{
 			this.type.foldConstants();
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
+		this.attributes.foldConstants();
 	}
 
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.cleanup(compilableList, classCompilableList);
-		}
+		this.attributes.cleanup(compilableList, classCompilableList);
 		if (this.type != null)
 		{
 			this.type.cleanup(compilableList, classCompilableList);
@@ -259,8 +210,7 @@ public abstract class Member implements IMember
 
 	protected void writeAnnotations(DataOutput out) throws IOException
 	{
-		ModifierSet.write(this.modifiers, out);
-		AttributeList.write(this.annotations, out);
+		AttributeList.write(this.attributes, out);
 	}
 
 	public void read(DataInput in) throws IOException
@@ -277,8 +227,7 @@ public abstract class Member implements IMember
 
 	protected void readAnnotations(DataInput in) throws IOException
 	{
-		this.modifiers = ModifierSet.read(in);
-		this.annotations = AttributeList.read(in);
+		this.attributes = AttributeList.read(in);
 	}
 
 	@Override
@@ -292,13 +241,6 @@ public abstract class Member implements IMember
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.toString(indent, buffer);
-		}
-		if (this.modifiers != null)
-		{
-			this.modifiers.toString(this.getKind(), buffer);
-		}
+		this.attributes.toString(indent, buffer);
 	}
 }

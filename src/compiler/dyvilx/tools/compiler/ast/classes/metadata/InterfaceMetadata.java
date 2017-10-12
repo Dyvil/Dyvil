@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -15,7 +16,6 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class InterfaceMetadata implements IClassMetadata
 {
@@ -132,7 +132,7 @@ public class InterfaceMetadata implements IClassMetadata
 		if (!method.hasModifier(Modifiers.STATIC_FINAL) && method.getValue() == null)
 		{
 			// Make methods without an implementation abstract
-			method.getModifiers().addIntModifier(Modifiers.ABSTRACT);
+			method.getAttributes().addFlag(Modifiers.ABSTRACT);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class InterfaceMetadata implements IClassMetadata
 	{
 		this.processMember(field, markers);
 
-		field.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
+		field.getAttributes().addFlag(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
 	}
 
 	protected void processProperty(IProperty property, MarkerList markers)

@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.expression.constant;
 
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -19,7 +19,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 public final class StringValue implements IConstantValue
 {
 	protected SourcePosition position;
-	protected String        value;
+	protected String         value;
 
 	public StringValue(String value)
 	{
@@ -64,7 +64,7 @@ public final class StringValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
+		final Annotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

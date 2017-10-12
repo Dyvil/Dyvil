@@ -1,26 +1,26 @@
 package dyvilx.tools.compiler.parser.method;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.field.IProperty;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
-import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
-import dyvilx.tools.compiler.parser.annotation.ModifierParser;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.classes.PropertyBodyParser;
-import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
+import dyvilx.tools.compiler.parser.annotation.ModifierParser;
+import dyvilx.tools.compiler.parser.classes.PropertyBodyParser;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -47,8 +47,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	protected IParametric consumer;
 
 	// Metadata
-	private ModifierList  modifiers;
-	private AttributeList annotations;
+	private AttributeList attributes = new AttributeList();
 
 	private IType type = Types.UNKNOWN;
 
@@ -70,8 +69,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 	private void reset()
 	{
-		this.modifiers = null;
-		this.annotations = null;
+		this.attributes = new AttributeList();
 		this.type = Types.UNKNOWN;
 		this.parameter = null;
 		this.flags &= ~VARARGS;
@@ -99,11 +97,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 				break;
 			case DyvilKeywords.LET:
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-				this.modifiers.addIntModifier(Modifiers.FINAL);
+				this.attributes.addFlag(Modifiers.FINAL);
 				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = NAME;
@@ -122,13 +116,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				pm.pushParser(new TypeParser(t -> this.setThisType(t, token, pm)));
 				return;
 			case DyvilSymbols.AT:
-				if (this.annotations == null)
-				{
-					this.annotations = new AttributeList();
-				}
-
-				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.add(annotation);
+				final Annotation annotation = new CodeAnnotation(token.raw());
+				this.attributes.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
@@ -136,12 +125,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			final Modifier modifier;
 			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
 			{
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-
-				this.modifiers.addModifier(modifier);
+				this.attributes.add(modifier);
 				return;
 			}
 
@@ -181,8 +165,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			this.parameter = this.consumer
-				                 .createParameter(token.raw(), name, this.type, this.modifiers, this.annotations);
+			this.parameter = this.consumer.createParameter(token.raw(), name, this.type, this.attributes);
 			this.mode = INTERNAL_NAME;
 			return;
 		case INTERNAL_NAME:
@@ -307,8 +290,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	private boolean isTerminator(int nextType)
 	{
 		return BaseSymbols.isTerminator(nextType)
-		       || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-				          && this.hasFlag(LAMBDA_ARROW_END);
+		       || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT) && this.hasFlag(
+			LAMBDA_ARROW_END);
 	}
 
 	protected void setTypeVarargs()

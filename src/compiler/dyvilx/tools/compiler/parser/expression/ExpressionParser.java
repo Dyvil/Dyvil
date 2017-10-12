@@ -2,8 +2,8 @@ package dyvilx.tools.compiler.parser.expression;
 
 import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationValue;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.*;
 import dyvilx.tools.compiler.ast.expression.access.*;
@@ -22,12 +22,12 @@ import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvilx.tools.compiler.ast.statement.loop.WhileStatement;
 import dyvilx.tools.compiler.parser.BracketMatcher;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.statement.*;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
@@ -767,9 +767,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return true;
 		case DyvilSymbols.AT:
 			// @ ...
-			Annotation a = new Annotation();
+			Annotation a = new CodeAnnotation(token.raw());
 			pm.pushParser(new AnnotationParser(a));
-			this.value = new AnnotationValue(a);
+			this.value = new AnnotationExpr(a);
 			this.mode = END;
 			return true;
 		case DyvilSymbols.ARROW_RIGHT:

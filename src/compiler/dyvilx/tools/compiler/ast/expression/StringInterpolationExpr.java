@@ -1,9 +1,10 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -18,7 +19,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaseClasses;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -131,7 +131,7 @@ public final class StringInterpolationExpr implements IValue
 			return this;
 		}
 
-		IAnnotation annotation;
+		Annotation annotation;
 		if ((annotation = type.getAnnotation(Types.FROMSTRING_CLASS)) != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -153,7 +153,7 @@ public final class StringInterpolationExpr implements IValue
 	private boolean isConvertible(IType type)
 	{
 		return type.getAnnotation(Types.FROMSTRING_CLASS) != null
-			       || type.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
+		       || type.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 
 	@Override
@@ -292,7 +292,8 @@ public final class StringInterpolationExpr implements IValue
 				// two non-null String values -> write first.concat(last)
 				first.writeExpression(writer, Types.STRING);
 				last.writeExpression(writer, Types.STRING);
-				writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
+				writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat",
+				                       "(Ljava/lang/String;)Ljava/lang/String;", false);
 				return;
 			}
 			// continue as normal

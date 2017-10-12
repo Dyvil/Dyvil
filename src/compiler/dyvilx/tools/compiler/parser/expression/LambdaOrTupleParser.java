@@ -1,16 +1,16 @@
 package dyvilx.tools.compiler.parser.expression;
 
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LambdaExpr;
 import dyvilx.tools.compiler.ast.expression.TupleExpr;
-import dyvilx.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.BracketMatcher;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -117,7 +117,7 @@ public class LambdaOrTupleParser extends Parser
 			{
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
 				final IParameter parameter = lambdaExpr.createParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
-				                                                        EmptyModifiers.INSTANCE, null);
+				                                                        new AttributeList());
 				lambdaExpr.getParameters().add(parameter);
 				this.value = lambdaExpr;
 				this.mode = TYPE_ARROW;

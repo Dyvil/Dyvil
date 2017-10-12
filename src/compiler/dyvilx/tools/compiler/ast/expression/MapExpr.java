@@ -3,8 +3,10 @@ package dyvilx.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -21,9 +23,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class MapExpr implements IValue
 {
@@ -113,8 +113,7 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isClassAccess()
 	{
-		return this.keys.size() == 1 && this.keys.getFirst().isClassAccess() && this.values.getFirst()
-		                                                                                   .isClassAccess();
+		return this.keys.size() == 1 && this.keys.getFirst().isClassAccess() && this.values.getFirst().isClassAccess();
 	}
 
 	@Override
@@ -150,7 +149,7 @@ public class MapExpr implements IValue
 	{
 		if (!Types.isSuperClass(type, MapType.MapTypes.IMMUTABLE_MAP_CLASS.getClassType()))
 		{
-			final IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
+			final Annotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation == null)
 			{
 				return null;

@@ -1,30 +1,30 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.attribute.annotation;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
+import dyvilx.tools.compiler.ast.attribute.Attribute;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
+import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.header.IObjectCompilable;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
-import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.ast.type.ITyped;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -33,13 +33,13 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
-public final class Annotation implements IAnnotation
+public abstract class Annotation implements Attribute, ITyped, IObjectCompilable, IArgumentsConsumer
 {
 	public static final class LazyFields
 	{
-		public static final IClass RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
-		public static final IClass TARGET_CLASS    = Package.javaLangAnnotation.resolveClass("Target");
 
+		public static final IClass    RETENTION_CLASS  = Package.javaLangAnnotation.resolveClass("Retention");
+		public static final IClass    TARGET_CLASS     = Package.javaLangAnnotation.resolveClass("Target");
 		public static final IClass    ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
 		public static final ClassType ANNOTATION       = new ClassType(ANNOTATION_CLASS);
 
@@ -49,11 +49,9 @@ public final class Annotation implements IAnnotation
 		}
 	}
 
-	protected SourcePosition position;
-	protected ArgumentList arguments = ArgumentList.EMPTY;
-
-	// Metadata
 	protected IType type;
+
+	protected ArgumentList arguments = ArgumentList.EMPTY;
 
 	public Annotation()
 	{
@@ -64,27 +62,10 @@ public final class Annotation implements IAnnotation
 		this.type = type;
 	}
 
-	public Annotation(SourcePosition position)
-	{
-		this.position = position;
-	}
-
-	public Annotation(SourcePosition position, IType type)
-	{
-		this.position = position;
-		this.type = type;
-	}
-
 	@Override
-	public SourcePosition getPosition()
+	public int flags()
 	{
-		return this.position;
-	}
-
-	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
+		return 0;
 	}
 
 	@Override
@@ -93,13 +74,17 @@ public final class Annotation implements IAnnotation
 		return this.type;
 	}
 
+	public String getTypeDescriptor()
+	{
+		return this.type.getInternalName();
+	}
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
 
-	@Override
 	public ArgumentList getArguments()
 	{
 		return this.arguments;
@@ -114,16 +99,7 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.type != null)
-		{
-			this.type = this.type.resolveType(markers, context);
-		}
-		else
-		{
-			markers.add(Markers.semanticError(this.position, "annotation.type.invalid"));
-			this.type = Types.UNKNOWN;
-		}
-
+		this.type = this.type.resolveType(markers, context);
 		this.arguments.resolveTypes(markers, context);
 	}
 
@@ -149,7 +125,7 @@ public final class Annotation implements IAnnotation
 			{
 				if (parameter.getValue() == null)
 				{
-					markers.add(Markers.semanticError(this.position, "annotation.parameter.missing", this.type,
+					markers.add(Markers.semanticError(this.getPosition(), "annotation.parameter.missing", this.type,
 					                                  parameter.getName()));
 				}
 				continue;
@@ -174,47 +150,14 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.type != null)
-		{
-			this.type.checkType(markers, context, TypePosition.CLASS);
-		}
-
+		this.type.checkType(markers, context, TypePosition.CLASS);
 		this.arguments.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		if (this.type == null || !this.type.isResolved())
-		{
-			return;
-		}
-
-		final IClass theClass = this.type.getTheClass();
-		if (theClass == null)
-		{
-			return;
-		}
-
-		if (!theClass.isAnnotation())
-		{
-			markers.add(Markers.semanticError(this.position, "annotation.type", this.type.getName()));
-			return;
-		}
-
-		if (target == null)
-		{
-			return;
-		}
-
-		final IClassMetadata metadata = theClass.getMetadata();
-		if (!metadata.isTarget(target))
-		{
-			final Marker error = Markers.semanticError(this.position, "annotation.target", this.type.getName());
-			error.addInfo(Markers.getSemantic("annotation.target.element", target));
-			error.addInfo(Markers.getSemantic("annotation.target.allowed", metadata.getTargets()));
-			markers.add(error);
-		}
+		this.arguments.check(markers, context);
 	}
 
 	@Override
@@ -258,7 +201,6 @@ public final class Annotation implements IAnnotation
 		}
 	}
 
-	@Override
 	public void write(AnnotationVisitor writer)
 	{
 		final IClass iclass = this.type.getTheClass();

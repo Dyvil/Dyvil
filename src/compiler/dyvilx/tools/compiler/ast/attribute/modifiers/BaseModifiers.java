@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.modifiers;
+package dyvilx.tools.compiler.ast.attribute.modifiers;
 
 import dyvil.reflect.Modifiers;
 
@@ -90,7 +90,7 @@ public enum BaseModifiers implements Modifier
 	}
 
 	@Override
-	public int intValue()
+	public int flags()
 	{
 		return this.intValue;
 	}
@@ -102,7 +102,7 @@ public enum BaseModifiers implements Modifier
 	}
 
 	@Override
-	public void toString(StringBuilder builder)
+	public void toString(String indent, StringBuilder builder)
 	{
 		builder.append(this.name);
 	}

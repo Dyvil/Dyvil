@@ -1,16 +1,17 @@
 package dyvilx.tools.compiler.parser.classes;
 
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
@@ -151,16 +152,8 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 	private void configureMethod(IMethod method, IToken token)
 	{
 		method.setPosition(token.raw());
-		if (this.modifiers != null)
-		{
-			method.setModifiers(this.modifiers);
-			this.modifiers = null;
-		}
-		if (this.annotations != null)
-		{
-			method.setAttributes(this.annotations);
-			this.annotations = null;
-		}
+		method.setAttributes(this.attributes);
+		this.attributes = new AttributeList();
 	}
 
 	@Override

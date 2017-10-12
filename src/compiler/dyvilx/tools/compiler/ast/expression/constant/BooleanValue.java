@@ -1,8 +1,9 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -13,7 +14,6 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class BooleanValue implements IConstantValue
 {
@@ -21,7 +21,7 @@ public final class BooleanValue implements IConstantValue
 	public static final BooleanValue FALSE = new BooleanValue(false);
 
 	protected SourcePosition position;
-	protected boolean       value;
+	protected boolean        value;
 
 	public BooleanValue(boolean value)
 	{
@@ -72,7 +72,7 @@ public final class BooleanValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.FROMBOOLEAN_CLASS);
+		final Annotation annotation = type.getTheClass().getAnnotation(Types.FROMBOOLEAN_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

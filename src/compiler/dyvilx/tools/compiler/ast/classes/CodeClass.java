@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
@@ -10,16 +11,14 @@ import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
@@ -34,7 +33,6 @@ import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -46,7 +44,7 @@ public class CodeClass extends AbstractClass
 	protected ArgumentList superConstructorArguments = ArgumentList.EMPTY;
 
 	// Metadata
-	protected IHeaderUnit   unit;
+	protected IHeaderUnit    unit;
 	protected SourcePosition position;
 
 	protected boolean traitInit;
@@ -55,19 +53,17 @@ public class CodeClass extends AbstractClass
 	{
 	}
 
-	public CodeClass(SourcePosition position, Name name, ModifierSet modifiers, AttributeList annotations)
+	public CodeClass(SourcePosition position, Name name, AttributeList attributes)
 	{
+		super(attributes);
 		this.position = position;
 		this.name = name;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
 	}
 
 	public CodeClass(IHeaderUnit unit, Name name)
 	{
 		this.unit = unit;
 		this.name = name;
-		this.modifiers = new ModifierList();
 	}
 
 	@Override
@@ -119,14 +115,11 @@ public class CodeClass extends AbstractClass
 
 		if (this.metadata == null)
 		{
-			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
+			this.metadata = IClass.getClassMetadata(this, this.attributes.flags());
 		}
 
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-		}
-		this.modifiers.resolveTypes(this, markers);
+		this.attributes.resolveTypes(markers, context, this);
+		ModifierUtil.checkModifiers(this, markers);
 
 		this.metadata.resolveTypesPre(markers, context);
 
@@ -169,10 +162,7 @@ public class CodeClass extends AbstractClass
 	{
 		context = context.push(this);
 
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-		}
+		this.attributes.resolve(markers, context);
 
 		if (this.typeParameters != null)
 		{
@@ -208,18 +198,15 @@ public class CodeClass extends AbstractClass
 
 		if (this.enclosingClass != null && !this.hasModifier(Modifiers.STATIC))
 		{
-			this.modifiers.addIntModifier(Modifiers.STATIC);
-			if ((this.modifiers.toFlags() & Modifiers.CLASS_TYPE_MODIFIERS) == 0)
+			this.attributes.addFlag(Modifiers.STATIC);
+			if ((this.attributes.flags() & Modifiers.CLASS_TYPE_MODIFIERS) == 0)
 			{
 				// is a plain old class, not an interface, trait, annotation, object or enum
 				markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
 			}
 		}
 
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
+		this.attributes.checkTypes(markers, context);
 
 		this.metadata.checkTypes(markers, context);
 
@@ -255,10 +242,7 @@ public class CodeClass extends AbstractClass
 	{
 		context = context.push(this);
 
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, this.getElementType());
-		}
+		this.attributes.check(markers, context, this.getElementType());
 
 		if (this.typeParameters != null)
 		{
@@ -274,7 +258,7 @@ public class CodeClass extends AbstractClass
 			final IClass superClass = this.superType.getTheClass();
 			if (superClass != null)
 			{
-				final int modifiers = superClass.getModifiers().toFlags();
+				final int modifiers = superClass.getAttributes().flags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
 					markers.add(Markers.semanticError(this.position, "class.extend.type",
@@ -306,7 +290,7 @@ public class CodeClass extends AbstractClass
 
 				if (!theClass.isInterface())
 				{
-					final String classType = ModifierUtil.classTypeToString(theClass.getModifiers().toFlags());
+					final String classType = ModifierUtil.classTypeToString(theClass.getAttributes().flags());
 					markers.add(
 						Markers.semanticError(this.position, "class.implement.type", classType, theClass.getName()));
 				}
@@ -384,10 +368,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void foldConstants()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
+		this.attributes.foldConstants();
 
 		if (this.typeParameters != null)
 		{
@@ -417,10 +398,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.cleanup(compilableList, this);
-		}
+		this.attributes.cleanup(compilableList, this);
 
 		if (this.typeParameters != null)
 		{
@@ -717,7 +695,7 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, long flags)
 	{
-		ModifierUtil.writeModifiers(writer, this, flags);
+		ModifierUtil.writeModifiers(writer, flags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
@@ -728,14 +706,7 @@ public class CodeClass extends AbstractClass
 			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true).visitEnd();
 		}
 
-		if (this.annotations != null)
-		{
-			int count = this.annotations.size();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.get(i).write(writer);
-			}
-		}
+		this.attributes.write(writer);
 
 		// Type Variable Annotations
 		if (this.typeParameters != null)
@@ -775,8 +746,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		ModifierSet.write(this.modifiers, out);
-		AttributeList.write(this.annotations, out);
+		AttributeList.write(this.attributes, out);
 
 		out.writeUTF(this.name.unqualified);
 
@@ -803,8 +773,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.modifiers = ModifierSet.read(in);
-		this.annotations = AttributeList.read(in);
+		this.attributes = AttributeList.read(in);
 
 		this.name = Name.read(in);
 

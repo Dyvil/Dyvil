@@ -1,38 +1,38 @@
-package dyvilx.tools.compiler.ast.annotation;
+package dyvilx.tools.compiler.ast.expression;
 
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Handle;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class AnnotationValue implements IValue, IAnnotationConsumer
+public class AnnotationExpr implements IValue, IAnnotationConsumer
 {
 	private static final Handle ANNOTATION_METAFACTORY = new Handle(ClassFormat.H_INVOKESTATIC,
 	                                                                "dyvil/runtime/AnnotationMetafactory",
 	                                                                "metafactory",
 	                                                                ClassFormat.BSM_HEAD + "[Ljava/lang/Object;"
-		                                                                + ClassFormat.BSM_TAIL);
+	                                                                + ClassFormat.BSM_TAIL);
 
-	protected IAnnotation annotation;
+	protected Annotation annotation;
 
-	public AnnotationValue()
+	public AnnotationExpr()
 	{
 	}
 
-	public AnnotationValue(IAnnotation annotation)
+	public AnnotationExpr(Annotation annotation)
 	{
 		this.annotation = annotation;
 	}
@@ -49,12 +49,12 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	}
 
 	@Override
-	public void setAnnotation(IAnnotation annotation)
+	public void setAnnotation(Annotation annotation)
 	{
 		this.annotation = annotation;
 	}
 
-	public IAnnotation getAnnotation()
+	public Annotation getAnnotation()
 	{
 		return this.annotation;
 	}

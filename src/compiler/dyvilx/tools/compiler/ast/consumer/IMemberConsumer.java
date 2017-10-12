@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.consumer;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.constructor.CodeConstructor;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -10,10 +12,7 @@ import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.field.Property;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
 
 public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IDataMemberConsumer<F>
 {
@@ -26,33 +25,33 @@ public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, 
 	void addDataMember(F field);
 
 	@Override
-	F createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations);
+	F createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes);
 
 	void addProperty(IProperty property);
 
-	default IProperty createProperty(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	default IProperty createProperty(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Property(position, name, type, modifiers, annotations);
+		return new Property(position, name, type, attributes);
 	}
 
 	void addConstructor(IConstructor constructor);
 
-	default IConstructor createConstructor(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
+	default IConstructor createConstructor(SourcePosition position, AttributeList attributes)
 	{
-		return new CodeConstructor(position, modifiers, annotations);
+		return new CodeConstructor(position, attributes);
 	}
 
 	void addInitializer(IInitializer initializer);
 
-	default IInitializer createInitializer(SourcePosition position, ModifierSet modifiers, AttributeList annotations)
+	default IInitializer createInitializer(SourcePosition position, AttributeList attributes)
 	{
-		return new Initializer(position, modifiers, annotations);
+		return new Initializer(position, attributes);
 	}
 
 	void addMethod(IMethod method);
 
-	default IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	default IMethod createMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new CodeMethod(position, name, type, modifiers, annotations);
+		return new CodeMethod(position, name, type, attributes);
 	}
 }

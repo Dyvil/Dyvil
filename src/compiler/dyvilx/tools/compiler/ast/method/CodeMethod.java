@@ -4,6 +4,7 @@ import dyvil.annotation.Reified;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
@@ -11,8 +12,9 @@ import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -23,8 +25,6 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvilx.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -39,7 +39,6 @@ import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -67,14 +66,14 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type);
 	}
 
-	public CodeMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public CodeMethod(IClass iclass, Name name, IType type, AttributeList attributes)
 	{
-		super(iclass, name, type, modifiers);
+		super(iclass, name, type, attributes);
 	}
 
-	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public CodeMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 	}
 
 	@Override
@@ -127,7 +126,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
+			this.attributes.addFlag(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.exceptions != null)
@@ -141,7 +140,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
 		{
-			this.modifiers.addIntModifier(Modifiers.ABSTRACT);
+			this.attributes.addFlag(Modifiers.ABSTRACT);
 		}
 
 		context.pop();
@@ -313,8 +312,8 @@ public class CodeMethod extends AbstractMethod
 		                              boolean thisMangled, IMethod method)
 	{
 		if (method == this // common cases
-			    || method.getParameters().size() != parameterCount // optimization
-			    || !method.getDescriptor().equals(descriptor))
+		    || method.getParameters().size() != parameterCount // optimization
+		    || !method.getDescriptor().equals(descriptor))
 		{
 			return thisMangled;
 		}
@@ -366,7 +365,7 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public IntrinsicData getIntrinsicData()
 	{
-		final IAnnotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
+		final Annotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
 		if (annotation == null)
 		{
 			return null;
@@ -400,7 +399,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE) && !this.modifiers.hasIntModifier(Modifiers.GENERATED))
+		if (!this.isOverride() && !this.attributes.hasFlag(Modifiers.GENERATED))
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}
@@ -420,7 +419,7 @@ public class CodeMethod extends AbstractMethod
 
 			final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
 			if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
-				    && !Types.isSuperType(superReturnType.asParameterType(), this.type))
+			    && !Types.isSuperType(superReturnType.asParameterType(), this.type))
 			{
 				final Marker marker = Markers
 					                      .semanticError(this.position, "method.override.type.incompatible", this.name);
@@ -484,7 +483,7 @@ public class CodeMethod extends AbstractMethod
 			return false;
 		}
 
-		if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
+		if (this.isOverride())
 		{
 			markers.add(Markers.semanticError(this.position, "method.override.notfound", this.name));
 		}
@@ -530,13 +529,10 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.cleanup(compilableList, classCompilableList);
 
-		if (this.annotations != null)
+		final Annotation intrinsic = this.attributes.getAnnotation(Types.INTRINSIC_CLASS);
+		if (intrinsic != null)
 		{
-			IAnnotation intrinsic = this.annotations.get(Types.INTRINSIC_CLASS);
-			if (intrinsic != null)
-			{
-				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
-			}
+			this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 		}
 
 		if (this.typeParameters != null)
@@ -748,10 +744,7 @@ public class CodeMethod extends AbstractMethod
 
 	protected void writeAnnotations(MethodWriter writer, long flags)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.write(writer);
-		}
+		this.attributes.write(writer);
 
 		// Write DyvilName annotation if it differs from the mangled name
 		final String qualifiedName = this.name.qualified;
@@ -771,7 +764,7 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, this, flags);
+		ModifierUtil.writeModifiers(writer, flags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

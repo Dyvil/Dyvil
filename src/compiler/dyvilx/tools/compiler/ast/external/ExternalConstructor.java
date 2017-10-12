@@ -1,42 +1,41 @@
 package dyvilx.tools.compiler.ast.external;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.AbstractConstructor;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.structure.Package;
-import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
-	private static final int EXCEPTIONS  = 1 << 2;
+	private static final int EXCEPTIONS = 1 << 2;
 
 	private byte resolved;
 
-	public ExternalConstructor(IClass enclosingClass)
+	public ExternalConstructor(IClass enclosingClass, AttributeList attributes)
 	{
-		super(enclosingClass);
+		super(enclosingClass, attributes);
 		this.type = enclosingClass.getThisType();
 	}
 
@@ -73,16 +72,13 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
 
-	private void resolveAnnotations()
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
-	}
-
 	private void resolveExceptions()
 	{
+		if (this.exceptions == null || (this.resolved & EXCEPTIONS) != 0)
+		{
+			return;
+		}
+
 		this.resolved |= EXCEPTIONS;
 
 		final IContext context = this.getExternalContext();
@@ -90,16 +86,22 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public AttributeList getAttributes()
+	public TypeList getExceptions()
 	{
-		this.resolveAnnotations();
-		return super.getAttributes();
+		this.resolveExceptions();
+		return super.getExceptions();
 	}
 
 	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public TypeList getExternalExceptions()
 	{
-		return new ExternalParameter(this, name, type, modifiers, annotations);
+		return super.getExceptions();
+	}
+
+	@Override
+	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
+	{
+		return new ExternalParameter(this, name, type, attributes);
 	}
 
 	@Override
@@ -134,6 +136,13 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
+	public String[] getInternalExceptions()
+	{
+		this.resolveExceptions();
+		return super.getInternalExceptions();
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
@@ -141,7 +150,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.EXCEPTION_PARAMETER:

@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.imports;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -20,9 +22,7 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -210,7 +210,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 
 		// Header Access Check
-		int accessLevel = headerDeclaration.getModifiers().toFlags() & Modifiers.ACCESS_MODIFIERS;
+		int accessLevel = headerDeclaration.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS;
 		if ((accessLevel & Modifiers.INTERNAL) != 0)
 		{
 			if (header instanceof ExternalHeader)

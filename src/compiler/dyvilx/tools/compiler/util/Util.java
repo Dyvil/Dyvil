@@ -2,13 +2,13 @@ package dyvilx.tools.compiler.util;
 
 import dyvil.lang.Name;
 import dyvil.string.CharUtils;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -91,7 +91,7 @@ public final class Util
 
 	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)
 	{
-		ModifierUtil.writeClassType(iClass.getModifiers().toFlags(), stringBuilder);
+		ModifierUtil.writeClassType(iClass.getAttributes().flags(), stringBuilder);
 
 		stringBuilder.append(iClass.getName());
 

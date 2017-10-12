@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.CastOperator;
@@ -17,7 +19,6 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ClassParameter;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
@@ -33,7 +34,6 @@ import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaseClasses;
 import dyvilx.tools.compiler.transform.Names;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
@@ -63,7 +63,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 			// Create a property with getter
 			final IProperty property = classParameter.createProperty();
-			property.getModifiers().addIntModifier(Modifiers.GENERATED);
+			property.getAttributes().addFlag(Modifiers.GENERATED);
 			property.initGetter();
 
 			if (!classParameter.hasModifier(Modifiers.FINAL))
@@ -96,7 +96,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			// Generate the apply method signature
 
 			final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
-			                                              new FlagModifierSet(modifiers));
+			                                              AttributeList.of(modifiers));
 			applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
 			this.copyClassParameters(applyMethod);
@@ -119,8 +119,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		if ((this.members & UNAPPLY) == 0)
 		{
 			// static final func unapply<TypeParams...>(value: This) -> (T...)
-			this.unapplyMethod = new CodeMethod(this.theClass, Names.unapply, returnType,
-			                                    new FlagModifierSet(modifiers));
+			this.unapplyMethod = new CodeMethod(this.theClass, Names.unapply, returnType, AttributeList.of(modifiers));
 			this.unapplyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 			final CodeParameter parameter = new CodeParameter(this.unapplyMethod, null, Names.value,
 			                                                  this.theClass.getThisType());
@@ -131,7 +130,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		{
 			// static final func unapply<TypeParams...>(value: any) -> (T...)?
 			this.unapplyAnyMethod = new CodeMethod(this.theClass, Names.unapply, NullableType.apply(returnType),
-			                                       new FlagModifierSet(modifiers));
+			                                       AttributeList.of(modifiers));
 			this.unapplyAnyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
 			final CodeParameter parameter = new CodeParameter(this.unapplyAnyMethod, null, Names.value,
@@ -203,8 +202,8 @@ public final class CaseClassMetadata extends ClassMetadata
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		return (this.applyMethod != null && this.applyMethod.overrides(candidate, typeContext)) //
-			       | (this.unapplyMethod != null && this.unapplyMethod.overrides(candidate, typeContext)) //
-			       | (this.unapplyAnyMethod != null && this.unapplyAnyMethod.overrides(candidate, typeContext));
+		       | (this.unapplyMethod != null && this.unapplyMethod.overrides(candidate, typeContext)) //
+		       | (this.unapplyAnyMethod != null && this.unapplyAnyMethod.overrides(candidate, typeContext));
 	}
 
 	@Override

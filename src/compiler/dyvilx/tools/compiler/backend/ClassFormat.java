@@ -1,8 +1,10 @@
 package dyvilx.tools.compiler.backend;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.ASMConstants;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.external.ExternalConstructor;
@@ -12,8 +14,6 @@ import dyvilx.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.reference.ReferenceType;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -27,7 +27,6 @@ import dyvilx.tools.compiler.ast.type.generic.GenericType;
 import dyvilx.tools.compiler.ast.type.generic.InternalGenericType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.ast.type.typevar.InternalTypeVarType;
-import dyvil.lang.Name;
 
 @SuppressWarnings( { "UnnecessaryBoxing", "unused" })
 public final class ClassFormat
@@ -87,13 +86,13 @@ public final class ClassFormat
 		return -1;
 	}
 
-	public static ModifierSet readModifiers(int access)
+	public static AttributeList readModifiers(int access)
 	{
 		if ((access & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
 			access |= Modifiers.PACKAGE;
 		}
-		return new FlagModifierSet(access);
+		return AttributeList.of(access);
 	}
 
 	public static String packageToInternal(String pack)
@@ -207,8 +206,7 @@ public final class ClassFormat
 	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
 		final ParameterList parameterList = methodSignature.getExternalParameterList();
-		return type ->
-		{
+		return type -> {
 			final ExternalParameter parameter = new ExternalParameter(null, null, type);
 			parameter.setMethod(methodSignature);
 			parameterList.add(parameter);

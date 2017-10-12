@@ -2,23 +2,21 @@ package dyvilx.tools.repl.context;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.array.ObjectArray;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.Field;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.repl.DyvilREPL;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,19 +25,18 @@ public class REPLVariable extends Field
 {
 	private REPLContext context;
 
-	private   Class<?> runtimeClass;
-	private   Object   displayValue;
+	private Class<?> runtimeClass;
+	private Object   displayValue;
 
 	public REPLVariable(REPLContext context, Name name, IValue value)
 	{
-		this(context, value.getPosition(), name, Types.UNKNOWN, new ModifierList(Modifiers.FINAL), null);
+		this(context, value.getPosition(), name, Types.UNKNOWN, AttributeList.of(Modifiers.FINAL));
 		this.setValue(value);
 	}
 
-	public REPLVariable(REPLContext context, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                   AttributeList annotations)
+	public REPLVariable(REPLContext context, SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(null, position, name, type, modifiers, annotations);
+		super(null, position, name, type, attributes);
 		this.context = context;
 	}
 

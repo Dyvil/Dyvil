@@ -1,8 +1,9 @@
 package dyvilx.tools.compiler.ast.type.compound;
 
+import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
@@ -13,7 +14,6 @@ import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ImplicitNullableType extends NullableType
@@ -82,12 +82,19 @@ public class ImplicitNullableType extends NullableType
 	}
 
 	@Override
-	public IType withAnnotation(IAnnotation annotation)
+	public IType withAnnotation(Annotation annotation)
 	{
-		final String internal = annotation.getType().getInternalName();
-		if (internal.equals(AnnotationUtil.NULLABLE_INTERNAL))
+		switch (annotation.getTypeDescriptor())
 		{
+		case AnnotationUtil.NULLABLE_INTERNAL:
 			return NullableType.apply(this.type);
+		case AnnotationUtil.PRIMITIVE_INTERNAL:
+			if (!this.type.getInternalName().equals("java/lang/Object"))
+			{
+				// @Primitive <prim>! => <prim>
+				return this.type.withAnnotation(annotation);
+			}
+			// but @Primitive Object! => any!
 		}
 
 		return super.withAnnotation(annotation);

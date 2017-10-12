@@ -1,19 +1,20 @@
 package dyvilx.tools.compiler.backend.visitor;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.*;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.bytecode.*;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.intrinsic.InlineIntrinsicData;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvil.lang.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
 {
@@ -54,7 +55,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 				modifiers |= Modifiers.VARARGS;
 			}
 
-			parameter.getModifiers().addIntModifier(modifiers);
+			parameter.getAttributes().addFlag(modifiers);
 		}
 	}
 
@@ -64,7 +65,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		final IParameter param = this.method.getExternalParameterList().get(parameter);
 		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
-			return new ModifierVisitor(param.getModifiers());
+			return new ModifierVisitor(param.getAttributes());
 		}
 
 		final String internal = ClassFormat.extendedToInternal(type);
@@ -77,7 +78,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		switch (type)
 		{
 		case ModifierUtil.DYVIL_MODIFIERS:
-			return new ModifierVisitor(this.method.getModifiers());
+			return new ModifierVisitor(this.method.getAttributes());
 		case AnnotationUtil.DYVIL_NAME:
 			return new DyvilNameVisitor(this.method);
 		case AnnotationUtil.RECEIVER_TYPE:
@@ -85,10 +86,10 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		}
 
 		final String internal = ClassFormat.extendedToInternal(type);
-		if (this.method.addRawAnnotation(internal, null))
+		if (!this.method.skipAnnotation(internal, null))
 		{
-			final Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationReader(this.method.getAttributes(), annotation);
+			final Annotation annotation = new ExternalAnnotation(new InternalType(internal));
+			return new AnnotationReader(this.method, annotation);
 		}
 		return null;
 	}

@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.ast.member;
 
+import dyvilx.tools.compiler.ast.attribute.Attribute;
+import dyvilx.tools.compiler.ast.attribute.modifiers.BaseModifiers;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
 
 import static dyvil.reflect.Modifiers.*;
 
@@ -36,9 +36,14 @@ public enum MemberKind
 		return this.name;
 	}
 
-	public boolean isModifierAllowed(Modifier modifier)
+	public boolean isAttributeAllowed(Attribute attribute)
 	{
-		final String str = modifier.toString();
+		if (attribute.flags() == 0)
+		{
+			return true;
+		}
+
+		final String str = attribute.toString();
 		final int index = this.allowedModifiers.indexOf(str);
 
 		return index >= 0 && (this.allowedModifiers.charAt(index + str.length()) == ',');

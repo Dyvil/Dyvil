@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.parser.statement;
 
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -14,20 +15,18 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.NestedMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.Closure;
 import dyvilx.tools.compiler.ast.statement.MemberStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.statement.VariableStatement;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.classes.MemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
-import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.TryParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -305,10 +304,9 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AttributeList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Variable(position, name, type, modifiers, annotations);
+		return new Variable(position, name, type, attributes);
 	}
 
 	@Override
@@ -318,10 +316,9 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                           AttributeList annotations)
+	public IMethod createMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new NestedMethod(position, name, type, modifiers, annotations);
+		return new NestedMethod(position, name, type, attributes);
 	}
 
 	@Override

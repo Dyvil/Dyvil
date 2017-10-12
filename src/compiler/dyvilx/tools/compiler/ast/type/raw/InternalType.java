@@ -1,7 +1,8 @@
 package dyvilx.tools.compiler.ast.type.raw;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -16,7 +17,6 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -122,9 +122,9 @@ public class InternalType implements IRawType, IUnresolvedType
 	}
 
 	@Override
-	public IType withAnnotation(IAnnotation annotation)
+	public IType withAnnotation(Annotation annotation)
 	{
-		if (AnnotationUtil.PRIMITIVE_INTERNAL.equals(annotation.getType().getInternalName()))
+		if (AnnotationUtil.PRIMITIVE_INTERNAL.equals(annotation.getTypeDescriptor()))
 		{
 			return PrimitiveType.getPrimitiveType(this.internalName);
 		}

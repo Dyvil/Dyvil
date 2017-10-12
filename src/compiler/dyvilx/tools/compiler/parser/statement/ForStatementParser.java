@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.parser.statement;
 
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
@@ -7,17 +8,15 @@ import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.loop.ForEachStatement;
 import dyvilx.tools.compiler.ast.statement.loop.ForStatement;
 import dyvilx.tools.compiler.ast.statement.loop.IForStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.classes.DataMemberParser;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.classes.DataMemberParser;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -41,10 +40,10 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 	protected IValueConsumer field;
 
 	private   SourcePosition position;
-	private   IVariable     variable;
-	private   IValue        update;
-	private   IValue        condition;
-	protected IForStatement forStatement;
+	private   IVariable      variable;
+	private   IValue         update;
+	private   IValue         condition;
+	protected IForStatement  forStatement;
 
 	private boolean parenthesis;
 
@@ -239,8 +238,8 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 	}
 
 	@Override
-	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Variable(position, name, type, modifiers, annotations);
+		return new Variable(position, name, type, attributes);
 	}
 }

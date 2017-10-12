@@ -1,9 +1,10 @@
 package dyvilx.tools.compiler.backend.visitor;
 
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationValue;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.AnnotationExpr;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.backend.ClassFormat;
@@ -11,18 +12,18 @@ import dyvilx.tools.compiler.backend.ClassFormat;
 public class AnnotationValueReader implements AnnotationVisitor
 {
 	IValueConsumer consumer;
-	
+
 	public AnnotationValueReader(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
 	}
-	
+
 	@Override
 	public void visit(String key, Object obj)
 	{
 		this.consumer.setValue(IValue.fromObject(obj));
 	}
-	
+
 	@Override
 	public void visitEnum(String key, String enumClass, String name)
 	{
@@ -32,16 +33,16 @@ public class AnnotationValueReader implements AnnotationVisitor
 			this.consumer.setValue(enumValue);
 		}
 	}
-	
+
 	@Override
 	public AnnotationVisitor visitAnnotation(String key, String desc)
 	{
-		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
-		AnnotationValue value = new AnnotationValue(annotation);
+		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
+		AnnotationExpr value = new AnnotationExpr(annotation);
 		this.consumer.setValue(value);
 		return new AnnotationReader(value, annotation);
 	}
-	
+
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
@@ -56,7 +57,7 @@ public class AnnotationValueReader implements AnnotationVisitor
 			}
 		};
 	}
-	
+
 	@Override
 	public void visitEnd()
 	{

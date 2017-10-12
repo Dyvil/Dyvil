@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -17,9 +19,7 @@ import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class TypeOperator extends AbstractValue
 {
@@ -83,7 +83,7 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyFields.TYPE_CONVERTIBLE);
+		final Annotation annotation = type.getAnnotation(LazyFields.TYPE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

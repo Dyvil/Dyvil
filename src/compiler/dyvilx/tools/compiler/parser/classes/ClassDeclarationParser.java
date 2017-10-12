@@ -5,14 +5,13 @@ import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.expression.ArgumentListParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -36,23 +35,21 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	protected IClassConsumer consumer;
 
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
-	protected ModifierSet   modifiers;
-	protected AttributeList annotations;
+	protected AttributeList attributes;
 
 	private IClass theClass;
 
 	public ClassDeclarationParser(IClassConsumer consumer)
 	{
 		this.consumer = consumer;
+		this.attributes = new AttributeList();
 		// this.mode = NAME;
 	}
 
-	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AttributeList annotations)
+	public ClassDeclarationParser(IClassConsumer consumer, AttributeList attributes)
 	{
 		this.consumer = consumer;
-
-		this.modifiers = modifiers;
-		this.annotations = annotations;
+		this.attributes = attributes;
 		// this.mode = NAME;
 	}
 
@@ -65,8 +62,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case NAME:
 			if (Tokens.isIdentifier(type))
 			{
-				this.theClass = this.consumer
-					                .createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
+				this.theClass = this.consumer.createClass(token.raw(), token.nameValue(), this.attributes);
 				this.mode = GENERICS;
 				return;
 			}

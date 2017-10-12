@@ -9,13 +9,12 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
 import dyvilx.tools.compiler.ast.statement.IfStatement;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -184,9 +183,8 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 	}
 
 	@Override
-	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AttributeList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Variable(position, name, type, modifiers, annotations);
+		return new Variable(position, name, type, attributes);
 	}
 }

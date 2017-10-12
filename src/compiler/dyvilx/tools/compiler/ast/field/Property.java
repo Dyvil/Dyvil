@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.field;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -11,8 +13,6 @@ import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -25,9 +25,7 @@ import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,12 +43,17 @@ public class Property extends Member implements IProperty
 
 	protected IClass enclosingClass;
 
-	protected CodeParameter setterParameter;
+	protected CodeParameter  setterParameter;
 	protected SourcePosition initializerPosition;
 
-	public Property(SourcePosition position, Name name, IType type, ModifierSet modifiers, AttributeList annotations)
+	public Property(SourcePosition position, Name name, IType type)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type);
+	}
+
+	public Property(SourcePosition position, Name name, IType type, AttributeList attributes)
+	{
+		super(position, name, type, attributes);
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public class Property extends Member implements IProperty
 		{
 			return this.getter;
 		}
-		final CodeMethod getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		final CodeMethod getter = new CodeMethod(this.enclosingClass, this.name, this.type);
 		getter.setPosition(this.position);
 		return this.getter = getter;
 	}
@@ -120,10 +123,9 @@ public class Property extends Member implements IProperty
 		}
 
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
-		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
+		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID);
 		this.setter.setPosition(this.position);
-		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
-		                                         new FlagModifierSet(), null);
+		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type);
 		this.setter.getParameters().add(this.setterParameter);
 
 		return this.setter;
@@ -174,34 +176,22 @@ public class Property extends Member implements IProperty
 
 		if (this.getter != null)
 		{
-			final ModifierSet getterModifiers = this.getter.getModifiers();
+			final AttributeList getterAttributes = this.getter.getAttributes();
 
 			// Add <generated> Modifier and copy Property Modifiers
-			getterModifiers.addIntModifier(Modifiers.GENERATED);
-			Field.copyModifiers(this.modifiers, getterModifiers);
-
-			// Copy Annotations
-			if (this.annotations != null)
-			{
-				this.getter.getAttributes().addAll(this.annotations);
-			}
+			getterAttributes.addFlag(Modifiers.GENERATED);
+			Field.copyModifiers(this.attributes, getterAttributes);
 
 			this.getter.setType(this.type);
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
-			final ModifierSet setterModifiers = this.setter.getModifiers();
+			final AttributeList setterModifiers = this.setter.getAttributes();
 
 			// Add <generated> Modifier and copy Property Modifiers
-			setterModifiers.addIntModifier(Modifiers.GENERATED);
-			Field.copyModifiers(this.modifiers, setterModifiers);
-
-			// Copy Annotations
-			if (this.annotations != null)
-			{
-				this.setter.getAttributes().addAll(this.annotations);
-			}
+			setterModifiers.addFlag(Modifiers.GENERATED);
+			Field.copyModifiers(this.attributes, setterModifiers);
 
 			this.setterParameter.setPosition(this.setter.getPosition());
 			this.setterParameter.setType(this.type);
@@ -481,18 +471,9 @@ public class Property extends Member implements IProperty
 		final String indent = Formatting.getIndent("property.getter.indent", prefix);
 
 		final IValue value = getter.getValue();
-		final ModifierSet modifiers = getter.getModifiers();
-		final AttributeList annotations = getter.getAttributes();
 
 		buffer.append('\n').append(indent);
-		if (annotations != null)
-		{
-			annotations.toInlineString(indent, buffer);
-		}
-		if (modifiers != null)
-		{
-			modifiers.toString(getter.getKind(), buffer);
-		}
+		getter.getAttributes().toInlineString(indent, buffer);
 		buffer.append("get");
 
 		if (value != null)
@@ -531,19 +512,10 @@ public class Property extends Member implements IProperty
 		final String indent = Formatting.getIndent("property.setter.indent", prefix);
 
 		final IValue value = setter.getValue();
-		final ModifierSet setterModifiers = setter.getModifiers();
-		final AttributeList annotations = setter.getAttributes();
 		final Name setterParameterName = setter.getParameters().get(0).getName();
 
 		buffer.append('\n').append(indent);
-		if (annotations != null)
-		{
-			annotations.toInlineString(indent, buffer);
-		}
-		if (setterModifiers != null)
-		{
-			setterModifiers.toString(setter.getKind(), buffer);
-		}
+		setter.getAttributes().toInlineString(indent, buffer);
 		buffer.append("set");
 
 		if (setterParameterName != Names.newValue)

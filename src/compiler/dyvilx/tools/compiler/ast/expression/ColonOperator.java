@@ -1,9 +1,10 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -22,7 +23,6 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ColonOperator implements IValue
@@ -53,7 +53,7 @@ public class ColonOperator implements IValue
 
 	// Metadata
 	private SourcePosition position;
-	private IType         type;
+	private IType          type;
 
 	public ColonOperator(IValue left, IValue right)
 	{
@@ -126,7 +126,7 @@ public class ColonOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyFields.COLON_CONVERTIBLE);
+		final Annotation annotation = type.getAnnotation(LazyFields.COLON_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.left, this.right))
@@ -175,7 +175,6 @@ public class ColonOperator implements IValue
 		{
 			return MISMATCH;
 		}
-
 
 		final IType rightType = Types.resolveTypeSafely(type, LazyFields.VALUE_PARAMETER);
 		final int rightMatch = TypeChecker.getTypeMatch(this.right, rightType, implicitContext);

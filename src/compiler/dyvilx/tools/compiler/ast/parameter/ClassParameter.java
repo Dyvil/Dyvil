@@ -4,6 +4,7 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -12,9 +13,6 @@ import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -46,10 +44,10 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                     AttributeList annotations)
+	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type,
+		                     AttributeList attributes)
 	{
-		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
+		super(enclosingClass, position, name, type, attributes);
 	}
 
 	@Override
@@ -125,7 +123,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void setVarargs()
 	{
-		this.modifiers.addIntModifier(Modifiers.VARARGS);
+		this.attributes.addFlag(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -197,7 +195,7 @@ public class ClassParameter extends Field implements IParameter
 	{
 		if (this.property != null)
 		{
-			this.property.getModifiers().addIntModifier(Modifiers.PUBLIC);
+			this.property.getAttributes().addFlag(Modifiers.PUBLIC);
 		}
 
 		super.resolveTypes(markers, context);
@@ -210,7 +208,7 @@ public class ClassParameter extends Field implements IParameter
 
 		if (this.value != null)
 		{
-			this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+			this.attributes.addFlag(Modifiers.DEFAULT);
 		}
 
 		if (this.hasModifier(Modifiers.OVERRIDE))

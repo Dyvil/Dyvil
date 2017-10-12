@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.type.raw;
 
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -42,7 +42,7 @@ public interface IRawType extends IObjectType
 	default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
-	
+
 	@Override
 	default IType resolveType(ITypeParameter typeParameter)
 	{
@@ -54,32 +54,32 @@ public interface IRawType extends IObjectType
 
 		return theClass.resolveType(typeParameter, this);
 	}
-	
+
 	@Override
 	default void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
-	
+
 	@Override
 	default void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	default void foldConstants()
 	{
 	}
-	
+
 	@Override
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 
 	@Override
-	default void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	default void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 	}
-	
+
 	@Override
 	default void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{

@@ -3,10 +3,11 @@ package dyvilx.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -23,7 +24,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ArrayExpr implements IValue
@@ -127,8 +127,7 @@ public final class ArrayExpr implements IValue
 		{
 			return IValue.super.asIgnoredClassAccess();
 		}
-		return new ClassAccess(this.position, new ArrayType(this.values.getFirst().getType()))
-			       .asIgnoredClassAccess();
+		return new ClassAccess(this.position, new ArrayType(this.values.getFirst().getType())).asIgnoredClassAccess();
 	}
 
 	public IType getElementType()
@@ -210,7 +209,7 @@ public final class ArrayExpr implements IValue
 		final ArrayType arrayType = type.extract(ArrayType.class);
 		if (arrayType == null)
 		{
-			final IAnnotation annotation;
+			final Annotation annotation;
 			if ((annotation = type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation, this.values)
@@ -243,8 +242,9 @@ public final class ArrayExpr implements IValue
 
 		for (int i = 0; i < size; i++)
 		{
-			final IValue value = TypeChecker.convertValue(this.values.get(i), elementType, typeContext, markers, context,
-			                                               LazyFields.ELEMENT_MARKER_SUPPLIER);
+			final IValue value = TypeChecker
+				                     .convertValue(this.values.get(i), elementType, typeContext, markers, context,
+				                                   LazyFields.ELEMENT_MARKER_SUPPLIER);
 			this.values.set(i, value);
 		}
 

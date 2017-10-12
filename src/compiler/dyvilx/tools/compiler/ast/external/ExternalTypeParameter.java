@@ -1,9 +1,11 @@
 package dyvilx.tools.compiler.ast.external;
 
 import dyvil.annotation.Reified;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.TypeParameter;
@@ -15,17 +17,15 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ExternalTypeParameter extends TypeParameter
 {
-	private static final int UPPER_BOUND = 1;
-	private static final int LOWER_BOUND = 2;
+	private static final int UPPER_BOUND  = 1;
+	private static final int LOWER_BOUND  = 2;
 	private static final int REIFIED_KIND = 4;
 
-	private int upperBoundCount;
+	private int  upperBoundCount;
 	private byte resolved;
 
 	// shared constructor
@@ -45,10 +45,7 @@ public class ExternalTypeParameter extends TypeParameter
 
 	private void resolveAnnotations()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
 	}
 
 	@Override
@@ -199,7 +196,7 @@ public class ExternalTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
 		this.upperBound = null;
 		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
