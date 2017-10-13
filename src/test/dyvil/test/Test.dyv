@@ -78,7 +78,7 @@ interface Test
 			{
 				errors.add("Inequality Requirement failed")
 				errors.add("\tfor value: \(this.expected)")
-				return;
+				return
 			}
 
 			errors.add("Equality Requirement failed")
