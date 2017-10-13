@@ -143,9 +143,9 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 
-	def libRun = files("$buildDir/dyvil-classes/library")
-	def dpfRun = files("$buildDir/dyvil-classes/dpf")
-	def testRun = files("$buildDir/dyvil-classes/test")
+	def libRun = files("$buildDir/classes/dyvil/library")
+	def dpfRun = files("$buildDir/classes/dyvil/dpf")
+	def testRun = files("$buildDir/classes/dyvil/test")
 
 	def bootstrap = files('libs/dyvil-bootstrap.jar')
 	def libComp = sourceSets.library.output
@@ -290,15 +290,15 @@ task genDPF(type: JavaExec) { JavaExec exec ->
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", "$buildDir/src/dyvil/library/"
+	runCompiler exec, 'config/lib.dyc', "$buildDir/classes/dyvil/library", "$buildDir/src/dyvil/library/"
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", "$buildDir/src/dyvil/dpf"
+	runCompiler exec, 'config/dpf.dyc', "$buildDir/classes/dyvil/dpf", "$buildDir/src/dyvil/dpf"
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/test.dyc', "$buildDir/dyvil-classes/test", 'src/test/'
+	runCompiler exec, 'config/test.dyc', "$buildDir/classes/dyvil/test", 'src/test/'
 }
 
 private void runCompiler(JavaExec exec, String config, String target, String... srcs)
@@ -365,7 +365,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 	from sourceSets.library.output
 	from sourceSets.library.resources
 
-	from("$buildDir/dyvil-classes/library") {
+	from("$buildDir/classes/dyvil/library") {
 		include binaryFilters
 	}
 
@@ -375,7 +375,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
 
-	from("$buildDir/dyvil-classes/dpf") {
+	from("$buildDir/classes/dyvil/dpf") {
 		include binaryFilters
 	}
 
@@ -430,10 +430,10 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.gensrc.output
 	from sourceSets.gensrc.resources
 
-	from("$buildDir/dyvil-classes/library") {
+	from("$buildDir/classes/dyvil/library") {
 		include binaryFilters
 	}
-	from("$buildDir/dyvil-classes/dpf") {
+	from("$buildDir/classes/dyvil/dpf") {
 		include binaryFilters
 	}
 
@@ -510,7 +510,7 @@ if (nightly)
 
 task cleanDyvil(type: Delete, group: 'cleanup') {
 	// Delete contents, but not the directories itself
-	delete fileTree("$buildDir/dyvil-classes")
+	delete fileTree("$buildDir/classes/dyvil")
 	delete fileTree("$buildDir/gensrc")
 }
 
@@ -520,6 +520,6 @@ clean {
 
 	delete = buildDir.listFiles().findAll({
 		def path = it.getPath()
-		!path.endsWith('dyvil-classes') && !path.endsWith('libs') && !path.endsWith('idea-out')
+		!path.endsWith('classes/dyvil') && !path.endsWith('libs') && !path.endsWith('idea-out')
 	}).toSet()
 }

@@ -1,1 +1,1 @@
-libraries = [ build/dyvil-classes/library, build/dyvil-classes/dpf, build/dyvil-classes/test ]
+libraries = [ build/classes/dyvil/library, build/classes/dyvil/dpf, build/classes/dyvil/test ]

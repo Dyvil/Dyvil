@@ -1,8 +1,8 @@
 source_dir = src/test
-output_dir = build/dyvil-classes/test
+output_dir = build/classes/dyvil/test
 
 main_type = dyvil.test.Main
 
-libraries = [ build/dyvil-classes/library, build/dyvil-classes/dpf ]
+libraries = [ build/classes/dyvil/library, build/classes/dyvil/dpf ]
 
 exclude = [ dyvil/experimental/** ]
