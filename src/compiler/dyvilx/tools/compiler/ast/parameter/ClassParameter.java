@@ -195,7 +195,14 @@ public class ClassParameter extends Field implements IParameter
 	{
 		if (this.property != null)
 		{
-			this.property.getAttributes().addFlag(Modifiers.PUBLIC);
+			if (this.isOverride())
+			{
+				markers.add(Markers.semanticError(this.position, "classparameter.override.property", this.name));
+			}
+			else
+			{
+				this.property.getAttributes().addFlag(Modifiers.PUBLIC);
+			}
 		}
 
 		super.resolveTypes(markers, context);
@@ -211,16 +218,16 @@ public class ClassParameter extends Field implements IParameter
 			this.attributes.addFlag(Modifiers.DEFAULT);
 		}
 
-		if (this.hasModifier(Modifiers.OVERRIDE))
+		if (this.isOverride())
 		{
 			IDataMember superField = this.enclosingClass.getSuperType().resolveField(this.name);
 			if (superField == null)
 			{
-				markers.add(Markers.semanticError(this.position, "class_parameter.override.not_found", this.name));
+				markers.add(Markers.semanticError(this.position, "classparameter.override.not_found", this.name));
 			}
 			else if (superField.hasModifier(Modifiers.STATIC))
 			{
-				markers.add(Markers.semanticError(this.position, "class_parameter.override.static", this.name,
+				markers.add(Markers.semanticError(this.position, "classparameter.override.static", this.name,
 				                                  superField.getEnclosingClass().getFullName()));
 			}
 		}

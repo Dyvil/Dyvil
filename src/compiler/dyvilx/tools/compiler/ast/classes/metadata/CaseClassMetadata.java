@@ -55,9 +55,9 @@ public final class CaseClassMetadata extends ClassMetadata
 		for (IParameter param : this.theClass.getParameters())
 		{
 			final ClassParameter classParameter = (ClassParameter) param;
-			if (classParameter.getProperty() != null)
+			if (classParameter.isOverride() || classParameter.getProperty() != null)
 			{
-				// Ignore class parameters that already have a property
+				// Ignore override class parameters and class parameters that already have a property
 				continue;
 			}
 
@@ -150,6 +150,9 @@ public final class CaseClassMetadata extends ClassMetadata
 
 			for (IParameter param : this.applyMethod.getParameters())
 			{
+				// no need to check for override class parameters here, since we are dealing with parameters of the
+				// apply method
+
 				arguments.add(new FieldAccess(param));
 			}
 
@@ -161,7 +164,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if (this.unapplyMethod != null)
 		{
-			final IParameter thisParam = this.unapplyAnyMethod.getParameters().get(0);
+			final IParameter thisParam = this.unapplyMethod.getParameters().get(0);
 
 			final TupleExpr tupleExpr = new TupleExpr(position);
 			final ArgumentList arguments = tupleExpr.getValues();
@@ -171,7 +174,17 @@ public final class CaseClassMetadata extends ClassMetadata
 				// value
 				final FieldAccess thisAccess = new FieldAccess(position, null, thisParam);
 				// value.classParam
-				final FieldAccess fieldAccess = new FieldAccess(position, thisAccess, param);
+				final IValue fieldAccess;
+				if (param.isOverride())
+				{
+					// if the class parameter is marked as 'override', we have to resolve it from a super-class
+					// the easiest way to do this is by name
+					fieldAccess = new FieldAccess(position, thisAccess, param.getName()).resolve(markers, context);
+				}
+				else
+				{
+					fieldAccess = new FieldAccess(position, thisAccess, param);
+				}
 				arguments.add(fieldAccess);
 			}
 
