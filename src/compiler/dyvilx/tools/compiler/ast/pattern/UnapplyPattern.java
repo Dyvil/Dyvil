@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -54,7 +55,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	@Override
 	public boolean isExhaustive()
 	{
-		if (NullableType.isNullable(this.unapplyCall.getType()))
+		if (this.unapplyCall == null || NullableType.isNullable(this.unapplyCall.getType()))
 		{
 			return false;
 		}
@@ -85,9 +86,16 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		// PatternType.unapply(_ : MatchedType)
+
+		final IClass matchClass = this.type.getTheClass();
+		if (matchClass == null)
+		{
+			return null;
+		}
+
 		final MethodCall methodCall = new MethodCall(this.position, new ClassAccess(this.type), Names.unapply,
 		                                             new ArgumentList(new DummyValue(type)));
-		final IValue method = methodCall.resolveCall(MarkerList.BLACKHOLE, this.type.getTheClass(), false);
+		final IValue method = methodCall.resolveCall(MarkerList.BLACKHOLE, matchClass, false);
 		return method != null && this.withMethod(method, markers) ? this : null;
 	}
 
