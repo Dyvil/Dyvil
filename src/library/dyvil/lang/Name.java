@@ -145,7 +145,7 @@ public final class Name
 		return this.qualified.equals(name);
 	}
 
-	public boolean startWith(String name)
+	public boolean startsWith(String name)
 	{
 		return this.qualified.startsWith(name);
 	}

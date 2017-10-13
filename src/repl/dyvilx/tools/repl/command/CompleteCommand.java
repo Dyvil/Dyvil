@@ -330,7 +330,7 @@ public class CompleteCommand implements ICommand
 
 	private static <T extends IMember> void checkMember(Set<T> set, T member, String start)
 	{
-		if (member.getName().startWith(start))
+		if (member.getName().startsWith(start))
 		{
 			set.add(member);
 		}
@@ -338,7 +338,7 @@ public class CompleteCommand implements ICommand
 
 	private static <T extends IMember> void checkMember(Set<T> set, T member, String start, boolean statics)
 	{
-		if (!member.getName().startWith(start))
+		if (!member.getName().startsWith(start))
 		{
 			return;
 		}

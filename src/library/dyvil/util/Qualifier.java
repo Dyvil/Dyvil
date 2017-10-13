@@ -1,30 +1,32 @@
 package dyvil.util;
 
+import dyvil.annotation.internal.NonNull;
+
 public class Qualifier
 {
-	public static final Qualifier INSTANCE = new Qualifier();
+	public static final @NonNull Qualifier INSTANCE = new Qualifier();
 
-	public static final String AMPERSAND     = "amp";
-	public static final String ASTERISK      = "times";
-	public static final String AT            = "at";
-	public static final String BACKSLASH     = "bslash";
-	public static final String BAR           = "bar";
-	public static final String CARET         = "up";
-	public static final String COLON         = "colon";
-	public static final String DOT           = "dot";
-	public static final String EQ            = "eq";
-	public static final String EXCLAMATION   = "bang";
-	public static final String GREATER       = "gt";
-	public static final String HASH          = "hash";
-	public static final String LESS          = "lt";
-	public static final String MINUS         = "minus";
-	public static final String PERCENT       = "percent";
-	public static final String PLUS          = "plus";
-	public static final String QUESTION_MARK = "qmark";
-	public static final String SLASH         = "div";
-	public static final String TILDE         = "tilde";
+	public static final @NonNull String AMPERSAND     = "amp";
+	public static final @NonNull String ASTERISK      = "times";
+	public static final @NonNull String AT            = "at";
+	public static final @NonNull String BACKSLASH     = "bslash";
+	public static final @NonNull String BAR           = "bar";
+	public static final @NonNull String CARET         = "up";
+	public static final @NonNull String COLON         = "colon";
+	public static final @NonNull String DOT           = "dot";
+	public static final @NonNull String EQ            = "eq";
+	public static final @NonNull String EXCLAMATION   = "bang";
+	public static final @NonNull String GREATER       = "gt";
+	public static final @NonNull String HASH          = "hash";
+	public static final @NonNull String LESS          = "lt";
+	public static final @NonNull String MINUS         = "minus";
+	public static final @NonNull String PERCENT       = "percent";
+	public static final @NonNull String PLUS          = "plus";
+	public static final @NonNull String QUESTION_MARK = "qmark";
+	public static final @NonNull String SLASH         = "div";
+	public static final @NonNull String TILDE         = "tilde";
 
-	public char replaceString(String str)
+	public int replaceString(@NonNull String str)
 	{
 		// @formatter:off
 		switch (str)
@@ -53,7 +55,7 @@ public class Qualifier
 		return 0;
 	}
 
-	public String replaceChar(char c)
+	public @NonNull String replaceCodePoint(int c)
 	{
 		switch (c)
 		{
@@ -99,20 +101,20 @@ public class Qualifier
 		return null;
 	}
 
-	public static String qualify(String s)
+	public static @NonNull String qualify(@NonNull String string)
 	{
-		return qualify(s, INSTANCE);
+		return qualify(string, INSTANCE);
 	}
 
-	public static String qualify(String s, Qualifier qualifier)
+	public static @NonNull String qualify(@NonNull String string, @NonNull Qualifier qualifier)
 	{
-		final int length = s.length();
+		final int length = string.length();
 		final StringBuilder builder = new StringBuilder(length);
 
-		for (int i = 0; i < length; i++)
+		for (int i = 0; i < length; )
 		{
-			final char c = s.charAt(i);
-			final String replacement = qualifier.replaceChar(c);
+			final int codePoint = string.codePointAt(i);
+			final String replacement = qualifier.replaceCodePoint(codePoint);
 
 			if (replacement != null)
 			{
@@ -121,22 +123,24 @@ public class Qualifier
 			}
 			else
 			{
-				builder.append(c);
+				builder.appendCodePoint(codePoint);
 			}
+
+			i += Character.charCount(codePoint);
 		}
 
 		return builder.toString();
 	}
 
-	public static String unqualify(String s)
+	public static @NonNull String unqualify(@NonNull String string)
 	{
-		return unqualify(s, INSTANCE);
+		return unqualify(string, INSTANCE);
 	}
 
-	public static String unqualify(String string, Qualifier qualifier)
+	public static @NonNull String unqualify(@NonNull String string, @NonNull Qualifier qualifier)
 	{
-		int index = string.indexOf('$');
-		if (index < 0)
+		int appendStart = string.indexOf('$');
+		if (appendStart < 0)
 		{
 			// no $ in string - don't apply any replacements
 			return string;
@@ -146,44 +150,38 @@ public class Qualifier
 		final StringBuilder builder = new StringBuilder(len);
 
 		// append all characters before the first $
-		builder.append(string, 0, index);
+		builder.append(string, 0, appendStart);
+		int searchIndex = appendStart;
 
-		for (; index < len; index++)
+		while (searchIndex < len)
 		{
-			final char c = string.charAt(index);
-			if (c != '$')
-			{
-				builder.append(c);
-				continue;
-			}
-
-			final int startIndex = index + 1;
+			final int cashIndex = string.indexOf('$', searchIndex);
+			final int startIndex = cashIndex + 1;
 			final int endIndex = symbolEndIndex(string, startIndex, len);
+			searchIndex = endIndex;
 
 			if (startIndex == endIndex)
 			{
 				// $$ or $_
-				builder.append('$');
 				continue;
 			}
 
-			index = endIndex - 1;
-			final String toReplace = string.substring(startIndex, endIndex);
-			final char replacement = qualifier.replaceString(toReplace);
+			final String key = string.substring(startIndex, endIndex);
+			final int replacement = qualifier.replaceString(key);
 
 			if (replacement > 0)
 			{
-				builder.append(replacement);
-			}
-			else
-			{
-				builder.append('$').append(toReplace);
+				builder.append(string, appendStart, cashIndex);
+				builder.appendCodePoint(replacement);
+				appendStart = endIndex;
 			}
 		}
+
+		builder.append(string, appendStart, len);
 		return builder.toString();
 	}
 
-	private static int symbolEndIndex(String string, int start, int end)
+	private static int symbolEndIndex(@NonNull String string, int start, int end)
 	{
 		for (; start < end; start++)
 		{
