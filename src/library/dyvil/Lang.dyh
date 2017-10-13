@@ -10,19 +10,20 @@ import dyvil.collection._
 import dyvil.io.Console
 import dyvil.random.Random
 import dyvil.function.PartialFunction
-import dyvil.tuple.Tuple.Of1 as Tuple
 
 import dyvil.util.{
 	Option, None, Some
 
+	Blackhole
 	Configurable
+	Timing
 	Version
 }
 
 import dyvil.tuple.Tuple.{
-	Of1 => Tupled
-	Of2 => Pair
-	Of3 => Triple
+	Of1 as Tupled
+	Of2 as Pair
+	Of3 as Triple
 }
 
 // Import useful annotation classes
@@ -44,7 +45,6 @@ using dyvil.lang.{
 	Types._
 	Output._
 	Assert._
-	Misc._
 }
 
 // ---------------------------------------- Type Aliases ----------------------------------------

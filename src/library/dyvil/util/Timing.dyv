@@ -1,0 +1,37 @@
+package dyvil.util
+
+import func java.lang.System.{
+	currentTimeMillis as milliTime
+	nanoTime
+}
+
+final class Timing
+{
+	private init() {} // no instances
+
+	// Simple Measurement
+
+	static func measureMillis(f: -> void) -> long = measureMillis(1, f)
+
+	static func measureMillis(iterations: int, f: -> void) -> long
+	{
+		var start = milliTime()
+		for (i <- 0 ..< iterations) f()
+		return (milliTime() - start) \ iterations
+	}
+
+	static func measureNanos(f: -> void) -> long = measureNanos(1, f)
+
+	static func measureNanos(iterations: int, f: -> void) -> long
+	{
+		var start = nanoTime()
+		for (i <- 0 ..< iterations) f()
+		return (nanoTime() - start) \ iterations
+	}
+
+	// Measurement with Result
+
+	static func milliTimed<R>(f: -> R) -> (R, long) = milliTime().{ (f(), milliTime - $0) }
+
+	static func nanoTimed<R>(f: -> R) -> (R, long) = nanoTime.{ (f(), nanoTime - $0) }
+}

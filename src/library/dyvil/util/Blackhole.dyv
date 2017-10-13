@@ -1,0 +1,20 @@
+package dyvil.util
+
+final class Blackhole
+{
+	private init() {} // no instances
+
+	private static var consumeSum: long = 0
+
+	static func consume(value: any!) -> void = consumeSum += System.identityHashCode(value)
+
+	static func consume(value: boolean) -> void = consumeSum += value as long
+
+	static func consume(value: int) -> void = consumeSum += value
+
+	static func consume(value: long) -> void = consumeSum += value
+
+	static func consume(value: double) -> void = consumeSum += value as long
+
+	static func consume(value: float) -> void = consumeSum += value as long
+}
