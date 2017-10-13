@@ -1,5 +1,7 @@
 package dyvil.tests
 
+import class dyvil.tests.CaseClassTest._
+
 using dyvil.Collections
 using dyvil.Test
 
@@ -159,6 +161,20 @@ class MatchTest
 			}
 
 			value =?= "abc"
+		}
+
+		test "Case Classes" {
+			let person = Person(0L, "Peter", 30, 1.8)
+			let student = Student(1L, "John", 20, 1.85, "CS", 123456L)
+
+			// destructure -> recreate -> check for equality
+			person match case Person(var id, var name, var age, var height) {
+				Person(id, name, age, height) =?= person
+			}
+
+			student match case Student(var id, var name, var age, var height, var faculty, var studentID) {
+				Student(id, name, age, height, faculty, studentID) =?= student
+			}
 		}
 
 		test "Custom" {

@@ -5,7 +5,7 @@ using dyvil.Test
 
 class ConstructorTest
 {
-	static case class A(
+	static case class A protected (
 		public let i: int
 		public let j: int
 	)
@@ -20,9 +20,7 @@ class ConstructorTest
 		static func initClass() -> void { /* noop, forces static initializer */ }
 	}
 
-	static case class B(
-		public let i: int { override get }
-	) extends A(i, 0)
+	static case class B(override let i: int) extends A(i, 0)
 	{
 		public var initialized: boolean
 
@@ -32,9 +30,7 @@ class ConstructorTest
 		}
 	}
 
-	static case class C(
-		public let j: int { override get }
-	) extends A(0, j)
+	static case class C(override let j: int) extends A(0, j)
 
 	static case object O extends A(1, 1)
 
@@ -71,6 +67,10 @@ class ConstructorTest
 
 			test "i" { a.i =?= 1 }
 			test "j" { a.j =?= 2 }
+
+			test "Protected Constructor" {
+				class(A).getDeclaredConstructors()[0].getModifiers() =?= dyvil.reflect.Modifiers.PROTECTED
+			}
 		}
 
 		test "B" {
