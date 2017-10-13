@@ -150,32 +150,32 @@ dependencies {
 	def bootstrap = files('libs/dyvil-bootstrap.jar')
 	def libComp = sourceSets.library.output
 
-	libraryRuntime libRun
+	libraryCompile libRun
 	libraryCompile bootstrap
 
 	// compiler -> library
 	compilerCompile libComp
-	compilerRuntime libRun
+	compilerCompile libRun
 	compilerCompile bootstrap
 
 	// dpf -> library
 	dpfCompile libComp
-	dpfRuntime libRun, dpfRun
+	dpfCompile libRun, dpfRun
 	dpfCompile bootstrap
 
 	// repl -> library, compiler
 	replCompile libComp, sourceSets.compiler.output
-	replRuntime libRun, dpfRun, testRun
+	replCompile libRun, dpfRun, testRun
 	replCompile bootstrap
 
 	// gensrc -> library
 	gensrcCompile libComp
-	gensrcRuntime libRun
+	gensrcCompile libRun
 	gensrcCompile bootstrap
 
 	// test -> library, junit
 	testCompile libComp, 'junit:junit:4.12'
-	testRuntime libRun, dpfRun, testRun
+	testCompile libRun, dpfRun, testRun
 	testCompile bootstrap
 }
 
@@ -520,6 +520,6 @@ clean {
 
 	delete = buildDir.listFiles().findAll({
 		def path = it.getPath()
-		!path.endsWith('dyvil-classes') && !path.endsWith('libs')
+		!path.endsWith('dyvil-classes') && !path.endsWith('libs') && !path.endsWith('idea-out')
 	}).toSet()
 }
