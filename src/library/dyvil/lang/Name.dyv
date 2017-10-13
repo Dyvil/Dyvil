@@ -1,0 +1,124 @@
+package dyvil.lang
+
+import dyvil.util.Qualifier.{ qualify, unqualify }
+
+import java.io.{ DataInput, DataOutput, IOException }
+
+@LiteralConvertible.FromString
+final class Name private (public let unqualified: String { get }, public let qualified: String { get })
+{
+	/**
+	 * This is about the size of the CACHE after the REPL has been initialized. Eagerly creating a large Hash Table may
+	 * improve performance by reducing the number of resize operations.
+	 */
+	private const CACHE_CAPACITY: int = 1024
+
+	/**
+	 * This cache stores mappings between both qualified and unqualified names and their associated Name objects.
+	 * Ideally, CACHE.get(name.qualified) == CACHE.get(name.unqualified) == name for all name: Name
+	 */
+	private const CACHE: [String:Name] = new mutable.HashMap<String, Name>(CACHE_CAPACITY)
+
+	// Creation
+
+	private static func create(qualified: String) -> Name
+	{
+		let name = new Name(qualified, qualified)
+		CACHE.put(qualified, name)
+		return name
+	}
+
+	private static func create(unqualified: String, qualified: String) -> Name
+	{
+		let name = new Name(unqualified, qualified)
+		CACHE.put(unqualified, name)
+		CACHE.put(qualified, name)
+		return name
+	}
+
+	static func apply(value: String) -> Name
+	{
+		if let name = CACHE.get(value) { return name }
+
+		return apply(unqualify(value), qualify(value))
+	}
+
+	@Deprecated(replacements: ["Name.apply(value: String)"]) // in Dyvil only
+	static func from(value: String) -> Name = apply(value)
+
+	static func apply(unqualified: String, qualified: String) -> Name
+	{
+		if let name = CACHE.get(qualified) { return name }
+
+		return create(unqualified, qualified)
+	}
+
+	@Deprecated(replacements: ["Name.apply(unqualified: String, qualified: String)"]) // in Dyvil only
+	static func from(unqualified: String, qualified: String) -> Name = apply(unqualified, qualified)
+
+	@BytecodeName('fromRaw')
+	static func apply(explicit raw value: String) -> Name
+	{
+		if let name = CACHE.get(value) { return name }
+
+		return create(value)
+	}
+
+	@BytecodeName('fromUnqualified')
+	static func apply(explicit unqualified: String) -> Name
+	{
+		if let name = CACHE.get(unqualified) { return name }
+
+		let qualified = qualify(unqualified)
+		if let name = CACHE.get(qualified) { return name }
+
+		return create(unqualified, qualified)
+	}
+
+	@BytecodeName('fromQualified')
+	static func apply(explicit qualified: String) -> Name
+	{
+		if let name = CACHE.get(qualified) { return name }
+
+		let unqualified = unqualify(qualified)
+		if let name = CACHE.get(unqualified) { return name }
+
+		return create(unqualified, qualified)
+	}
+
+	// Serialization
+
+	static func read(input: DataInput) -> Name! throws IOException
+	{
+		let data = input.readUTF()
+		if (data.isEmpty()) { return null }
+		return apply(unqualified: data)
+	}
+
+	infix func write(name: Name!, output: DataOutput) -> void throws IOException
+	{
+		output.writeUTF(name?.unqualified ?? "")
+	}
+
+	func write(output: DataOutput) -> void throws IOException
+	{
+		output.writeUTF(this.unqualified)
+	}
+
+	// Equals and HashCode
+
+	/*
+	 * The name class, as it is interned, uses identity hash code and equals.
+	 * Thus, the equals and hashCode methods from Object are not overriden.
+	 */
+
+	// Helper Methods
+
+	func equals(qualified: String) -> boolean = this.qualified == qualified
+
+	func startsWith(qualified: String) -> boolean = this.qualified.startsWith(qualified)
+
+	func endsWith(qualified: String) -> boolean = this.qualified.endsWith(qualified)
+
+	override func toString() -> String = this.unqualified
+}
