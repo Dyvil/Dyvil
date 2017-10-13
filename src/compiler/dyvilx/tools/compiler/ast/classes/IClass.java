@@ -4,6 +4,7 @@ import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.metadata.*;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -94,6 +95,15 @@ public interface IClass
 	}
 
 	default void setSuperConstructorArguments(ArgumentList arguments)
+	{
+	}
+
+	default AttributeList getConstructorAttributes()
+	{
+		return null;
+	}
+
+	default void setConstructorAttributes(AttributeList attributes)
 	{
 	}
 

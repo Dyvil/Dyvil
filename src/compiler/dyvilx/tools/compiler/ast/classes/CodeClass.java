@@ -42,6 +42,7 @@ import java.io.IOException;
 public class CodeClass extends AbstractClass
 {
 	protected ArgumentList superConstructorArguments = ArgumentList.EMPTY;
+	protected AttributeList constructorAttributes;
 
 	// Metadata
 	protected IHeaderUnit    unit;
@@ -106,6 +107,22 @@ public class CodeClass extends AbstractClass
 	public void setSuperConstructorArguments(ArgumentList arguments)
 	{
 		this.superConstructorArguments = arguments;
+	}
+
+	@Override
+	public AttributeList getConstructorAttributes()
+	{
+		if (this.constructorAttributes != null)
+		{
+			return this.constructorAttributes;
+		}
+		return this.constructorAttributes = new AttributeList();
+	}
+
+	@Override
+	public void setConstructorAttributes(AttributeList attributes)
+	{
+		this.constructorAttributes = attributes;
 	}
 
 	@Override

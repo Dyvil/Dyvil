@@ -29,6 +29,8 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.lang.annotation.ElementType;
+
 public class ClassMetadata implements IClassMetadata
 {
 	protected static final int CONSTRUCTOR = 1;
@@ -50,8 +52,7 @@ public class ClassMetadata implements IClassMetadata
 
 	protected int members;
 
-	protected IConstructor    constructor;
-	protected InitializerCall superInitializer;
+	protected IConstructor constructor;
 
 	public ClassMetadata(IClass iclass)
 	{
@@ -219,12 +220,13 @@ public class ClassMetadata implements IClassMetadata
 		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			// Generate the constructor signature
-
-			final AttributeList attributes = AttributeList.of(Modifiers.PUBLIC | Modifiers.GENERATED);
+			AttributeList attributes = this.theClass.getConstructorAttributes();
+			attributes.addFlag(Modifiers.GENERATED);
 			final CodeConstructor constructor = new CodeConstructor(this.theClass, attributes);
 
 			this.copyClassParameters(constructor);
 
+			// resolves attributes too
 			constructor.resolveTypes(markers, context);
 			this.constructor = constructor;
 		}
@@ -259,14 +261,17 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
+		// only attributes and initializer are resolved
+		this.constructor.getAttributes().resolve(markers, context);
+
 		final IType superType = this.theClass.getSuperType();
 		if (superType != null && this.constructor.getInitializer() == null)
 		{
 			// Generate the constructor body
-			this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), true,
-			                                                              this.theClass.getSuperConstructorArguments(),
-			                                                              superType).resolve(markers, this.constructor);
-			this.constructor.setInitializer(this.superInitializer);
+			final IValue superInitializer = new InitializerCall(this.theClass.getPosition(), true,
+			                                                    this.theClass.getSuperConstructorArguments(), superType)
+				                                .resolve(markers, this.constructor);
+			this.constructor.setInitializer((InitializerCall) superInitializer);
 		}
 
 		final ParameterList classParams = this.theClass.getParameters();
@@ -300,36 +305,40 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.superInitializer != null)
+		if (this.hasDefaultConstructor())
 		{
-			this.superInitializer.checkTypes(markers, this.constructor);
+			this.constructor.getInitializer().checkTypes(markers, context);
+			this.constructor.getAttributes().checkTypes(markers, context);
 		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.superInitializer != null)
+		if (this.hasDefaultConstructor())
 		{
-			this.superInitializer.check(markers, this.constructor);
+			this.constructor.getInitializer().check(markers, context);
+			this.constructor.getAttributes().check(markers, context, ElementType.CONSTRUCTOR);
 		}
 	}
 
 	@Override
 	public void foldConstants()
 	{
-		if (this.superInitializer != null)
+		if (this.hasDefaultConstructor())
 		{
-			this.superInitializer.foldConstants();
+			this.constructor.getInitializer().foldConstants();
+			this.constructor.getAttributes().foldConstants();
 		}
 	}
 
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.superInitializer != null)
+		if (this.hasDefaultConstructor())
 		{
-			this.superInitializer.cleanup(compilableList, classCompilableList);
+			this.constructor.getInitializer().cleanup(compilableList, classCompilableList);
+			this.constructor.getAttributes().cleanup(compilableList, classCompilableList);
 		}
 	}
 

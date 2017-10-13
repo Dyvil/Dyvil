@@ -864,6 +864,19 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.typeParameters.toString(indent, buffer);
 		}
 
+		final AttributeList constructorAttributes = this.getConstructorAttributes();
+		if (constructorAttributes != null && !constructorAttributes.isEmpty())
+		{
+			buffer.append(' ');
+			constructorAttributes.toInlineString(indent, buffer);
+
+			if (this.parameters.isEmpty())
+			{
+				// when there are constructor modifiers but no parameters, we still display the ()
+				buffer.append("()");
+			}
+		}
+
 		if (!this.parameters.isEmpty())
 		{
 			this.parameters.toString(indent, buffer);
