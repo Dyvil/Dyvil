@@ -2,7 +2,6 @@ package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
-import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.metadata.*;
@@ -131,7 +130,7 @@ public interface IClass
 
 	byte getVisibility(IClassMember member);
 
-	Collection<IMethod> getMethods(Name name);
+	void addMethods(Collection<IMethod> methods);
 
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 

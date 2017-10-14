@@ -3,9 +3,7 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
-import dyvil.collection.List;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -321,26 +319,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public Collection<IMethod> getMethods(Name name)
+	public void addMethods(Collection<IMethod> methods)
 	{
-		final List<IMethod> list = new ArrayList<>();
-
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				final IMethod getter = property.getGetter();
-				if (getter != null && name == getter.getName())
-				{
-					list.add(getter);
-				}
-
-				final IMethod setter = property.getSetter();
-				if (setter != null && name == setter.getName())
-				{
-					list.add(setter);
-				}
+				addMethods(methods, property);
 			}
 		}
 
@@ -351,12 +337,39 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 				final IMethod method = this.body.getMethod(i);
 				if (method != null)
 				{
-					list.add(method);
+					methods.add(method);
 				}
 			}
+
+			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+			{
+				final IProperty property = this.body.getField(i).getProperty();
+				if (property != null)
+				{
+					addMethods(methods, property);
+				}
+			}
+
+			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+			{
+				addMethods(methods, this.body.getProperty(i));
+			}
+		}
+	}
+
+	private static void addMethods(Collection<IMethod> methods, IProperty property)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			methods.add(getter);
 		}
 
-		return list;
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			methods.add(setter);
+		}
 	}
 
 	@Override
