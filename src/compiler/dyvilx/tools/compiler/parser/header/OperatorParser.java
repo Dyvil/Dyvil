@@ -107,6 +107,9 @@ public final class OperatorParser extends Parser
 			switch (type)
 			{
 			case BaseSymbols.SEMICOLON:
+				pm.popParser(true);
+				this.map.addOperator(this.operator);
+				return;
 			case Tokens.EOF:
 				pm.popParser();
 				this.map.addOperator(this.operator);

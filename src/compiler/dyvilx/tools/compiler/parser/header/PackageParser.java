@@ -52,7 +52,7 @@ public class PackageParser extends Parser
 			if (type == BaseSymbols.SEMICOLON)
 			{
 				this.packageDeclaration.setPackage(this.buffer.toString());
-				pm.popParser();
+				pm.popParser(true);
 				return;
 			}
 			this.mode = NAME;
@@ -66,11 +66,5 @@ public class PackageParser extends Parser
 				pm.reparse();
 			}
 		}
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return true;
 	}
 }

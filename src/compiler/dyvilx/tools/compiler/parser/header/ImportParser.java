@@ -175,10 +175,4 @@ public final class ImportParser extends Parser
 		}
 		this.consumer.setImport(this.theImport);
 	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return true;
-	}
 }

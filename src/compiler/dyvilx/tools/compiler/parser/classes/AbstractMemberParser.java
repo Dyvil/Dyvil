@@ -5,6 +5,8 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.parsing.IParserManager;
@@ -23,6 +25,20 @@ public abstract class AbstractMemberParser extends Parser
 	public AbstractMemberParser(@NonNull AttributeList attributes)
 	{
 		this.attributes = attributes;
+	}
+
+	protected boolean parseAttribute(IParserManager pm, IToken token)
+	{
+		if (this.parseModifier(pm, token))
+		{
+			return true;
+		}
+		if (token.type() == DyvilSymbols.AT && token.next().type() != DyvilKeywords.INTERFACE)
+		{
+			this.parseAnnotation(pm, token);
+			return true;
+		}
+		return false;
 	}
 
 	protected void parseAnnotation(IParserManager pm, IToken token)
