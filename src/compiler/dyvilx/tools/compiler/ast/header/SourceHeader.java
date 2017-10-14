@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.SemicolonInference;
-import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
+import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ParserManager;
@@ -106,7 +106,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	public void parse()
 	{
 		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers)
-			.parse(new DyvilHeaderParser(this));
+			.parse(new SourceFileParser(this).withFlags(SourceFileParser.NO_CLASSES));
 	}
 
 	@Override
