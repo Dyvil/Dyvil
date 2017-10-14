@@ -181,10 +181,26 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// and it sets the name to be used in the bytecode
 				this.internalName = firstValue.stringValue();
 			}
-			// do not retain the annotation
+			return true;
+		case AnnotationUtil.AUTOMANGLED_INTERNAL:
+			this.internalName = this.createMangledName();
 			return true;
 		}
 		return false;
+	}
+
+	private String createMangledName()
+	{
+		// append the qualified name
+		final StringBuilder builder = new StringBuilder(this.name.qualified);
+
+		for (IParameter param : this.getParameters())
+		{
+			// append all external parameter labels preceded by an underscore
+			builder.append('_').append(param.getQualifiedLabel());
+		}
+
+		return builder.toString();
 	}
 
 	@Override
