@@ -103,6 +103,6 @@ public class TypeAliasParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > NAME;
+		return this.mode > NAME && super.reportErrors();
 	}
 }

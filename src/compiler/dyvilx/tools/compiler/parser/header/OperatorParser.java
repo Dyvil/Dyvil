@@ -273,6 +273,6 @@ public final class OperatorParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > OPERATOR;
+		return this.mode > OPERATOR && super.reportErrors();
 	}
 }

@@ -139,6 +139,6 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode != DECLARATOR;
+		return this.mode != DECLARATOR && super.reportErrors();
 	}
 }
