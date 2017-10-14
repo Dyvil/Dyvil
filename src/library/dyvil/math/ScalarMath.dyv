@@ -2,27 +2,31 @@ package dyvil.math
 
 interface ScalarMath<T>
 {
+	// Constants
+
 	static func _0 -> T
 
 	static func _1 -> T
 
+	// Unary Operators
+
 	prefix func +(rhs: T) -> T = rhs
 
-	prefix func -(rhs: T) -> T // = 0 - rhs
+	prefix func -(rhs: T) -> T // = _0 - rhs
 
-	postfix func inverse(lhs: T) -> T // = 1 / rhs
+	postfix func inverse(lhs: T) -> T // = _1 / lhs
 
 	// Additive Operators
 
 	infix func +(lhs: T, rhs: T) -> T
 
-	infix func -(lhs: T, rhs: T) -> T
+	infix func -(lhs: T, rhs: T) -> T // = lhs + -rhs
 
 	// Multiplicative Operators
 
 	infix func *(lhs: T, rhs: T) -> T
 
-	infix func /(lhs: T, rhs: T) -> T
+	infix func /(lhs: T, rhs: T) -> T // = lhs * rhs.inverse
 
 	// Implementations
 
