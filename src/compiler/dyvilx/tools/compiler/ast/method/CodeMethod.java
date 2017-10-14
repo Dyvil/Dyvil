@@ -398,6 +398,33 @@ public class CodeMethod extends AbstractMethod
 
 	private boolean filterOverride(IMethod candidate, MarkerList markers, ITypeContext typeContext)
 	{
+		final String candidateInternalName = candidate.getInternalName();
+		final boolean sameName = this.name == candidate.getName();
+		final boolean sameInternalName = this.getInternalName().equals(candidateInternalName);
+
+		if (sameName && !sameInternalName) // same name but different internal name
+		{
+			if (this.name.qualified.equals(this.internalName))
+			// no AutoMangled or BytecodeName annotation, otherwise the user probably knows what they are doing and
+			// doesn't need a warning
+			{
+				final Marker marker = Markers.semantic(this.position, "method.override.mangled_mismatch", this.name,
+				                                       candidateInternalName);
+				marker.addInfo(Markers.getSemantic("method.override.mangled_mismatch.info", candidateInternalName));
+				markers.add(marker);
+			}
+			return true;
+		}
+		if (!sameName && sameInternalName)
+		{
+			final Marker marker = Markers.semanticError(this.position, "method.override.mangled_clash", this.name,
+			                                            candidate.getName(), candidateInternalName);
+			marker.addInfo(Markers.getSemantic("method.override.mangled_clash.info"));
+			return true; // hard error so it doesn't matter if we remove or not - bytecode will never be generated
+		}
+
+		// sameName && sameInternalName should be true
+
 		final IClass enclosingClass = candidate.getEnclosingClass();
 		boolean errors = true;
 

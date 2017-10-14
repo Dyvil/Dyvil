@@ -795,10 +795,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean overrides(IMethod candidate, ITypeContext typeContext)
 	{
-		// Check Name and number of type parameters
-		if (candidate.getName() != this.name // different name
+		if (candidate.hasModifier(Modifiers.STATIC_FINAL) // don't check static final
 		    || this.typeArity() != candidate.typeArity() // different number of type params
-		    || candidate.hasModifier(Modifiers.STATIC_FINAL)) // don't check static final
+		    || this.name != candidate.getName() // different name
+		       && !candidate.getInternalName().equals(this.getInternalName()) // and different internal name
+			// this means either name or internal name or both must match to consider an override
+			// if only one matches then there is special code in CodeMethod.filterOverride that produces diagnostics
+			)
 		{
 			return false;
 		}
@@ -806,8 +809,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final ParameterList thisParameters = this.getParameters();
 		final ParameterList candidateParameters = candidate.getParameters();
 
-		// Check Parameter Count
-		if (candidateParameters.size() != thisParameters.size())
+		if (candidateParameters.size() != thisParameters.size()) // different number of parameters
 		{
 			return false;
 		}
