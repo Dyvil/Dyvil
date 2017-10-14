@@ -343,7 +343,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func copy GENERIC(array: [T], withSize size: int) -> [T]
 	{
 		let result = APPLY_WITH_SIZE
-		System.arraycopy(array, 0, result, 0, array.size)
+		System.arraycopy(array, 0, result, 0, Math.min(size, array.size))
 		return result
 	}
 

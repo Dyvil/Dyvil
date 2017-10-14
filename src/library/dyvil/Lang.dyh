@@ -131,9 +131,10 @@ infix   operator -   { left, 1100 }
 
 // Multiplicative Operators
 infix   operator *   { left, 1200 }
-infix   operator /   { left, 1200 }
-infix   operator \   { left, 1200 }
-infix   operator %   { left, 1200 }
+infix   operator /   { left, 1200 } // exact / float division
+infix   operator \   { left, 1200 } // integer division
+infix   operator %   { left, 1200 } // remainder
+infix   operator /%  { left, 1200 } // divmod, i.e. (a / b, a % b)
 
 // Exponentiation Operators
 infix   operator **  { right, 1300 }
