@@ -79,14 +79,13 @@ abstract class Primitives
 	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
 	infix func toOctalString(value: int) -> String = value.toOctalString
 
-	infix func toString(value: int, radix: int) -> String =
-		radix match {
-			case  2: return value.toBinaryString
-			case  8: return value.toOctalString
-			case 10: return value.toString
-			case 16: return value.toHexString
-			case _ : return java.lang.Integer.toString(value, radix);
-		}
+	infix func toString(value: int, radix: int) -> String = radix match {
+		case  2 => return value.toBinaryString
+		case  8 => return value.toOctalString
+		case 10 => return value.toString
+		case 16 => return value.toHexString
+		case _  => return java.lang.Integer.toString(value, radix);
+	}
 
 	// Long toString
 
@@ -102,14 +101,13 @@ abstract class Primitives
 	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
 	infix func toOctalString(value: long) -> String = value.toOctalString
 
-	infix func toString(value: long, radix: int) -> String =
-		radix match {
-			case  2: return value.toBinaryString
-			case  8: return value.toOctalString
-			case 10: return value.toString
-			case 16: return value.toHexString
-			case _ : return java.lang.Long.toString(value, radix)´
-		}
+	infix func toString(value: long, radix: int) -> String = radix match {
+		case  2 => return value.toBinaryString
+		case  8 => return value.toOctalString
+		case 10 => return value.toString
+		case 16 => return value.toHexString
+		case _  => return java.lang.Long.toString(value, radix)´
+	}
 
 	// Float toString
 
