@@ -826,7 +826,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		case DyvilKeywords.NEW:
 			// new ...
 			this.mode = ACCESS;
-			pm.pushParser(new ConstructorCallParser(this), true);
+			final int flags = this.hasFlag(IGNORE_CLOSURE) ? ConstructorCallParser.IGNORE_ANON_CLASS : 0;
+			pm.pushParser(new ConstructorCallParser(this).withFlags(flags), true);
 			return true;
 		case DyvilKeywords.RETURN:
 		{
