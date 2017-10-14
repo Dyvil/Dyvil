@@ -186,6 +186,12 @@ public class TupleType extends ResolvedGenericType
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
+		if (this.arguments.size() == 1)
+		{
+			super.toString(indent, buffer);
+			return;
+		}
+
 		this.arguments.toString(indent, buffer, '(', ')');
 	}
 }
