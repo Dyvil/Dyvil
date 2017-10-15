@@ -10,6 +10,7 @@ import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.*;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -26,6 +27,7 @@ import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -241,13 +243,30 @@ public final class PrimitiveType implements IType
 	@Override
 	public IMethod getBoxMethod()
 	{
-		return this.boxMethod;
+		if (this.boxMethod != null)
+		{
+			return this.boxMethod;
+		}
+		if (this == Types.VOID)
+		{
+			return this.boxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("apply"));
+		}
+		return this.boxMethod = IContext.resolveMethod(this.wrapperClass, null, Names.valueOf,
+		                                               new ArgumentList(new DummyValue(this)));
 	}
 
 	@Override
 	public IMethod getUnboxMethod()
 	{
-		return this.unboxMethod;
+		if (this.unboxMethod != null)
+		{
+			return this.unboxMethod;
+		}
+		if (this == Types.VOID)
+		{
+			return this.unboxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("voidValue"));
+		}
+		return this.unboxMethod = this.wrapperClass.getBody().getMethod(Name.fromRaw(this.name + "Value"));
 	}
 
 	@Override
@@ -390,13 +409,10 @@ public final class PrimitiveType implements IType
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		if (this.wrapperClass != null)
+		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
+		if (list.hasCandidate())
 		{
-			this.wrapperClass.getMethodMatches(list, receiver, name, arguments);
-			if (list.hasCandidate())
-			{
-				return;
-			}
+			return;
 		}
 
 		if (this.extClass != null)
@@ -408,7 +424,10 @@ public final class PrimitiveType implements IType
 			}
 		}
 
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
+		if (this.wrapperClass != null)
+		{
+			this.wrapperClass.getMethodMatches(list, receiver, name, arguments);
+		}
 	}
 
 	@Override
@@ -552,7 +571,7 @@ public final class PrimitiveType implements IType
 			// Target is not a primitive type
 			if (primitiveTarget == null || primitiveTarget.getTypecode() < 0)
 			{
-				this.boxMethod.writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
+				this.getBoxMethod().writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
 				return;
 			}
 		}

@@ -16,6 +16,7 @@ public final class Names
 	public static final Name subscript      = Name.fromRaw("subscript");
 	public static final Name subscript_$amp = Name.from("subscript_&", "subscript_$amp");
 	public static final Name subscript_$eq  = Name.from("subscript_=", "subscript_$eq");
+	public static final Name valueOf        = Name.fromRaw("valueOf");
 	public static final Name value          = Name.fromRaw("value");
 	public static final Name values         = Name.fromRaw("values");
 	public static final Name $VALUES        = Name.fromRaw("$VALUES");

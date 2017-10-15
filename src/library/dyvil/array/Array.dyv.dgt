@@ -22,8 +22,8 @@ public abstract class #(TYPE_NAME)Array
 		#define(GENERIC) {<T>}
 		#define(GENERIC_2) {<T, REIFIED U>}
 		#define(GENERIC_REIFIED) {<REIFIED T>}
-		#define(APPLY_T) {apply<T>}
-		#define(APPLY_WITH_SIZE) {apply(size, of: array.elementType)}
+		#define(APPLY_T) {ObjectArray<T>}
+		#define(APPLY_WITH_SIZE) {ObjectArray(size, of: array.elementType)}
 	}
 	#else {
 		#define(T) {PRIMITIVE}
@@ -31,8 +31,8 @@ public abstract class #(TYPE_NAME)Array
 		#define(GENERIC) {}
 		#define(GENERIC_2) {<REIFIED U>}
 		#define(GENERIC_REIFIED) {}
-		#define(APPLY_T) {apply}
-		#define(APPLY_WITH_SIZE) {apply(size)}
+		#define(APPLY_T) {new [PRIMITIVE]}
+		#define(APPLY_WITH_SIZE) {new [PRIMITIVE](size)}
 	}
 
 	private init() {} // no instances
@@ -47,7 +47,7 @@ public abstract class #(TYPE_NAME)Array
 	static inline func apply GENERIC_REIFIED() -> [T] = []
 
 	#if (IS_GENERIC) {
-		static inline func apply GENERIC_REIFIED(size: int) -> [T] = apply<T>(size, of: class T)
+		static inline func apply GENERIC_REIFIED(size: int) -> [T] = ObjectArray<T>(size, of: class T)
 
 		@BytecodeName('ofType')
 		static func apply GENERIC(size: int, of elementType: Class<T>) -> [T] = Array.newInstance(elementType, size) as [T]
@@ -87,7 +87,7 @@ public abstract class #(TYPE_NAME)Array
 		@BytecodeName('rangeClosed')
 		static func apply GENERIC(from: T, to: T) -> [T]
 		{
-			let array = apply((to - from + 1)#if (RANGE_CAST) { as int})
+			let array = APPLY_T((to - from + 1)#if (RANGE_CAST) { as int})
 			var index = 0
 			for (i <- from .. to) array[index++] = i
 			return array
@@ -96,7 +96,7 @@ public abstract class #(TYPE_NAME)Array
 		@BytecodeName('rangeOpen')
 		static func range GENERIC(from: T, explicit toExclusive: T) -> [T]
 		{
-			let array = apply((toExclusive - from)#if (RANGE_CAST) { as int})
+			let array = APPLY_T((toExclusive - from)#if (RANGE_CAST) { as int})
 			var index = 0
 			for (i <- from ..< toExclusive) array[index++] = from
 			return array
@@ -170,7 +170,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func added GENERIC(array: [T], value: T) -> [T]
 	{
 		let size = array.size
-		let result = apply(size + 1 #if (IS_GENERIC) {, of: array.elementType })
+		let result = APPLY_T(size + 1 #if (IS_GENERIC) {, of: array.elementType })
 		System.arraycopy(array, 0, result, 0, size)
 		result[size] = value
 		return result
@@ -227,7 +227,7 @@ public abstract class #(TYPE_NAME)Array
 		infix func mapped(array: [T], mapper: T -> T) -> [T]
 		{
 			let size = array.size
-			let result = apply(size)
+			let result = APPLY_T(size)
 			for (i <- 0 ..< size) result[i] = mapper(array[i])
 			return result
 		}
@@ -247,7 +247,7 @@ public abstract class #(TYPE_NAME)Array
 		infix func flatMapped(array: [T], mapper: T -> [T]) -> [T]
 		{
 			var size = 0
-			var result = apply(array.size << 2)
+			var result = APPLY_T(array.size << 2)
 
 			for (v <- array)
 			{
@@ -338,7 +338,7 @@ public abstract class #(TYPE_NAME)Array
 
 	// Copying
 
-	infix inline func copy GENERIC(array: [T]) -> [T] = (array as Object).clone as [T]
+	infix inline func copy GENERIC(array: [T]) -> [T] = (array as Object).clone() as [T]
 
 	infix func copy GENERIC(array: [T], withSize size: int) -> [T]
 	{
