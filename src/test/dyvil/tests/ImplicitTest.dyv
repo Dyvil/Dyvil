@@ -14,6 +14,18 @@ public class ImplicitTest
 		func toDebugString() -> String
 	}
 
+	static class ErrorExample
+	{
+		class A { func test() -> String = "A" }
+		class B { func test() -> String = "B" }
+
+		implicit postfix func s2a(s: String) -> A = new A
+
+		implicit postfix func s2b(s: String) -> B = new B
+
+		// "a".test() -> error: Ambigous call to method 'test' [method.access.ambiguous]
+	}
+
 	static implicit func i2s(i: int) -> String = i.toString
 
 	static implicit func b2s(b: boolean) -> String = b.toString

@@ -15,7 +15,6 @@ import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.ITyped;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -143,17 +142,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 	{
 		if (receiver != null)
 		{
-			final IType receiverType = receiver.getType();
-			if (receiverType != null)
-			{
-				final IDataMember match = receiverType.resolveField(name);
-				if (match != null)
-				{
-					return match;
-				}
-			}
-
-			return null;
+			return receiver.getType().resolveField(name);
 		}
 
 		final IDataMember match = context.resolveField(name);
@@ -176,7 +165,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 		final MatchList<IMethod> matches = new MatchList<>(implicitContext);
 
-		// Methods available through the receiver
+		// Methods available via the receiver type
 		if (receiver != null)
 		{
 			receiver.getType().getMethodMatches(matches, receiver, name, arguments);
@@ -186,34 +175,42 @@ public interface ICall extends IValue, IArgumentsConsumer
 			}
 		}
 
-		// Methods available through the first argument
+		// Methods available via the first argument
 		if (arguments.size() == 1)
 		{
 			arguments.getFirst().getType().getMethodMatches(matches, receiver, name, arguments);
+
+			// Methods from the first argument have to be resolved before those from the enclosing context,
+			// otherwise we would have strange behaviours e.g. with the expression -1 in a context where there is
+			// a) a "prefix func -(_: SomeType)" and
+			// b) an implicit conversion function from int to SomeType
 			if (matches.hasCandidate())
 			{
 				return matches;
 			}
 		}
 
-		// Methods available in the current context
+		// Methods available in the enclosing context
 		context.getMethodMatches(matches, receiver, name, arguments);
 		if (matches.hasCandidate())
 		{
 			return matches;
 		}
 
-		// Methods available through implicit conversions
+		// Methods available through implicit conversions of the receiver
 		if (receiver != null)
 		{
 			MatchList<IMethod> implicits = IContext.resolveImplicits(implicitContext, receiver, null);
 			for (Candidate<IMethod> candidate : implicits)
 			{
 				candidate.getMember().getType().getMethodMatches(matches, receiver, name, arguments);
-				if (matches.hasCandidate())
-				{
-					return matches;
-				}
+			}
+			// This part is not in the loop because we do not want to depend on the ranking of the implicit conversion
+			// methods. If two methods have the same ranking, the problem will propagate until later when they are
+			// resolved again.
+			if (matches.hasCandidate())
+			{
+				return matches;
 			}
 		}
 
