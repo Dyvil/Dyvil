@@ -118,11 +118,7 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.receiver != null)
-		{
-			this.receiver.resolveTypes(markers, context);
-		}
-
+		super.resolveTypes(markers, context);
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, context);
@@ -205,10 +201,7 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.receiver != null)
-		{
-			this.receiver.check(markers, context);
-		}
+		super.check(markers, context);
 		if (this.value != null)
 		{
 			this.value.check(markers, context);

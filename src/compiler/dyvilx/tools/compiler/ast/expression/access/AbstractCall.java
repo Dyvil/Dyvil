@@ -97,7 +97,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	@Override
 	public boolean isResolved()
 	{
-		return this.method != null;
+		return this.method != null && this.method.getType().isResolved();
 	}
 
 	public IMethod getMethod()
@@ -335,6 +335,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		{
 			this.method
 				.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+
+			if (!this.method.getType().isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "method.access.unresolved_type", this.getName()));
+			}
 		}
 
 		this.arguments.check(markers, context);

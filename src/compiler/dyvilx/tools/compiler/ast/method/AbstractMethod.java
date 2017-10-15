@@ -443,7 +443,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 
 			final IType receiverType;
-			if (mod == Modifiers.INFIX)
+			if (mod == Modifiers.INFIX && !parameters.isEmpty())
 			{
 				// Infix access to infix method
 				receiverType = parameters.get(0).getCovariantType();
@@ -580,7 +580,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (receiver != null)
 		{
 			final int mod = this.attributes.flags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && !receiver.isClassAccess())
+			if (mod == Modifiers.INFIX && !receiver.isClassAccess() && !parameters.isEmpty())
 			{
 				// infix or extension method, declaring class implicit
 
@@ -1055,8 +1055,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final int modifiers = this.attributes.flags();
-		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (this.hasModifier(Modifiers.INFIX) && !this.parameters.isEmpty())
 		{
 			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
 			return;
@@ -1064,7 +1063,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		final IType receiverType = this.enclosingClass.getReceiverType();
 
-		if ((modifiers & Modifiers.STATIC) == 0)
+		if (!this.isStatic())
 		{
 			receiver.writeNullCheckedExpression(writer, receiverType);
 		}
@@ -1086,7 +1085,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, ArgumentList arguments) throws BytecodeException
 	{
-		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX)
+		    && !this.parameters.isEmpty())
 		{
 			arguments.writeValues(writer, this.parameters, 1);
 			return;
