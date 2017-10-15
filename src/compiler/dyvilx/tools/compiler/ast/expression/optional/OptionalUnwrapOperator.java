@@ -178,7 +178,7 @@ public class OptionalUnwrapOperator implements IValue
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.receiver.writeExpression(writer, type == null ? null : NullableType.unapply(type));
-		if (this.force)
+		if (this.force || this.getType().isPrimitive())
 		{
 			return;
 		}
