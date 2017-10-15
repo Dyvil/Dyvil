@@ -155,9 +155,9 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 
 	// equals and hashCode
 
-	override func equals(obj: any!) -> boolean = obj is Polynomial && this.equals(obj as Polynomial)
+	override func equals(obj: any!) -> boolean = this === obj || obj is Polynomial && this.equals(obj as Polynomial)
 
-	func equals(obj: Polynomial) -> boolean = obj.coefficients == this.coefficients
+	func equals(that: Polynomial) -> boolean = this === that || this.coefficients == that.coefficients
 
 	override func hashCode() -> int = this.coefficients.hashCode
 
