@@ -725,10 +725,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	 */
 	private static boolean useTableSwitch(int low, int high, int count)
 	{
-		int tableSpace = 4 + high - low + 1;
-		int tableTime = 3; // constant time
-		int lookupSpace = 3 + 2 * count;
-		int lookupTime = MathUtils.log2(count); // binary search O(log n)
+		// this calculation can cause integer overflow with string hash codes of large absolute value
+		final long tableSpace = 4L + (long) high - (long) low + 1L;
+		final int tableTime = 3; // constant time
+		final int lookupSpace = 3 + 2 * count;
+		final int lookupTime = MathUtils.log2(count); // binary search O(log n)
 		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
 	}
 
@@ -768,7 +769,9 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	{
 		assert defaultLabel != null;
 
-		final Label[] handlers = new Label[high - low + 1];
+		// this calculation can cause integer overflow with string hash codes of large absolute value
+		final int size = (int) ((long) high - (long) low + 1L);
+		final Label[] handlers = new Label[size];
 		Arrays.fill(handlers, defaultLabel);
 
 		for (KeyCache.Entry entry : entries)

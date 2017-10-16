@@ -17,30 +17,31 @@ import dyvilx.tools.parsing.marker.MarkerList;
 public final class StringPattern extends Pattern
 {
 	private String value;
-	
+
 	public StringPattern(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	@Override
 	public int getPatternType()
 	{
 		return STRING;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.STRING;
 	}
-	
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (Types.isExactType(type, Types.STRING))
+		if (type.getTheClass() == Types.STRING_CLASS)
 		{
+			// also accepts String! or String?
 			return this;
 		}
 		if (Types.isSuperType(type, Types.STRING))
@@ -49,52 +50,52 @@ public final class StringPattern extends Pattern
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isSwitchable()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean switchCheck()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int subPatterns()
 	{
 		return 1;
 	}
-	
+
 	@Override
 	public int switchValue()
 	{
 		return this.value.hashCode();
 	}
-	
+
 	@Override
 	public int minValue()
 	{
 		return this.value.hashCode();
 	}
-	
+
 	@Override
 	public int maxValue()
 	{
 		return this.value.hashCode();
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		writeStringInvJump(writer, varIndex, elseLabel, this.value);
 	}
-	
+
 	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		writer.visitLdcInsn(value);
 		if (varIndex >= 0)
