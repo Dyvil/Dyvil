@@ -82,7 +82,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 	override func contains(element: any!)
 	{
-		FOR_EACH if (current == element) return true
+		FOR_EACH if (element == current) return true
 		return false
 	}
 
