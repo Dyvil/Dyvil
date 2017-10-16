@@ -9,13 +9,13 @@ class RangeTest
 	@LiteralConvertible.FromInt
 	static case class RangeableInt(let value: int) implements Rangeable<RangeableInt>
 	{
-		override func next() -> RangeableInt = apply(this.value + 1)
+		override func next() -> RangeableInt = RangeableInt(this.value + 1)
 
-		override func prev() -> RangeableInt = apply(this.value - 1)
+		override func prev() -> RangeableInt = RangeableInt(this.value - 1)
 
 		override func distanceTo(other: RangeableInt) -> int = other.value - this.value
 
-		override func compareTo(other: RangeableInt) -> int = this.value.compareTo other.value
+		override func compareTo(other: RangeableInt) -> int = this.value.compareTo(other.value)
 	}
 
 	static func apply() -> Test = test "Ranges" {

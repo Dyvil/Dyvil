@@ -16,8 +16,8 @@ public class ImplicitTest
 
 	static class ErrorExample
 	{
-		class A { func test() -> String = "A" }
-		class B { func test() -> String = "B" }
+		static class A { func test() -> String = "A" }
+		static class B { func test() -> String = "B" }
 
 		implicit postfix func s2a(s: String) -> A = new A
 

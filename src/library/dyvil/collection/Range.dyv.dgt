@@ -99,7 +99,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 	{
 		let builder = new immutable.ArrayList.Builder<R>(this.size())
 		for (value <- this) builder.add(mapper(value))
-		return builder.build();
+		return builder.build()
 	}
 
 	override func flatMapped<R>(mapper: Function<-T, +Iterable<+R>>) -> Queryable<R>

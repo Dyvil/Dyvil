@@ -87,7 +87,7 @@ abstract class Primitives
 		case  8 => return value.toOctalString
 		case 10 => return value.toString
 		case 16 => return value.toHexString
-		case _  => return java.lang.Integer.toString(value, radix);
+		case _  => return java.lang.Integer.toString(value, radix)
 	}
 
 	// Long toString
