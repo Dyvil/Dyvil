@@ -122,6 +122,8 @@ class Qualifier
 		while (searchIndex < len)
 		{
 			let cashIndex = string.indexOf('$', searchIndex)
+			if (cashIndex < 0) break
+
 			let startIndex = cashIndex + 1
 			let endIndex = symbolEndIndex(string, startIndex, len)
 			searchIndex = endIndex
