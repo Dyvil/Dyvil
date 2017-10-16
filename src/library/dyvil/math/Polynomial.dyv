@@ -50,6 +50,33 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 		return sum
 	}
 
+	func derivative() -> Polynomial
+	{
+		// derivative of a polynomial of degree 0 or -1 is the zero polynomial
+		if (this.degree <= 0) return _0
+
+		let oldCoeff = this.coefficients
+		let newCoeff = [double](oldCoeff.size - 1)
+		for (i <- 1 ..< oldCoeff.size)
+		{
+			newCoeff[i - 1] = oldCoeff[i] * i
+		}
+		return new Polynomial(newCoeff) // no trimming necessary
+	}
+
+	func integral() -> Polynomial
+	{
+		if (this.isZero) return _0
+
+		let oldCoeff = this.coefficients
+		let newCoeff = [double](oldCoeff.size + 1)
+		for (i <- 0 ..< oldCoeff.size)
+		{
+			newCoeff[i + 1] = oldCoeff[i] / (i + 1)
+		}
+		return new Polynomial(newCoeff) // no trimming necessary
+	}
+
 	// Constants
 
 	public const _0: Polynomial = new Polynomial([]) { override get }
@@ -151,6 +178,17 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 		let dDeg = d.degree
 		let dCoeff = d.coefficients[dDeg]
 		return Polynomial(rCoeff / dCoeff, degree: rDeg - dDeg)
+	}
+
+	static func gcd(a: Polynomial, b: Polynomial) -> Polynomial
+	{
+		while (!b.isZero())
+		{
+			let t = b
+			b = a % b
+			a = t
+		}
+		return a
 	}
 
 	// equals and hashCode
