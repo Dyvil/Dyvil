@@ -883,6 +883,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public int getInvokeOpcode()
 	{
+		return this.getInvokeOpcode(this.getEnclosingClass());
+	}
+
+	private int getInvokeOpcode(IClass owner)
+	{
 		int modifiers = this.attributes.flags();
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
@@ -892,7 +897,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
-		if (this.enclosingClass.isInterface())
+		if (owner.isInterface())
 		{
 			return Opcodes.INVOKEINTERFACE;
 		}
@@ -1114,40 +1119,66 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		writer.visitLineNumber(lineNumber);
 
-		int opcode;
-		int modifiers = this.attributes.flags();
-
-		final String owner = this.enclosingClass.getInternalName();
+		final int opcode;
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
-		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		if (this.hasModifier(Modifiers.EXTENSION))
 		{
-			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM,
-			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName, descriptor));
+			// extension method invocation
+			final Handle handle = new Handle(ClassFormat.H_INVOKESTATIC, this.enclosingClass.getInternalName(),
+			                                 mangledName, descriptor);
+			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM, handle);
 			return;
 		}
 
-		if (receiver == null)
+		final String owner;
+		final boolean isInterface;
+
+		if (receiver != null)
 		{
-			opcode = this.getInvokeOpcode();
-		}
-		else if (receiver.valueTag() == IValue.SUPER)
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-		}
-		else if (receiver.isIgnoredClassAccess() && receiver.getType().hasTag(IType.TYPE_VAR))
-		{
-			writer
-				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);
-			return;
+			final IType receiverType = receiver.getType();
+			if (receiver.isIgnoredClassAccess() && receiverType.hasTag(IType.TYPE_VAR))
+			{
+				// Dynamic invocation of a static method based on a type variable
+				writer.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"),
+				                              STATICVIRTUAL_BSM);
+				return;
+			}
+
+			if (receiver.valueTag() == IValue.SUPER)
+			{
+				// Super-method invocation
+				opcode = Opcodes.INVOKESPECIAL;
+				owner = this.enclosingClass.getInternalName();
+				isInterface = this.enclosingClass.isInterface();
+			}
+			else if (this.isStatic())
+			{
+				opcode = Opcodes.INVOKESTATIC;
+				owner = this.enclosingClass.getInternalName();
+				isInterface = this.enclosingClass.isInterface();
+			}
+			else
+			{
+				// bugfix: for non-static calls, we use the type of the receiver to avoid
+				// IllegalAccessExceptions on the owner class.
+				// Example: Calling length() on a StringBuilder object resolves to AbstractStringBuilder.length(),
+				// but AbstractStringBuilder is not accessible
+				final IClass receiverClass = receiverType.getTheClass();
+				opcode = this.getInvokeOpcode(receiverClass);
+				owner = receiverType.getInternalName();
+				isInterface = receiverClass.isInterface();
+			}
 		}
 		else
 		{
 			opcode = this.getInvokeOpcode();
+			owner = this.enclosingClass.getInternalName();
+			isInterface = this.enclosingClass.isInterface();
 		}
 
-		writer.visitMethodInsn(opcode, owner, mangledName, descriptor, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, mangledName, descriptor, isInterface);
 	}
 
 	@Override
