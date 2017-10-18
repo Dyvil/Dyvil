@@ -218,15 +218,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		if (matches == null || !matches.isAmbigous()) // isAmbiguous returns false for empty lists
 		{
 			marker = Markers.semanticError(this.position, "method.access.resolve", this.getName());
-			this.addArgumentInfo(marker);
 		}
 		else
 		{
 			marker = Markers.semanticError(this.position, "method.access.ambiguous", this.getName());
-			this.addArgumentInfo(marker);
-
-			this.addCandidates(matches, marker);
 		}
+
+		this.addArgumentInfo(marker);
+		this.addCandidates(matches, marker);
 
 		markers.add(marker);
 	}
@@ -245,6 +244,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 
 	private void addCandidates(MatchList<IMethod> matches, Marker marker)
 	{
+		if (matches.isEmpty())
+		{
+			return;
+		}
+
 		// Duplicate in ConstructorCall.addCandidates
 
 		marker.addInfo(Markers.getSemantic("method.access.candidates"));
@@ -268,7 +272,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	{
 		final StringBuilder builder = new StringBuilder().append('\t');
 		final IMethod member = candidate.getMember();
-		builder.append(member.getReceiverType()).append('.');
+		builder.append(member.getReceiverType()).append(member.isStatic() ? '.' : '#');
 		Util.methodSignatureToString(member, this.genericData, builder);
 		marker.addInfo(builder.toString());
 	}

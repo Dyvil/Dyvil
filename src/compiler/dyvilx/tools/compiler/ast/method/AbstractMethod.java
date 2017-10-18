@@ -436,9 +436,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess() // a
+			    || mod == 0 && receiver.isClassAccess() && !receiver.getType().getTheClass().isObject()) // b
 			{
-				// Disallow non-static access to static method
+				// Disallow non-static access to static method (a)
+				// and static access to instance method (unless it's an object class) (b)
 				invalid = true;
 			}
 
@@ -463,7 +465,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			if (arguments == null)
 			{
-				list.add(new Candidate<>(this, receiverMatch, receiverType, false));
+				list.add(new Candidate<>(this, receiverMatch, receiverType, invalid));
 				return;
 			}
 
@@ -615,7 +617,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				{
 					// static method called like instance method -> warning
 
-					markers.add(Markers.semantic(position, "method.access.static", this.name));
+					markers.add(Markers.semanticError(position, "method.access.static", this.name));
 				}
 				else if (this.getReceiverType().getTheClass() == this.enclosingClass
 				         && receiver.getType().getTheClass() != this.enclosingClass)

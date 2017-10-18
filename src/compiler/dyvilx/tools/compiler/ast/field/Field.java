@@ -154,53 +154,57 @@ public class Field extends Member implements IField
 	@Override
 	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
-		if (receiver != null)
+		ModifierUtil.checkVisibility(this, position, markers, context);
+		if (receiver == null)
 		{
-			if (this.isStatic())
+			if (!this.isStatic())
 			{
-				if (!receiver.isClassAccess())
+				if (context.hasStaticAccess())
 				{
-					markers.add(Markers.semantic(position, "field.access.static", this.name));
+					markers.add(Markers.semanticError(position, "field.access.instance", this.name));
 				}
-				else if (receiver.getType().getTheClass() != this.enclosingClass)
+				else
 				{
-					markers.add(Markers.semantic(position, "field.access.static.type", this.name,
-					                             this.enclosingClass.getFullName()));
-				}
-				receiver = receiver.asIgnoredClassAccess();
-			}
-			else if (receiver.isClassAccess())
-			{
-				if (!receiver.getType().getTheClass().isObject())
-				{
-					markers.add(Markers.semantic(position, "field.access.instance", this.name));
+					receiver = new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
+
+					if (!this.enclosingClass.isAnonymous())
+					{
+						markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
+					}
 				}
 			}
-			else
-			{
-				IType type = this.enclosingClass.getClassType();
-				receiver = TypeChecker.convertValue(receiver, type, type, markers, context, TypeChecker.markerSupplier(
-					"field.access.receiver_type", this.name));
-			}
+
+			return receiver;
 		}
-		else if (!this.isStatic())
+
+		if (this.isStatic())
 		{
-			if (context.hasStaticAccess())
+			if (!receiver.isClassAccess())
+			{
+				markers.add(Markers.semanticError(position, "field.access.static", this.name));
+			}
+			else if (receiver.getType().getTheClass() != this.enclosingClass)
+			{
+				markers.add(Markers.semantic(position, "field.access.static.type", this.name,
+				                             this.enclosingClass.getFullName()));
+			}
+			receiver = receiver.asIgnoredClassAccess();
+		}
+		else if (receiver.isClassAccess())
+		{
+			if (!receiver.getType().getTheClass().isObject())
 			{
 				markers.add(Markers.semantic(position, "field.access.instance", this.name));
 			}
-			else
-			{
-				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
-
-				if (!this.enclosingClass.isAnonymous())
-				{
-					markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
-				}
-			}
+		}
+		else
+		{
+			receiver = TypeChecker
+				           .convertValue(receiver, this.enclosingClass.getThisType(), receiver.getType(), markers,
+				                         context,
+				                         TypeChecker.markerSupplier("field.access.receiver_type", this.name));
 		}
 
-		ModifierUtil.checkVisibility(this, position, markers, context);
 		return receiver;
 	}
 
