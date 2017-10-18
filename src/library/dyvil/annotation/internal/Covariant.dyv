@@ -1,0 +1,7 @@
+package dyvil.annotation.`internal`
+
+import java.lang.annotation._
+
+@Target([.TYPE_PARAMETER])
+@Retention(.RUNTIME)
+@interface Covariant
