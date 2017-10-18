@@ -40,9 +40,15 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 		let sign = ((bits >>> 63) == 0) ? 1 : -1
 		let e    = (bits >> 52) as int & 0x7FF
-		let exp  = e - 1075
+		var exp  = e - 1075
 		let m    = bits & 0xF_FFFF_FFFF_FFFFL
-		let mant = e == 0 ? (m << 1) : (m | 0x10_0000_0000_0000L)
+		var mant = e == 0 ? (m << 1) : (m | 0x10_0000_0000_0000L)
+
+		if (exp > 0)
+		{
+			mant <<= exp
+			exp = 0
+		}
 
 		// d = sign * mant * 2^exp = (sign * mant) / 2^(-exp)
 

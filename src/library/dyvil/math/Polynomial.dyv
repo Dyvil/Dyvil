@@ -83,6 +83,8 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 
 	public const _1: Polynomial = new Polynomial([1]) { override get }
 
+	public const _x: Polynomial = new Polynomial([0, 1])
+
 	// Unary Operators
 
 	private postfix func mapped(poly: Polynomial, op: double -> double) -> Polynomial
@@ -98,7 +100,10 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 
 	override prefix func -(rhs: Polynomial) -> Polynomial = rhs.mapped(c => -c)
 
-	override postfix func inverse(lhs: Polynomial) -> Polynomial = throw new UnsupportedOperationException()
+	override postfix func inverse(lhs: Polynomial) -> Polynomial
+	{
+		throw new UnsupportedOperationException('reciprocal of polynomial')
+	}
 
 	// Additive Operators
 
@@ -157,6 +162,8 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 	// divmod
 	infix func /%(lhs n: Polynomial, rhs d: Polynomial) -> (Polynomial, Polynomial)
 	{
+		if (d.isZero) throw new ArithmeticException('division by zero polynomial')
+
 		var q = _0
 		var r = n // invariant: n = d * q + r
 
@@ -178,6 +185,23 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 		let dDeg = d.degree
 		let dCoeff = d.coefficients[dDeg]
 		return Polynomial(rCoeff / dCoeff, degree: rDeg - dDeg)
+	}
+
+	infix func **(lhs: Polynomial, rhs: int) -> Polynomial
+	{
+		if (rhs < 0) throw new UnsupportedOperationException('polynomial to the negative power')
+		if (rhs == 0) return _1
+		if (rhs == 1) return lhs
+
+		// exp by squaring
+		if ((rhs & 1) == 0)
+		{
+			return (lhs * lhs) ** (rhs >> 1)
+		}
+		else
+		{
+			return lhs * (lhs * lhs) ** (rhs >> 1) // use (rhs >> 1) instead of (rhs - 1) \ 2
+		}
 	}
 
 	static func gcd(a: Polynomial, b: Polynomial) -> Polynomial
