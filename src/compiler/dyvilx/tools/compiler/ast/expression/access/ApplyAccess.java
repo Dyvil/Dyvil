@@ -11,27 +11,27 @@ import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public class ApplyMethodCall extends AbstractCall
+public class ApplyAccess extends AbstractCall
 {
-	public ApplyMethodCall(SourcePosition position)
+	public ApplyAccess(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ApplyMethodCall(SourcePosition position, IValue receiver)
+	public ApplyAccess(SourcePosition position, IValue receiver)
 	{
 		this.position = position;
 		this.receiver = receiver;
 	}
 
-	public ApplyMethodCall(SourcePosition position, IValue instance, ArgumentList arguments)
+	public ApplyAccess(SourcePosition position, IValue instance, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = arguments;
 	}
 
-	public ApplyMethodCall(SourcePosition position, IValue instance, IMethod method, ArgumentList arguments)
+	public ApplyAccess(SourcePosition position, IValue instance, IMethod method, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -60,7 +60,7 @@ public class ApplyMethodCall extends AbstractCall
 	@Override
 	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
-		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
+		return new ApplyAssignment(this.position.to(position), this.receiver, this.arguments, rhs);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class ApplyMethodCall extends AbstractCall
 		this.arguments = applyArguments;
 		this.receiver = applyReceiver;
 
-		return new UpdateMethodCall(position, applyReceiver, applyArguments, rhs).resolveCall(markers, context, true);
+		return new ApplyAssignment(position, applyReceiver, applyArguments, rhs).resolveCall(markers, context, true);
 	}
 
 	@Override

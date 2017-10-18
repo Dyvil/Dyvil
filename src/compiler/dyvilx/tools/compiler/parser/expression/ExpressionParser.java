@@ -201,10 +201,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
 
-				final ApplyMethodCall applyMethodCall = new ApplyMethodCall(this.value.getPosition(), this.value);
-				ArgumentListParser.parseArguments(pm, token.next(), applyMethodCall);
+				final ApplyAccess applyAccess = new ApplyAccess(this.value.getPosition(), this.value);
+				ArgumentListParser.parseArguments(pm, token.next(), applyAccess);
 
-				this.value = applyMethodCall;
+				this.value = applyAccess;
 				this.mode = PARAMETERS_END;
 				return;
 			case BaseSymbols.COLON:
@@ -629,8 +629,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		final ApplyMethodCall applyCall = new ApplyMethodCall(SourcePosition.between(token.prev(), token), this.value,
-		                                                      ArgumentList.empty());
+		final ApplyAccess applyCall = new ApplyAccess(SourcePosition.between(token.prev(), token), this.value,
+		                                              ArgumentList.empty());
 
 		this.value = applyCall;
 		this.parseApply(pm, token, applyCall);

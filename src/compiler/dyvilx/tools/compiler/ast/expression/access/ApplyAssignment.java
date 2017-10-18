@@ -9,14 +9,14 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
 import dyvil.lang.Name;
 
-public class UpdateMethodCall extends AbstractCall implements IValueConsumer
+public class ApplyAssignment extends AbstractCall implements IValueConsumer
 {
-	public UpdateMethodCall(SourcePosition position)
+	public ApplyAssignment(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public UpdateMethodCall(SourcePosition position, IValue instance, ArgumentList arguments, IValue rhs)
+	public ApplyAssignment(SourcePosition position, IValue instance, ArgumentList arguments, IValue rhs)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -32,7 +32,7 @@ public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 	@Override
 	public Name getName()
 	{
-		return Names.update;
+		return Names.apply_$eq;
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.appended(Names.update, value);
+		this.arguments = this.arguments.appended(Names.newValue, value);
 	}
 
 	@Override

@@ -45,9 +45,9 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.appended(Names.update, value);
+		this.arguments = this.arguments.appended(Names.newValue, value);
 	}
-	
+
 	@Override
 	public void toString(String indent, StringBuilder buffer)
 	{

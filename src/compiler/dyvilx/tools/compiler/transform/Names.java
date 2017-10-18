@@ -9,9 +9,9 @@ public final class Names
 	public static final Name get            = Name.fromRaw("get");
 	public static final Name set            = Name.fromRaw("set");
 	public static final Name apply          = Name.fromRaw("apply");
-	public static final Name applyStatement = Name.fromRaw("applyStatement");
 	public static final Name apply_$amp     = Name.from("apply_&", "apply_$amp");
-	public static final Name update         = Name.fromRaw("update");
+	public static final Name apply_$eq      = Name.from("apply_=", "apply_$eq");
+	public static final Name applyStatement = Name.fromRaw("applyStatement");
 	public static final Name unapply        = Name.fromRaw("unapply");
 	public static final Name subscript      = Name.fromRaw("subscript");
 	public static final Name subscript_$amp = Name.from("subscript_&", "subscript_$amp");

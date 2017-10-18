@@ -90,7 +90,7 @@ public class MethodCall extends AbstractCall implements INamed
 	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		final FieldAccess access = new FieldAccess(this.position, this.receiver, this.name);
-		return new UpdateMethodCall(this.position.to(position), access, this.arguments, rhs);
+		return new ApplyAssignment(this.position.to(position), access, this.arguments, rhs);
 	}
 
 	@Override
@@ -177,7 +177,7 @@ public class MethodCall extends AbstractCall implements INamed
 
 		// Field or Class Access available, try to resolve an apply method
 
-		final ApplyMethodCall call = new ApplyMethodCall(this.position, access, this.arguments);
+		final ApplyAccess call = new ApplyAccess(this.position, access, this.arguments);
 		call.genericData = this.genericData;
 		return call.resolveCall(markers, context, report);
 	}

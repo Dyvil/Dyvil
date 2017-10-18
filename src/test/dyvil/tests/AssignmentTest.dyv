@@ -46,7 +46,7 @@ class AssignmentTest
 		var subscriptArray: [int] = [ 0, 0, 0 ]
 
 		func apply(i: int) -> int = this.applyArray[i]
-		func update(i: int, value: int) -> void = this.applyArray[i] = value
+		func apply_=(i: int, value: int) -> void = this.applyArray[i] = value
 
 		func subscript(i: int) -> int = this.subscriptArray[i]
 		func subscript_=(i: int, value: int) = this.subscriptArray[i] = value
@@ -73,7 +73,7 @@ class AssignmentTest
 		let counter = new Counter
 		var modCount = 0
 
-		counter(modCount++) += modCount++ // apply/update
+		counter(modCount++) += modCount++ // apply/apply_=
 		// counter.applyArray[0] = 1
 		counter[modCount++] += modCount++ // subscript/subscript_=
 		// counter.subscriptArray[2] = 3
