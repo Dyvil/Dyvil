@@ -1,0 +1,16 @@
+package dyvil.random
+
+object MaxRandom implements Random
+{
+	override func next(bits: int) -> int = bits == 32 ? -1 : (1 << bits) - 1
+
+	override func nextInt(max: int) -> int = max - 1
+
+	override func nextLong(max: long) -> long = max - 1L
+
+	override func nextFloat() -> float = 1F
+
+	override func nextDouble() -> double = 1D
+
+	override func nextGaussian() -> double = 1D
+}

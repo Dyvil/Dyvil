@@ -1,0 +1,21 @@
+package dyvil.random
+
+/**
+ * A {@link Random} implementation that always returns the minimum value.
+ *
+ * @author Clashsoft
+ */
+object MinRandom implements Random
+{
+	override func next(bits: int) -> int = 0
+
+	override func nextInt(max: int) -> int = 0
+
+	override func nextLong(max: long) -> long = 0L
+
+	override func nextFloat() -> float = 0F
+
+	override func nextDouble() -> double = 0D
+
+	override func nextGaussian() -> double = -1D
+}
