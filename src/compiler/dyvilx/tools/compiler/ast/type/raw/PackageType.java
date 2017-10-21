@@ -133,7 +133,7 @@ public class PackageType implements IRawType
 	public void read(DataInput in) throws IOException
 	{
 		final String internal = in.readUTF();
-		this.thePackage = RootPackage.rootPackage.resolvePackageInternal(internal);
+		this.thePackage = RootPackage.rootPackage.resolveInternalPackage(internal);
 	}
 
 	@Override

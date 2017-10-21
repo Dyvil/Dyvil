@@ -2,18 +2,16 @@ package dyvilx.tools.compiler.ast.structure;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
-import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
-	private final Map<String, IClass> internalClass = new HashMap<>();
+	private final Map<String, IClass> classCache = new HashMap<>();
 
 	public DyvilCompiler compiler;
 
@@ -35,64 +33,43 @@ public final class RootPackage extends Package
 		}
 	}
 
-	public Package resolvePackageInternal(String internal)
+	public Package resolveInternalPackage(String internal)
 	{
-		for (Library library : this.compiler.config.libraries)
+		Package pack = this;
+		int nextIndex;
+		int startIndex = 0;
+
+		while ((nextIndex = internal.indexOf('/', startIndex)) >= 0)
 		{
-			final Package pack = library.resolvePackage(internal);
-			if (pack != null)
-			{
-				return pack;
-			}
+			pack = pack.resolvePackage(internal.substring(startIndex, nextIndex));
+			startIndex = nextIndex + 1;
 		}
 
-		return null;
-	}
-
-	@Override
-	public IClass resolveClass(String name)
-	{
-		return this.resolveInternalClass(ClassFormat.packageToInternal(name));
+		return pack.resolvePackage(internal.substring(startIndex));
 	}
 
 	public IClass resolveInternalClass(String internal)
 	{
-		IClass iclass = this.internalClass.get(internal);
-		if (iclass != null)
+		IClass result = this.classCache.get(internal);
+		if (result != null)
 		{
-			return iclass;
+			return result;
 		}
 
-		iclass = this.resolveInternalClass_(internal);
-		this.internalClass.put(internal, iclass);
+		Package pack = this;
+		int nextIndex;
+		int startIndex = 0;
 
-		return iclass;
-	}
-
-	private IClass resolveInternalClass_(String internal)
-	{
-		final int index = internal.lastIndexOf('/');
-		if (index == -1)
+		while ((nextIndex = internal.indexOf('/', startIndex)) >= 0)
 		{
-			return super.resolveClass(internal);
+			pack = pack.resolvePackage(internal.substring(startIndex, nextIndex));
+			startIndex = nextIndex + 1;
 		}
 
-		final String packageName = internal.substring(0, index);
-		final String className = internal.substring(index + 1);
+		result = pack.resolveClass(internal.substring(startIndex));
+		this.classCache.put(internal, result);
 
-		for (Library lib : this.compiler.config.libraries)
-		{
-			final Package pack = lib.resolvePackage(packageName);
-			if (pack != null)
-			{
-				final IClass iclass = pack.resolveClass(className);
-				if (iclass != null)
-				{
-					return iclass;
-				}
-			}
-		}
-		return null;
+		return result;
 	}
 
 	@Override

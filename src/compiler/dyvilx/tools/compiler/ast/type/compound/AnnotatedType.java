@@ -66,6 +66,11 @@ public class AnnotatedType extends TypeDelegate
 
 		this.annotation.resolveTypes(markers, context);
 
+		if (!this.annotation.getType().isResolved())
+		{
+			return this;
+		}
+
 		switch (this.annotation.getTypeDescriptor())
 		{
 		case AnnotationUtil.DYVIL_TYPE_INTERNAL:

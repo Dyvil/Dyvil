@@ -457,7 +457,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.name = Name.fromQualified(name.substring(index + 1));
 			// Do not set 'fullName' here
-			this.thePackage = Package.rootPackage.resolvePackageInternal(name.substring(0, index));
+			this.thePackage = Package.rootPackage.resolveInternalPackage(name.substring(0, index));
 		}
 
 		if (signature != null)
