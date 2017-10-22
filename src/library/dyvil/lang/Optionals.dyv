@@ -6,17 +6,28 @@ final class Optionals
 {
 	private init() {} // no instances
 
-	// Wrapping
-
 	@Intrinsic([ LOAD_0 ])
-	static func Optional<T>(value: T) -> T? = value
+	static func Optional<type T: any>(value: T) -> T? = value
 
-	// Chaining
+	/**
+	 * Returns the `null` value, but with the possibly non-null type `T`. This is an unsafe operation that should
+	 * only be used for non-null fields that are guaranteed to be initialized in a constructor, initializer block or,
+	 * for static fields, in a static initializer block.
+	 */
+	@Intrinsic([ ACONST_NULL ])
+	static func unsafeInit<type T: Object>() -> T = unsafeInit<T>
 
+	/**
+	 * The Optional Chain Operator
+	 */
 	@Intrinsic([], compilerCode: Intrinsic.OPTIONAL_CHAIN)
-	postfix func ? <T>(lhs: T?) -> T = lhs!!
+	postfix func ? <type T: any>(lhs: T?) -> T = lhs!!
 
-	// Unwrapping
+	@OverloadPriority(-1)
+	@Deprecated('The optional chain operator should not be used with a non-optional left-hand operand')
+	@BytecodeName('$qmark_1')
+	@Intrinsic([ LOAD_0 ])
+	postfix func ? <type T: any>(lhs: T) -> T = lhs
 
 	/*
 	 * The Optional Unwrap Operator
@@ -25,49 +36,78 @@ final class Optionals
 	 * `NullPointerException` is thrown.
 	 */
 	@Intrinsic([], compilerCode: Intrinsic.OPTIONAL_UNWRAP)
-	postfix func ! <T>(lhs: T?) -> T = lhs!
+	postfix func ! <type T: any>(lhs: T?) -> T = lhs!
 
-	/**
-	 * Checks if the given optional value is null and throws a NullPointerException in that case.
-	 */
-	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2, POP ]
-	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
-	static func unwrapNullCheck<T>(optional: T?) -> void { optional!!.getClass }
+	@OverloadPriority(-1)
+	@Deprecated('The optional unwrap operator should not be used with a non-optional left-hand operand')
+	@BytecodeName('$bang_1')
+	@Intrinsic([ LOAD_0 ])
+	postfix func ! <type T: any>(lhs: T) -> T = lhs
 
 	/**
 	 * The Unsafe Unwrap Operator
 	 *
-	 * See `unsafeUnwrap` for details
-	 */
-	@Intrinsic([], compilerCode: Intrinsic.FORCE_UNWRAP)
-	postfix func !! <T>(lhs: T?) -> T = unsafeUnwrap<T>(lhs)
-
-	/**
 	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
 	 * parameter is never actually null.
 	 */
+	@Intrinsic([], compilerCode: Intrinsic.FORCE_UNWRAP)
+	postfix func !! <type T: any>(lhs: T?) -> T = lhs!!
+
+	@OverloadPriority(-1)
+	@Deprecated('The optional force unwrap operator should not be used with a non-optional left-hand operand')
+	@BytecodeName('$bang$bang_1')
 	@Intrinsic([ LOAD_0 ])
-	static func unsafeUnwrap<T>(optional: T?) -> T = optional!!
+	postfix func !! <type T: any>(lhs: T) -> T = lhs
 
 	/**
-	 * Returns the `null` value, but with the possibly non-null type `T`. This is an unsafe operation that should
-	 * only be used for non-null fields that are guaranteed to be initialized in a constructor, initializer block or,
-	 * for static fields, in a static initializer block.
-	 */
-	@Intrinsic([ ACONST_NULL ])
-	static func unsafeInit<T>() -> T = unsafeInit<T>
-
-	// Nullable Coalescing
-
-	/**
-	 * The Nullable Coalescing Operator
+	 * The Null Coalescing Operator
 	 *
 	 * Returns the left-hand argument if it is not `null` at runtime, and the right-hand argument otherwise.
 	 */
 	@Intrinsic([], compilerCode: Intrinsic.NULL_COALESCING)
-	infix func ?? <T, U> (lhs: T?, rhs: U) -> T|U = lhs ?? rhs
+	infix func ?? <type T: any, type U>(lhs: T?, rhs: U) -> T|U = lhs ?? rhs
 
-	// Hash Code
+	/*
+	@OverloadPriority(-1)
+	@Deprecated('The null coalescing operator should not be used with a non-optional left-hand operand')
+	@BytecodeName('$qmark$qmark_1')
+	@Intrinsic([ LOAD_0 ])
+	infix func ?? <type T: any, type U>(lhs: T, rhs: U) -> T = lhs
+	*/
 
-	postfix func hashCode<T: Object>(optional: T?) -> int = optional?.hashCode ?? 0
+	// --------------- Equality ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ]
+	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	infix func == <type T: any>(lhs: T?, rhs: T?) -> boolean = equals(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	infix func != <type T: any>(lhs: T?, rhs: T?) -> boolean = !equals(lhs, rhs)
+
+	// Equality with null operands
+
+	@OverloadPriority
+	@BytecodeName("$eq$eq_null")
+	@Intrinsic([ LOAD_0, IS_NULL ])
+	infix func ==(lhs: any!, rhs: null) -> boolean = lhs == null
+
+	@OverloadPriority
+	@BytecodeName("null_$eq$eq")
+	@Intrinsic([ LOAD_1, IS_NULL ])
+	infix func ==(lhs: null, rhs: any!) -> boolean = rhs == null
+
+	@OverloadPriority
+	@BytecodeName("$bang$eq_null")
+	@Intrinsic([ LOAD_0, IS_NONNULL ])
+	infix func !=(lhs: any!, rhs: null) -> boolean = lhs != null
+
+	@OverloadPriority
+	@BytecodeName("null_$bang$eq")
+	@Intrinsic([ LOAD_1, IS_NONNULL ])
+	infix func !=(lhs: null, rhs: any!) -> boolean = rhs != null
+
+	// --------------- Hash Code ---------------
+
+	postfix func hashCode<type T: any>(optional: T?) -> int = optional?.hashCode ?? 0
 }

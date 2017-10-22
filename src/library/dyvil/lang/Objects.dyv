@@ -43,41 +43,16 @@ final class Objects
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
 	infix func == <type T: any>(lhs: T, rhs: T?) -> boolean = lhs.equals(rhs)
 
-	@BytecodeName("$eq$eq_0")
-	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ]
-	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	infix func == <type T: any>(lhs: T?, rhs: T?) -> boolean = equals(lhs, rhs)
-
 	// Structural Inequality (!equals)
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
 	infix func != <type T: any>(lhs: T, rhs: T?) -> boolean = !lhs.equals(rhs)
 
-	@BytecodeName("$bang$eq_0")
-	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
-	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	infix func != <type T: any>(lhs: T?, rhs: T?) -> boolean = !equals(lhs, rhs)
-
 	// Reference Equality
 
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
 	infix func ===(lhs: any!, rhs: any!) -> boolean = lhs === rhs
-
-	// Reference Inequality
-
-	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	infix func !==(lhs: any!, rhs: any!) -> boolean = lhs !== rhs
-
-	@OverloadPriority
-	@BytecodeName("$eq$eq_null")
-	@Intrinsic([ LOAD_0, IS_NULL ])
-	infix func ==(lhs: any!, rhs: null) -> boolean = lhs == null
-
-	@OverloadPriority
-	@BytecodeName("null_$eq$eq")
-	@Intrinsic([ LOAD_1, IS_NULL ])
-	infix func ==(lhs: null, rhs: any!) -> boolean = rhs == null
 
 	@OverloadPriority
 	@BytecodeName("$eq$eq$eq_null")
@@ -89,15 +64,10 @@ final class Objects
 	@Intrinsic([ LOAD_1, IS_NULL ])
 	infix func ===(lhs: null, rhs: any!) -> boolean = rhs === null
 
-	@OverloadPriority
-	@BytecodeName("$bang$eq_null")
-	@Intrinsic([ LOAD_0, IS_NONNULL ])
-	infix func !=(lhs: any!, rhs: null) -> boolean = lhs != null
+	// Reference Inequality
 
-	@OverloadPriority
-	@BytecodeName("null_$bang$eq")
-	@Intrinsic([ LOAD_1, IS_NONNULL ])
-	infix func !=(lhs: null, rhs: any!) -> boolean = rhs != null
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
+	infix func !==(lhs: any!, rhs: any!) -> boolean = lhs !== rhs
 
 	@OverloadPriority
 	@BytecodeName("$bang$eq$eq_null")
