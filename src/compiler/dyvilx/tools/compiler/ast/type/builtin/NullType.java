@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.type.builtin;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.compound.NullableType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
@@ -36,6 +37,24 @@ public class NullType implements IBuiltinType
 	public boolean useNonNullAnnotation()
 	{
 		return false;
+	}
+
+	@Override
+	public int subTypeCheckLevel()
+	{
+		return IType.SUBTYPE_NULL;
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return superType.canExtract(NullType.class) || NullableType.isNullable(superType);
 	}
 
 	// Compilation

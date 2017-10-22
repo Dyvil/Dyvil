@@ -145,11 +145,6 @@ public class NullableType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		if (subType.hasTag(IType.NULL))
-		{
-			return true;
-		}
-
 		final NullableType nullable = subType.extract(NullableType.class);
 		if (nullable != null)
 		{
