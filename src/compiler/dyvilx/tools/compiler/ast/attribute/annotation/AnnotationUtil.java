@@ -88,10 +88,6 @@ public final class AnnotationUtil
 			value = parameter.getValue();
 		}
 
-		if (value.valueTag() == IValue.STRING)
-		{
-			return value.stringValue();
-		}
-		return null;
+		return value.stringValue();
 	}
 }

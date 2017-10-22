@@ -187,6 +187,11 @@ public final class Deprecation
 
 	private static String replaceMember(IMember member, String value)
 	{
+		if (value == null)
+		{
+			return null;
+		}
+
 		return value.replace("{member.kind}", Markers.getSemantic("member." + member.getKind().getName()))
 		            .replace("{member.name}", member.getName().toString());
 	}
