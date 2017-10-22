@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.parser.classes;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
@@ -18,6 +19,7 @@ import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -66,32 +68,20 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		switch (this.mode)
 		{
 		case NAME:
-			if (Tokens.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
-				this.theClass = this.consumer.createClass(token.raw(), token.nameValue(), this.classAttributes);
-				this.mode = GENERICS;
-				return;
-			}
-			pm.report(token, "class.identifier");
-			return;
-		case GENERICS_END:
-			this.mode = PARAMETERS;
-			if (TypeParser.isGenericEnd(token, type))
-			{
-				pm.splitJump(token, 1);
+				pm.report(token, "class.identifier");
 				return;
 			}
 
-			pm.reparse();
-			pm.report(token, "generic.close_angle");
-			return;
-		case PARAMETERS_END:
-			this.mode = EXTENDS;
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			final Name name = token.nameValue();
+			if (name.qualified.indexOf('$') >= 0)
 			{
-				pm.reparse();
-				pm.report(token, "class.parameters.close_paren");
+				pm.report(Markers.syntaxError(token, "class.identifier.invalid", name, name.qualified));
 			}
+
+			this.theClass = this.consumer.createClass(token.raw(), name, this.classAttributes);
+			this.mode = GENERICS;
 			return;
 		case GENERICS:
 			if (type == BaseSymbols.SEMICOLON && token.isInferred() && TypeParser.isGenericStart(token.next()))
@@ -194,6 +184,25 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 
 			this.mode = BODY_END;
 			pm.report(token, "class.body.separator");
+			return;
+		case GENERICS_END:
+			this.mode = PARAMETERS;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "generic.close_angle");
+			return;
+		case PARAMETERS_END:
+			this.mode = EXTENDS;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "class.parameters.close_paren");
+			}
 			return;
 		case BODY_END:
 			pm.popParser();
