@@ -7,7 +7,7 @@ import dyvil.util.AutoPrinter
 import java.io.PrintStream
 
 import const java.lang.System.out
-import func dyvil.array.ObjectArray.deepToString
+import func dyvil.array.ObjectArray.arrayToString
 
 abstract class Output
 {
@@ -50,7 +50,7 @@ abstract class Output
 
 	}
 
-	static inline func print(array: [Object!]) -> void = out.println(array.deepToString)
+	static inline func print(array: [Object!]) -> void = out.println(array.toString)
 
 	// print(All) functions
 
@@ -80,11 +80,11 @@ abstract class Output
 	{
 		if !values.isEmpty
 		{
-			out.print(values[0].deepToString)
+			out.print(values[0].arrayToString)
 			for i <- 1 ..< values.size
 			{
 				out.print(separator)
-				out.print(values[i].deepToString)
+				out.print(values[i].arrayToString)
 			}
 		}
 

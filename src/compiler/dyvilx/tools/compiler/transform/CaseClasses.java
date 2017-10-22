@@ -321,10 +321,6 @@ public abstract class CaseClasses
 			default:
 				return;
 			}
-		case IType.ARRAY:
-			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepHashCode",
-			                       "([Ljava/lang/Object;)I", true);
-			return;
 		default:
 			writer
 				.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "hashCode", "([Ljava/lang/Object;)I",
@@ -516,7 +512,7 @@ public abstract class CaseClasses
 				                 true);
 			return;
 		}
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "toString",
 		                       "([Ljava/lang/Object;)Ljava/lang/String;", true);
 	}
 
@@ -557,7 +553,7 @@ public abstract class CaseClasses
 			                       "([DLjava/lang/StringBuilder;)V", true);
 			return;
 		}
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "toString",
 		                       "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
 	}
 }

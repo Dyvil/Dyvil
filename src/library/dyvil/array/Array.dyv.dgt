@@ -163,9 +163,16 @@ public abstract class #(TYPE_NAME)Array
 	@Intrinsic([], compilerCode: Intrinsic.ARRAY_SPREAD)
 	postfix func `...` GENERIC(array: [T]) -> [T] = array
 
-	infix inline func == GENERIC(lhs: [T], rhs: [T]) -> boolean = Arrays.equals(lhs, rhs)
+	#if (IS_GENERIC) {
+		infix inline func == GENERIC(lhs: [T]!, rhs: [T]!) -> boolean = Arrays.deepEquals(lhs, rhs)
 
-	infix inline func != GENERIC(lhs: [T], rhs: [T]) -> boolean = !Arrays.equals(lhs, rhs)
+		infix inline func != GENERIC(lhs: [T]!, rhs: [T]!) -> boolean = !Arrays.deepEquals(lhs, rhs)
+	}
+	#else {
+		infix inline func ==(lhs: [T]!, rhs: [T]!) -> boolean = Arrays.equals(lhs, rhs)
+
+		infix inline func !=(lhs: [T]!, rhs: [T]!) -> boolean = !Arrays.equals(lhs, rhs)
+	}
 
 	infix func added GENERIC(array: [T], value: T) -> [T]
 	{
@@ -370,123 +377,90 @@ public abstract class #(TYPE_NAME)Array
 	// equals, hashCode and toString
 
 	#if (IS_GENERIC) {
-		infix inline func equals(array: [ERASURE]!, other: [ERASURE]!) -> boolean = Arrays.equals(array, other)
+		inline infix func equals(array: [ERASURE]!, other: [ERASURE]!) -> boolean = Arrays.deepEquals(array, other)
 
-		postfix inline func hashCode(array: [ERASURE]!) -> int = Arrays.hashCode(array)
+		inline postfix func hashCode(array: [ERASURE]!) -> int = Arrays.deepHashCode(array)
 
-		infix inline func deepEquals(array: [ERASURE]!, other: [ERASURE]!) -> boolean = Arrays.deepEquals(array, other)
+		infix func arrayEquals(lhs: any!, rhs: any!) -> boolean = [lhs].equals([rhs])
 
-		postfix inline func deepHashCode(array: [ERASURE]!) -> int = Arrays.deepHashCode(array)
+		postfix func arrayHashCode(obj: any!) -> int = [obj].hashCode
 	}
 	#else {
-		infix inline func equals(array: [T]!, other: [T]!) -> boolean = Arrays.equals(array, other)
+		inline infix func equals(array: [T]!, other: [T]!) -> boolean = Arrays.equals(array, other)
 
-		infix inline func hashCode(array: [T]!) -> int = Arrays.hashCode(array)
-	}
-	#if (IS_OBJECT) {
-		infix func deepEquals(lhs: any!, rhs: any!) -> boolean = [lhs].deepEquals([rhs])
-
-		postfix func deepHashCode(obj: any!) -> int = [obj].deepHashCode
+		inline infix func hashCode(array: [T]!) -> int = Arrays.hashCode(array)
 	}
 
 	// toString
 
 	infix func toString(array: [ERASURE]!) -> String
 	{
-		if (array == null) return 'null'
+		if let array = array
+		{
+			let size = array.size
+			if (size == 0) return '[]'
 
-		let size = array!!.size
-		if (size == 0) return '[]'
-
-		let builder = new StringBuilder()
-		append(array!!, size, builder)
-		return builder.toString!!
+			let builder = new StringBuilder
+			append(array, size, builder)
+			return builder.toString!!
+		}
+		else return 'null'
 	}
 
 	infix func toString(array: [ERASURE]!, builder: StringBuilder) -> void
 	{
-		if (array == null)
+		if let array = array
 		{
-			builder.append('null')
-			return
-		}
-
-		let size = array!!.size
-		if (size == 0)
-		{
-			builder.append('[]')
-			return
-		}
-
-		append(array!!, size, builder)
-	}
-
-	private static func append(array: [ERASURE], size: int, builder: StringBuilder) -> void
-	{
-		builder.append('[').append(array[0])
-		for (i <- 1 ..< size) builder.append(', ').append(array[i])
-		builder.append(']')
-	}
-
-	#if (IS_GENERIC) {
-		postfix func deepToString(array: [ERASURE]!) -> String
-		{
-			if (array == null) return 'null'
-
-			let size = array!!.size
-			if (size == 0) return '[]'
-
-			let builder = new StringBuilder()
-			deepAppend(array!!, size, builder)
-			return builder.toString!!
-		}
-
-		infix func deepToString(array: [ERASURE]!, builder: StringBuilder) -> void
-		{
-			if (array == null)
-			{
-				builder.append('null')
-				return
-			}
-
-			let size = array!!.size
-			if (size <= 0)
+			let size = array.size
+			if (size == 0)
 			{
 				builder.append('[]')
 				return
 			}
 
-			deepAppend(array!!, size, builder)
+			append(array, size, builder)
 		}
-
-		private static func deepAppend(array: [ERASURE], size: int, builder: StringBuilder) -> void
+		else
 		{
+			builder.append('null')
+		}
+	}
+
+	private static func append(array: [ERASURE], size: int, builder: StringBuilder) -> void
+	{
+		#if (IS_GENERIC) {
 			builder.append('[')
-			array[0].deepToString(builder)
+			array[0].arrayToString(builder)
 			for (i <- 1 ..< size)
 			{
 				builder.append(', ')
-				array[i].deepToString(builder)
+				array[i].arrayToString(builder)
 			}
 			builder.append(']')
 		}
+		#else {
+			builder.append('[').append(array[0])
+			for (i <- 1 ..< size) builder.append(', ').append(array[i])
+			builder.append(']')
+		}
+	}
 
-		postfix func deepToString(obj: ERASURE) -> String
+	#if (IS_GENERIC) {
+		postfix func arrayToString(obj: ERASURE) -> String
 		{
 			if (obj == null) return 'null'
 
 			let objectClass = obj!!.dynamicClass
 			if (!objectClass.isArray) return obj!!.toString
 
-			#for (spec <- PRIMITIVE_SPECS) {
-				#import(spec)
+			#for (spec <- PRIMITIVE_SPECS) {#import(spec)
 				if (objectClass === class [PRIMITIVE]) return (obj as [PRIMITIVE]).toString
 			}
 
-			return (obj as [ERASURE]).deepToString
+			return (obj as [ERASURE]).toString
 		}
 
-		infix func deepToString(obj: ERASURE, builder: StringBuilder) -> void
+		infix func arrayToString(obj: ERASURE, builder: StringBuilder) -> void
 		{
 			if (obj == null)
 			{
@@ -506,7 +480,7 @@ public abstract class #(TYPE_NAME)Array
 				if (objectClass === class [PRIMITIVE]) { (obj as [PRIMITIVE]).toString(builder); return }
 			}
 
-			(obj as [ERASURE]).deepToString(builder)
+			(obj as [ERASURE]).toString(builder)
 		}
 	}
 }
