@@ -1,3 +1,129 @@
+Dyvil v0.36.0
+=============
+
+- Added support for Default Constructor Attributes. #365
+- Added support for `override` class parameters. #366
+- Keywords that are not modifiers can now be used as Parameter Labels. #361
+- Slightly altered Semicolon Inference behaviour.
+
+## Dyvil Library v0.36.0
+
+- Added Type Parameters to the Equality Operators in the `Objects` class.
+- Added a deprecated overload for optional operators with non-optional operands. #372
+- Added a field for the initial seed to the `JavaRandom` class.
+- Added the `/%` (divmod) operator for ints and longs.
+- Added the `ACC_VARARGS` flag to the `Modifiers.CONSTRUCTOR_MODIFIERS` bitmask.
+- Added the `Function.Of1. **` operator.
+- Added the `Modifiers.INTRINSIC` field.
+- Added the `SourcePosition.isNeighboring` and `Positioned.expandPosition` methods.
+- Added the `dyvil.annotation.AutoMangled` annotation. #368
+- Added the `dyvil.lang.Representable` class.
+- Added the `dyvil.math.Polynomial` class to model polynomials of doubles.
+- Added the `dyvil.math.Rational` class.
+- Added the `dyvil.util.Timing` and `.Blackhole` classes.
+- All internal type annotations are now runtime-reifiable.
+- Cleaned up the `Tokens` and `BaseSymbols` classes.
+- Converted the `Name` class to Dyvil.
+- Converted the `dyvil.random.MinRandom` and `.MaxRandom` classes to Dyvil.
+- Converted the `dyvil.util.Qualifier` class to Dyvil.
+- Converted the remaining Annotation Classes from the `dyvil.annotation.internal` package to Dyvil.
+- Fixed an implementation bug in the `dyvil.random.Random.nextLong()` method.
+- Fixed the `Array.copy(int)` method implementations causing AIOOB errors.
+- Fixed unnecessary force-unwrapping in the `dyvilx.event.CovariantEventBus` class.
+- Improved Marker Level formatting.
+- Improved the `dyvil.math.MathUtils.sum`, `.product` and `.!` (factorial) methods.
+- Improved the `dyvil.util.Qualifier` implementation and API.
+- Made the `ObjectArray.toString`, `.hashCode` and `.equals` methods 'deep' by default.
+- Markers are now sorted by position, then by level and then by message.
+- Removed extra semicolons from the `JavaRandom` and `InvariantEventBus` classes.
+- Removed the `AgentUtil` class.
+- Removed the `String.apply(reflecting:)` method from the `dyvil.lang.Strings` class.
+- Removed the `dyvil.lang.Misc` class.
+- Removed the `dyvil.random.JavaRandoms` class.
+- Renamed the `Name.startWith` method to `startsWith`.
+- Replaced the `Marker.getMarkerType(): String` method with `getLevel(): MarkerLevel`.
+- Split the `LexerUtil` class into `StringLiterals` and `CharacterTypes`.
+- Updated Array classes to use the correct apply methods.
+- Updated the `Lang` header and removed the `Tuple` alias for `Tuple.Of1`.
+- Updated the `Map` and `ObjectRange` classes.
+- Updated the `Modifiers` class to allow `override` on class parameters.
+- Updated the `Primitives` class to provide `apply` methods for primitive wrapper classes.
+- Updated the `dyvil.lang.Primitives` template to match Dyvil code style.
+
+## Dyvil Compiler v0.36.0
+
+- Added an error diagnostic for class names where the qualified name contains '$'.
+- Added error diagnostics when accessing a field or method with an unresolved type.
+- Added support for Default Constructor Attributes. #365
+- Added support for `override` class parameters. #366
+- Added support for the `AutoMangled` annotation. #368
+- Added the `AbstractMemberParser.parseAttribute(...)` method.
+- Added the `BracketMatcher` class.
+- Added the `ThisExpr(IClass)` constructor.
+- Ambiguous calls involving implicit conversion on the receiver will now be reported properly.
+- Annotations and Modifiers are now both stored in the `AttributeList` class.
+- Apply Assignments now use the name `apply_=` instead of `update` (affects resolution for this sugar).
+- Case Classes now fully support Override Class Parameters. #366
+- Dropped support for Automatic Method Name Mangling. #368
+- Fixed Integer Overflow resulting from TABLESWITCH calculations.
+- Fixed Optional Unwrap Operators working incorrectly with Optionals of Primitives.
+- Fixed Parameter Order in a `ThisExpr` constructor.
+- Fixed String Pattern Matching working incorrectly with Single-Quoted Strings.
+- Fixed a few compiler errors caused by Unapply Patterns with unresolved types.
+- Fixed an error that allowed `null` values to be assigned to non-nullable types.
+- Fixed an issue that caused Overload Resolution to depend on Import Order.
+- Fixed an issue that caused the constructor call parser to pick up field properties as anonymous classes.
+- Fixed an issue that caused virtual calls to be generated which access invisible classes. #370
+- Fixed an issue where `InternalType`s pointing to classes available as source would fail resolution.
+- Fixed an issue where properties and field properties would not be considered for method duplicate checking.
+- Fixed compiler error caused by `Deprecated` annotations using single-quoted string literals.
+- Fixed compiler error for annotated types where the annotation type is unresolved.
+- Fixed many issues related to (Type) Annotations and Modifiers.
+- Implementations of the `Parser.reportErrors()` method now consider the parent parser.
+- Improved Ambiguous Method Call error diagnostic information.
+- Improved Marker Level property reading.
+- Improved Override Behaviour for Methods with Custom Bytecode Names. #369
+- Improved Semicolon Inference Rules.
+- Improved String Pattern Matching with nullable values.
+- Improved Tuple Type Formatting for `Tuple.Of1`.
+- Improved diagnostic error message for unresolved methods.
+- Lifted a limitation on Wildcard Imports that would only allow them to be used on packages with an `import` declaration.
+- Merged the `DyvilUnitParser` and `DyvilHeaderParser` classes into the `SourceFileParser` class and cleaned up the implementation.
+- Moved and renamed the `AnnotationList` class to `d.t.c.ast.attribute.AttributeList`.
+- Moved and renamed the `IAnnotated` interface to `d.t.c.ast.attribute.Attributable`.
+- Moved old but remaining annotation / modifier classes to the `d.t.c.ast.attribute` package.
+- Moved the `DyvilKeywords`, `DyvilSymbols` and `SemicolonInference` classes to the `parser` package.
+- Non-static Access to static Methods or Fields now produces an error diagnostic. #371
+- Overhauled the Annotation / Modifier System.
+- Primitive Boxing and Unboxing is now done using the default methods from the wrapper classes.
+- Refactored method override parameter label checking.
+- Removed some methods from the `Util` class.
+- Removed the `ClassParameterSetter` class.
+- Removed the `ParserUtil` class by moving methods to other classes.
+- Renamed the `ApplyMethodCall` class to `ApplyAccess` and the `UpdateMethodCall` class to `ApplyAssignment`.
+- The Header / Source File Parser now requires declarations to be separated by semicolons.
+- The `OperatorParser` and `PackageParser` classes no longer consume the trailing semicolon.
+- Updated many APIs related to annotations / modifiers.
+- Updated the `CaseClasses` class to use correct `ObjectArray` methods.
+- Updated the `ClassMetadata` class.
+
+## Dyvil REPL v0.22.0
+
+- Fix Header Declaration Parsing bug #367.
+- Updated REPL classes to adapt to compiler API changes.
+- Updated the `CompleteCommand` class to adapt to library API changes.
+- Updated the `REPLVariable` class to adapt to library API changes.
+
+## Dyvil Property Format v0.15.0
+
+- Fixed Compilation Errors in the `StringInterpolation` and `StringValue` classes.
+- Updated the `RootNode` and `d.t.d.a.value.Value` classes to adapt to `Name` API changes.
+- Updated the `d.t.dpf.converter.string.Parser` class to match Dyvil code style.
+
+## Dyvil GenSrc v0.8.0
+
+- Updated the `StringValue` and `GenSrcLexer` classes to adapt to library API changes.
+
 Dyvil v0.35.0
 =============
 
