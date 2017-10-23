@@ -95,7 +95,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func contains(key: any!, value: any!) -> boolean
 	{
-		for (e <- this) if (e.getKey() == key && e.getValue() == value) return true
+		for (e <- this) if (key == e.getKey() && value == e.getValue()) return true
 		return false
 	}
 

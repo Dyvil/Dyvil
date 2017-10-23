@@ -1,10 +1,12 @@
 package dyvilx.tools.compiler.ast.generic;
 
 import dyvil.annotation.Reified;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ClassOperator;
@@ -18,17 +20,15 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
 	protected SourcePosition position;
-	protected CodeParameter reifyParameter;
+	protected CodeParameter  reifyParameter;
 
 	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
@@ -36,10 +36,11 @@ public class CodeTypeParameter extends TypeParameter
 		this.position = position;
 	}
 
-	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance, AnnotationList annotations)
+	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance,
+		                        AttributeList annotations)
 	{
 		super(generic, name, variance);
-		this.annotations = annotations;
+		this.attributes = annotations;
 		this.position = position;
 	}
 
@@ -64,10 +65,7 @@ public class CodeTypeParameter extends TypeParameter
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-		}
+		this.attributes.resolveTypes(markers, context, this);
 
 		if (this.lowerBound != null)
 		{
@@ -113,20 +111,15 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.upperBound.resolve(markers, context);
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-			this.computeReifiedKind();
-		}
+
+		this.attributes.resolve(markers, context);
+		this.computeReifiedKind();
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
+		this.attributes.checkTypes(markers, context);
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
@@ -153,18 +146,17 @@ public class CodeTypeParameter extends TypeParameter
 
 		if (this.getReifiedKind() != null)
 		{
-			this.reifyParameter = new CodeParameter(Name.apply("reify_" + this.name.qualified), type);
-			this.reifyParameter.getModifiers().addIntModifier(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
+			final AttributeList attributes = AttributeList
+				                                 .of(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
+			final Name name = Name.apply("reify_" + this.name.qualified);
+			this.reifyParameter = new CodeParameter(null, this.position, name, type, attributes);
 		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, ElementType.TYPE_PARAMETER);
-		}
+		this.attributes.check(markers, context, ElementType.TYPE_PARAMETER);
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.check(markers, context);
@@ -178,10 +170,7 @@ public class CodeTypeParameter extends TypeParameter
 	@Override
 	public void foldConstants()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
+		this.attributes.foldConstants();
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.foldConstants();
@@ -195,10 +184,7 @@ public class CodeTypeParameter extends TypeParameter
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.cleanup(compilableList, classCompilableList);
-		}
+		this.attributes.cleanup(compilableList, classCompilableList);
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.cleanup(compilableList, classCompilableList);
@@ -210,7 +196,7 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
 	}
 

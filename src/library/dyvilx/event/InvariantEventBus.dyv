@@ -22,7 +22,7 @@ public class InvariantEventBus implements EventBus
 			// If the method is non-static, the event handler object must not be null
 			if ((method.getModifiers & STATIC) == 0 && handler == null)
 			{
-				continue;
+				continue
 			}
 
 			let parameterType = method.getParameterTypes()[0]

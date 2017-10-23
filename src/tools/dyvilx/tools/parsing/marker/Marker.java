@@ -5,8 +5,9 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.io.AppendablePrintStream;
 import dyvil.io.Console;
-import dyvil.source.position.SourcePosition;
 import dyvil.source.Source;
+import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
 
 public abstract class Marker implements Comparable<Marker>
 {
@@ -52,7 +53,7 @@ public abstract class Marker implements Comparable<Marker>
 		this.addInfo(builder.toString());
 	}
 
-	public abstract String getMarkerType();
+	public abstract MarkerLevel getLevel();
 
 	public abstract String getColor();
 
@@ -63,39 +64,52 @@ public abstract class Marker implements Comparable<Marker>
 	@Override
 	public int compareTo(@NonNull Marker o)
 	{
-		return this.position.compareTo(o.position);
+		final int byPos = this.position.compareTo(o.position);
+		if (byPos != 0)
+		{
+			return byPos;
+		}
+		final int byLevel = -this.getLevel().compareTo(o.getLevel());
+		if (byLevel != 0)
+		{
+			return byLevel;
+		}
+		return this.message.compareTo(o.message);
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
+		return this == obj || obj instanceof Marker && this.equals((Marker) obj);
+	}
+
+	public boolean equals(Marker that)
+	{
+		if (this == that)
 		{
 			return true;
 		}
-		if (!(obj instanceof Marker))
+		if (!this.position.equals(that.position))
 		{
 			return false;
 		}
-
-		final Marker marker = (Marker) obj;
-
-		if (!this.position.equals(marker.position))
+		if (this.getLevel() != that.getLevel())
 		{
 			return false;
 		}
-		if (this.message != null ? !this.message.equals(marker.message) : marker.message != null)
+		if (!this.message.equals(that.message))
 		{
 			return false;
 		}
 		//
-		return this.info != null ? this.info.equals(marker.info) : marker.info == null;
+		return this.info != null ? this.info.equals(that.info) : that.info == null;
 	}
 
 	@Override
 	public int hashCode()
 	{
 		int result = this.position.hashCode();
+		result = 31 * result + (this.getLevel().hashCode());
 		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
 		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
 		return result;
@@ -103,7 +117,7 @@ public abstract class Marker implements Comparable<Marker>
 
 	public void log(Source source, String indent, StringBuilder buffer, boolean colors)
 	{
-		final String type = this.getMarkerType();
+		final String type = BaseMarkers.INSTANCE.getString("marker_level." + this.getLevel().name().toLowerCase());
 
 		final SourcePosition position = this.position;
 		final int endLine = position.endLine();

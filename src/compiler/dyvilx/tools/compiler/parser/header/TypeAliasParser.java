@@ -3,14 +3,14 @@ package dyvilx.tools.compiler.parser.header;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.type.TypeParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 public class TypeAliasParser extends Parser
@@ -57,7 +57,7 @@ public class TypeAliasParser extends Parser
 			}
 			return;
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				Name name = token.nameValue();
 				this.typeAlias = new TypeAlias(name, token.raw());
@@ -103,6 +103,6 @@ public class TypeAliasParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > NAME;
+		return this.mode > NAME && super.reportErrors();
 	}
 }

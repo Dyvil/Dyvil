@@ -3,9 +3,8 @@ package dyvilx.tools.compiler.parser.statement;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.statement.SyncStatement;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -64,7 +63,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			// pm.report(token, "sync.separator");
 			return;
 		case ACTION:
-			if (ParserUtil.isTerminator(type) && !token.isInferred())
+			if (BaseSymbols.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;

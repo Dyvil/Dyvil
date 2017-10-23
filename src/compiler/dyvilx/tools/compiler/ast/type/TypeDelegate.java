@@ -1,10 +1,11 @@
 package dyvilx.tools.compiler.ast.type;
 
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -19,7 +20,6 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -176,7 +176,8 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                            IContext context)
 	{
 		return this.type.convertValueTo(value, targetType, typeContext, markers, context);
 	}
@@ -273,7 +274,7 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return this.type.getAnnotation(type);
 	}
@@ -435,7 +436,7 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		this.type = IType.withAnnotation(this.type, annotation, typePath, step, steps);
 	}

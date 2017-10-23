@@ -18,11 +18,29 @@ abstract class Function
 	{
 		func apply(_ par1: P1) -> R
 
-		infix func andThen<A, B, C>(_ f: A -> B, _ g: B -> C) -> (A -> C) = x => g(f(x))
+		infix func compose<A, B, C>(_ f: B -> C, _ g: A -> B) -> (A -> C) = x => f(g(x))
 
-		infix func compose<A, B, C>(_ g: B -> C, _ f: A -> B) -> (A -> C) = f.andThen g
+		infix inline func andThen<A, B, C>(_ f: A -> B, _ g: B -> C) -> (A -> C) = g.compose(f)
 
-		infix func * <A, B, C>(_ lhs: B -> C, _ rhs: A -> B) -> (A -> C) = rhs.andThen lhs
+		// composition operator
+		infix inline func * <A, B, C>(_ lhs: B -> C, _ rhs: A -> B) -> (A -> C) = lhs.compose(rhs)
+
+		// repeated application / pow operator
+		infix func ** <A>(_ lhs: A -> A, _ n: int) -> (A -> A) = a => {
+			var result = a
+			for (i <- 0 ..< n) result = lhs(result)
+			return result
+		}
+
+		/* alternative ** (pow) implementation that creates a recursive lambda:
+		// f ** n = f(f(...f(n)...))
+		//          ^---_--^
+		//              n function calls
+		infix func ** <A>(_ lhs: A -> A, _ n: int) -> (A -> A) = n match {
+			case 0 => identity<A>()            // f^0 = id
+			case var n => lhs * (lhs ** (n-1)) // f^n = f * (f ** (n-1))
+		}
+		*/
 
 		static func identity<T> -> (T -> T) = x => x
 	}

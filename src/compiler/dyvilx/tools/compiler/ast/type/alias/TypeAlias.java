@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.type.alias;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -23,7 +24,6 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -181,10 +181,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-		}
+		this.attributes.resolveTypes(markers, context, this);
 
 		context = context.push(this);
 
@@ -208,10 +205,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-		}
+		this.attributes.resolve(markers, context);
 
 		context = context.push(this);
 
@@ -228,10 +222,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
+		this.attributes.checkTypes(markers, context);
 
 		context = context.push(this);
 
@@ -248,10 +239,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, ElementType.TYPE);
-		}
+		this.attributes.check(markers, context, ElementType.TYPE);
 
 		context = context.push(this);
 

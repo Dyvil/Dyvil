@@ -4,8 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -13,7 +12,6 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.Member;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.reference.ReferenceType;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -75,9 +73,9 @@ public class Variable extends Member implements IVariable
 		this.type = type;
 	}
 
-	public Variable(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Variable(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 	}
 
 	@Override
@@ -117,19 +115,14 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
-	{
-		return true;
-	}
-
-	@Override
 	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
+		                         IValue newValue)
 	{
 		this.assigned = true;
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);

@@ -1,9 +1,11 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Type;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -19,9 +21,7 @@ import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class ClassOperator implements IValue
 {
@@ -43,7 +43,7 @@ public final class ClassOperator implements IValue
 
 	// Metadata
 	private SourcePosition position;
-	private IType         genericType;
+	private IType          genericType;
 
 	public ClassOperator(SourcePosition position)
 	{
@@ -114,7 +114,7 @@ public final class ClassOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyFields.CLASS_CONVERTIBLE);
+		final Annotation annotation = type.getAnnotation(LazyFields.CLASS_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

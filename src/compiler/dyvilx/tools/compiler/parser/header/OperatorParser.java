@@ -3,8 +3,8 @@ package dyvilx.tools.compiler.parser.header;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.expression.operator.IOperatorMap;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
@@ -107,6 +107,9 @@ public final class OperatorParser extends Parser
 			switch (type)
 			{
 			case BaseSymbols.SEMICOLON:
+				pm.popParser(true);
+				this.map.addOperator(this.operator);
+				return;
 			case Tokens.EOF:
 				pm.popParser();
 				this.map.addOperator(this.operator);
@@ -270,6 +273,6 @@ public final class OperatorParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > OPERATOR;
+		return this.mode > OPERATOR && super.reportErrors();
 	}
 }

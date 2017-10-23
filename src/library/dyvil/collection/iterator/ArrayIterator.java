@@ -67,7 +67,7 @@ public class ArrayIterator<E> implements Iterator<E>
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder("ArrayIterator(array: ");
-		ObjectArray.deepToString(this.array);
+		ObjectArray.toString(this.array, builder);
 		return builder.append(", index: ").append(this.index).append(", end: ").append(this.size).append(')')
 		              .toString();
 	}

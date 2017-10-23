@@ -1,26 +1,25 @@
 package dyvilx.tools.compiler.parser.type;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.CodeTypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.classes.AbstractMemberParser;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
-import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class TypeParameterParser extends Parser implements ITypeConsumer
+public final class TypeParameterParser extends AbstractMemberParser implements ITypeConsumer
 {
 	public static final int ANNOTATIONS = 0;
 	public static final int VARIANCE    = 1;
@@ -36,7 +35,6 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private int flags;
 	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
-	private AnnotationList annotationList;
 
 	public TypeParameterParser(ITypeParametric typeParameterized)
 	{
@@ -54,8 +52,8 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			switch (type)
 			{
 			case DyvilSymbols.AT:
-				final IAnnotation annotation = new Annotation();
-				this.addAnnotation(annotation);
+				final Annotation annotation = new CodeAnnotation(token.raw());
+				this.attributes.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			case DyvilKeywords.TYPE:
@@ -78,14 +76,14 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			// Fallthrough
 		case VARIANCE:
 		{
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "type_parameter.identifier");
 				return;
 			}
 
 			final Name name = token.nameValue();
-			if (ParserUtil.isIdentifier(token.next().type()))
+			if (Tokens.isIdentifier(token.next().type()))
 			{
 				if (name == Names.plus)
 				{
@@ -105,7 +103,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			return;
 		}
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				this.createTypeParameter(token, this.variance);
 				return;
@@ -128,7 +126,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
+			if (BaseSymbols.isTerminator(type) || TypeParser.isGenericEnd(token, type))
 			{
 				if (this.typeParameter != null)
 				{
@@ -166,17 +164,8 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 	private void createTypeParameter(IToken token, Variance variance)
 	{
 		this.typeParameter = new CodeTypeParameter(token.raw(), this.typeParameterized, token.nameValue(), variance,
-		                                           this.annotationList);
+		                                           this.attributes);
 		this.mode = TYPE_BOUNDS;
-	}
-
-	private void addAnnotation(IAnnotation annotion)
-	{
-		if (this.annotationList == null)
-		{
-			this.annotationList = new AnnotationList();
-		}
-		this.annotationList.add(annotion);
 	}
 
 	@Override

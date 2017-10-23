@@ -1,10 +1,11 @@
 package dyvilx.tools.compiler.ast.generic;
 
 import dyvil.annotation.Reified;
+import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotated;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.Attributable;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -22,14 +23,13 @@ import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.phase.IResolvable;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends ASTNode, IResolvable, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends ASTNode, IResolvable, INamed, Attributable, IObjectCompilable
 {
 	ITypeParametric getGeneric();
-	
+
 	int getIndex();
 
 	void setIndex(int index);
@@ -59,7 +59,7 @@ public interface ITypeParameter extends ASTNode, IResolvable, INamed, IAnnotated
 
 	void setUpperBound(IType bound);
 
-	void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath);
+	void addBoundAnnotation(Annotation annotation, int index, TypePath typePath);
 
 	// Lower Bounds
 

@@ -1,7 +1,10 @@
 package dyvilx.tools.compiler.ast.parameter;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -10,24 +13,19 @@ import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ClassParameter extends Field implements IParameter
 {
 	// Metadata
-	protected int     index;
-	protected int     localIndex;
-	protected IType   covariantType;
+	protected int   index;
+	protected int   localIndex;
+	protected IType covariantType;
 
 	protected ICallableMember constructor;
 
@@ -46,10 +44,10 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                     AnnotationList annotations)
+	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type,
+		                     AttributeList attributes)
 	{
-		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
+		super(enclosingClass, position, name, type, attributes);
 	}
 
 	@Override
@@ -125,7 +123,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void setVarargs()
 	{
-		this.modifiers.addIntModifier(Modifiers.VARARGS);
+		this.attributes.addFlag(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -173,7 +171,7 @@ public class ClassParameter extends Field implements IParameter
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
-			return new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
+			return new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
 		}
 
 		ModifierUtil.checkVisibility(this, position, markers, context);
@@ -197,7 +195,14 @@ public class ClassParameter extends Field implements IParameter
 	{
 		if (this.property != null)
 		{
-			this.property.getModifiers().addIntModifier(Modifiers.PUBLIC);
+			if (this.isOverride())
+			{
+				markers.add(Markers.semanticError(this.position, "classparameter.override.property", this.name));
+			}
+			else
+			{
+				this.property.getAttributes().addFlag(Modifiers.PUBLIC);
+			}
 		}
 
 		super.resolveTypes(markers, context);
@@ -208,9 +213,23 @@ public class ClassParameter extends Field implements IParameter
 	{
 		super.resolve(markers, context);
 
-		if (this.value !=null)
+		if (this.value != null)
 		{
-			this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+			this.attributes.addFlag(Modifiers.DEFAULT);
+		}
+
+		if (this.isOverride())
+		{
+			IDataMember superField = this.enclosingClass.getSuperType().resolveField(this.name);
+			if (superField == null)
+			{
+				markers.add(Markers.semanticError(this.position, "classparameter.override.not_found", this.name));
+			}
+			else if (superField.hasModifier(Modifiers.STATIC))
+			{
+				markers.add(Markers.semanticError(this.position, "classparameter.override.static", this.name,
+				                                  superField.getEnclosingClass().getFullName()));
+			}
 		}
 	}
 
@@ -223,7 +242,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.enclosingClass.isAnnotation())
+		if (this.enclosingClass.isAnnotation() || this.hasModifier(Modifiers.OVERRIDE))
 		{
 			return;
 		}

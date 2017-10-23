@@ -1,25 +1,25 @@
 package dyvilx.tools.compiler.ast.header;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.FileSource;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.lang.I18n;
-import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.SemicolonInference;
+import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
-import dyvilx.tools.compiler.transform.SemicolonInference;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.FileSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,7 +105,8 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void parse()
 	{
-		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers).parse(new DyvilHeaderParser(this));
+		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers)
+			.parse(new SourceFileParser(this).withFlags(SourceFileParser.NO_CLASSES));
 	}
 
 	@Override
@@ -134,7 +135,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		if (this.headerDeclaration == null)
 		{
 			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
-			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
+			                                               AttributeList.of(Modifiers.PUBLIC));
 		}
 
 		this.resolveImports();

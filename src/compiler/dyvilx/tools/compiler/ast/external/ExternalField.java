@@ -1,16 +1,15 @@
 package dyvilx.tools.compiler.ast.external;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.Field;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
@@ -21,9 +20,9 @@ public final class ExternalField extends Field
 	private int resolved = CONSTANT_VALUE;
 	private Object constantValue;
 
-	public ExternalField(IClass iclass, Name name, String desc, IType type, ModifierSet modifierSet)
+	public ExternalField(IClass iclass, Name name, String desc, IType type, AttributeList attributes)
 	{
-		super(iclass, name, type, modifierSet);
+		super(iclass, name, type, attributes);
 		this.descriptor = desc;
 	}
 
@@ -45,10 +44,7 @@ public final class ExternalField extends Field
 
 	private void resolveAnnotations()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
 	}
 
 	private void resolveReturnType()
@@ -84,10 +80,10 @@ public final class ExternalField extends Field
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override

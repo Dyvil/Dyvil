@@ -6,8 +6,13 @@ import static dyvil.reflect.Opcodes.*;
 import static dyvilx.tools.compiler.backend.ClassFormat.DOUBLE;
 import static dyvilx.tools.compiler.backend.ClassFormat.LONG;
 
-public interface BackendUtil
+public abstract class BackendUtil
 {
+	private BackendUtil()
+	{
+		// no instances
+	}
+
 	static boolean twoWord(Object type)
 	{
 		return type == LONG || type == DOUBLE;

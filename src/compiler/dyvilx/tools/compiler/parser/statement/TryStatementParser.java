@@ -1,25 +1,23 @@
 package dyvilx.tools.compiler.parser.statement;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.statement.exception.CatchBlock;
 import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
@@ -65,7 +63,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 				this.mode = END;
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				int nextType = token.next().type();
 				if (nextType == Tokens.EOF)
@@ -140,8 +138,8 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 	}
 
 	@Override
-	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Variable(position, name, type, modifiers, annotations);
+		return new Variable(position, name, type, attributes);
 	}
 }

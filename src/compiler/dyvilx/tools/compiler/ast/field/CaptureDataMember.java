@@ -1,25 +1,24 @@
 package dyvilx.tools.compiler.ast.field;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public abstract class CaptureDataMember implements IDataMember
 {
-	protected IVariable     variable;
+	protected IVariable      variable;
 	protected SourcePosition accessPosition;
 
 	protected int localIndex;
@@ -93,35 +92,18 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public ModifierSet getModifiers()
+	public AttributeList getAttributes()
 	{
-		return this.variable.getModifiers();
+		return this.variable.getAttributes();
 	}
 
 	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-	}
-
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return this.variable.hasModifier(mod);
-	}
-
-	@Override
-	public AnnotationList getAnnotations()
-	{
-		return this.variable.getAnnotations();
-	}
-
-	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public Annotation getAnnotation(IClass type)
 	{
 		return this.variable.getAnnotation(type);
 	}
@@ -149,7 +131,8 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
+		                         IValue newValue)
 	{
 		this.variable.setReferenceType();
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);
@@ -171,8 +154,8 @@ public abstract class CaptureDataMember implements IDataMember
 		// Check if the variable is neither final nor effectively final
 		if (this.variable.isAssigned() && !this.variable.hasModifier(Modifiers.FINAL))
 		{
-				// Reference Capture is required
-				this.variable.setReferenceType();
+			// Reference Capture is required
+			this.variable.setReferenceType();
 		}
 	}
 

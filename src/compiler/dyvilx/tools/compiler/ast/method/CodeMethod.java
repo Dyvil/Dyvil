@@ -3,16 +3,19 @@ package dyvilx.tools.compiler.ast.method;
 import dyvil.annotation.Reified;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashSet;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -23,8 +26,6 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvilx.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -39,7 +40,6 @@ import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -67,14 +67,14 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type);
 	}
 
-	public CodeMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public CodeMethod(IClass iclass, Name name, IType type, AttributeList attributes)
 	{
-		super(iclass, name, type, modifiers);
+		super(iclass, name, type, attributes);
 	}
 
-	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public CodeMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
+			this.attributes.addFlag(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.exceptions != null)
@@ -141,7 +141,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
 		{
-			this.modifiers.addIntModifier(Modifiers.ABSTRACT);
+			this.attributes.addFlag(Modifiers.ABSTRACT);
 		}
 
 		context.pop();
@@ -264,7 +264,6 @@ public class CodeMethod extends AbstractMethod
 
 		if (this.exceptions != null)
 		{
-
 			for (int i = 0; i < this.exceptions.size(); i++)
 			{
 				final IType exceptionType = this.exceptions.get(i);
@@ -291,82 +290,34 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkDuplicates(MarkerList markers)
 	{
-		final Collection<IMethod> candidates = this.enclosingClass.getMethods(this.name);
+		final Collection<IMethod> candidates = new ArrayList<>();
+		this.enclosingClass.addMethods(candidates);
 		if (candidates.isEmpty())
 		{
 			return;
 		}
 
+		final String internalName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
-		final String signature = this.getSignature();
 		final int parameterCount = this.parameters.size();
-
-		boolean thisMangled = !this.name.qualified.equals(this.getInternalName());
 
 		for (IMethod method : candidates)
 		{
-			thisMangled = this.checkDuplicate(markers, descriptor, signature, parameterCount, thisMangled, method);
+			if (method != this // exclude this method
+			    && method.getParameters().size() == parameterCount // optimization
+			    && method.getInternalName().equals(internalName) && method.getDescriptor().equals(descriptor))
+			{
+				final Marker marker = Markers.semanticError(this.position, "method.duplicate", this.name,
+				                                            this.internalName, descriptor);
+				markers.add(marker);
+			}
 		}
-	}
-
-	private boolean checkDuplicate(MarkerList markers, String descriptor, String signature, int parameterCount,
-		                              boolean thisMangled, IMethod method)
-	{
-		if (method == this // common cases
-			    || method.getParameters().size() != parameterCount // optimization
-			    || !method.getDescriptor().equals(descriptor))
-		{
-			return thisMangled;
-		}
-
-		final String otherMangledName = method.getInternalName();
-		if (!this.internalName.equals(otherMangledName))
-		{
-			return thisMangled;
-		}
-
-		// Name mangling required
-
-		if (!thisMangled)
-		{
-			// ensure this method gets name-mangled
-			this.internalName = createMangledName(this);
-		}
-
-		if (this.internalName.equals(otherMangledName))
-		{
-			markers.add(Markers.semanticError(this.position, "method.duplicate", this.name, signature));
-			return true;
-		}
-
-		final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
-		marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
-		marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
-		marker.addInfo(Markers.getSemantic("method.name_mangled.bytecode_name", this.internalName));
-		markers.add(marker);
-		return true;
-	}
-
-	private static String createMangledName(IMethod method)
-	{
-		// append the qualified name plus the name separator
-		final StringBuilder builder = new StringBuilder(method.getName().qualified).append('_');
-
-		final ParameterList params = method.getParameters();
-		for (int i = 0, count = params.size(); i < count; i++)
-		{
-			// append all external parameter labels followed by an underscore
-			builder.append(params.get(i).getQualifiedLabel()).append('_');
-		}
-
-		// strip the trailing _
-		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
 
 	@Override
 	public IntrinsicData getIntrinsicData()
 	{
-		final IAnnotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
+		final Annotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
 		if (annotation == null)
 		{
 			return null;
@@ -393,14 +344,14 @@ public class CodeMethod extends AbstractMethod
 
 		final ITypeContext typeContext = this.enclosingClass.getThisType();
 
-		this.checkParameterLabels(markers, typeContext);
+		this.filterOverrides(markers, typeContext);
 
 		if (this.checkNoOverride(markers))
 		{
 			return;
 		}
 
-		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE) && !this.modifiers.hasIntModifier(Modifiers.GENERATED))
+		if (!this.isOverride() && !this.attributes.hasFlag(Modifiers.GENERATED))
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}
@@ -420,7 +371,7 @@ public class CodeMethod extends AbstractMethod
 
 			final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
 			if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
-				    && !Types.isSuperType(superReturnType.asParameterType(), this.type))
+			    && !Types.isSuperType(superReturnType.asParameterType(), this.type))
 			{
 				final Marker marker = Markers
 					                      .semanticError(this.position, "method.override.type.incompatible", this.name);
@@ -433,48 +384,86 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	private void checkParameterLabels(MarkerList markers, ITypeContext typeContext)
+	private void filterOverrides(MarkerList markers, ITypeContext typeContext)
 	{
 		for (Iterator<IMethod> iterator = this.overrideMethods.iterator(); iterator.hasNext(); )
 		{
 			final IMethod overrideMethod = iterator.next();
-			final IClass enclosingClass = overrideMethod.getEnclosingClass();
-			boolean errors = true;
-
-			for (IMethod method : this.overrideMethods)
+			if (this.filterOverride(overrideMethod, markers, typeContext))
 			{
-				if (method != overrideMethod && method.getEnclosingClass() == enclosingClass)
-				{
-					// If this method overrides two methods from the same class, we do not produce any parameter label errors
-					errors = false;
-				}
-			}
-
-			final ParameterList params = overrideMethod.getParameters();
-			for (int i = 0, count = params.size(); i < count; i++)
-			{
-				final IParameter thisParam = this.parameters.get(i);
-				final Name thisName = thisParam.getLabel();
-				final Name otherName = params.get(i).getLabel();
-
-				if (thisName == otherName || thisName == null || otherName == null)
-				{
-					// Parameter labels match
-					continue;
-				}
-
-				if (errors)
-				{
-					final Marker marker = Markers.semantic(thisParam.getPosition(), "method.override.parameter_label",
-					                                       i + 1, thisName, otherName);
-					addOverrideInfo(typeContext, overrideMethod, marker);
-					markers.add(marker);
-				}
-
-				// This method does not properly override the candidate
 				iterator.remove();
 			}
 		}
+	}
+
+	private boolean filterOverride(IMethod candidate, MarkerList markers, ITypeContext typeContext)
+	{
+		final String candidateInternalName = candidate.getInternalName();
+		final boolean sameName = this.name == candidate.getName();
+		final boolean sameInternalName = this.getInternalName().equals(candidateInternalName);
+
+		if (sameName && !sameInternalName) // same name but different internal name
+		{
+			if (this.name.qualified.equals(this.internalName))
+			// no AutoMangled or BytecodeName annotation, otherwise the user probably knows what they are doing and
+			// doesn't need a warning
+			{
+				final Marker marker = Markers.semantic(this.position, "method.override.mangled_mismatch", this.name,
+				                                       candidateInternalName);
+				marker.addInfo(Markers.getSemantic("method.override.mangled_mismatch.info", candidateInternalName));
+				markers.add(marker);
+			}
+			return true;
+		}
+		if (!sameName && sameInternalName)
+		{
+			final Marker marker = Markers.semanticError(this.position, "method.override.mangled_clash", this.name,
+			                                            candidate.getName(), candidateInternalName);
+			marker.addInfo(Markers.getSemantic("method.override.mangled_clash.info"));
+			return true; // hard error so it doesn't matter if we remove or not - bytecode will never be generated
+		}
+
+		// sameName && sameInternalName should be true
+
+		final IClass enclosingClass = candidate.getEnclosingClass();
+		boolean errors = true;
+
+		for (IMethod method : this.overrideMethods)
+		{
+			if (method != candidate && method.getEnclosingClass() == enclosingClass)
+			{
+				// If this method overrides two methods from the same class, we do not produce any parameter label errors
+				errors = false;
+			}
+		}
+
+		final ParameterList params = candidate.getParameters();
+		for (int i = 0, count = params.size(); i < count; i++)
+		{
+			final IParameter thisParam = this.parameters.get(i);
+			final Name thisName = thisParam.getLabel();
+			final Name otherName = params.get(i).getLabel();
+
+			if (thisName == otherName || thisName == null || otherName == null)
+			{
+				// Parameter labels match
+				continue;
+			}
+
+			if (errors)
+			{
+				final Marker marker = Markers
+					                      .semantic(thisParam.getPosition(), "method.override.parameter_label", i + 1,
+					                                thisName, otherName);
+				addOverrideInfo(typeContext, candidate, marker);
+				markers.add(marker);
+			}
+
+			// This method does not properly override the candidate
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean checkNoOverride(MarkerList markers)
@@ -484,7 +473,7 @@ public class CodeMethod extends AbstractMethod
 			return false;
 		}
 
-		if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
+		if (this.isOverride())
 		{
 			markers.add(Markers.semanticError(this.position, "method.override.notfound", this.name));
 		}
@@ -530,13 +519,10 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.cleanup(compilableList, classCompilableList);
 
-		if (this.annotations != null)
+		final Annotation intrinsic = this.attributes.getAnnotation(Types.INTRINSIC_CLASS);
+		if (intrinsic != null)
 		{
-			IAnnotation intrinsic = this.annotations.get(Types.INTRINSIC_CLASS);
-			if (intrinsic != null)
-			{
-				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
-			}
+			this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 		}
 
 		if (this.typeParameters != null)
@@ -748,10 +734,7 @@ public class CodeMethod extends AbstractMethod
 
 	protected void writeAnnotations(MethodWriter writer, long flags)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.write(writer);
-		}
+		this.attributes.write(writer);
 
 		// Write DyvilName annotation if it differs from the mangled name
 		final String qualifiedName = this.name.qualified;
@@ -771,7 +754,7 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, this, flags);
+		ModifierUtil.writeModifiers(writer, flags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

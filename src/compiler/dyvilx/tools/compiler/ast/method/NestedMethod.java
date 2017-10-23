@@ -1,43 +1,42 @@
 package dyvilx.tools.compiler.ast.method;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.CaptureVariable;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
+import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaptureHelper;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class NestedMethod extends CodeMethod
 {
 	private CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 
-	public NestedMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public NestedMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 	}
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (context.isStatic())
+		if (context.hasStaticAccess())
 		{
-			this.modifiers.addIntModifier(Modifiers.STATIC);
+			this.attributes.addFlag(Modifiers.STATIC);
 		}
 
 		super.resolveTypes(markers, context);
@@ -61,7 +60,7 @@ public class NestedMethod extends CodeMethod
 
 		if (!this.captureHelper.isThisCaptured())
 		{
-			this.modifiers.addIntModifier(Modifiers.STATIC);
+			this.attributes.addFlag(Modifiers.STATIC);
 		}
 	}
 
@@ -93,13 +92,13 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+		final int modifiers = this.attributes.flags() & ModifierUtil.JAVA_MODIFIER_MASK;
 
-		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer
-			                                                               .visitMethod(modifiers, this.getInternalName(),
-			                                                                            this.getDescriptor(),
-			                                                                            this.getSignature(),
-			                                                                            this.getInternalExceptions()));
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers,
+		                                                                                  this.getInternalName(),
+		                                                                                  this.getDescriptor(),
+		                                                                                  this.getSignature(),
+		                                                                                  this.getInternalExceptions()));
 
 		this.writeAnnotations(methodWriter, modifiers);
 

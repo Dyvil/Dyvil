@@ -4,21 +4,19 @@ public class BaseSymbols implements Symbols
 {
 	public static final BaseSymbols INSTANCE = new BaseSymbols();
 
-	public static final int PARENTHESIS = Tokens.BRACKET | 0x00010000;
-	public static final int SQUARE      = Tokens.BRACKET | 0x00020000;
-	public static final int CURLY       = Tokens.BRACKET | 0x00040000;
+	protected static final int PARENTHESIS = Tokens.BRACKET | 0x00010000;
+	protected static final int SQUARE      = Tokens.BRACKET | 0x00020000;
+	protected static final int CURLY       = Tokens.BRACKET | 0x00040000;
 
-	public static final int OPEN  = 0x00000000;
-	public static final int CLOSE = 0x00100000;
+	public static final int OPEN_BRACKET  = Tokens.BRACKET;
+	public static final int CLOSE_BRACKET = Tokens.BRACKET | 0x00100000;
 
-	public static final int OPEN_BRACKET         = Tokens.BRACKET | OPEN;
-	public static final int CLOSE_BRACKET        = Tokens.BRACKET | CLOSE;
-	public static final int OPEN_PARENTHESIS     = PARENTHESIS | OPEN;
-	public static final int CLOSE_PARENTHESIS    = PARENTHESIS | CLOSE;
-	public static final int OPEN_SQUARE_BRACKET  = SQUARE | OPEN;
-	public static final int CLOSE_SQUARE_BRACKET = SQUARE | CLOSE;
-	public static final int OPEN_CURLY_BRACKET   = CURLY | OPEN;
-	public static final int CLOSE_CURLY_BRACKET  = CURLY | CLOSE;
+	public static final int OPEN_PARENTHESIS     = OPEN_BRACKET | PARENTHESIS;
+	public static final int CLOSE_PARENTHESIS    = CLOSE_BRACKET | PARENTHESIS;
+	public static final int OPEN_SQUARE_BRACKET  = OPEN_BRACKET | SQUARE;
+	public static final int CLOSE_SQUARE_BRACKET = CLOSE_BRACKET | SQUARE;
+	public static final int OPEN_CURLY_BRACKET   = OPEN_BRACKET | CURLY;
+	public static final int CLOSE_CURLY_BRACKET  = CLOSE_BRACKET | CURLY;
 
 	public static final int DOT        = Tokens.SYMBOL | 0x00010000;
 	public static final int COLON      = Tokens.SYMBOL | 0x00020000;
@@ -90,5 +88,26 @@ public class BaseSymbols implements Symbols
 	public int getLength(int type)
 	{
 		return 1;
+	}
+
+	public static boolean isCloseBracket(int type)
+	{
+		return (type & CLOSE_BRACKET) == CLOSE_BRACKET;
+	}
+
+	public static boolean isTerminator(int type)
+	{
+		switch (type)
+		{
+		case Tokens.EOF:
+		case COMMA:
+		case SEMICOLON:
+		case COLON:
+		case CLOSE_CURLY_BRACKET:
+		case CLOSE_PARENTHESIS:
+		case CLOSE_SQUARE_BRACKET:
+			return true;
+		}
+		return false;
 	}
 }

@@ -1,14 +1,14 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.dpf.model.Expandable;
-import dyvil.tools.dpf.converter.DPFValueVisitor;
-import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvilx.tools.parsing.ASTNode;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvil.tools.dpf.model.Expandable
+import dyvil.tools.dpf.converter.DPFValueVisitor
+import dyvil.tools.dpf.visitor.StringInterpolationVisitor
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvilx.tools.parsing.lexer.StringLiterals
 
 public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {
@@ -88,14 +88,14 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		buffer.append('"')
-		LexerUtil.appendStringLiteralBody(this.strings[0], buffer)
+		StringLiterals.appendStringLiteralBody(this.strings[0], buffer)
 
 		for (i <- 0 ..< this.values.size)
 		{
 			buffer.append("\\(")
 			this.values[i].toString(indent, buffer)
 			buffer.append(')')
-			LexerUtil.appendStringLiteralBody(this.strings[i + 1], buffer)
+			StringLiterals.appendStringLiteralBody(this.strings[i + 1], buffer)
 		}
 		buffer.append('"')
 	}

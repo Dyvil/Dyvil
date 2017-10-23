@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.parser.type;
 
-import dyvilx.tools.compiler.ast.annotation.Annotation;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -11,21 +13,17 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.*;
 import dyvilx.tools.compiler.ast.type.generic.*;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-import static dyvilx.tools.compiler.parser.ParserUtil.isTerminator;
-import static dyvilx.tools.compiler.parser.ParserUtil.neighboring;
+import static dyvilx.tools.parsing.lexer.BaseSymbols.isTerminator;
 
 public final class TypeParser extends Parser implements ITypeConsumer
 {
@@ -101,7 +99,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				switch (type)
 				{
 				case DyvilSymbols.AT:
-					Annotation a = new Annotation();
+					Annotation a = new CodeAnnotation(token.raw());
 					pm.pushParser(new AnnotationParser(a));
 					this.type = new AnnotatedType(a);
 					this.mode = ANNOTATION_END;
@@ -206,7 +204,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				}
 			}
 
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				if (isTerminator(type))
 				{
@@ -264,12 +262,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			{
 				pm.report(nextToken, "type.tuple.lambda_arrow");
 			}
-			Util.expandPosition(this.type, token);
+			this.type.expandPosition(token);
 			this.mode = END;
 			return;
 		}
 		case LAMBDA_END:
-			Util.expandPosition(this.type, token.prev());
+			this.type.expandPosition(token.prev());
 			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
@@ -285,7 +283,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case ARRAY_END:
-			Util.expandPosition(this.type, token);
+			this.type.expandPosition(token);
 			this.mode = END;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
@@ -365,8 +363,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				}
 
 				final IToken next = token.next();
-				final boolean leftNeighbor = neighboring(token.prev(), token);
-				final boolean rightNeighbor = neighboring(token, next);
+				final boolean leftNeighbor = token.prev().isNeighboring(token);
+				final boolean rightNeighbor = token.isNeighboring(next);
 				if (isTerminator(next.type()) || leftNeighbor && !rightNeighbor)
 				{
 					// type_OPERATOR

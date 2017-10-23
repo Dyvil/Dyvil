@@ -4,9 +4,12 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.TextSource;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.CodeClass;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -29,17 +32,13 @@ import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
-import dyvil.source.TextSource;
 import dyvilx.tools.repl.DyvilREPL;
 
 public class REPLContext extends AbstractHeader
@@ -254,12 +253,12 @@ public class REPLContext extends AbstractHeader
 		member.setEnclosingClass(this.currentClass);
 
 		// Ensure public & static
-		final ModifierSet modifiers = member.getModifiers();
-		if ((modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		final AttributeList modifiers = member.getAttributes();
+		if ((modifiers.flags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
-			modifiers.addIntModifier(Modifiers.PUBLIC);
+			modifiers.addFlag(Modifiers.PUBLIC);
 		}
-		modifiers.addIntModifier(Modifiers.STATIC);
+		modifiers.addFlag(Modifiers.STATIC);
 	}
 
 	@Override
@@ -330,10 +329,9 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public REPLVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                    AnnotationList annotations)
+	public REPLVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new REPLVariable(this, position, name, type, modifiers, annotations);
+		return new REPLVariable(this, position, name, type, attributes);
 	}
 
 	@Override

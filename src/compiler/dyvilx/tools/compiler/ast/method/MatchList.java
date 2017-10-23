@@ -35,6 +35,11 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 		}
 	}
 
+	public boolean isSkipSort()
+	{
+		return (this.sorted & SKIP_SORT) != 0;
+	}
+
 	public int size()
 	{
 		return this.size;
@@ -47,8 +52,7 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 
 	public boolean hasCandidate()
 	{
-		return (this.sorted & SKIP_SORT) == 0 && !this.isEmpty() && !this.isAmbigous()
-			       && !this.getBestCandidate().invalid;
+		return !this.isSkipSort() && !this.isEmpty() && !this.isAmbigous() && !this.getBestCandidate().invalid;
 	}
 
 	public void ensureCapacity(int capacity)
@@ -67,14 +71,24 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 
 	public void add(Candidate<T> candidate)
 	{
-		// TODO Maybe insert the candidate at correct position if this list is already sorted?
-
 		this.sorted &= ~SORTED;
 
-		final int index = this.size;
-		this.ensureCapacity(index + 1);
-		this.candidates[index] = candidate;
-		this.size++;
+		this.ensureCapacity(this.size + 1);
+		this.candidates[this.size++] = candidate;
+	}
+
+	public void addAll(MatchList<T> list)
+	{
+		final int otherSize = list.size;
+		if (otherSize <= 0)
+		{
+			return;
+		}
+
+		this.sorted &= ~SORTED;
+		this.ensureCapacity(this.size + otherSize);
+		System.arraycopy(list.candidates, 0, this.candidates, this.size, otherSize);
+		this.size += otherSize;
 	}
 
 	public Candidate<T> getCandidate(int index)
@@ -152,5 +166,10 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 	{
 		this.sort();
 		return new ArrayIterator<>(this.candidates, 0, this.size);
+	}
+
+	public MatchList<T> emptyCopy()
+	{
+		return new MatchList<>(this.implicitContext, this.isSkipSort());
 	}
 }

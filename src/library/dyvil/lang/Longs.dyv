@@ -53,6 +53,8 @@ public abstract class Longs
 	@Intrinsic([ LOAD_0, LOAD_1, LREM ])
 	infix func %(lhs: long, rhs: long) -> long = lhs % rhs
 
+	infix func /%(lhs: long, rhs: long) -> (long, long) = (lhs \ rhs, lhs % rhs)
+
 	@Intrinsic([ LOAD_0, LOAD_1, LDIV ])
 	infix func \(lhs: long, rhs: long) -> long = lhs \ rhs
 

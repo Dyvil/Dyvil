@@ -1,15 +1,15 @@
 package dyvilx.tools.compiler.backend.visitor;
 
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 
 public class ModifierVisitor implements AnnotationVisitor
 {
-	private final ModifierSet modifierSet;
+	private final AttributeList attributes;
 
-	public ModifierVisitor(ModifierSet modifierSet)
+	public ModifierVisitor(AttributeList attributes)
 	{
-		this.modifierSet = modifierSet;
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -17,7 +17,7 @@ public class ModifierVisitor implements AnnotationVisitor
 	{
 		if ("value".equals(name) && value instanceof Integer)
 		{
-			this.modifierSet.addIntModifier((int) value);
+			this.attributes.addFlag((int) value);
 		}
 	}
 

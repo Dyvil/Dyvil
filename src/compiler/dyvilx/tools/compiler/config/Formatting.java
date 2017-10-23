@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.config;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -114,7 +115,6 @@ public final class Formatting
 		stringBuilder.append(close);
 	}
 
-
 	public static String getSeparator(String key, char character)
 	{
 		StringBuilder stringBuilder = new StringBuilder(3);
@@ -132,5 +132,10 @@ public final class Formatting
 			builder.append('\t');
 		}
 		return builder.toString();
+	}
+
+	public static boolean endsWithSymbol(StringBuilder buffer)
+	{
+		return CharacterTypes.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));
 	}
 }

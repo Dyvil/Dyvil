@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationMetadata;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.metadata.*;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -23,7 +23,6 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public interface IClass
@@ -98,6 +97,15 @@ public interface IClass
 	{
 	}
 
+	default AttributeList getConstructorAttributes()
+	{
+		return null;
+	}
+
+	default void setConstructorAttributes(AttributeList attributes)
+	{
+	}
+
 	// Interfaces
 
 	TypeList getInterfaces();
@@ -122,7 +130,7 @@ public interface IClass
 
 	byte getVisibility(IClassMember member);
 
-	Collection<IMethod> getMethods(Name name);
+	void addMethods(Collection<IMethod> methods);
 
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 

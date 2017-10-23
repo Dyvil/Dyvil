@@ -1,11 +1,8 @@
 package dyvilx.tools.compiler.ast.imports;
 
-import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.context.IDefaultContext;
-import dyvilx.tools.compiler.ast.structure.Package;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -37,22 +34,8 @@ public final class WildcardImport extends Import
 		if (this.parent != null)
 		{
 			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
-			parentContext = this.parent.asParentContext();
+			this.context = this.parent.asParentContext();
 		}
-
-		if ((mask & KindedImport.STATIC) != 0 && parentContext != null)
-		{
-			this.context = parentContext;
-			return;
-		}
-
-		if (!(parentContext instanceof Package))
-		{
-			markers.add(Markers.semanticError(this.position, "import.wildcard.invalid"));
-			this.context = IDefaultContext.DEFAULT;
-			return;
-		}
-		this.context = parentContext;
 	}
 
 	@Override

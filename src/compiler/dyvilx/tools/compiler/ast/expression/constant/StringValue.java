@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.expression.constant;
 
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -13,13 +13,13 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class StringValue implements IConstantValue
 {
 	protected SourcePosition position;
-	protected String        value;
+	protected String         value;
 
 	public StringValue(String value)
 	{
@@ -64,7 +64,7 @@ public final class StringValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
+		final Annotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -138,6 +138,6 @@ public final class StringValue implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		LexerUtil.appendStringLiteral(this.value, buffer);
+		StringLiterals.appendStringLiteral(this.value, buffer);
 	}
 }

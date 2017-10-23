@@ -5,7 +5,7 @@ import dyvil.tools.dpf.visitor.NodeVisitor
 
 public class RootNode extends Node
 {
-	public init() : super(Name.fromRaw("root"))
+	public init() : super(Name('root'))
 
 	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor)
 

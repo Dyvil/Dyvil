@@ -53,6 +53,8 @@ public abstract class Ints
 	@Intrinsic([ LOAD_0, LOAD_1, IREM ])
 	infix func %(lhs: int, rhs: int) -> int = lhs % rhs
 
+	infix func /%(lhs: int, rhs: int) -> (int, int) = (lhs \ rhs, lhs % rhs)
+
 	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
 	infix func \(lhs: int, rhs: int) -> int = lhs \ rhs
 

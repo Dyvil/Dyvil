@@ -1,0 +1,127 @@
+package dyvil.math
+
+@LiteralConvertible.FromInt
+@LiteralConvertible.FromLong
+class Rational private (let numerator: long { public get }, let denominator: long { public get })
+	implements ScalarMath<Rational>, Formattable, Comparable<Rational>
+{
+	static func gcd(a: long, b: long) -> long
+	{
+		while (b != 0)
+		{
+			let t = b
+			b = a % b
+			a = t
+		}
+		return a
+	}
+
+	static func apply(numerator: long) -> Rational = new Rational(numerator, 1)
+
+	static func apply(numerator: long, denominator: long) -> Rational
+	{
+		if (numerator == 0) return _0
+
+		if (denominator < 0)
+		{
+			// make sure the denominator is always positive
+			numerator = -numerator
+			denominator = -denominator
+		}
+
+		let gcd = gcd(numerator, denominator)
+		return new Rational(numerator \ gcd, denominator \ gcd)
+	}
+
+	@Experimental
+	static func apply(explicit approximating d: double)
+	{
+		let bits = Double.doubleToLongBits(d)
+
+		let sign = ((bits >>> 63) == 0) ? 1 : -1
+		let e    = (bits >> 52) as int & 0x7FF
+		var exp  = e - 1075
+		let m    = bits & 0xF_FFFF_FFFF_FFFFL
+		var mant = e == 0 ? (m << 1) : (m | 0x10_0000_0000_0000L)
+
+		if (exp > 0)
+		{
+			mant <<= exp
+			exp = 0
+		}
+
+		// d = sign * mant * 2^exp = (sign * mant) / 2^(-exp)
+
+		return Rational(sign * mant, 1L << -exp)
+	}
+
+	// Constants
+
+	public const _0: Rational = 0 { override get }
+
+	public const _1: Rational = 1 { override get }
+
+	// Unary Operators
+
+	override prefix func +(rhs: Rational) -> Rational = rhs
+
+	override prefix func -(rhs: Rational) -> Rational = new Rational(-rhs.numerator, rhs.denominator)
+
+	override postfix func inverse(lhs: Rational) -> Rational = Rational(lhs.denominator, lhs.numerator)
+
+	func toFloat() -> float = this.toDouble() as float
+
+	func toDouble() -> double = this.numerator / this.denominator
+
+	// Additive Operators
+
+	override infix func +(lhs: Rational, rhs: Rational) -> Rational
+	{
+		// a / b + c / d = (a * d + b * c) / (b * d)
+		let lhsDenom = lhs.denominator
+		let rhsDenom = rhs.denominator
+
+		let num = lhs.numerator * rhsDenom + rhs.numerator * lhsDenom
+		let denom = lhsDenom * rhsDenom
+		return Rational(num, denom)
+	}
+
+	override infix func -(lhs: Rational, rhs: Rational) -> Rational = lhs + -rhs
+
+	// Multiplicative Operators
+
+	override infix func *(lhs: Rational, rhs: Rational) -> Rational
+	{
+		let num = lhs.numerator * rhs.numerator
+		let denom = lhs.denominator * rhs.denominator
+		return Rational(num, denom)
+	}
+
+	override infix func /(lhs: Rational, rhs: Rational) -> Rational
+	{
+		let num = lhs.numerator * rhs.denominator
+		let denom = lhs.denominator * rhs.numerator
+		return Rational(num, denom)
+	}
+
+	// Equals and Hash Code
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is Rational && this.equals(obj as Rational)
+
+	func equals(that: Rational) -> boolean = this === that || this.numerator == that.numerator && this.denominator == that.denominator
+
+	override func hashCode() -> int = this.numerator.hashCode * 31 + this.denominator.hashCode
+
+	override func compareTo(_ that: Rational) -> int
+	{
+		// a / b <?> c / d  | * b | * d
+		// a * d <?> c * b
+		return (this.numerator * that.denominator).compareTo(that.numerator * this.denominator)
+	}
+
+	// String
+
+	override func toString() -> String = String(this)
+
+	override func toString(buffer: StringBuilder) -> void = buffer.append(this.numerator).append(" / ").append(this.denominator)
+}

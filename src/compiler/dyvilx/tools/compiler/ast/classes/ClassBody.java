@@ -6,8 +6,7 @@ import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.parsing.ASTNode;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
@@ -23,7 +22,6 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -34,6 +32,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.IResolvable;
 import dyvilx.tools.compiler.util.Markers;
+import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
@@ -185,10 +184,9 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 	}
 
 	@Override
-	public IField createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                              AnnotationList annotations)
+	public IField createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new Field(this.enclosingClass, position, name, type, modifiers, annotations);
+		return new Field(this.enclosingClass, position, name, type, attributes);
 	}
 
 	public IField getField(int index)
@@ -318,7 +316,7 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 	public Iterable<IMethod> allMethods()
 	{
 		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(this.methodCount + this.propertyCount * 2
-			                                                                   + this.fieldCount);
+		                                                                   + this.fieldCount);
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			builder.add(this.methods[i]);
@@ -461,7 +459,7 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		final IMethod setter = property.getSetter();
 
 		return getter != null && checkMethodImplements(getter, candidate, typeContext)
-			       || setter != null && checkMethodImplements(setter, candidate, typeContext);
+		       || setter != null && checkMethodImplements(setter, candidate, typeContext);
 	}
 
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)

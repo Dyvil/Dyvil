@@ -3,9 +3,10 @@ package dyvilx.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -25,7 +26,6 @@ import dyvilx.tools.compiler.ast.type.compound.TupleType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.TypeChecker;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class TupleExpr implements IValue, IArgumentsConsumer
@@ -140,7 +140,7 @@ public final class TupleExpr implements IValue, IArgumentsConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
+		final Annotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, this.values).withType(type, typeContext, markers, context);

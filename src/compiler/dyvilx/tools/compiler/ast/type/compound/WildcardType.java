@@ -1,10 +1,11 @@
 package dyvilx.tools.compiler.ast.type.compound;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -17,7 +18,6 @@ import dyvilx.tools.compiler.ast.type.raw.IRawType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -223,7 +223,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	}
 
 	@Override
-	public IType withAnnotation(IAnnotation annotation)
+	public IType withAnnotation(Annotation annotation)
 	{
 		final IType a = this.type.withAnnotation(annotation);
 		if (a == null)
@@ -236,7 +236,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath.getStep(step) == TypePath.WILDCARD_BOUND)
 		{

@@ -222,6 +222,8 @@ public interface Modifiers
 	 */
 	int OVERRIDE = 0x20000000;
 
+	int INTRINSIC = 0x40000000;
+
 	int GENERATED = 0x80000000;
 
 	// Masks
@@ -244,26 +246,26 @@ public interface Modifiers
 	 * The modifiers that can be used on any member.
 	 */
 	int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL // denotable
-		                       | SYNTHETIC;
+	                       | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be used on classes.
 	 */
 	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS // denotable
-		                      | CLASS_TYPE_MODIFIERS | STRICT;
+	                      | CLASS_TYPE_MODIFIERS | STRICT;
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
 	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY | ENUM | IMPLICIT // denotable
-		                      | TRANSIENT | VOLATILE;
+	                      | TRANSIENT | VOLATILE;
 
 	/**
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
 		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | INLINE | INFIX | EXTENSION | IMPLICIT | OVERRIDE // denotable
-			| NATIVE | STRICT | BRIDGE | ACC_VARARGS;
+		| NATIVE | STRICT | BRIDGE | ACC_VARARGS;
 
 	/**
 	 * The modifiers that can be applied to variables and method parameters.
@@ -274,15 +276,16 @@ public interface Modifiers
 	 * The modifiers that can be used on parameters.
 	 */
 	int PARAMETER_MODIFIERS = VARIABLE_MODIFIERS | EXPLICIT // denotable
-		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | ACC_VARARGS | SYNTHETIC;
+	                          | DEFAULT | MANDATED | EXTENSION | VARARGS | ACC_VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
 	 */
-	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | IMPLICIT | EXPLICIT // denotable
+	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | IMPLICIT | EXPLICIT | OVERRIDE // denotable
 	                                | DEFAULT;
 
-	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
+	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS // denotable
+	                            | ACC_VARARGS;
 
 	int INITIALIZER_MODIFIERS = PRIVATE | STATIC;
 

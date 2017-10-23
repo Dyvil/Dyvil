@@ -1,9 +1,8 @@
 package dyvilx.tools.compiler.parser.annotation;
 
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.parser.expression.ArgumentListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -14,20 +13,20 @@ public class AnnotationParser extends Parser
 	public static final int NAME             = 1;
 	public static final int PARAMETERS_START = 2;
 	public static final int PARAMETERS_END   = 4;
-	
-	private IAnnotation annotation;
-	
-	public AnnotationParser(IAnnotation annotation)
+
+	private Annotation annotation;
+
+	public AnnotationParser(Annotation annotation)
 	{
 		this.annotation = annotation;
 		this.mode = NAME;
 	}
-	
-	public void reset(IAnnotation annotation)
+
+	public void reset(Annotation annotation)
 	{
 		this.annotation = annotation;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -41,7 +40,7 @@ public class AnnotationParser extends Parser
 			this.mode = PARAMETERS_START;
 			return;
 		case PARAMETERS_START:
-			Util.expandPosition(this.annotation, token.prev());
+			this.annotation.expandPosition(token.prev());
 
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
@@ -49,7 +48,7 @@ public class AnnotationParser extends Parser
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			
+
 			pm.popParser(true);
 			return;
 		case PARAMETERS_END:

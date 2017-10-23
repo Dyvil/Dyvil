@@ -97,7 +97,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	@Override
 	public boolean isResolved()
 	{
-		return this.method != null;
+		return this.method != null && this.method.getType().isResolved();
 	}
 
 	public IMethod getMethod()
@@ -218,15 +218,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		if (matches == null || !matches.isAmbigous()) // isAmbiguous returns false for empty lists
 		{
 			marker = Markers.semanticError(this.position, "method.access.resolve", this.getName());
-			this.addArgumentInfo(marker);
 		}
 		else
 		{
 			marker = Markers.semanticError(this.position, "method.access.ambiguous", this.getName());
-			this.addArgumentInfo(marker);
-
-			addCandidates(matches, marker);
 		}
+
+		this.addArgumentInfo(marker);
+		this.addCandidates(matches, marker);
 
 		markers.add(marker);
 	}
@@ -243,32 +242,39 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		}
 	}
 
-	private static void addCandidates(MatchList<IMethod> matches, Marker marker)
+	private void addCandidates(MatchList<IMethod> matches, Marker marker)
 	{
+		if (matches.isEmpty())
+		{
+			return;
+		}
+
 		// Duplicate in ConstructorCall.addCandidates
 
 		marker.addInfo(Markers.getSemantic("method.access.candidates"));
 
 		final Candidate<IMethod> first = matches.getCandidate(0);
-		addCandidateInfo(marker, first);
+		this.addCandidateInfo(marker, first);
 
 		for (int i = 1, count = matches.size(); i < count; i++)
 		{
 			final Candidate<IMethod> candidate = matches.getCandidate(i);
-			if (!candidate.equals(first))
+			if (!candidate.equals(first)) // only print the candidates with the same ranking as the first
 			{
 				break;
 			}
 
-			addCandidateInfo(marker, candidate);
+			this.addCandidateInfo(marker, candidate);
 		}
 	}
 
-	private static void addCandidateInfo(Marker marker, Candidate<IMethod> candidate)
+	private void addCandidateInfo(Marker marker, Candidate<IMethod> candidate)
 	{
-		final StringBuilder sb = new StringBuilder().append('\t');
-		Util.methodSignatureToString(candidate.getMember(), null, sb);
-		marker.addInfo(sb.toString());
+		final StringBuilder builder = new StringBuilder().append('\t');
+		final IMethod member = candidate.getMember();
+		builder.append(member.getReceiverType()).append(member.isStatic() ? '.' : '#');
+		Util.methodSignatureToString(member, this.genericData, builder);
+		marker.addInfo(builder.toString());
 	}
 
 	// every resolveCall implementation calls this
@@ -335,6 +341,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		{
 			this.method
 				.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+
+			if (!this.method.getType().isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "method.access.unresolved_type", this.getName()));
+			}
 		}
 
 		this.arguments.check(markers, context);

@@ -4,6 +4,8 @@ package dyvil.math
 @LiteralConvertible.FromTuple
 public case class Complex(let real: double, let imag: double) implements ScalarMath<Complex>
 {
+	// Constants
+
 	public const _i: Complex = Complex(0, 1)
 
 	public const _0: Complex = 0 { override get }
@@ -29,7 +31,7 @@ public case class Complex(let real: double, let imag: double) implements ScalarM
 
 	// --------------- Scalar Math Operations ---------------
 
-	// Prefix Operators
+	// Unary Operators
 
 	override inline prefix func +(rhs: Complex) -> Complex = rhs
 

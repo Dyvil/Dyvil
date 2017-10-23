@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.header;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
@@ -14,6 +15,7 @@ import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
 import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.imports.IImportContext;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -25,7 +27,6 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvil.lang.Name;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -600,7 +601,10 @@ class HeaderContext implements IStaticContext
 		final ImportDeclaration[] importDeclarations = this.header.importDeclarations;
 		for (int i = 0; i < this.header.importCount; i++)
 		{
-			importDeclarations[i].getContext().resolveTypeAlias(matches, receiver, name, arguments);
+			final IImportContext importContext = importDeclarations[i].getContext();
+			final MatchList<ITypeAlias> subList = matches.emptyCopy();
+			importContext.resolveTypeAlias(subList, receiver, name, arguments);
+			matches.addAll(subList);
 		}
 	}
 
@@ -689,9 +693,13 @@ class HeaderContext implements IStaticContext
 			return;
 		}
 
+		final ImportDeclaration[] imports = this.header.importDeclarations;
 		for (int i = 0; i < this.header.importCount; i++)
 		{
-			this.header.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
+			final IImportContext importContext = imports[i].getContext();
+			final MatchList<IMethod> subList = list.emptyCopy();
+			importContext.getMethodMatches(subList, receiver, name, arguments);
+			list.addAll(subList);
 		}
 	}
 
@@ -705,9 +713,13 @@ class HeaderContext implements IStaticContext
 			return;
 		}
 
+		final ImportDeclaration[] imports = this.header.importDeclarations;
 		for (int i = 0; i < this.header.importCount; i++)
 		{
-			this.header.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
+			final IImportContext importContext = imports[i].getContext();
+			final MatchList<IMethod> subList = list.emptyCopy();
+			importContext.getImplicitMatches(subList, value, targetType);
+			list.addAll(subList);
 		}
 	}
 }

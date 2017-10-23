@@ -4,10 +4,9 @@ import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -41,7 +40,7 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 				this.parseAnnotation(pm, token);
 				return;
 			case DyvilKeywords.LET:
-				this.getModifiers().addIntModifier(Modifiers.FINAL);
+				this.attributes.addFlag(Modifiers.FINAL);
 				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = NAME;
@@ -54,15 +53,14 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 			}
 			// Fallthrough
 		case NAME:
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "variable.identifier");
 				return;
 			}
 
 			this.dataMember = this.consumer
-				                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.modifiers,
-				                                    this.annotations);
+				                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.attributes);
 
 			this.mode = TYPE;
 			return;

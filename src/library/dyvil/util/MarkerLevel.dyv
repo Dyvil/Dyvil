@@ -6,4 +6,5 @@ enum MarkerLevel
 	case INFO
 	case WARNING
 	case ERROR
+	case SYNTAX
 }

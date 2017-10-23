@@ -1,22 +1,29 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.annotation.AnnotationParser;
+import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.compiler.parser.expression.ArgumentListParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
@@ -24,35 +31,33 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private static final int NAME                   = 0;
 	private static final int GENERICS               = 1;
 	private static final int GENERICS_END           = 2;
-	private static final int PARAMETERS             = 8;
-	private static final int PARAMETERS_END         = 16;
-	private static final int EXTENDS                = 32;
-	private static final int EXTENDS_PARAMETERS     = 64;
-	private static final int EXTENDS_PARAMETERS_END = 128;
-	private static final int IMPLEMENTS             = 256;
-	private static final int BODY                   = 512;
-	private static final int BODY_END               = 1024;
+	private static final int PARAMETERS             = 3;
+	private static final int PARAMETERS_END         = 4;
+	private static final int EXTENDS                = 5;
+	private static final int EXTENDS_PARAMETERS     = 6;
+	private static final int EXTENDS_PARAMETERS_END = 7;
+	private static final int IMPLEMENTS             = 8;
+	private static final int BODY                   = 9;
+	private static final int BODY_END               = 10;
 
 	protected IClassConsumer consumer;
 
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
-	protected ModifierSet    modifiers;
-	protected AnnotationList annotations;
+	protected AttributeList classAttributes;
 
 	private IClass theClass;
 
 	public ClassDeclarationParser(IClassConsumer consumer)
 	{
 		this.consumer = consumer;
+		this.classAttributes = new AttributeList();
 		// this.mode = NAME;
 	}
 
-	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
+	public ClassDeclarationParser(IClassConsumer consumer, AttributeList attributes)
 	{
 		this.consumer = consumer;
-
-		this.modifiers = modifiers;
-		this.annotations = annotations;
+		this.classAttributes = attributes;
 		// this.mode = NAME;
 	}
 
@@ -63,33 +68,20 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		switch (this.mode)
 		{
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
-				this.theClass = this.consumer
-					                .createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
-				this.mode = GENERICS;
-				return;
-			}
-			pm.report(token, "class.identifier");
-			return;
-		case GENERICS_END:
-			this.mode = PARAMETERS;
-			if (TypeParser.isGenericEnd(token, type))
-			{
-				pm.splitJump(token, 1);
+				pm.report(token, "class.identifier");
 				return;
 			}
 
-			pm.reparse();
-			pm.report(token, "generic.close_angle");
-			return;
-		case PARAMETERS_END:
-			this.mode = EXTENDS;
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			final Name name = token.nameValue();
+			if (name.qualified.indexOf('$') >= 0)
 			{
-				pm.reparse();
-				pm.report(token, "class.parameters.close_paren");
+				pm.report(Markers.syntaxError(token, "class.identifier.invalid", name, name.qualified));
 			}
+
+			this.theClass = this.consumer.createClass(token.raw(), name, this.classAttributes);
+			this.mode = GENERICS;
 			return;
 		case GENERICS:
 			if (type == BaseSymbols.SEMICOLON && token.isInferred() && TypeParser.isGenericStart(token.next()))
@@ -106,6 +98,19 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			// Fallthrough
 		case PARAMETERS:
+			final Modifier modifier = ModifierParser.parseModifier(token, pm);
+			if (modifier != null)
+			{
+				this.theClass.getConstructorAttributes().add(modifier);
+				return;
+			}
+			if (type == DyvilSymbols.AT)
+			{
+				final Annotation annotation = new CodeAnnotation(token.raw());
+				this.theClass.getConstructorAttributes().add(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
+				return;
+			}
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.theClass).withFlags(ParameterListParser.ALLOW_PROPERTIES));
@@ -151,7 +156,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = BODY_END;
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				if (token.isInferred())
 				{
@@ -179,6 +184,25 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 
 			this.mode = BODY_END;
 			pm.report(token, "class.body.separator");
+			return;
+		case GENERICS_END:
+			this.mode = PARAMETERS;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "generic.close_angle");
+			return;
+		case PARAMETERS_END:
+			this.mode = EXTENDS;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "class.parameters.close_paren");
+			}
 			return;
 		case BODY_END:
 			pm.popParser();

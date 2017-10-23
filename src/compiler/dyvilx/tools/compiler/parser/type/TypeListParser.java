@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.parser.type;
 
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -46,7 +45,7 @@ public final class TypeListParser extends Parser
 			{
 			//noinspection DefaultNotLastCaseInSwitch
 			default:
-				if (!ParserUtil.isCloseBracket(type) && !TypeParser.isGenericEnd(token, type))
+				if (!BaseSymbols.isCloseBracket(type) && !TypeParser.isGenericEnd(token, type))
 				{
 					break;
 				}

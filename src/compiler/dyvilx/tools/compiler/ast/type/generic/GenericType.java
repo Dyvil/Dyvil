@@ -5,7 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Type;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -169,7 +169,7 @@ public abstract class GenericType implements IObjectType
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
 		{

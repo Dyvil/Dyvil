@@ -1,14 +1,14 @@
 package dyvilx.tools.compiler.parser.expression;
 
 import dyvilx.tools.compiler.ast.classes.ClassBody;
-import dyvilx.tools.compiler.ast.expression.access.ClassConstructor;
-import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.access.ClassConstructor;
+import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.ClassBodyParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -22,13 +22,23 @@ public class ConstructorCallParser extends Parser
 	private static final int ANONYMOUS_CLASS_END        = 4;
 	private static final int ANONYMOUS_CLASS            = 8;
 
+	public static final int IGNORE_ANON_CLASS = 1;
+
 	protected IValueConsumer consumer;
 
 	private ConstructorCall call;
 
+	private byte flags;
+
 	public ConstructorCallParser(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
+	}
+
+	public ConstructorCallParser withFlags(int flags)
+	{
+		this.flags |= flags;
+		return this;
 	}
 
 	@Override
@@ -62,7 +72,7 @@ public class ConstructorCallParser extends Parser
 			}
 			// Fallthrough
 		case ANONYMOUS_CLASS:
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET && (this.flags & IGNORE_ANON_CLASS) == 0)
 			{
 				// new ... ( ... ) { ...
 				this.parseBody(pm);

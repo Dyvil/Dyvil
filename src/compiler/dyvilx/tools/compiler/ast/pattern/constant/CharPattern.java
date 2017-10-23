@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
@@ -9,9 +10,8 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class CharPattern extends Pattern
 {
@@ -19,14 +19,15 @@ public final class CharPattern extends Pattern
 	private static final byte TYPE_STRING = 2;
 
 	private String value;
-	
+
 	private byte type;
-	
+
 	public CharPattern(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
+
 	public CharPattern(SourcePosition position, String value, boolean forceChar)
 	{
 		this.position = position;
@@ -45,7 +46,7 @@ public final class CharPattern extends Pattern
 	{
 		return Types.CHAR;
 	}
-	
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
@@ -62,9 +63,10 @@ public final class CharPattern extends Pattern
 		{
 			return null;
 		}
-		
-		if (Types.isExactType(type, Types.STRING))
+
+		if (type.getTheClass() == Types.STRING_CLASS)
 		{
+			// also accepts String! or String?
 			this.type = TYPE_STRING;
 			return this;
 		}
@@ -75,7 +77,7 @@ public final class CharPattern extends Pattern
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
@@ -88,19 +90,19 @@ public final class CharPattern extends Pattern
 		}
 		return this.type != TYPE_CHAR && Types.isSuperType(type, Types.STRING);
 	}
-	
+
 	@Override
 	public boolean isSwitchable()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int subPatterns()
 	{
 		return 1;
 	}
-	
+
 	@Override
 	public int switchValue()
 	{
@@ -110,22 +112,28 @@ public final class CharPattern extends Pattern
 		}
 		return this.value.hashCode();
 	}
-	
+
+	@Override
+	public boolean switchCheck()
+	{
+		return this.type != TYPE_CHAR;
+	}
+
 	@Override
 	public int minValue()
 	{
 		return this.switchValue();
 	}
-	
+
 	@Override
 	public int maxValue()
 	{
 		return this.switchValue();
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		if (this.type == TYPE_STRING)
 		{
@@ -138,10 +146,10 @@ public final class CharPattern extends Pattern
 		writer.visitLdcInsn(this.value.charAt(0));
 		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		LexerUtil.appendCharLiteral(this.value, buffer);
+		StringLiterals.appendCharLiteral(this.value, buffer);
 	}
 }

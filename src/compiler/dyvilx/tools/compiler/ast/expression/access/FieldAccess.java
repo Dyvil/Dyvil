@@ -77,7 +77,7 @@ public class FieldAccess extends AbstractFieldAccess
 	@Override
 	public boolean isResolved()
 	{
-		return this.field != null;
+		return this.field != null && this.field.getType().isResolved();
 	}
 
 	@Override
@@ -181,15 +181,6 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		if (this.receiver != null)
-		{
-			this.receiver.resolveTypes(markers, context);
-		}
-	}
-
-	@Override
 	protected void reportResolve(MarkerList markers)
 	{
 		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
@@ -247,30 +238,6 @@ public class FieldAccess extends AbstractFieldAccess
 
 		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
 		return type != null ? new ClassAccess(this.position, type) : null;
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.receiver != null)
-		{
-			this.receiver.checkTypes(markers, context);
-		}
-
-		if (this.field != null)
-		{
-			this.field = this.field.capture(context);
-			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.receiver != null)
-		{
-			this.receiver.check(markers, context);
-		}
 	}
 
 	@Override

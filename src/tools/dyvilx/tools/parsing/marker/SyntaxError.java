@@ -2,6 +2,7 @@ package dyvilx.tools.parsing.marker;
 
 import dyvil.io.Console;
 import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
 
 public class SyntaxError extends Marker
 {
@@ -9,11 +10,11 @@ public class SyntaxError extends Marker
 	{
 		super(position, message);
 	}
-	
+
 	@Override
-	public String getMarkerType()
+	public MarkerLevel getLevel()
 	{
-		return "syntax";
+		return MarkerLevel.SYNTAX;
 	}
 
 	@Override
@@ -27,7 +28,7 @@ public class SyntaxError extends Marker
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isWarning()
 	{

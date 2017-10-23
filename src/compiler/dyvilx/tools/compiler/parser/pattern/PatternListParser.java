@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.parser.pattern;
 import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.IPatternList;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -28,7 +27,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (ParserUtil.isCloseBracket(type))
+		if (BaseSymbols.isCloseBracket(type))
 		{
 			if (this.pattern != null)
 			{

@@ -1,36 +1,24 @@
 package dyvilx.tools.compiler.util;
 
-import dyvil.source.position.Positioned;
-import dyvil.source.position.SourcePosition;
+import dyvil.lang.Name;
 import dyvil.string.CharUtils;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.parsing.ASTNode;
-import dyvil.lang.Name;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 
+// TODO get rid of this class
 public final class Util
 {
-	public static void expandPosition(Positioned positioned, SourcePosition to)
-	{
-		final SourcePosition pos = positioned.getPosition();
-		if (pos == null)
-		{
-			positioned.setPosition(to.raw());
-			return;
-		}
-		positioned.setPosition(pos.to(to));
-	}
-
 	// region Member & AST toString
 
 	public static String memberSignatureToString(IMember member, ITypeContext typeContext)
@@ -103,7 +91,7 @@ public final class Util
 
 	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)
 	{
-		ModifierUtil.writeClassType(iClass.getModifiers().toFlags(), stringBuilder);
+		ModifierUtil.writeClassType(iClass.getAttributes().flags(), stringBuilder);
 
 		stringBuilder.append(iClass.getName());
 
@@ -210,7 +198,7 @@ public final class Util
 		final int unqualifiedLength = name.unqualified.length();
 		final char lastChar = name.unqualified.charAt(unqualifiedLength - 1);
 
-		if (LexerUtil.isIdentifierSymbol(lastChar))
+		if (CharacterTypes.isIdentifierSymbol(lastChar))
 		{
 			// Last character is a symbol -> add = without _
 			return Name.from(name.unqualified.concat("="), name.qualified.concat("$eq"));
@@ -242,21 +230,6 @@ public final class Util
 	}
 
 	// endregion
-
-	public static boolean startsWithSymbol(Name name)
-	{
-		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointAt(0));
-	}
-
-	public static boolean endsWithSymbol(Name name)
-	{
-		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointBefore(name.unqualified.length()));
-	}
-
-	public static boolean endsWithSymbol(StringBuilder buffer)
-	{
-		return LexerUtil.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));
-	}
 
 	public static String toTime(long nanos)
 	{

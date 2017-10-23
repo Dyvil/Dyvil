@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.CodeConstructor;
@@ -18,7 +20,6 @@ import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
@@ -33,7 +34,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class EnumClassMetadata extends ClassMetadata
@@ -53,7 +53,7 @@ public class EnumClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesPre(markers, context);
 
-		this.theClass.getModifiers().addIntModifier(Modifiers.FINAL);
+		this.theClass.getAttributes().addFlag(Modifiers.FINAL);
 
 		// Ensure the super type is Enum<TYPE>
 		final IType classType = this.theClass.getClassType();
@@ -93,7 +93,7 @@ public class EnumClassMetadata extends ClassMetadata
 		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.constructor = new CodeConstructor(this.theClass,
-			                                       new FlagModifierSet(Modifiers.PROTECTED | Modifiers.GENERATED));
+			                                       AttributeList.of(Modifiers.PROTECTED | Modifiers.GENERATED));
 			this.updateConstructor(this.constructor);
 			this.copyClassParameters(this.constructor);
 		}
@@ -104,9 +104,9 @@ public class EnumClassMetadata extends ClassMetadata
 		// Prepend parameters and set super initializer
 		final CodeParameter nameParam = new CodeParameter(constructor, null, Names.name,
 		                                                  new ImplicitNullableType(Types.STRING),
-		                                                  new FlagModifierSet(Modifiers.SYNTHETIC), null);
+		                                                  AttributeList.of(Modifiers.SYNTHETIC));
 		final CodeParameter ordParam = new CodeParameter(constructor, null, Names.ordinal, Types.INT,
-		                                                 new FlagModifierSet(Modifiers.SYNTHETIC), null);
+		                                                 AttributeList.of(Modifiers.SYNTHETIC));
 
 		constructor.getParameters().insert(0, nameParam);
 		constructor.getParameters().insert(1, ordParam);
@@ -132,7 +132,7 @@ public class EnumClassMetadata extends ClassMetadata
 	protected void initValuesField(ClassBody body, IType arrayType)
 	{
 		this.valuesField = new Field(this.theClass, Names.$VALUES, arrayType,
-		                             new FlagModifierSet(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC));
+		                             AttributeList.of(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC));
 
 		final ArrayExpr value = new ArrayExpr();
 		value.setType(arrayType);
@@ -166,19 +166,19 @@ public class EnumClassMetadata extends ClassMetadata
 	{
 		// public static func values() -> [final EnumType]
 		this.valuesMethod = new CodeMethod(this.theClass, Names.values, arrayType,
-		                                   new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                   AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 
 		final Name from = Name.fromRaw("from");
 
 		// public static func valueOf(ordinal: int) -> EnumType
 		this.fromOrdMethod = new CodeMethod(this.theClass, from, classType,
-		                                    new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                    AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 		this.fromOrdMethod.setInternalName("valueOf");
 		this.fromOrdMethod.getParameters().add(new CodeParameter(Name.fromRaw("ordinal"), Types.INT));
 
 		// public static func valueOf(name: String) -> EnumType
 		this.fromNameMethod = new CodeMethod(this.theClass, from, classType,
-		                                     new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                     AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 		this.fromNameMethod.setInternalName("valueOf");
 		this.fromNameMethod.getParameters().add(new CodeParameter(Name.fromRaw("name"), Types.STRING));
 	}

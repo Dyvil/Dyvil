@@ -30,10 +30,10 @@ class OverloadTest
 
 	// ----------------- g section -----------------
 
-	// @BytecodeName("g_ints") // will be automatically name-mangled
+	@AutoMangled
 	static func g(ints: List<int>) -> String = "g(List<int>)"
 
-	// @BytecodeName("g_strings")
+	@AutoMangled
 	static func g(strings: List<String>) -> String = "g(List<String>)"
 
 	@BytecodeName("g_intSet")
@@ -44,16 +44,16 @@ class OverloadTest
 
 	// ----------------- h section -----------------
 
-	@BytecodeName("h_ints")
+	@AutoMangled
 	static func h(ints: List<int>) -> String = "h(List<int>)"
 
-	@BytecodeName("h_longs")
+	@AutoMangled
 	static func h(longs: List<long>) -> String = "h(List<long>)"
 
-	@BytecodeName("h_floats")
+	@AutoMangled
 	static func h(floats: List<float>) -> String = "h(List<float>)"
 
-	@BytecodeName("h_doubles")
+	@AutoMangled
 	static func h(doubles: List<double>) -> String = "h(List<double>)"
 
 	// ----------------- main test -----------------

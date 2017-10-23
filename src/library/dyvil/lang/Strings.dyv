@@ -40,48 +40,6 @@ abstract class Strings
 	@BytecodeName("fromShared")
 	static func apply(this: String, fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
 
-	@BytecodeName("reflect")
-	static func apply(this: String, reflecting: any) -> String = new StringBuilder().{ reflect(reflecting, $0, true); $0.toString }
-
-	private static func reflect(value: any, builder: StringBuilder, fieldNames: boolean) -> void
-	{
-		builder.append('(')
-
-		var currentType = value.dynamicClass
-		builder.append(currentType.getName()).append(')')
-
-		while (currentType != null)
-		{
-			for (field <- currentType.getFields)
-			{
-				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) continue
-
-				if (fieldNames)
-				{
-					builder.append(field.getName()).append(': ')
-				}
-
-				try
-				{
-					field.setAccessible(true)
-					builder.append(field.get(value))
-				}
-				catch (ex: IllegalAccessException)
-				{
-					builder.append("<error>")
-				}
-			}
-
-			currentType = currentType.getSuperclass
-		}
-
-		// delete extra ', '
-		let length = builder.length()
-		if (builder.charAt(length - 2) == ',') { builder.delete(length - 2, length) }
-
-		builder.append(')')
-	}
-
 	// Subscripts
 
 	inline infix func subscript(s: CharSequence, index: int) -> char = s.charAt index

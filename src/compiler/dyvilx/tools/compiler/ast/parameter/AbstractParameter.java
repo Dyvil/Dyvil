@@ -2,18 +2,16 @@ package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
@@ -22,7 +20,6 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
@@ -61,9 +58,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
-		                        ModifierSet modifiers, AnnotationList annotations)
+		                        AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 		this.label = name;
 		this.method = callable;
 	}
@@ -117,17 +114,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public ModifierSet getModifiers()
-	{
-		if (this.modifiers == null)
-		{
-			this.modifiers = new FlagModifierSet();
-		}
-
-		return this.modifiers;
-	}
-
-	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
@@ -172,13 +158,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	@Override
 	public void setVarargs()
 	{
-		this.getModifiers().addIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
-	{
-		return true;
+		this.attributes.addFlag(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -186,7 +166,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	{
 		if (this.method != null && this.method.hasModifier(Modifiers.GENERATED))
 		{
-			this.getModifiers().addIntModifier(Modifiers.GENERATED);
+			this.attributes.addFlag(Modifiers.GENERATED);
 		}
 
 		super.resolveTypes(markers, context);
@@ -203,9 +183,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		{
 			if (functionType.isExtension())
 			{
-				this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
+				this.attributes.addFlag(Modifiers.INFIX_FLAG);
 			}
-			else if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
+			else if (this.attributes.hasFlag(Modifiers.INFIX_FLAG))
 			{
 				functionType.setExtension(true);
 			}
@@ -235,15 +215,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.toInlineString(indent, buffer);
-		}
-
-		if (this.modifiers != null)
-		{
-			this.modifiers.toString(this.getKind(), buffer);
-		}
+		this.attributes.toInlineString(indent, buffer);
 
 		if (this.label != this.name)
 		{

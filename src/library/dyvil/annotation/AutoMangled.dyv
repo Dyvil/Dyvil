@@ -1,0 +1,9 @@
+package dyvil.annotation
+
+import java.lang.annotation._
+
+@Target([ .METHOD ])
+@Retention(.SOURCE)
+@interface AutoMangled
+{
+}

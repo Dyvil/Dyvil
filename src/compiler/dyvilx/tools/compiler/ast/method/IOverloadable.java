@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.method;
 
 import dyvil.annotation.OverloadPriority;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -12,7 +12,7 @@ public interface IOverloadable extends IMember
 
 	default int getOverloadPriority()
 	{
-		final IAnnotation annotation = this.getAnnotation(Types.OVERLOADPRIORITY_CLASS);
+		final Annotation annotation = this.getAnnotation(Types.OVERLOADPRIORITY_CLASS);
 		if (annotation == null)
 		{
 			return 0;

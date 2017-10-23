@@ -1,9 +1,9 @@
 package dyvilx.tools.repl.input;
 
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.classes.MemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.TryParserManager;
@@ -12,7 +12,8 @@ import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 import dyvilx.tools.repl.context.REPLContext;
 
-import static dyvilx.tools.compiler.parser.header.DyvilHeaderParser.ONE_ELEMENT;
+import static dyvilx.tools.compiler.parser.header.SourceFileParser.NO_CLASSES;
+import static dyvilx.tools.compiler.parser.header.SourceFileParser.ONE_ELEMENT;
 import static dyvilx.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 
 public class REPLParser extends Parser
@@ -20,7 +21,7 @@ public class REPLParser extends Parser
 	protected static final int ELEMENT   = 0;
 	protected static final int SEPARATOR = 1;
 
-	protected static final TryParserManager TRY_PARSER   = new TryParserManager(DyvilSymbols.INSTANCE);
+	protected static final TryParserManager TRY_PARSER = new TryParserManager(DyvilSymbols.INSTANCE);
 
 	protected final REPLContext context;
 
@@ -50,8 +51,8 @@ public class REPLParser extends Parser
 		case ELEMENT:
 
 			this.mode = SEPARATOR;
-			if (TRY_PARSER
-				    .tryParse(pm, new DyvilHeaderParser(this.context).withFlags(ONE_ELEMENT), token, EXIT_ON_ROOT))
+			if (TRY_PARSER.tryParse(pm, new SourceFileParser(this.context).withFlags(ONE_ELEMENT | NO_CLASSES), token,
+			                        EXIT_ON_ROOT))
 			{
 				return;
 			}

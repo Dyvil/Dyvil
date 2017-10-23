@@ -1,13 +1,10 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.field.EnumConstant;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -26,14 +23,12 @@ public class EnumConstantParser extends AbstractMemberParser
 	public EnumConstantParser(IMemberConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.modifiers = new ModifierList();
 	}
 
-	public EnumConstantParser(IMemberConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
+	public EnumConstantParser(IMemberConsumer consumer, AttributeList attributes)
 	{
+		super(attributes);
 		this.consumer = consumer;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
 	}
 
 	@Override
@@ -49,12 +44,12 @@ public class EnumConstantParser extends AbstractMemberParser
 			}
 			return;
 		case NAME:
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "field.identifier");
 			}
 
-			this.constant = new EnumConstant(token.raw(), token.nameValue(), this.getModifiers(), this.annotations);
+			this.constant = new EnumConstant(token.raw(), token.nameValue(), this.attributes);
 			this.mode = VALUE;
 			return;
 		case VALUE:

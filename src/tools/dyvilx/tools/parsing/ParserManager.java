@@ -1,7 +1,7 @@
 package dyvilx.tools.parsing;
 
 import dyvil.lang.Name;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.lexer.Symbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.marker.Marker;
@@ -96,7 +96,7 @@ public class ParserManager implements IParserManager
 		final int length = identifier.length();
 		final int lastCodePoint = identifier.codePointBefore(length);
 
-		if (LexerUtil.isIdentifierSymbol(lastCodePoint) || LexerUtil.isIdentifierConnector(lastCodePoint))
+		if (CharacterTypes.isIdentifierSymbol(lastCodePoint) || CharacterTypes.isIdentifierConnector(lastCodePoint))
 		{
 			final int symbol = this.symbols.getSymbolType(identifier);
 			if (symbol != 0)

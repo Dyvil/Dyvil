@@ -4,8 +4,8 @@ import dyvil.collection.Set;
 import dyvil.lang.Formattable;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -150,9 +150,9 @@ public abstract class BinaryType implements IObjectType
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public Annotation getAnnotation(IClass type)
 	{
-		final IAnnotation left = this.left.getAnnotation(type);
+		final Annotation left = this.left.getAnnotation(type);
 		return left != null ? left : this.right.getAnnotation(type);
 	}
 
@@ -214,7 +214,7 @@ public abstract class BinaryType implements IObjectType
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	public void addAnnotation(Annotation annotation, TypePath typePath, int step, int steps)
 	{
 	}
 

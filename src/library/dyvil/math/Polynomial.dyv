@@ -1,0 +1,270 @@
+package dyvil.math
+
+@LiteralConvertible.FromInt
+@LiteralConvertible.FromLong
+@LiteralConvertible.FromFloat
+@LiteralConvertible.FromDouble
+class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomial>, Formattable, (double -> double)
+{
+	@BytecodeName("apply0")
+	static func apply(coefficient: double) -> Polynomial = Polynomial(coefficient, degree: 0)
+
+	static func apply(coefficients: double...) -> Polynomial
+	{
+		for (var i = coefficients.size - 1; i >= 0; i--)
+		{
+			if (coefficients[i] != 0)
+			{
+				// trim trailing zeroes of the array
+				return new Polynomial(coefficients.trim(i + 1))
+			}
+		}
+		// array is all zeros or empty
+		return _0
+	}
+
+	static func apply(coefficient: double, explicit degree: int) -> Polynomial
+	{
+		if (coefficient == 0) return _0
+
+		let array = new [double](degree + 1)
+		array[degree] = coefficient
+		return new Polynomial(array)
+	}
+
+	func degree() -> int = this.coefficients.size - 1
+
+	func subscript(index: int) = this.coefficients[index]
+
+	func isZero() = this.coefficients.isEmpty
+
+	override func apply(_ x: double) -> double
+	{
+		var xpow = 1.0
+		var sum = 0.0
+		for (c <- this.coefficients)
+		{
+			sum += c * xpow
+			xpow *= x
+		}
+		return sum
+	}
+
+	func derivative() -> Polynomial
+	{
+		// derivative of a polynomial of degree 0 or -1 is the zero polynomial
+		if (this.degree <= 0) return _0
+
+		let oldCoeff = this.coefficients
+		let newCoeff = [double](oldCoeff.size - 1)
+		for (i <- 1 ..< oldCoeff.size)
+		{
+			newCoeff[i - 1] = oldCoeff[i] * i
+		}
+		return new Polynomial(newCoeff) // no trimming necessary
+	}
+
+	func integral() -> Polynomial
+	{
+		if (this.isZero) return _0
+
+		let oldCoeff = this.coefficients
+		let newCoeff = [double](oldCoeff.size + 1)
+		for (i <- 0 ..< oldCoeff.size)
+		{
+			newCoeff[i + 1] = oldCoeff[i] / (i + 1)
+		}
+		return new Polynomial(newCoeff) // no trimming necessary
+	}
+
+	// Constants
+
+	public const _0: Polynomial = new Polynomial([]) { override get }
+
+	public const _1: Polynomial = new Polynomial([1]) { override get }
+
+	public const _x: Polynomial = new Polynomial([0, 1])
+
+	// Unary Operators
+
+	private postfix func mapped(poly: Polynomial, op: double -> double) -> Polynomial
+	{
+		let oldCoeff = poly.coefficients
+		let size = oldCoeff.size
+		let newCoeff = new [double](size)
+		for (i <- 0 ..< size) newCoeff[i] = op(oldCoeff[i])
+		return Polynomial(newCoeff...)
+	}
+
+	override prefix func +(rhs: Polynomial) -> Polynomial = rhs
+
+	override prefix func -(rhs: Polynomial) -> Polynomial = rhs.mapped(c => -c)
+
+	override postfix func inverse(lhs: Polynomial) -> Polynomial
+	{
+		throw new UnsupportedOperationException('reciprocal of polynomial')
+	}
+
+	// Additive Operators
+
+	override infix func +(lhs: Polynomial, rhs: Polynomial) -> Polynomial
+	{
+		let lhsCoeff = lhs.coefficients
+		let rhsCoeff = rhs.coefficients
+
+		if (lhsCoeff.size > rhsCoeff.size)
+		{
+			let coeff = lhsCoeff.copy
+			for (i <- 0 ..< rhsCoeff.size) coeff[i] += rhsCoeff[i]
+			return Polynomial(coeff...)
+		}
+		else
+		{
+			let coeff = rhsCoeff.copy
+			for (i <- 0 ..< lhsCoeff.size) coeff[i] += lhsCoeff[i]
+			return Polynomial(coeff...)
+		}
+	}
+
+	override infix func -(lhs: Polynomial, rhs: Polynomial) -> Polynomial = lhs + -rhs
+
+	// Multiplicative Operators
+
+	infix func *(lhs: double, rhs: Polynomial) -> Polynomial = rhs.mapped(c => lhs * c)
+
+	infix func *(lhs: Polynomial, rhs: double) -> Polynomial = lhs.mapped(c => c * rhs)
+
+	override infix func *(lhs: Polynomial, rhs: Polynomial) -> Polynomial
+	{
+		let lhsCoeff = lhs.coefficients
+		let lhsSize = lhsCoeff.size
+		let rhsCoeff = rhs.coefficients
+		let rhsSize = rhsCoeff.size
+		let coeff = new [double](lhsSize + rhsSize - 1)
+
+		for (i <- 0 ..< lhsCoeff.size)
+		{
+			for (j <- 0 ..< rhsCoeff.size)
+			{
+				coeff[i + j] += lhsCoeff[i] * rhsCoeff[j]
+			}
+		}
+
+		return Polynomial(coeff...)
+	}
+
+	infix func /(lhs: Polynomial, rhs: double) -> Polynomial = lhs.mapped(c => c / rhs)
+
+	override infix func /(lhs: Polynomial, rhs: Polynomial) -> Polynomial = (lhs /% rhs)._1
+
+	infix func %(lhs: Polynomial, rhs: Polynomial) -> Polynomial = (lhs /% rhs)._2
+
+	// divmod
+	infix func /%(lhs n: Polynomial, rhs d: Polynomial) -> (Polynomial, Polynomial)
+	{
+		if (d.isZero) throw new ArithmeticException('division by zero polynomial')
+
+		var q = _0
+		var r = n // invariant: n = d * q + r
+
+		while (!r.isZero && r.degree >= d.degree)
+		{
+			let t = divideHigh(r, d)
+			q += t
+			r -= t * d
+		}
+
+		return (q, r)
+	}
+
+	// helper for divmod
+	private static func divideHigh(r: Polynomial, d: Polynomial) -> Polynomial
+	{
+		let rDeg = r.degree
+		let rCoeff = r.coefficients[rDeg]
+		let dDeg = d.degree
+		let dCoeff = d.coefficients[dDeg]
+		return Polynomial(rCoeff / dCoeff, degree: rDeg - dDeg)
+	}
+
+	infix func **(lhs: Polynomial, rhs: int) -> Polynomial
+	{
+		if (rhs < 0) throw new UnsupportedOperationException('polynomial to the negative power')
+		if (rhs == 0) return _1
+		if (rhs == 1) return lhs
+
+		// exp by squaring
+		if ((rhs & 1) == 0)
+		{
+			return (lhs * lhs) ** (rhs >> 1)
+		}
+		else
+		{
+			return lhs * (lhs * lhs) ** (rhs >> 1) // use (rhs >> 1) instead of (rhs - 1) \ 2
+		}
+	}
+
+	static func gcd(a: Polynomial, b: Polynomial) -> Polynomial
+	{
+		while (!b.isZero())
+		{
+			let t = b
+			b = a % b
+			a = t
+		}
+		return a
+	}
+
+	// equals and hashCode
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is Polynomial && this.equals(obj as Polynomial)
+
+	func equals(that: Polynomial) -> boolean = this === that || this.coefficients == that.coefficients
+
+	override func hashCode() -> int = this.coefficients.hashCode
+
+	// String
+
+	override func toString() -> String = String(this)
+
+	override func toString(buffer: StringBuilder) -> void
+	{
+		let size = this.coefficients.size
+		if (size == 0)
+		{
+			buffer.append('0.0')
+			return
+		}
+		else if (size == 1)
+		{
+			buffer.append(this.coefficients[0])
+			return
+		}
+
+		// append x^0 term, but without x^0
+		var coeff = this.coefficients[0]
+		if (coeff != 0)
+		{
+			buffer.append(coeff).append(' + ')
+		}
+
+		// append x^1 .. x^(n-1) terms
+		for (i <- 1 .. size - 2)
+		{
+			coeff = this.coefficients[i]
+			if (coeff != 0)
+			{
+				toString(coeff, i, buffer)
+				buffer.append(' + ')
+			}
+		}
+
+		// append x^n term
+		toString(this.coefficients[size - 1], size - 1, buffer)
+	}
+
+	private static func toString(coefficient: double, degree: int, buffer: StringBuilder)
+	{
+		buffer.append(coefficient).append(' x^').append(degree)
+	}
+}

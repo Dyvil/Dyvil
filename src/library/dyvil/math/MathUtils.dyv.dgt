@@ -53,9 +53,9 @@ abstract class MathUtils
 		}
 	}
 
-	static func sum(this: Math, k start: long, to end: long, _ f: long -> long) -> long
+	static func sum(this: Math, k start: long, to end: long, _ f: long -> double) -> double
 	{
-		var sum = 0L
+		var sum = 0.0D
 		for (k <- start .. end) sum += f(k)
 		return sum
 	}
@@ -72,9 +72,9 @@ abstract class MathUtils
 		}
 	}
 
-	static func product(this: Math, k start: long, to end: long, _ f: long -> long) -> long
+	static func product(this: Math, k start: long, to end: long, _ f: long -> double) -> double
 	{
-		var product = 0L
+		var product = 1.0D
 		for (k <- start .. end) product *= f(k)
 		return product
 	}
@@ -141,7 +141,11 @@ abstract class MathUtils
 	postfix func !(_ lhs: long) -> long
 	{
 		var l = lhs
-		while (lhs > 1) l *= { lhs -= 1 }
+		while (lhs > 1)
+		{
+			lhs -= 1
+			l *= lhs
+		}
 		return l
 	}
 

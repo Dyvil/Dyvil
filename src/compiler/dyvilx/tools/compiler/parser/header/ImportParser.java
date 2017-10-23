@@ -2,11 +2,9 @@ package dyvilx.tools.compiler.parser.header;
 
 import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.imports.*;
-import dyvilx.tools.compiler.parser.ParserUtil;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
@@ -107,7 +105,7 @@ public final class ImportParser extends Parser
 			}
 
 			pm.report(token, "import.identifier");
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				pm.popParser(true);
 			}
@@ -136,7 +134,7 @@ public final class ImportParser extends Parser
 			case DyvilKeywords.AS:
 				this.mode = END;
 				final IToken next = token.next();
-				if (ParserUtil.isIdentifier(next.type()))
+				if (Tokens.isIdentifier(next.type()))
 				{
 					this.theImport.setAlias(next.nameValue());
 					pm.skip();
@@ -153,7 +151,7 @@ public final class ImportParser extends Parser
 			pm.report(token, "import.dot");
 			return;
 		case MULTI_IMPORT_END:
-			Util.expandPosition(this.theImport, token);
+			this.theImport.expandPosition(token);
 			this.end();
 			pm.popParser();
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
@@ -176,11 +174,5 @@ public final class ImportParser extends Parser
 			return;
 		}
 		this.consumer.setImport(this.theImport);
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return true;
 	}
 }

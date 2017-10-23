@@ -1,9 +1,11 @@
 package dyvilx.tools.compiler.ast.context;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.field.IAccessible;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
@@ -13,14 +15,12 @@ import dyvilx.tools.compiler.ast.imports.IImportContext;
 import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvil.lang.Name;
 
 public interface IContext extends IMemberContext, IImportContext
 {
@@ -32,7 +32,7 @@ public interface IContext extends IMemberContext, IImportContext
 	byte FALSE = 0;
 	byte TRUE  = 1;
 
-	default boolean isStatic()
+	default boolean hasStaticAccess()
 	{
 		return this.checkStatic() != FALSE;
 	}
@@ -119,7 +119,8 @@ public interface IContext extends IMemberContext, IImportContext
 		return matches;
 	}
 
-	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, ArgumentList arguments)
+	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type,
+		                                      ArgumentList arguments)
 	{
 		return resolveConstructors(implicitContext, type, arguments).getBestMember();
 	}
@@ -186,7 +187,7 @@ public interface IContext extends IMemberContext, IImportContext
 	static boolean isUnhandled(IContext context, IType exceptionType)
 	{
 		return Types.isSuperType(Types.EXCEPTION, exceptionType) // Exception type is sub-type of java.lang.Exception
-			       && !Types.isSuperType(Types.RUNTIME_EXCEPTION, exceptionType) // but not java.lang.RuntimeException
-			       && context.checkException(exceptionType) == FALSE;
+		       && !Types.isSuperType(Types.RUNTIME_EXCEPTION, exceptionType) // but not java.lang.RuntimeException
+		       && context.checkException(exceptionType) == FALSE;
 	}
 }

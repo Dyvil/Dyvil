@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -14,7 +15,6 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class SuperExpr implements IValue
 {
@@ -77,7 +77,7 @@ public final class SuperExpr implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (context.isStatic())
+		if (context.hasStaticAccess())
 		{
 			markers.add(Markers.semantic(this.position, "super.access.static"));
 			return;

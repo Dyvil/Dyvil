@@ -1,19 +1,21 @@
 package dyvilx.tools.compiler.ast.parameter;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassWriter;
@@ -21,7 +23,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
-import dyvil.lang.Name;
 
 public interface IParameter extends IVariable, IClassMember
 {
@@ -90,7 +91,7 @@ public interface IParameter extends IVariable, IClassMember
 
 	default void writeParameter(MethodWriter writer)
 	{
-		final AnnotationList annotations = this.getAnnotations();
+		final AttributeList annotations = this.getAttributes();
 		final IType type = this.getType();
 		final long flags = ModifierUtil.getFlags(this);
 
@@ -111,7 +112,7 @@ public interface IParameter extends IVariable, IClassMember
 			annotations.write(visitor);
 		}
 
-		ModifierUtil.writeModifiers(visitor, this, flags);
+		ModifierUtil.writeModifiers(visitor, flags);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 	}
@@ -134,7 +135,7 @@ public interface IParameter extends IVariable, IClassMember
 		else
 		{
 			name = method.getInternalName() + "$paramDefault$" + this.getInternalName();
-			access = method.getModifiers().toFlags() & Modifiers.MEMBER_MODIFIERS | Modifiers.STATIC;
+			access = (method.getAttributes().flags() & Modifiers.MEMBER_MODIFIERS) | Modifiers.STATIC;
 		}
 
 		final String desc = "()" + this.getDescriptor();
@@ -160,13 +161,13 @@ public interface IParameter extends IVariable, IClassMember
 
 	default AnnotationVisitor visitAnnotation(String internalType)
 	{
-		if (!this.addRawAnnotation(internalType, null))
+		if (this.skipAnnotation(internalType, null))
 		{
 			return null;
 		}
 
 		IType type = new InternalType(internalType);
-		Annotation annotation = new Annotation(type);
-		return new AnnotationReader(this.getAnnotations(), annotation);
+		Annotation annotation = new ExternalAnnotation(type);
+		return new AnnotationReader(this, annotation);
 	}
 }

@@ -66,6 +66,8 @@ interface SourcePosition extends Comparable<SourcePosition>
 	@Deprecated // in Dyvil only
 	func isAfter(position: SourcePosition) -> boolean = this.compareTo(position) > 0
 
+	func isNeighboring(position: SourcePosition) -> boolean = this.endColumn == position.startColumn
+
 	// Base Implementation
 
 	private static case class Base

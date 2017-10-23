@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.expression;
 
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.access.AbstractCall;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -13,10 +15,8 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class LiteralConversion extends AbstractCall
 {
@@ -28,12 +28,12 @@ public class LiteralConversion extends AbstractCall
 		this.position = position;
 	}
 
-	public LiteralConversion(IValue literal, IAnnotation annotation)
+	public LiteralConversion(IValue literal, Annotation annotation)
 	{
 		this(literal, annotation, new ArgumentList(literal));
 	}
 
-	public LiteralConversion(IValue literal, IAnnotation annotation, ArgumentList arguments)
+	public LiteralConversion(IValue literal, Annotation annotation, ArgumentList arguments)
 	{
 		this.position = literal.getPosition();
 		this.literal = literal;
@@ -79,7 +79,7 @@ public class LiteralConversion extends AbstractCall
 		}
 	}
 
-	public static Name[] parseAnnotation(IAnnotation annotation)
+	public static Name[] parseAnnotation(Annotation annotation)
 	{
 		final String method = getMethod(annotation);
 		if (method == null)
@@ -124,7 +124,7 @@ public class LiteralConversion extends AbstractCall
 		return result;
 	}
 
-	public static String getMethod(IAnnotation annotation)
+	public static String getMethod(Annotation annotation)
 	{
 		final IValue value = annotation.getArguments().getFirst();
 		if (value == null)
@@ -134,7 +134,7 @@ public class LiteralConversion extends AbstractCall
 		return value.stringValue();
 	}
 
-	public static Name getMethodName(IAnnotation annotation)
+	public static Name getMethodName(Annotation annotation)
 	{
 		final String method = getMethod(annotation);
 		if (method == null)

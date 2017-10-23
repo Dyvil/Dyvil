@@ -1,17 +1,16 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.expression.ArgumentListParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -39,11 +38,10 @@ public class ConstructorParser extends AbstractMemberParser
 		this.mode = DECLARATOR;
 	}
 
-	public ConstructorParser(IMemberConsumer<?> consumer, ModifierSet modifiers, AnnotationList annotations)
+	public ConstructorParser(IMemberConsumer<?> consumer, AttributeList attributes)
 	{
+		super(attributes);
 		this.consumer = consumer;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
 		this.mode = DECLARATOR;
 	}
 
@@ -60,7 +58,7 @@ public class ConstructorParser extends AbstractMemberParser
 				this.parseAnnotation(pm, token);
 				return;
 			case DyvilKeywords.INIT:
-				this.member = this.consumer.createConstructor(token.raw(), this.modifiers, this.annotations);
+				this.member = this.consumer.createConstructor(token.raw(), this.attributes);
 				this.mode = PARAMETERS;
 				return;
 			}

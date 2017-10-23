@@ -65,20 +65,20 @@ interface Test
 	static case class EqualityTest(
 		let actual: Object!
 		let expected: Object!
-		let inverted: boolean = false
+		let comparisonResult: boolean = true
 	) implements Test
 	{
-		override func passes() -> boolean = [this.actual].deepEquals([this.expected]) != this.inverted
+		override func passes() -> boolean = ([this.actual] == [this.expected]) == this.comparisonResult
 
 		override func addErrors(errors: List<String>) -> void
 		{
 			if (this.passes) return
 
-			if (this.inverted)
+			if (!this.comparisonResult)
 			{
 				errors.add("Inequality Requirement failed")
 				errors.add("\tfor value: \(this.expected)")
-				return;
+				return
 			}
 
 			errors.add("Equality Requirement failed")
@@ -87,9 +87,9 @@ interface Test
 		}
 	}
 
-	infix func =?=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, false)
+	infix func =?=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, true)
 
-	infix func =!=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, true)
+	infix func =!=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, false)
 
 	// Expect Throwable Tests
 

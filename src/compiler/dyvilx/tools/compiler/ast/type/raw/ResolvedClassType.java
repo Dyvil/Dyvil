@@ -1,10 +1,10 @@
 package dyvilx.tools.compiler.ast.type.raw;
 
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ResolvedClassType extends ClassType
 {

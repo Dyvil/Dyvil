@@ -1,16 +1,13 @@
 package dyvilx.tools.compiler.parser.classes;
 
+import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
-import dyvilx.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -33,7 +30,6 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 	public MemberParser(IMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
-		this.modifiers = new ModifierList();
 		// this.mode = TYPE;
 	}
 
@@ -62,7 +58,7 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				pm.reparse();
 				// Fallthrough
 			case Tokens.EOF:
-				if (DyvilHeaderParser.hasModifiers(this.modifiers, this.annotations))
+				if (!this.attributes.isEmpty())
 				{
 					pm.report(token, "member.declarator");
 				}
@@ -72,8 +68,7 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
-					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.modifiers,
-					                                                                 this.annotations);
+					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.attributes);
 					this.consumer.addInitializer(initializer);
 					this.mode = END;
 					pm.pushParser(new StatementListParser(initializer));
@@ -81,12 +76,12 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				}
 
 				this.mode = END;
-				pm.pushParser(new ConstructorParser(this.consumer, this.modifiers, this.annotations), true);
+				pm.pushParser(new ConstructorParser(this.consumer, this.attributes), true);
 				return;
 			case DyvilKeywords.CONST:
 			case DyvilKeywords.LET:
 			case DyvilKeywords.VAR:
-				final FieldParser<T> parser = new FieldParser<>(this.consumer, this.modifiers, this.annotations);
+				final FieldParser<T> parser = new FieldParser<>(this.consumer, this.attributes);
 				if ((this.flags & NO_FIELD_PROPERTIES) != 0)
 				{
 					parser.withFlags(FieldParser.NO_PROPERTIES);
@@ -95,7 +90,7 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				this.mode = END;
 				return;
 			case DyvilKeywords.CASE:
-				if (!ParserUtil.isIdentifier(token.next().type()))
+				if (!Tokens.isIdentifier(token.next().type()))
 				{
 					break;
 				}
@@ -106,23 +101,22 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 			case DyvilKeywords.FUNC:
 			case DyvilKeywords.OPERATOR:
 				this.mode = END;
-				pm.pushParser(new MethodParser(this.consumer, this.modifiers, this.annotations), true);
+				pm.pushParser(new MethodParser(this.consumer, this.attributes), true);
 				return;
 			}
 
 			final Modifier modifier;
 			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
 			{
-				this.modifiers.addModifier(modifier);
+				this.attributes.add(modifier);
 				return;
 			}
 
 			int classType;
 			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
-				this.modifiers.addIntModifier(classType);
-				ClassDeclarationParser parser = new ClassDeclarationParser(this.consumer, this.modifiers,
-				                                                           this.annotations);
+				this.attributes.addFlag(classType);
+				ClassDeclarationParser parser = new ClassDeclarationParser(this.consumer, this.attributes);
 				pm.pushParser(parser);
 				this.mode = END;
 				return;
@@ -145,6 +139,6 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode != DECLARATOR;
+		return this.mode != DECLARATOR && super.reportErrors();
 	}
 }

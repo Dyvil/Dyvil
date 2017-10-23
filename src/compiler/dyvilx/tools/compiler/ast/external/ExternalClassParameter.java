@@ -1,31 +1,26 @@
 package dyvilx.tools.compiler.ast.external;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ClassParameter;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ExternalClassParameter extends ClassParameter
 {
-	private static final int TYPE        = 2;
+	private static final int TYPE = 2;
 
 	private byte resolved;
 
-	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type, ModifierSet modifiers)
+	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type, AttributeList attributes)
 	{
-		super(enclosingClass, name, type);
+		super(enclosingClass, null, name, type, attributes);
 		this.descriptor = desc;
-		if (modifiers != null)
-		{
-			this.modifiers = modifiers;
-		}
 	}
 
 	private IContext getCombiningContext()
@@ -35,10 +30,7 @@ public class ExternalClassParameter extends ClassParameter
 
 	private void resolveAnnotations()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
 	}
 
 	private void resolveReturnType()
@@ -68,10 +60,10 @@ public class ExternalClassParameter extends ClassParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override

@@ -10,7 +10,7 @@ interface Random
 
 	func nextBoolean() -> boolean = this.next(1) > 0
 
-	func nextBoolean(f: float) -> boolean = this.nextFloat() < f
+	func nextBoolean(withProbability f: float) -> boolean = this.nextFloat() < f
 
 	func nextByte() -> byte = this.next(7) as byte
 
@@ -51,9 +51,9 @@ interface Random
 
 	func nextInt(min: int, max: int) -> int = min + this.nextInt(max - min + 1)
 
-	func nextInt(f: float) -> int = (f + (this.nextFloat() < f ? 0 : 1)) as int
+	func nextInt(f: float) -> int = f as int + (this.nextFloat() < f ? 0 : 1)
 
-	func nextLong() -> long = ((this.next(32) as long) << 32) + this.next(32)
+	func nextLong() -> long = ((this.next(31) as long) << 32) | this.next(32)
 
 	func nextLong(max: long) -> long
 	{

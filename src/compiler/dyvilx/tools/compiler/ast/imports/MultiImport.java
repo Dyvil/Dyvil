@@ -149,7 +149,9 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].asContext().resolveTypeAlias(matches, receiver, name, arguments);
+			final MatchList<ITypeAlias> subList = matches.emptyCopy();
+			this.imports[i].asContext().resolveTypeAlias(subList, receiver, name, arguments);
+			matches.addAll(subList);
 		}
 	}
 
@@ -200,7 +202,9 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].asContext().getMethodMatches(list, receiver, name, arguments);
+			final MatchList<IMethod> subList = list.emptyCopy();
+			this.imports[i].asContext().getMethodMatches(subList, receiver, name, arguments);
+			list.addAll(subList);
 		}
 	}
 
@@ -209,7 +213,9 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].asContext().getImplicitMatches(list, value, targetType);
+			final MatchList<IMethod> subList = list.emptyCopy();
+			this.imports[i].asContext().getImplicitMatches(subList, value, targetType);
+			list.addAll(subList);
 		}
 	}
 

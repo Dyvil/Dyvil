@@ -6,7 +6,21 @@ import java.io._
 
 class CaseClassTest
 {
-	static case class Person(let id: long, let name: String, let age: int, let height: double)
+	static case class Person(
+		let id: long
+		let name: String
+		let age: int
+		let height: double
+	)
+
+	static case class Student(
+		override let id: long
+		override let name: String
+		override let age: int
+		override let height: double
+		let faculty: String
+		let studentID: long
+	) extends Person(id, name, age, height)
 
 	static case class Arrays(
 		let ints: [int]

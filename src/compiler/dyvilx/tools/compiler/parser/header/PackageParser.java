@@ -1,12 +1,12 @@
 package dyvilx.tools.compiler.parser.header;
 
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
-import dyvilx.tools.compiler.parser.ParserUtil;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 public class PackageParser extends Parser
@@ -39,7 +39,7 @@ public class PackageParser extends Parser
 			}
 			return;
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
+			if (Tokens.isIdentifier(type))
 			{
 				final Name name = token.nameValue();
 				this.buffer.append(name.qualified);
@@ -52,7 +52,7 @@ public class PackageParser extends Parser
 			if (type == BaseSymbols.SEMICOLON)
 			{
 				this.packageDeclaration.setPackage(this.buffer.toString());
-				pm.popParser();
+				pm.popParser(true);
 				return;
 			}
 			this.mode = NAME;
@@ -66,11 +66,5 @@ public class PackageParser extends Parser
 				pm.reparse();
 			}
 		}
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return true;
 	}
 }

@@ -39,7 +39,7 @@ public interface Value extends ASTNode, dyvil.tools.dpf.model.value.Value
 
 	implicit static final func apply(literal: Name) -> NameAccess = NameAccess(literal)
 
-	implicit static final func apply(literal: boolean) -> NameAccess = NameAccess(Name.fromRaw(literal.toString))
+	implicit static final func apply(literal: boolean) -> NameAccess = NameAccess(Name(literal.toString))
 
 	static final func apply(elements: Value...) -> ListValue = ListValue(elements...)
 

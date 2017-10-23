@@ -1,10 +1,10 @@
 package dyvilx.tools.compiler.parser.annotation;
 
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvilx.tools.compiler.ast.modifiers.Modifier;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.ast.attribute.modifiers.BaseModifiers;
+import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.token.IToken;
 

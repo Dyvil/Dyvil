@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.parameter;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -9,7 +11,6 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
@@ -17,10 +18,8 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class CodeParameter extends AbstractParameter
 {
@@ -43,10 +42,10 @@ public class CodeParameter extends AbstractParameter
 		super(callable, position, name, type);
 	}
 
-	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                    AnnotationList annotations)
+	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
+		                    AttributeList attributes)
 	{
-		super(callable, position, name, type, modifiers, annotations);
+		super(callable, position, name, type, attributes);
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class CodeParameter extends AbstractParameter
 			return;
 		}
 
-		this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+		this.attributes.addFlag(Modifiers.DEFAULT);
 
 		IValue value = this.value.resolve(markers, context);
 
@@ -87,10 +86,8 @@ public class CodeParameter extends AbstractParameter
 				                     IType.TypePosition.PARAMETER_TYPE;
 			this.type.checkType(markers, context, position);
 		}
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
+
+		this.attributes.checkTypes(markers, context);
 
 		if (this.value != null)
 		{
@@ -114,7 +111,7 @@ public class CodeParameter extends AbstractParameter
 		}
 
 		if (this.isVarargs() && !this.type.canExtract(ArrayType.class)
-			    && this.type.getAnnotation(ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
+		    && this.type.getAnnotation(ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
 		{
 			final Marker marker = Markers.semanticError(this.type.getPosition(), "parameter.varargs.incompatible",
 			                                            this.name);

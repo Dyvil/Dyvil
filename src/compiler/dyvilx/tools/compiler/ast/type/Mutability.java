@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.type;
 
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -51,13 +51,14 @@ public enum Mutability
 	{
 		if (this != UNDEFINED)
 		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), this.extendedAnnotationType, true).visitEnd();
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), this.extendedAnnotationType, true)
+			       .visitEnd();
 		}
 	}
 
-	public static Mutability readAnnotation(IAnnotation annotation)
+	public static Mutability readAnnotation(Annotation annotation)
 	{
-		final String annotationType = annotation.getType().getInternalName();
+		final String annotationType = annotation.getTypeDescriptor();
 		if (IMMUTABLE.annotationType.equals(annotationType))
 		{
 			return IMMUTABLE;

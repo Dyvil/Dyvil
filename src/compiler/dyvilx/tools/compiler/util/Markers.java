@@ -5,7 +5,6 @@ import dyvil.source.position.SourcePosition;
 import dyvil.util.I18n;
 import dyvil.util.MarkerLevel;
 import dyvilx.tools.parsing.marker.*;
-import dyvilx.tools.parsing.marker.InfoMarker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -126,25 +125,15 @@ public final class Markers
 
 		try
 		{
-			switch (MARKER_LEVEL_BUNDLE.getString(key))
-			{
-			case "info":
-				level = MarkerLevel.INFO;
-				break;
-			case "warning":
-				level = MarkerLevel.WARNING;
-				break;
-			case "ignore":
-				level = MarkerLevel.IGNORE;
-				break;
-			default:
-				level = MarkerLevel.ERROR;
-				break;
-			}
+			level = MarkerLevel.valueOf(MARKER_LEVEL_BUNDLE.getString(key).toUpperCase());
 		}
 		catch (MissingResourceException ex)
 		{
 			// Should never happen - we check for 'containsKey' above
+		}
+
+		if (level == null)
+		{
 			level = MarkerLevel.ERROR;
 		}
 

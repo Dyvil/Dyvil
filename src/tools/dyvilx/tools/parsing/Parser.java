@@ -66,6 +66,6 @@ public abstract class Parser
 	 */
 	public boolean reportErrors()
 	{
-		return true;
+		return this.parent == null || this.parent.reportErrors();
 	}
 }

@@ -1,0 +1,164 @@
+package dyvil.util
+
+class Qualifier
+{
+	public const INSTANCE = new Qualifier
+
+	//           Symbol Name  | Symbol          =  Mnemonic // Proposed Mnemonic
+	public const AMPERSAND     /* & */ : String = "amp"     // amp
+    public const ASTERISK      /* * */ : String = "times"   // ast
+    public const AT            /* @ */ : String = "at"      // at
+    public const BACKSLASH     /* \ */ : String = "bslash"  // bsl
+    public const BAR           /* | */ : String = "bar"     // bar
+    public const CARET         /* ^ */ : String = "up"      // crt
+    public const COLON         /* : */ : String = "colon"   // cln
+    public const DOT           /* . */ : String = "dot"     // dot
+    public const EQ            /* = */ : String = "eq"      // eq
+    public const EXCLAMATION   /* ! */ : String = "bang"    // xcl
+    public const GREATER       /* > */ : String = "gt"      // gt
+    public const HASH          /* # */ : String = "hash"    // hsh
+    public const LESS          /* < */ : String = "lt"      // lt
+    public const MINUS         /* - */ : String = "minus"   // mns
+    public const PERCENT       /* % */ : String = "percent" // per
+    public const PLUS          /* + */ : String = "plus"    // pls
+    public const QUESTION_MARK /* ? */ : String = "qmark"   // qmk
+    public const SLASH         /* / */ : String = "div"     // sls
+    public const TILDE         /* ~ */ : String = "tilde"   // tld
+
+	func replaceString(s: String) -> int = s match
+	{
+		case AMPERSAND     => return '&'
+		case ASTERISK      => return '*'
+		case AT            => return '@'
+		case BACKSLASH     => return '\\'
+		case BAR           => return '|'
+		case CARET         => return '^'
+		case COLON         => return ':'
+		case DOT           => return '.'
+		case EQ            => return '='
+		case EXCLAMATION   => return '!'
+		case GREATER       => return '>'
+		case HASH          => return '#'
+		case LESS          => return '<'
+		case MINUS         => return '-'
+		case PERCENT       => return '%'
+		case PLUS          => return '+'
+		case QUESTION_MARK => return '?'
+		case SLASH         => return '/'
+		case TILDE         => return '~'
+		case _             => return 0
+	}
+
+	func replaceCodePoint(c: int) -> String? = c match
+	{
+		case '&'  => return AMPERSAND
+		case '*'  => return ASTERISK
+		case '@'  => return AT
+		case '\\' => return BACKSLASH
+		case '|'  => return BAR
+		case '^'  => return CARET
+		case ':'  => return COLON
+		case '.'  => return DOT
+		case '='  => return EQ
+		case '!'  => return EXCLAMATION
+		case '>'  => return GREATER
+		case '#'  => return HASH
+		case '<'  => return LESS
+		case '-'  => return MINUS
+		case '%'  => return PERCENT
+		case '+'  => return PLUS
+		case '?'  => return QUESTION_MARK
+		case '/'  => return SLASH
+		case '~'  => return TILDE
+		case _    => return null
+	}
+
+	static func qualify(string: String) -> String = qualify(string, INSTANCE)
+
+	static func qualify(string: String, qualifier: Qualifier) -> String
+	{
+		let length = string.length
+		let builder = new StringBuilder(length)
+		var i = 0
+
+		while (i < length)
+		{
+			let codePoint = string.codePointAt(i)
+			let replacement = qualifier.replaceCodePoint(codePoint)
+
+			if (replacement != null)
+			{
+				builder.append('$').append(replacement)
+			}
+			else
+			{
+				builder.appendCodePoint(codePoint)
+			}
+
+			i += Character.charCount(codePoint)
+		}
+
+		return builder.toString()
+	}
+
+	static func unqualify(string: String) -> String = unqualify(string, INSTANCE)
+
+	static func unqualify(string: String, qualifier: Qualifier) -> String
+	{
+		var appendStart = string.indexOf('$')
+		if (appendStart < 0)
+		{
+			// no $ in string - don't apply any replacements
+			return string
+		}
+
+		let len = string.length
+		let builder = new StringBuilder(len)
+
+		// append all characters before the first $
+		builder.append(string, 0, appendStart)
+		var searchIndex = appendStart
+
+		while (searchIndex < len)
+		{
+			let cashIndex = string.indexOf('$', searchIndex)
+			if (cashIndex < 0) break
+
+			let startIndex = cashIndex + 1
+			let endIndex = symbolEndIndex(string, startIndex, len)
+			searchIndex = endIndex
+
+			if (startIndex == endIndex)
+			{
+				// $$ or $_
+				continue
+			}
+
+			let key = string.substring(startIndex, endIndex)
+			let replacement = qualifier.replaceString(key)
+
+			if (replacement > 0)
+			{
+				builder.append(string, appendStart, cashIndex)
+				builder.appendCodePoint(replacement)
+				appendStart = endIndex
+			}
+		}
+
+		builder.append(string, appendStart, len)
+		return builder.toString()
+	}
+
+	private static func symbolEndIndex(string: String, start: int, end: int) -> int
+	{
+		while (start < end)
+		{
+			match string.charAt(start)
+			{
+				case '$' | '_' => return start
+				case _ => start++
+			}
+		}
+		return end
+	}
+}

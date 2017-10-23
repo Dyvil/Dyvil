@@ -5,12 +5,13 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -24,7 +25,6 @@ import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -36,8 +36,8 @@ import static dyvilx.tools.compiler.ast.type.builtin.Types.isSuperType;
 
 public abstract class TypeParameter implements ITypeParameter
 {
-	protected @Nullable AnnotationList annotations;
-	protected Variance variance = Variance.INVARIANT;
+	protected @NonNull AttributeList attributes = new AttributeList();
+	protected          Variance      variance   = Variance.INVARIANT;
 
 	protected Name name;
 
@@ -128,40 +128,36 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
-		if (this.annotations != null)
-		{
-			return this.annotations;
-		}
-		return this.annotations = new AnnotationList();
+		return this.attributes;
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.attributes = attributes;
 	}
 
 	@Override
-	public final IAnnotation getAnnotation(IClass type)
+	public final Annotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.getAnnotations().get(type);
+		return this.attributes.getAnnotation(type);
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
 		{
-		case "Ldyvil/annotation/internal/Covariant;":
+		case "dyvil/annotation/internal/Covariant":
 			this.variance = Variance.COVARIANT;
-			return false;
-		case "Ldyvil/annotation/internal/Contravariant;":
+			return true;
+		case "dyvil/annotation/internal/Contravariant":
 			this.variance = Variance.CONTRAVARIANT;
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	protected void computeReifiedKind()
@@ -171,7 +167,7 @@ public abstract class TypeParameter implements ITypeParameter
 			return;
 		}
 
-		final IAnnotation reifiedAnnotation = this.getAnnotation(Types.REIFIED_CLASS);
+		final Annotation reifiedAnnotation = this.getAnnotation(Types.REIFIED_CLASS);
 		if (reifiedAnnotation != null)
 		{
 			final IParameter parameter = Types.REIFIED_CLASS.getParameters().get(0);
@@ -181,7 +177,7 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
 		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
 	}
@@ -413,13 +409,7 @@ public abstract class TypeParameter implements ITypeParameter
 			visitor.visitTypeAnnotation(typeRef, null, type, true).visitEnd();
 		}
 
-		if (this.annotations != null)
-		{
-			for (int i = 0, count = this.annotations.size(); i < count; i++)
-			{
-				this.annotations.get(i).write(visitor, typeRef, null);
-			}
-		}
+		this.attributes.write(visitor, typeRef, null);
 
 		if (this.upperBounds == null)
 		{
@@ -468,14 +458,7 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.annotations != null)
-		{
-			for (int i = 0, size = this.annotations.size(); i < size; i++)
-			{
-				this.annotations.get(i).toString(indent, buffer);
-				buffer.append(' ');
-			}
-		}
+		this.attributes.toInlineString(indent, buffer);
 
 		buffer.append("type ");
 

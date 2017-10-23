@@ -16,90 +16,68 @@ final class Objects
 
 	// Useful globals
 
-	static inline func run<R>(f: -> R) -> R = f()
+	inline static func run<R>(f: -> R) -> R = f()
 
-	infix inline func run<T, R>(self: T, f: T.() -> R) = f(self)
+	inline infix func run<T, R>(self: T, f: T.() -> R) = f(self)
 
-	infix inline func use<T>(self: T, f: T.() -> void) -> T { f self; self }
+	inline infix func use<T>(self: T, f: T.() -> void) -> T { f self; self }
 
-	static inline func with<T, R>(receiver: T, f: T -> R) -> R = f(receiver)
+	inline static func with<T, R>(receiver: T, f: T -> R) -> R = f(receiver)
 
 	@Intrinsic([ LOAD_0 ])
 	static func implicitly<type T>(implicit value: T) -> T = value
 
 	// Errors and Stubs
 
-	static inline func error(message: String) -> none = throw new Error(message)
+	inline static func error(message: String) -> none = throw new Error(message)
 
-	static inline func notImplemented() -> none = throw new UnsupportedOperationException("Not Implemented!")
+	inline static func notImplemented() -> none = throw new UnsupportedOperationException("Not Implemented!")
 
-	// Object Extensions
+	inline static func unsupported() -> none = throw new UnsupportedOperationException
 
 	// Structural Equality (equals)
 
+	static func equals(lhs: any!, rhs: any!) -> boolean = lhs === rhs || lhs !== null && lhs!!.equals(rhs)
+
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
-	infix func ==(lhs: Object, rhs: Object!) -> boolean = lhs.equals(rhs)
-
-	@BytecodeName("equals")
-	infix func ==(lhs: Object!, rhs: Object!) -> boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
-
-	@OverloadPriority
-	// @Deprecated(replacements: [ '===(Object!, null) -> boolean' ])
-	@Intrinsic([ LOAD_0, IS_NULL ])
-	infix func ==(lhs: Object!, rhs: null) -> boolean = lhs == null
-
-	@OverloadPriority
-	// @Deprecated(replacements: [ '===(null, Object!) -> boolean' ])
-	@Intrinsic([ LOAD_1, IS_NULL ])
-	infix func ==(lhs: null, rhs: Object!) -> boolean = rhs == null
-
-	// Reference Equality
-
-	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	infix func ===(lhs: Object!, rhs: Object!) -> boolean = lhs === rhs
-
-	@OverloadPriority
-	@Intrinsic([ LOAD_0, IS_NULL ])
-	infix func ===(lhs: Object!, rhs: null) -> boolean = lhs === null
-
-	@OverloadPriority
-	@Intrinsic([ LOAD_1, IS_NULL ])
-	infix func ===(lhs: null, rhs: Object!) -> boolean = rhs === null
+	infix func == <type T: any>(lhs: T, rhs: T?) -> boolean = lhs.equals(rhs)
 
 	// Structural Inequality (!equals)
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
-	infix func !=(lhs: Object, rhs: Object!) -> boolean = !lhs.equals(rhs)
+	infix func != <type T: any>(lhs: T, rhs: T?) -> boolean = !lhs.equals(rhs)
 
-	@BytecodeName("notEquals")
-	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
-	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	infix func !=(lhs: Object!, rhs: Object!) -> boolean = lhs != rhs
+	// Reference Equality
 
-	@OverloadPriority
-	// @Deprecated(replacements: [ '!==(Object!, null) -> boolean' ])
-	@Intrinsic([ LOAD_0, IS_NONNULL ])
-	infix func !=(lhs: Object!, rhs: null) -> boolean = lhs != null
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
+	infix func ===(lhs: any!, rhs: any!) -> boolean = lhs === rhs
 
 	@OverloadPriority
-	// @Deprecated(replacements: [ '!==(null, Object!) -> boolean' ])
-	@Intrinsic([ LOAD_1, IS_NONNULL ])
-	infix func !=(lhs: null, rhs: Object!) -> boolean = rhs != null
+	@BytecodeName("$eq$eq$eq_null")
+	@Intrinsic([ LOAD_0, IS_NULL ])
+	infix func ===(lhs: any!, rhs: null) -> boolean = lhs === null
+
+	@OverloadPriority
+	@BytecodeName("null_$eq$eq$eq")
+	@Intrinsic([ LOAD_1, IS_NULL ])
+	infix func ===(lhs: null, rhs: any!) -> boolean = rhs === null
 
 	// Reference Inequality
 
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	infix func !==(lhs: Object!, rhs: Object!) -> boolean = lhs !== rhs
+	infix func !==(lhs: any!, rhs: any!) -> boolean = lhs !== rhs
 
 	@OverloadPriority
+	@BytecodeName("$bang$eq$eq_null")
 	@Intrinsic([ LOAD_0, IS_NONNULL ])
-	infix func !==(lhs: Object!, rhs: null) -> boolean = lhs !== null
+	infix func !==(lhs: any!, rhs: null) -> boolean = lhs !== null
 
 	@OverloadPriority
+	@BytecodeName("null_$bang$eq$eq")
 	@Intrinsic([ LOAD_1, IS_NONNULL ])
-	infix func !==(lhs: null, rhs: Object!) -> boolean = rhs !== null
+	infix func !==(lhs: null, rhs: any!) -> boolean = rhs !== null
 
 	// Comparable
 

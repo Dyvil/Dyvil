@@ -1,20 +1,17 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.modifiers.ModifierList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.parser.ParserUtil;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.parser.type.TypeListParser;
 import dyvilx.tools.compiler.parser.type.TypeParameterListParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -40,15 +37,13 @@ public class MethodParser extends AbstractMemberParser
 	public MethodParser(IMemberConsumer<?> consumer)
 	{
 		this.consumer = consumer;
-		this.modifiers = new ModifierList();
 		this.mode = DECLARATOR;
 	}
 
-	public MethodParser(IMemberConsumer<?> consumer, ModifierSet modifiers, AnnotationList annotations)
+	public MethodParser(IMemberConsumer<?> consumer, AttributeList attributes)
 	{
+		super(attributes);
 		this.consumer = consumer;
-		this.modifiers = modifiers;
-		this.annotations = annotations;
 		this.mode = DECLARATOR;
 	}
 
@@ -79,14 +74,13 @@ public class MethodParser extends AbstractMemberParser
 			return;
 		case METHOD_NAME:
 		{
-			if (!ParserUtil.isIdentifier(type))
+			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "method.identifier");
 				return;
 			}
 
-			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.UNKNOWN, this.modifiers,
-			                                         this.annotations);
+			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.UNKNOWN, this.attributes);
 
 			this.mode = GENERICS;
 			return;

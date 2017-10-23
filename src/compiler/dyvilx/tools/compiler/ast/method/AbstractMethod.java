@@ -5,21 +5,22 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
-import dyvilx.tools.compiler.ast.external.ExternalMethod;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.GenericData;
@@ -30,8 +31,6 @@ import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvilx.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
@@ -49,7 +48,6 @@ import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.marker.SemanticError;
@@ -64,7 +62,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
 	                                                         ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodHandle;"
-		                                                         + ClassFormat.BSM_TAIL);
+	                                                         + ClassFormat.BSM_TAIL);
 
 	protected static final Handle STATICVIRTUAL_BSM = new Handle(ClassFormat.H_INVOKESTATIC,
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
@@ -107,16 +105,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.name = name;
 	}
 
-	public AbstractMethod(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
+	public AbstractMethod(IClass enclosingClass, Name name, IType type, AttributeList attributes)
 	{
-		super(name, type, modifiers);
+		super(name, type, attributes);
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                     AnnotationList annotations)
+	public AbstractMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, attributes);
 	}
 
 	@Override
@@ -154,36 +151,27 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
 		{
 		case ModifierUtil.NATIVE_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.NATIVE);
-			return false;
+			this.attributes.addFlag(Modifiers.NATIVE);
+			return true;
 		case ModifierUtil.STRICTFP_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.STRICT);
-			return false;
+			this.attributes.addFlag(Modifiers.STRICT);
+			return true;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
-			return true;
-		case ModifierUtil.OVERRIDE_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
+			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
-		case AnnotationUtil.INRINSIC:
-			if (annotation == null)
-			{
-				return true;
-			}
-
-			this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
-			// retain the annotation if this method is not external
-			return this.getClass() != ExternalMethod.class;
+		case AnnotationUtil.INRINSIC_INTERNAL:
+			this.attributes.addFlag(Modifiers.INTRINSIC);
+			return false;
 		case AnnotationUtil.DYVIL_NAME_INTERNAL:
 			if (annotation == null)
 			{
-				return true;
+				return false;
 			}
 
 			final IValue firstValue = annotation.getArguments().getFirst();
@@ -193,10 +181,26 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// and it sets the name to be used in the bytecode
 				this.internalName = firstValue.stringValue();
 			}
-			// do not retain the annotation
-			return false;
+			return true;
+		case AnnotationUtil.AUTOMANGLED_INTERNAL:
+			this.internalName = this.createMangledName();
+			return true;
 		}
-		return true;
+		return false;
+	}
+
+	private String createMangledName()
+	{
+		// append the qualified name
+		final StringBuilder builder = new StringBuilder(this.name.qualified);
+
+		for (IParameter param : this.getParameters())
+		{
+			// append all external parameter labels preceded by an underscore
+			builder.append('_').append(param.getQualifiedLabel());
+		}
+
+		return builder.toString();
 	}
 
 	@Override
@@ -216,12 +220,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean isStatic()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.STATIC);
-	}
-
-	@Override
 	public byte checkStatic()
 	{
 		return this.isStatic() ? TRUE : PASS;
@@ -230,7 +228,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isAbstract()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
+		return super.isAbstract() && !this.isObjectMethod();
 	}
 
 	@Override
@@ -242,7 +240,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
 			if (this.name == Names.equals
-				    && this.parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
+			    && this.parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}
@@ -389,7 +387,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final IType[] matchTypes;
 		boolean invalid = false;
 
-		final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
+		final int mod = this.attributes.flags() & Modifiers.INFIX;
 		if (receiver == null)
 		{
 			if (mod == Modifiers.INFIX)
@@ -438,14 +436,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess() // a
+			    || mod == 0 && receiver.isClassAccess() && !receiver.getType().getTheClass().isObject()) // b
 			{
-				// Disallow non-static access to static method
+				// Disallow non-static access to static method (a)
+				// and static access to instance method (unless it's an object class) (b)
 				invalid = true;
 			}
 
 			final IType receiverType;
-			if (mod == Modifiers.INFIX)
+			if (mod == Modifiers.INFIX && !parameters.isEmpty())
 			{
 				// Infix access to infix method
 				receiverType = parameters.get(0).getCovariantType();
@@ -465,7 +465,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			if (arguments == null)
 			{
-				list.add(new Candidate<>(this, receiverMatch, receiverType, false));
+				list.add(new Candidate<>(this, receiverMatch, receiverType, invalid));
 				return;
 			}
 
@@ -581,8 +581,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		if (receiver != null)
 		{
-			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && !receiver.isClassAccess())
+			final int mod = this.attributes.flags() & Modifiers.INFIX;
+			if (mod == Modifiers.INFIX && !receiver.isClassAccess() && !parameters.isEmpty())
 			{
 				// infix or extension method, declaring class implicit
 
@@ -617,10 +617,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				{
 					// static method called like instance method -> warning
 
-					markers.add(Markers.semantic(position, "method.access.static", this.name));
+					markers.add(Markers.semanticError(position, "method.access.static", this.name));
 				}
 				else if (this.getReceiverType().getTheClass() == this.enclosingClass
-					         && receiver.getType().getTheClass() != this.enclosingClass)
+				         && receiver.getType().getTheClass() != this.enclosingClass)
 				{
 					// static method called on wrong type -> warning
 
@@ -654,11 +654,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				updateReceiverType(receiver, genericData);
 			}
 		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
+		else if (!this.isStatic())
 		{
 			// no receiver, non-static method
 
-			if (context.isStatic())
+			if (context.hasStaticAccess())
 			{
 				// called from static context -> error
 
@@ -668,7 +668,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// unqualified call
 				final IType receiverType = this.enclosingClass.getThisType();
-				receiver = new ThisExpr(position, receiverType, context, markers);
+				receiver = new ThisExpr(position, receiverType, markers, context);
 				if (genericData != null)
 				{
 					genericData.setFallbackTypeContext(receiverType);
@@ -769,7 +769,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IAnnotation mutatingAnnotation = this.getAnnotation(Types.MUTATING_CLASS);
+		final Annotation mutatingAnnotation = this.getAnnotation(Types.MUTATING_CLASS);
 		if (mutatingAnnotation == null)
 		{
 			return;
@@ -797,10 +797,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean overrides(IMethod candidate, ITypeContext typeContext)
 	{
-		// Check Name and number of type parameters
-		if (candidate.getName() != this.name // different name
-			    || this.typeArity() != candidate.typeArity() // different number of type params
-			    || candidate.hasModifier(Modifiers.STATIC_FINAL)) // don't check static final
+		if (candidate.hasModifier(Modifiers.STATIC_FINAL) // don't check static final
+		    || this.typeArity() != candidate.typeArity() // different number of type params
+		    || this.name != candidate.getName() // different name
+		       && !candidate.getInternalName().equals(this.getInternalName()) // and different internal name
+			// this means either name or internal name or both must match to consider an override
+			// if only one matches then there is special code in CodeMethod.filterOverride that produces diagnostics
+			)
 		{
 			return false;
 		}
@@ -808,8 +811,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final ParameterList thisParameters = this.getParameters();
 		final ParameterList candidateParameters = candidate.getParameters();
 
-		// Check Parameter Count
-		if (candidateParameters.size() != thisParameters.size())
+		if (candidateParameters.size() != thisParameters.size()) // different number of parameters
 		{
 			return false;
 		}
@@ -858,19 +860,37 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isIntrinsic()
 	{
-		return this.getIntrinsicData() != null;
+		return this.hasModifier(Modifiers.INTRINSIC);
 	}
 
 	@Override
 	public IntrinsicData getIntrinsicData()
 	{
-		return this.intrinsicData;
+		if (!this.isIntrinsic())
+		{
+			return null;
+		}
+		if (this.intrinsicData != null)
+		{
+			return this.intrinsicData;
+		}
+		final Annotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
+		if (annotation == null)
+		{
+			return null;
+		}
+		return this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
 	}
 
 	@Override
 	public int getInvokeOpcode()
 	{
-		int modifiers = this.modifiers.toFlags();
+		return this.getInvokeOpcode(this.getEnclosingClass());
+	}
+
+	private int getInvokeOpcode(IClass owner)
+	{
+		int modifiers = this.attributes.flags();
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return Opcodes.INVOKESTATIC;
@@ -879,7 +899,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
-		if (this.enclosingClass.isInterface())
+		if (owner.isInterface())
 		{
 			return Opcodes.INVOKEINTERFACE;
 		}
@@ -1042,8 +1062,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final int modifiers = this.modifiers.toFlags();
-		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (this.hasModifier(Modifiers.INFIX) && !this.parameters.isEmpty())
 		{
 			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
 			return;
@@ -1051,7 +1070,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		final IType receiverType = this.enclosingClass.getReceiverType();
 
-		if ((modifiers & Modifiers.STATIC) == 0)
+		if (!this.isStatic())
 		{
 			receiver.writeNullCheckedExpression(writer, receiverType);
 		}
@@ -1073,7 +1092,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, ArgumentList arguments) throws BytecodeException
 	{
-		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX)
+		    && !this.parameters.isEmpty())
 		{
 			arguments.writeValues(writer, this.parameters, 1);
 			return;
@@ -1101,40 +1121,66 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		writer.visitLineNumber(lineNumber);
 
-		int opcode;
-		int modifiers = this.modifiers.toFlags();
-
-		final String owner = this.enclosingClass.getInternalName();
+		final int opcode;
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
-		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		if (this.hasModifier(Modifiers.EXTENSION))
 		{
-			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM,
-			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName, descriptor));
+			// extension method invocation
+			final Handle handle = new Handle(ClassFormat.H_INVOKESTATIC, this.enclosingClass.getInternalName(),
+			                                 mangledName, descriptor);
+			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM, handle);
 			return;
 		}
 
-		if (receiver == null)
+		final String owner;
+		final boolean isInterface;
+
+		if (receiver != null)
 		{
-			opcode = this.getInvokeOpcode();
-		}
-		else if (receiver.valueTag() == IValue.SUPER)
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-		}
-		else if (receiver.isIgnoredClassAccess() && receiver.getType().hasTag(IType.TYPE_VAR))
-		{
-			writer
-				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);
-			return;
+			final IType receiverType = receiver.getType();
+			if (receiver.isIgnoredClassAccess() && receiverType.hasTag(IType.TYPE_VAR))
+			{
+				// Dynamic invocation of a static method based on a type variable
+				writer.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"),
+				                              STATICVIRTUAL_BSM);
+				return;
+			}
+
+			if (receiver.valueTag() == IValue.SUPER)
+			{
+				// Super-method invocation
+				opcode = Opcodes.INVOKESPECIAL;
+				owner = this.enclosingClass.getInternalName();
+				isInterface = this.enclosingClass.isInterface();
+			}
+			else if (this.isStatic())
+			{
+				opcode = Opcodes.INVOKESTATIC;
+				owner = this.enclosingClass.getInternalName();
+				isInterface = this.enclosingClass.isInterface();
+			}
+			else
+			{
+				// bugfix: for non-static calls, we use the type of the receiver to avoid
+				// IllegalAccessExceptions on the owner class.
+				// Example: Calling length() on a StringBuilder object resolves to AbstractStringBuilder.length(),
+				// but AbstractStringBuilder is not accessible
+				final IClass receiverClass = receiverType.getTheClass();
+				opcode = this.getInvokeOpcode(receiverClass);
+				owner = receiverType.getInternalName();
+				isInterface = receiverClass.isInterface();
+			}
 		}
 		else
 		{
 			opcode = this.getInvokeOpcode();
+			owner = this.enclosingClass.getInternalName();
+			isInterface = this.enclosingClass.isInterface();
 		}
 
-		writer.visitMethodInsn(opcode, owner, mangledName, descriptor, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, mangledName, descriptor, isInterface);
 	}
 
 	@Override

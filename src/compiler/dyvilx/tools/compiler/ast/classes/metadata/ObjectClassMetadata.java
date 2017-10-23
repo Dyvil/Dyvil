@@ -1,8 +1,10 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -10,7 +12,6 @@ import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
@@ -19,7 +20,6 @@ import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
@@ -62,17 +62,17 @@ public final class ObjectClassMetadata extends ClassMetadata
 		final ClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
 		{
-			markers.add(Markers.semantic(this.theClass.getPosition(), "class.object.constructor",
-			                             this.theClass.getName()));
+			markers.add(Markers.semanticError(this.theClass.getPosition(), "class.object.constructor",
+			                                  this.theClass.getName()));
 		}
 
 		if ((this.members & INSTANCE_FIELD) == 0)
 		{
 			final Field field = new Field(this.theClass, Names.instance, this.theClass.getClassType(),
-			                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
+			                              AttributeList.of(Modifiers.PUBLIC | Modifiers.CONST));
 			this.instanceField = field;
 
-			this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));
+			this.constructor.setAttributes(AttributeList.of(Modifiers.PRIVATE));
 			final ConstructorCall call = new ConstructorCall(null, this.constructor, ArgumentList.EMPTY);
 			field.setValue(call);
 		}

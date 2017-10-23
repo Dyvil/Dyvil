@@ -1,8 +1,8 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.ast.value
 
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvilx.tools.parsing.ASTNode;
-import dyvilx.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvilx.tools.parsing.lexer.StringLiterals
 
 case class StringValue(protected let value: String) implements Constant
 {
@@ -14,5 +14,5 @@ case class StringValue(protected let value: String) implements Constant
 
 	override func toString() -> String = String(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void = LexerUtil.appendStringLiteral(this.value, buffer)
+	override func toString(indent: String, buffer: StringBuilder) -> void = StringLiterals.appendStringLiteral(this.value, buffer)
 }

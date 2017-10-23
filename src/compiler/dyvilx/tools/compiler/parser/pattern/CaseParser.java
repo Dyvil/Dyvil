@@ -4,11 +4,10 @@ import dyvilx.tools.compiler.ast.consumer.ICaseConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.MatchCase;
-import dyvilx.tools.compiler.parser.ParserUtil;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
-import dyvilx.tools.compiler.transform.DyvilSymbols;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -46,7 +45,7 @@ public class CaseParser extends Parser implements IValueConsumer
 				pm.pushParser(new PatternParser(this.matchCase));
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+			if (BaseSymbols.isTerminator(type))
 			{
 				pm.popParser(true);
 				return;

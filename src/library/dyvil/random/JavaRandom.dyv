@@ -2,17 +2,22 @@ package dyvil.random
 
 import java.util.Random
 
-internal class JavaRandom extends Random implements dyvil.random.Random
+internal class JavaRandom(private var seed: long { public get; public set: this.setSeed(newValue) })
+	extends Random(seed) implements dyvil.random.Random
 {
-	private const serialVersionUID: long = -6648049590269700311L;
+	private const serialVersionUID: long = -6648049590269700311L
 
 	public init() : super()
 
-	public init(seed: long) : super(seed)
+	override func setSeed(seed: long) -> void
+	{
+		super.setSeed(seed)
+		this.seed = seed
+	}
 
 	override func next(bits: int) -> int = super<Random>.next(bits)
 
 	override func nextGaussian() -> double = super<Random>.nextGaussian()
 
-	override func toString() -> String = "Random()"
+	override func toString() -> String = "Random(\(this.seed))"
 }

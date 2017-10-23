@@ -1,14 +1,15 @@
 package dyvilx.tools.compiler.ast.classes;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.field.*;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -17,7 +18,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaptureHelper;
-import dyvil.lang.Name;
 
 public class AnonymousClass extends CodeClass
 {
@@ -29,10 +29,10 @@ public class AnonymousClass extends CodeClass
 
 	public AnonymousClass(SourcePosition position)
 	{
+		super(null, null, AttributeList.of(Modifiers.STATIC));
 		this.metadata = new AnonymousClassMetadata(this);
 		this.body = new ClassBody(this);
 		this.position = position;
-		this.modifiers = new FlagModifierSet(Modifiers.STATIC);
 	}
 
 	@Override

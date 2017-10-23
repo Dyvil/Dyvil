@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.imports;
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.transform.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;

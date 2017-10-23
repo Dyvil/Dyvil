@@ -1,16 +1,17 @@
 package dyvilx.tools.compiler.backend.visitor;
 
+import dyvil.lang.Name;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationValue;
-import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.AnnotationExpr;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 
 public class ValueAnnotationVisitor implements AnnotationVisitor
 {
@@ -52,8 +53,8 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, String desc)
 	{
-		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
-		AnnotationValue value = new AnnotationValue(annotation);
+		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
+		AnnotationExpr value = new AnnotationExpr(annotation);
 		this.consumer.setValue(value);
 		return new AnnotationReader(value, annotation);
 	}

@@ -4,13 +4,15 @@ import dyvil.collection.Map;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.mutable.HashMap;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.*;
-import dyvilx.tools.compiler.ast.annotation.Annotation;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
+import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.AbstractClass;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -28,7 +30,6 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ClassParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
@@ -43,7 +44,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.visitor.*;
 import dyvilx.tools.compiler.sources.DyvilFileType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -69,7 +69,6 @@ public final class ExternalClass extends AbstractClass
 	public ExternalClass(Name name)
 	{
 		this.name = name;
-		// this.modifiers = new FlagModifierSet();
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public final class ExternalClass extends AbstractClass
 
 		final IContext context = this.getCombiningContext();
 
-		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
+		this.metadata = IClass.getClassMetadata(this, this.attributes.flags());
 		this.metadata.resolveTypesHeader(null, context);
 		this.metadata.resolveTypesBody(null, context);
 	}
@@ -173,10 +172,7 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveAnnotations()
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		}
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
 	}
 
 	public void setClassParameters(String[] classParameters)
@@ -249,10 +245,10 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
 		this.resolveAnnotations();
-		return super.getAnnotations();
+		return super.getAttributes();
 	}
 
 	@Override
@@ -354,7 +350,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.get(name);
+		final IParameter parameter = this.resolveClassParameter(name);
 		if (parameter != null)
 		{
 			return parameter;
@@ -437,7 +433,7 @@ public final class ExternalClass extends AbstractClass
 
 	public void visit(int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.modifiers = readModifiers(access);
+		this.attributes = readModifiers(access);
 		this.internalName = name;
 
 		this.body = new ClassBody(this);
@@ -461,7 +457,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.name = Name.fromQualified(name.substring(index + 1));
 			// Do not set 'fullName' here
-			this.thePackage = Package.rootPackage.resolvePackageInternal(name.substring(0, index));
+			this.thePackage = Package.rootPackage.resolveInternalPackage(name.substring(0, index));
 		}
 
 		if (signature != null)
@@ -487,28 +483,23 @@ public final class ExternalClass extends AbstractClass
 		switch (type)
 		{
 		case ModifierUtil.DYVIL_MODIFIERS:
-			return new ModifierVisitor(this.modifiers);
+			return new ModifierVisitor(this.attributes);
 		case AnnotationUtil.CLASS_PARAMETERS:
 			return new ClassParameterAnnotationVisitor(this);
 		}
 
 		String internal = ClassFormat.extendedToInternal(type);
-		if (this.addRawAnnotation(internal, null))
+		if (!this.skipAnnotation(internal, null))
 		{
-			if (this.annotations == null)
-			{
-				this.annotations = new AnnotationList();
-			}
-
-			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationReader(this.getAnnotations(), annotation);
+			Annotation annotation = new ExternalAnnotation(ClassFormat.internalToType(internal));
+			return new AnnotationReader(this, annotation);
 		}
 		return null;
 	}
 
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc)
 	{
-		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.CLASS_EXTENDS:
@@ -527,12 +518,12 @@ public final class ExternalClass extends AbstractClass
 		case TypeReference.CLASS_TYPE_PARAMETER:
 		{
 			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
-			if (typeVar.addRawAnnotation(desc, annotation))
+			if (!typeVar.skipAnnotation(annotation.getTypeDescriptor(), annotation))
 			{
 				return null;
 			}
 
-			typeVar.getAnnotations().add(annotation);
+			typeVar.getAttributes().add(annotation);
 			break;
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
@@ -587,8 +578,7 @@ public final class ExternalClass extends AbstractClass
 				return null;
 			}
 
-			final ExternalConstructor ctor = new ExternalConstructor(this);
-			ctor.setModifiers(readModifiers(access));
+			final ExternalConstructor ctor = new ExternalConstructor(this, readModifiers(access));
 
 			if (signature != null)
 			{

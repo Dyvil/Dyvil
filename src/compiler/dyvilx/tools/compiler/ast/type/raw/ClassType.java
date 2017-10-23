@@ -1,7 +1,11 @@
 package dyvilx.tools.compiler.ast.type.raw;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Type;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -12,11 +16,10 @@ import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -88,6 +91,16 @@ public class ClassType implements IRawType
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
+	}
+
+	@Override
+	public IType withAnnotation(Annotation annotation)
+	{
+		if (AnnotationUtil.PRIMITIVE_INTERNAL.equals(annotation.getTypeDescriptor()))
+		{
+			return PrimitiveType.getPrimitiveType(this);
+		}
+		return null;
 	}
 
 	// IContext

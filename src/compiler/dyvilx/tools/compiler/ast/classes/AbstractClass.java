@@ -3,13 +3,13 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
-import dyvil.collection.List;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.annotation.AnnotationList;
-import dyvilx.tools.compiler.ast.annotation.IAnnotation;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -25,8 +25,6 @@ import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.modifiers.ModifierSet;
-import dyvilx.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ClassParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
@@ -43,7 +41,6 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
@@ -52,8 +49,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
-	protected @Nullable AnnotationList annotations;
-	protected @NonNull  ModifierSet    modifiers;
+	protected @NonNull AttributeList attributes;
 
 	// Signature
 
@@ -84,6 +80,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IType thisType;
 
 	protected IType classType = new ClassType(this);
+
+	public AbstractClass()
+	{
+		this.attributes = new AttributeList();
+	}
+
+	public AbstractClass(@NonNull AttributeList attributes)
+	{
+		this.attributes = attributes;
+	}
 
 	@Override
 	public abstract IHeaderUnit getHeader();
@@ -117,68 +123,40 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public AnnotationList getAnnotations()
+	public AttributeList getAttributes()
 	{
-		if (this.annotations != null)
-		{
-			return this.annotations;
-		}
-		return this.annotations = new AnnotationList();
+		return this.attributes;
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
+	public void setAttributes(AttributeList attributes)
 	{
-		this.annotations = annotations;
+		this.attributes = attributes;
 	}
 
 	@Override
-	public final IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.getAnnotations().get(type);
-	}
-
-	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
 		{
 		case ModifierUtil.STRICTFP_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.STRICT);
-			return false;
+			this.attributes.addFlag(Modifiers.STRICT);
+			return true;
 		case Deprecation.DYVIL_INTERNAL:
 		case Deprecation.JAVA_INTERNAL:
-			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
-			return true;
-		case "java/lang/FunctionalInterface":
-			this.modifiers.addIntModifier(Modifiers.FUNCTIONAL);
+			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
+		case "java/lang/FunctionalInterface":
+			this.attributes.addFlag(Modifiers.FUNCTIONAL);
+			return true;
 		}
-		return true;
-	}
-
-	@Override
-	public ModifierSet getModifiers()
-	{
-		return this.modifiers;
-	}
-
-	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-		this.modifiers = modifiers;
-	}
-
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return this.modifiers.hasIntModifier(mod);
+		return false;
 	}
 
 	@Override
 	public int getAccessLevel()
 	{
-		return this.modifiers.toFlags() & Modifiers.ACCESS_MODIFIERS;
+		return this.attributes.flags() & Modifiers.ACCESS_MODIFIERS;
 	}
 
 	// Names
@@ -234,10 +212,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
-		                                 AnnotationList annotations)
+	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		return new ClassParameter(this, position, name, type, modifiers, annotations);
+		return new ClassParameter(this, position, name, type, attributes);
 	}
 
 	// Super Types
@@ -342,26 +319,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public Collection<IMethod> getMethods(Name name)
+	public void addMethods(Collection<IMethod> methods)
 	{
-		final List<IMethod> list = new ArrayList<>();
-
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				final IMethod getter = property.getGetter();
-				if (getter != null && name == getter.getName())
-				{
-					list.add(getter);
-				}
-
-				final IMethod setter = property.getSetter();
-				if (setter != null && name == setter.getName())
-				{
-					list.add(setter);
-				}
+				addMethods(methods, property);
 			}
 		}
 
@@ -372,12 +337,39 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 				final IMethod method = this.body.getMethod(i);
 				if (method != null)
 				{
-					list.add(method);
+					methods.add(method);
 				}
 			}
+
+			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+			{
+				final IProperty property = this.body.getField(i).getProperty();
+				if (property != null)
+				{
+					addMethods(methods, property);
+				}
+			}
+
+			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+			{
+				addMethods(methods, this.body.getProperty(i));
+			}
+		}
+	}
+
+	private static void addMethods(Collection<IMethod> methods, IProperty property)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			methods.add(getter);
 		}
 
-		return list;
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			methods.add(setter);
+		}
 	}
 
 	@Override
@@ -621,10 +613,17 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
+	protected IParameter resolveClassParameter(Name name)
+	{
+		final IParameter parameter = this.parameters.get(name);
+		// do not expose override class parameters
+		return parameter == null || parameter.hasModifier(Modifiers.OVERRIDE) ? null : parameter;
+	}
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.get(name);
+		final IParameter parameter = this.resolveClassParameter(name);
 		if (parameter != null)
 		{
 			return parameter;
@@ -851,7 +850,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.enclosingClass != null)
 		{
-			final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+			final int modifiers = this.getAttributes().flags() & ModifierUtil.JAVA_MODIFIER_MASK;
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 		}
@@ -868,18 +867,27 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.toString(indent, buffer);
-		}
-		this.modifiers.toString(this.getKind(), buffer);
+		this.attributes.toString(indent, buffer);
 
-		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
+		ModifierUtil.writeClassType(this.attributes.flags(), buffer);
 		buffer.append(this.name);
 
 		if (this.typeParameters != null)
 		{
 			this.typeParameters.toString(indent, buffer);
+		}
+
+		final AttributeList constructorAttributes = this.getConstructorAttributes();
+		if (constructorAttributes != null && !constructorAttributes.isEmpty())
+		{
+			buffer.append(' ');
+			constructorAttributes.toInlineString(indent, buffer);
+
+			if (this.parameters.isEmpty())
+			{
+				// when there are constructor modifiers but no parameters, we still display the ()
+				buffer.append("()");
+			}
 		}
 
 		if (!this.parameters.isEmpty())

@@ -11,6 +11,7 @@ import dyvilx.tools.compiler.ast.member.INamed;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvil.lang.Name;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAccess, OptionalChainAware
@@ -108,6 +109,15 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 	public void setType(IType type)
 	{
 		this.type = type;
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.resolveTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -217,6 +227,35 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 	protected abstract IValue resolveAsMethod(IValue receiver, MarkerList markers, IContext context);
 
 	protected abstract IValue resolveAsType(IContext context);
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.checkTypes(markers, context);
+		}
+
+		if (this.field != null)
+		{
+			this.field = this.field.capture(context);
+			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
+		}
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.check(markers, context);
+		}
+
+		if (this.field != null && !this.field.getType().isResolved())
+		{
+			markers.add(Markers.semanticError(this.position, "field.access.unresolved_type", this.name));
+		}
+	}
 
 	@Override
 	public String toString()
