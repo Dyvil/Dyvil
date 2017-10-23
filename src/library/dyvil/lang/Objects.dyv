@@ -37,7 +37,7 @@ final class Objects
 
 	// Structural Equality (equals)
 
-	static func equals(lhs: any!, rhs: any!) -> boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
+	static func equals(lhs: any!, rhs: any!) -> boolean = lhs === rhs || lhs !== null && lhs!!.equals(rhs)
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])

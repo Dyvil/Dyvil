@@ -166,7 +166,7 @@ public class REPLVariable extends Field
 
 		try
 		{
-			ObjectArray.deepToString(this.displayValue, buffer);
+			ObjectArray.arrayToString(this.displayValue, buffer);
 		}
 		catch (Throwable t)
 		{
