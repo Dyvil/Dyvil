@@ -2,6 +2,10 @@ package dyvilx.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.MatchList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -44,6 +48,14 @@ public class AnyType implements IBuiltinType
 	public boolean isSuperClassOf(IType subType)
 	{
 		return true;
+	}
+
+	// Resolution
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		Types.OBJECT_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	// Compilation
