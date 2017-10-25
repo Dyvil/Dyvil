@@ -179,24 +179,25 @@ public final class DyvilCompiler extends BasicTool
 
 		if (arg.startsWith("-o"))
 		{
+			final String level = arg.substring(2);
 			try
 			{
 				this.phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				this.config.setConstantFolding(Integer.parseInt(arg.substring(2)));
-				return;
+				this.config.setConstantFolding(Integer.parseInt(level));
 			}
 			catch (Exception ignored)
 			{
+				this.warn(I18n.get("argument.optimisation.invalid", level));
 			}
+			return;
 		}
 		if (arg.charAt(0) == '@')
 		{
 			return;
 		}
-		if (arg.startsWith("print["))
+		if (arg.startsWith("print@"))
 		{
-			final int index = arg.lastIndexOf(']');
-			final String phase = arg.substring(6, index);
+			final String phase = arg.substring(6);
 
 			for (ICompilerPhase compilerPhase : this.phases)
 			{
@@ -206,6 +207,9 @@ public final class DyvilCompiler extends BasicTool
 					return;
 				}
 			}
+
+			this.warn(I18n.get("argument.print.phase", phase));
+			return;
 		}
 
 		if (!ConfigParser.readProperty(this.config, arg))
