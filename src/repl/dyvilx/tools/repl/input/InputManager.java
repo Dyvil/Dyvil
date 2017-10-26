@@ -20,6 +20,11 @@ public class InputManager
 
 	public String readInput() throws IOException
 	{
+		if (this.output != null)
+		{
+			this.output.print("> ");
+		}
+
 		final StringBuilder buffer = new StringBuilder();
 
 		int braceDepth = 0;
@@ -135,6 +140,11 @@ public class InputManager
 
 	private void printIndent(int indent)
 	{
+		if (this.output == null)
+		{
+			return;
+		}
+
 		this.output.print("| ");
 		for (int j = 0; j < indent; j++)
 		{

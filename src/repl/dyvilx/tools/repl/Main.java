@@ -11,10 +11,10 @@ public final class Main
 	public static void main(String[] args) throws Exception
 	{
 		final DyvilREPL instance = new DyvilREPL(System.out, System.err);
-		final InputManager inputManager = new InputManager(System.out, System.in);
 
 		instance.launch(args);
 
+		final InputManager inputManager = new InputManager(System.out, System.in);
 		do
 		{
 			if (!readAndProcess(instance, inputManager))
@@ -38,8 +38,6 @@ public final class Main
 
 	private static boolean readAndProcess(DyvilREPL repl, InputManager inputManager)
 	{
-		System.out.print("> ");
-
 		final String currentCode;
 		try
 		{
