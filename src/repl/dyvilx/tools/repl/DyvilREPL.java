@@ -53,6 +53,7 @@ public final class DyvilREPL
 		registerCommand(new RenameCommand());
 		registerCommand(new VariablesCommand());
 		registerCommand(new VersionCommand());
+		registerCommand(new LoadCommand());
 	}
 
 	public DyvilREPL(PrintStream output)
