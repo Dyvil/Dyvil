@@ -1,10 +1,7 @@
 package dyvilx.tools.repl.command;
 
 import dyvil.collection.Entry;
-import dyvil.collection.Map;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.HashMap;
-import dyvil.collection.mutable.TreeMap;
 import dyvil.collection.mutable.TreeSet;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
@@ -42,37 +39,28 @@ public class HelpCommand implements ICommand
 		final PrintStream output = repl.getOutput();
 		output.println(I18n.get("command.help.available"));
 
-		Map<ICommand, Set<String>> commands = new HashMap<>();
+		final Set<String> commands = new TreeSet<>();
 
 		for (Entry<String, ICommand> entry : DyvilREPL.getCommands())
 		{
-			final ICommand command = entry.getValue();
-			Set<String> names = commands.get(command);
-			if (names == null)
-			{
-				commands.put(command, names = new TreeSet<>());
-			}
-			names.add(entry.getKey());
-		}
-
-		Map<String, ICommand> result = new TreeMap<>();
-		for (Entry<ICommand, Set<String>> entry : commands)
-		{
-			result.put(entry.getValue().toString("", ", ", ""), entry.getKey());
+			commands.add(entry.getValue().getName());
 		}
 
 		int maxLength = 0;
-		for (String s : result.keys())
+
+		for (String name : commands)
 		{
-			if (s.length() > maxLength)
+			final int length = name.length();
+			if (length > maxLength)
 			{
-				maxLength = s.length();
+				maxLength = length;
 			}
 		}
 
-		for (Entry<String, ICommand> entry : result)
+		final String format = ":%1$-" + maxLength + "s - %2$s\n";
+		for (String name : commands)
 		{
-			output.printf("%1$" + maxLength + "s - %2$s\n", entry.getKey(), getDesc(entry.getValue().getName()));
+			output.printf(format, name, getDesc(name));
 		}
 	}
 
@@ -81,7 +69,7 @@ public class HelpCommand implements ICommand
 		final ICommand command = DyvilREPL.getCommands().get(commandName);
 		if (command == null)
 		{
-			repl.getErrorOutput().println(I18n.get("command.not_found", commandName));
+			repl.getCompiler().warn(I18n.get("command.not_found", commandName));
 			return;
 		}
 
@@ -93,7 +81,7 @@ public class HelpCommand implements ICommand
 		final String[] aliases = command.getAliases();
 		if (aliases != null && aliases.length > 0)
 		{
-			output.println(I18n.get("command.help.aliases", String.join(", ", (CharSequence[]) aliases)));
+			output.println(I18n.get("command.help.aliases", String.join(", ", aliases)));
 		}
 	}
 
