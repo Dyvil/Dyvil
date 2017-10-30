@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.header;
 import dyvil.io.Console;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
-import dyvilx.tools.compiler.sources.IFileType;
+import dyvilx.tools.compiler.sources.FileType;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -39,7 +39,7 @@ public interface ICompilationUnit extends ASTNode
 
 	void compile();
 
-	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, IFileType fileType, Name name, FileSource source)
+	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, FileType fileType, Name name, FileSource source)
 	{
 		final int size = markers.size();
 		if (size <= 0)
