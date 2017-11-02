@@ -26,3 +26,5 @@ out/
 .classpath
 .project
 .settings/
+
+src/test/dyvil/experimental/Test.java
