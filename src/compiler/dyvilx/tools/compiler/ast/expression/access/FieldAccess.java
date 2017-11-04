@@ -90,8 +90,9 @@ public class FieldAccess extends AbstractFieldAccess
 	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
-		// x op= z
-		// -> x = x.op(z)
+		// x (op)= z
+		// -> x = x (op) z
+		// note that x is only evaluated once
 
 		final IValue fieldReceiver = helper.processValue(this.receiver);
 		this.receiver = fieldReceiver;

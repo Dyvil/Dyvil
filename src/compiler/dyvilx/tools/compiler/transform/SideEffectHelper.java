@@ -1,17 +1,17 @@
 package dyvilx.tools.compiler.transform;
 
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.statement.VariableStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
-import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.statement.VariableStatement;
 
 public class SideEffectHelper
 {
 	private StatementList statementList;
-	private int registered;
+	private int           registered;
 
 	public IValue processValue(IValue value)
 	{
@@ -35,7 +35,7 @@ public class SideEffectHelper
 
 		return new FieldAccess(value.getPosition(), null, variable);
 	}
-	
+
 	public ArgumentList processArguments(ArgumentList arguments)
 	{
 		final ArgumentList copy = arguments.copy();
@@ -46,7 +46,7 @@ public class SideEffectHelper
 		}
 		return copy;
 	}
-	
+
 	public IValue finish(IValue value)
 	{
 		if (this.statementList != null)

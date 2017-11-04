@@ -58,9 +58,9 @@ public class SubscriptAccess extends AbstractCall
 	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
-		// x[y...] op= z
-		// -> x[y...] = x[y...].op(z)
-		// -> x.subscript_=(y..., x.subscript(y...).op(z))
+		// x[y...] (op)= z
+		// -> x[y...] = x[y...] (op) z
+		// note that x and y... are each only evaluated once
 
 		final IValue subscriptReceiver = helper.processValue(this.receiver);
 		final ArgumentList subscriptArguments = helper.processArguments(this.arguments);
