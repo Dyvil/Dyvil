@@ -168,8 +168,8 @@ dependencies {
 	replCompile libRun, dpfRun, testRun
 	replCompile bootstrap
 
-	// gensrc -> library
-	gensrcCompile libComp
+	// gensrc -> library, compiler
+	gensrcCompile libComp, sourceSets.compiler.output
 	gensrcCompile libRun
 	gensrcCompile bootstrap
 
@@ -255,6 +255,19 @@ task copyDPFDyvil(type: Sync, dependsOn: 'genDPF') {
 	includeEmptyDirs = false
 	include dyvilFilters
 }
+
+// GenSrc
+
+task copyGensrcJava(type: Sync) {
+	from sourceSets.gensrc.java
+	into "$buildDir/src/java/gensrc"
+
+	include javaFilters
+	includeEmptyDirs = false
+}
+
+compileGensrcJava.dependsOn copyGensrcJava
+compileGensrcJava.source = "$buildDir/src/java/gensrc"
 
 // Tests
 
