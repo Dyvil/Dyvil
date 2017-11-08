@@ -1,0 +1,61 @@
+package dyvilx.tools.gensrc
+
+import java.util.Properties
+import java.io.{ File, BufferedInputStream, FileInputStream, IOException }
+import java.time.{ LocalDateTime, format.DateTimeFormatter }
+
+abstract class Builtins
+{
+	private init() {} // no instances
+
+	public const GEN_NOTICE: String = 'GENERATED SOURCE - DO NOT EDIT'
+
+	public const TIME_STAMP: String = timeStamp()
+
+	// Time Stamps
+
+	static func timeStamp() -> String = LocalDateTime.now().toString()
+
+	static func timeStamp(format: String) -> String = timeStamp(DateTimeFormatter.ofPattern(format))
+
+	static func timeStamp(format formatter: DateTimeFormatter) -> String = LocalDateTime.now().format(formatter)
+
+	// Specializations
+
+	static func spec(fileName: String) -> Specialization = spec(new File(fileName))
+
+	static func spec(file: File) -> Specialization
+	{
+		try
+		{
+			let input = new BufferedInputStream(new FileInputStream(file))
+			let props = new Properties()
+			props.load(input)
+			input.close()
+
+			return new Specialization() {
+				override func subscript(key: String) -> String = props.getProperty(key)
+			}
+		}
+		catch (ex: IOException)
+		{
+			throw new RuntimeException(ex)
+		}
+	}
+
+	// Include
+
+	static func include(fileName: String) -> String = include(new File(fileName))
+
+	static func include(file: File) -> String
+	{
+		try
+		{
+			return dyvil.io.FileUtils.read(file)
+		}
+		catch (ex: IOException)
+		{
+			throw new RuntimeException(ex)
+		}
+	}
+}
