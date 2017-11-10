@@ -1,25 +1,25 @@
 package dyvilx.tools.gensrc.lexer;
 
+import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Symbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 
 public class GenSrcSymbols implements Symbols
 {
 	public static final GenSrcSymbols INSTANCE = new GenSrcSymbols();
 
-	public static final int ARROW_LEFT = Tokens.SYMBOL | 0x000A0000;
+	public static final int ARROW_LEFT = DyvilSymbols.ARROW_LEFT;
 
-	public static final int IF       = Tokens.KEYWORD | 0x00010000;
-	public static final int ELSE     = Tokens.KEYWORD | 0x00020000;
-	public static final int FOR      = Tokens.KEYWORD | 0x00030000;
-	public static final int DEFINE   = Tokens.KEYWORD | 0x00040000;
-	public static final int UNDEFINE = Tokens.KEYWORD | 0x00050000;
-	public static final int LOCAL    = Tokens.KEYWORD | 0x00060000;
-	public static final int DELETE   = Tokens.KEYWORD | 0x00070000;
-	public static final int NAME     = Tokens.KEYWORD | 0x00080000;
-	public static final int INCLUDE  = Tokens.KEYWORD | 0x00090000;
-	public static final int IMPORT   = Tokens.KEYWORD | 0x000A0000;
+	public static final int CONST    = DyvilKeywords.CONST;
+	public static final int ELSE     = DyvilKeywords.ELSE;
+	public static final int FOR      = DyvilKeywords.FOR;
+	public static final int FUNC     = DyvilKeywords.FUNC;
+	public static final int IF       = DyvilKeywords.IF;
+	public static final int IMPORT   = DyvilKeywords.IMPORT;
+	public static final int LET      = DyvilKeywords.LET;
+	public static final int TEMPLATE = DyvilKeywords.TEMPLATE;
+	public static final int VAR      = DyvilKeywords.VAR;
 
 	private GenSrcSymbols()
 	{
@@ -30,26 +30,17 @@ public class GenSrcSymbols implements Symbols
 	{
 		switch (s)
 		{
-		case "if":
-			return IF;
-		case "else":
-			return ELSE;
-		case "for":
-			return FOR;
-		case "define":
-			return DEFINE;
-		case "undefine":
-			return UNDEFINE;
-		case "local":
-			return LOCAL;
-		case "delete":
-			return DELETE;
-		case "name":
-			return NAME;
-		case "include":
-			return INCLUDE;
-		case "import":
-			return IMPORT;
+		// @formatter:off
+		case "const": return CONST;
+		case "else": return ELSE;
+		case "for": return FOR;
+		case "func": return FUNC;
+		case "if": return IF;
+		case "import": return IMPORT;
+		case "let": return LET;
+		case "template": return TEMPLATE;
+		case "var": return VAR;
+		// @formatter:on
 		}
 		return 0;
 	}
@@ -69,30 +60,22 @@ public class GenSrcSymbols implements Symbols
 	@Override
 	public String toString(int type)
 	{
+
 		switch (type)
 		{
-		case ARROW_LEFT:
-			return "<-";
-		case IF:
-			return "if";
-		case ELSE:
-			return "else";
-		case FOR:
-			return "for";
-		case DEFINE:
-			return "define";
-		case UNDEFINE:
-			return "undefine";
-		case LOCAL:
-			return "local";
-		case DELETE:
-			return "delete";
-		case NAME:
-			return "name";
-		case INCLUDE:
-			return "include";
-		case IMPORT:
-			return "import";
+		// @formatter:off
+		case ARROW_LEFT: return "<-";
+		// Keywords
+		case CONST: return "const";
+		case ELSE: return "else";
+		case FOR: return "for";
+		case FUNC: return "func";
+		case IF: return "if";
+		case IMPORT: return "import";
+		case LET: return "let";
+		case TEMPLATE: return "template";
+		case VAR: return "var";
+		// @formatter:on
 		}
 		return BaseSymbols.INSTANCE.toString(type);
 	}
