@@ -29,7 +29,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	protected TokenList tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
-	public final FileSource sourceFile;
+	public final FileSource fileSource;
 	public final File       outputDirectory;
 	public final File       outputFile;
 
@@ -40,7 +40,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		this.compiler = compiler;
 
 		this.pack = pack;
-		this.sourceFile = new FileSource(input);
+		this.fileSource = new FileSource(input);
 
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf(File.separatorChar);
@@ -67,9 +67,9 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
-	public FileSource getSourceFile()
+	public FileSource getFileSource()
 	{
-		return this.sourceFile;
+		return this.fileSource;
 	}
 
 	@Override
@@ -82,12 +82,12 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		try
 		{
-			this.sourceFile.load();
+			this.fileSource.load();
 			return true;
 		}
 		catch (IOException ex)
 		{
-			this.compiler.error(I18n.get("source.error", this.sourceFile), ex);
+			this.compiler.error(I18n.get("source.error", this.fileSource), ex);
 			return false;
 		}
 	}
@@ -97,7 +97,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		if (this.load())
 		{
-			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.sourceFile.getText());
+			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.fileSource.text());
 			SemicolonInference.inferSemicolons(this.tokens.first());
 		}
 	}
@@ -178,7 +178,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	protected boolean printMarkers()
 	{
 		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.sourceFile);
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.fileSource);
 	}
 
 	@Override

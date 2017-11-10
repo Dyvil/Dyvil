@@ -14,7 +14,7 @@ public class FileSource extends TextSource
 		this.inputFile = inputFile;
 	}
 
-	public File getInputFile()
+	public File file()
 	{
 		return this.inputFile;
 	}

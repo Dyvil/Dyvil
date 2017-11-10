@@ -16,13 +16,13 @@ public class LineSource implements Source
 	}
 
 	@Override
-	public String getText()
+	public String text()
 	{
 		return this.line;
 	}
 
 	@Override
-	public String getLine(int index)
+	public String line(int index)
 	{
 		return index == 1 ? this.line : null;
 	}

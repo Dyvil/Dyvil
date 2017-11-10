@@ -125,7 +125,7 @@ public abstract class Marker implements Comparable<Marker>
 
 		buffer.append(indent);
 
-		this.appendLine(buffer, source.getLine(endLine), position.startColumn(), position.endColumn(), colors,
+		this.appendLine(buffer, source.line(endLine), position.startColumn(), position.endColumn(), colors,
 		                colorString);
 
 		buffer.append(indent).append(colorString).append(type);

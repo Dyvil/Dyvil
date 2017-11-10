@@ -44,7 +44,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Saves the formatted AST to the input file
 	 */
 	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT", unit -> FileUtils.tryWrite(
-		unit.getSourceFile().getInputFile(), unit.toString()));
+		unit.getFileSource().file(), unit.toString()));
 
 	ICompilerPhase RESOLVE_HEADERS = new ResolveHeaderPhase(45);
 

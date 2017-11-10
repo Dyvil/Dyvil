@@ -59,7 +59,7 @@ public class REPLContext extends AbstractHeader
 	// Updated for every input
 	private int resultIndex;
 	private int classIndex;
-	protected TextSource currentSource = new TextSource();
+	protected TextSource currentSource;
 	private CodeClass currentClass;
 
 	// Cleared for every input
@@ -102,7 +102,7 @@ public class REPLContext extends AbstractHeader
 		final String className = CLASS_PREFIX + this.classIndex++;
 		this.currentClass = new CodeClass(this, Name.fromRaw(className));
 		this.currentClass.setBody(new ClassBody(this.currentClass));
-		this.currentSource.read(text);
+		this.currentSource = new TextSource(text);
 	}
 
 	public MarkerList getMarkers()

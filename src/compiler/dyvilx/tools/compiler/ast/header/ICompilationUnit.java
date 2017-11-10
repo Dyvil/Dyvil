@@ -13,7 +13,7 @@ import java.io.File;
 
 public interface ICompilationUnit extends ASTNode
 {
-	FileSource getSourceFile();
+	FileSource getFileSource();
 
 	File getOutputFile();
 

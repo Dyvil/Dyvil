@@ -4,7 +4,7 @@ public interface Source
 {
 	int lineCount();
 
-	String getText();
+	String text();
 
-	String getLine(int index);
+	String line(int index);
 }

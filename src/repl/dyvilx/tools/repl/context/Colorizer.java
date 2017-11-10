@@ -24,7 +24,7 @@ public class Colorizer
 		final List<StringBuilder> lines = new ArrayList<>(source.lineCount());
 		for (int i = 0, count = source.lineCount(); i < count; i++)
 		{
-			lines.add(new StringBuilder(source.getLine(i + 1)));
+			lines.add(new StringBuilder(source.line(i + 1)));
 		}
 
 		// iterate, starting from the last token

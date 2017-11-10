@@ -61,13 +61,13 @@ public class TextSource implements Source
 	}
 
 	@Override
-	public String getText()
+	public String text()
 	{
 		return this.text;
 	}
 
 	@Override
-	public String getLine(int index)
+	public String line(int index)
 	{
 		if (index == this.lineCount)
 		{
