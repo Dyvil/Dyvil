@@ -87,7 +87,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		}
 		catch (IOException ex)
 		{
-			this.compiler.error(I18n.get("source.error", this.fileSource), ex);
+			this.compiler.error(I18n.get("source.error", this.fileSource.file()), ex);
 			return false;
 		}
 	}

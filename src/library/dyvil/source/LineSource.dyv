@@ -1,0 +1,10 @@
+package dyvil.source
+
+case class LineSource(private let line: String) implements Source
+{
+	override var lineCount: int { get: 1 }
+
+	override var text: String { get: this.line }
+
+	override func line(at index: int) -> String! = index == 1 ? this.line : null
+}

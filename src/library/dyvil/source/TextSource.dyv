@@ -1,0 +1,68 @@
+package dyvil.source
+
+case class TextSource(protected let text: String { public override get }) implements Source
+{
+	protected const EXPECTED_LINE_LENGTH: int = 80
+
+	var lineStarts: [int]! // 0-based, i.e. the line start of line 1 is at index 0 of this array
+
+	var lineCount: int { override get: this.getLineStarts().size }
+
+	override func line(at index: int) -> String!
+	{
+		let lineStarts = this.getLineStarts()
+		let lineCount = lineStarts.size
+		index-- // 1-based to 0-based
+
+		if (index > lineCount) return null
+		if (index == lineCount)
+		{
+			return this.text.substring(lineStarts[index])
+		}
+		return this.text.substring(lineStarts[index], lineEnd(this.text, lineStarts[index + 1]))
+	}
+
+	private func getLineStarts() -> [int]
+	{
+		if (let lineStarts = this.lineStarts) return lineStarts
+
+		let length = this.text.length
+		var lineStarts = new [int](length \ EXPECTED_LINE_LENGTH + 1)
+		var lineCount = 1
+
+		for (i <- 0 ..< length) match (this.text.charAt(i))
+		{
+			case '\r'
+			{
+				if (i + 1 < length && this.text.charAt(i + 1) == '\n')
+				{
+					i++
+				}
+				lineStarts = add(lineStarts, lineCount++, i + 1)
+			}
+			case '\n' => lineStarts = add(lineStarts, lineCount++, i + 1)
+			case _ {}
+		}
+
+		this.lineStarts = lineStarts.trim(lineCount)
+	}
+
+	private static func add(array: [int], index: int, value: int) -> [int]
+	{
+		if (index >= array.size) array = array.copy(withSize: index << 1)
+		array[index] = value
+		return array
+	}
+
+	private static func lineEnd(text: String, textIndex index: int) -> int
+	{
+		if (index <= 0) return 0
+
+		match (text.charAt(index - 1))
+		{
+			case '\n' => index - ((index >= 1 && text.charAt(index - 1) == '\r') ? 2 : 1)
+			case '\r' => index - 1
+			case _    => index
+		}
+	}
+}
