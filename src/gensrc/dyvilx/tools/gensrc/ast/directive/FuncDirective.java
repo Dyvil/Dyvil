@@ -1,13 +1,13 @@
 package dyvilx.tools.gensrc.ast.directive;
 
 import dyvil.annotation.internal.NonNull;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.statement.MemberStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 
 public class FuncDirective extends MemberStatement
 {
-	public FuncDirective(IClassMember member)
+	public FuncDirective(IMethod member)
 	{
 		super(member);
 	}
