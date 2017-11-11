@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.collection.Collection;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Formattable;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
@@ -321,9 +323,24 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.matchedValue.check(markers, context);
 		}
 
+		final Set<Object> values = new HashSet<>(this.caseCount);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].check(markers, context);
+			final MatchCase matchCase = this.cases[i];
+			final IPattern pattern = matchCase.pattern;
+
+			matchCase.check(markers, context);
+
+			for (int j = 0, subPatterns = pattern.subPatterns(); j < subPatterns; j++)
+			{
+				final IPattern subPattern = pattern.subPattern(j);
+				final Object constantValue = subPattern.constantValue();
+
+				if (constantValue != null && !values.add(constantValue))
+				{
+					markers.add(Markers.semanticError(subPattern.getPosition(), "match.case.duplicate", constantValue));
+				}
+			}
 		}
 	}
 

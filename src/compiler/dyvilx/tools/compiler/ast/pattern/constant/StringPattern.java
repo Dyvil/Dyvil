@@ -52,6 +52,14 @@ public final class StringPattern extends Pattern
 	}
 
 	@Override
+	public Object constantValue()
+	{
+		return this.value;
+	}
+
+	// Switch Resolution
+
+	@Override
 	public boolean isSwitchable()
 	{
 		return true;
@@ -61,12 +69,6 @@ public final class StringPattern extends Pattern
 	public boolean switchCheck()
 	{
 		return true;
-	}
-
-	@Override
-	public int subPatterns()
-	{
-		return 1;
 	}
 
 	@Override
@@ -86,6 +88,8 @@ public final class StringPattern extends Pattern
 	{
 		return this.value.hashCode();
 	}
+
+	// Compilation
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)

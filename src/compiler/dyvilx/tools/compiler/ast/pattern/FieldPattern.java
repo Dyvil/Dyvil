@@ -59,15 +59,26 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
+	public boolean isType(IType type)
+	{
+		return this.dataMember == null || Types.isSuperType(type, this.dataMember.getType());
+	}
+
+	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		return this.isType(type) ? this : null;
 	}
 
 	@Override
-	public boolean isType(IType type)
+	public Object constantValue()
 	{
-		return this.dataMember == null || Types.isSuperType(type, this.dataMember.getType());
+		if (this.dataMember.hasConstantValue())
+		{
+			final IValue value = this.dataMember.getValue();
+			return value != null ? value.toObject() : null;
+		}
+		return null;
 	}
 
 	@Override
@@ -122,7 +133,7 @@ public class FieldPattern implements IPattern
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		final IType fieldType = this.dataMember.getType();
 		final int lineNumber = this.lineNumber();

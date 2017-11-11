@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.pattern;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -16,10 +18,10 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
+
+import java.util.Arrays;
 
 public final class TuplePattern extends Pattern implements IPatternList
 {
@@ -48,6 +50,12 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
+	public IPattern getPattern(int index)
+	{
+		return this.patterns[index];
+	}
+
+	@Override
 	public void setPattern(int index, IPattern pattern)
 	{
 		this.patterns[index] = pattern;
@@ -64,12 +72,6 @@ public final class TuplePattern extends Pattern implements IPatternList
 			this.patterns = temp;
 		}
 		this.patterns[index] = pattern;
-	}
-
-	@Override
-	public IPattern getPattern(int index)
-	{
-		return this.patterns[index];
 	}
 
 	@Override
@@ -144,6 +146,24 @@ public final class TuplePattern extends Pattern implements IPatternList
 			return new TypeCheckPattern(this, type, tupleType);
 		}
 		return this;
+	}
+
+	@Override
+	public Object constantValue()
+	{
+		final Object[] subValues = new Object[this.patternCount];
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			final Object subValue = this.getPattern(i).constantValue();
+			if (subValue == null)
+			{
+				return null;
+			}
+
+			subValues[i] = subValue;
+		}
+
+		return new TupleSurrogate(subValues);
 	}
 
 	@Override
@@ -237,5 +257,34 @@ public final class TuplePattern extends Pattern implements IPatternList
 			buffer.append(' ');
 		}
 		buffer.append(')');
+	}
+}
+
+class TupleSurrogate
+{
+	private final Object[] values;
+
+	public TupleSurrogate(Object[] values)
+	{
+		this.values = values;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o != null && this.getClass() == o.getClass() //
+		                    && Arrays.equals(this.values, ((TupleSurrogate) o).values);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Arrays.hashCode(this.values);
+	}
+
+	@Override
+	public String toString()
+	{
+		return dyvil.collection.immutable.ArrayList.apply(this.values).toString("(", ", ", ")");
 	}
 }

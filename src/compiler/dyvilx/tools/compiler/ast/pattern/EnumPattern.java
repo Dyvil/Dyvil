@@ -48,6 +48,12 @@ public class EnumPattern extends FieldPattern
 	}
 
 	@Override
+	public Object constantValue()
+	{
+		return new EnumSurrogate(this.name.qualified);
+	}
+
+	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
@@ -59,3 +65,32 @@ public class EnumPattern extends FieldPattern
 		buffer.append('.').append(this.name);
 	}
 }
+
+class EnumSurrogate
+{
+	private final String name;
+
+	public EnumSurrogate(String name)
+	{
+		this.name = name;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o != null && this.getClass() == o.getClass() && this.name.equals(((EnumSurrogate) o).name);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.name.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return "." + this.name;
+	}
+}
+

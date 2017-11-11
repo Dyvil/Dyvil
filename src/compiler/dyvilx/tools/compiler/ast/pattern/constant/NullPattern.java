@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
+import dyvil.lang.internal.Null;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
@@ -27,6 +28,12 @@ public final class NullPattern extends Pattern
 	public IType getType()
 	{
 		return Types.NULL;
+	}
+
+	@Override
+	public Object constantValue()
+	{
+		return Null.instance;
 	}
 
 	@Override

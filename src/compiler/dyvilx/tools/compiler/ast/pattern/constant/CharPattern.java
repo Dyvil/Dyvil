@@ -48,6 +48,19 @@ public final class CharPattern extends Pattern
 	}
 
 	@Override
+	public boolean isType(IType type)
+	{
+		if (this.value.length() == 1 && this.type != TYPE_STRING)
+		{
+			if (Types.isSuperType(type, Types.CHAR))
+			{
+				return true;
+			}
+		}
+		return this.type != TYPE_CHAR && Types.isSuperType(type, Types.STRING);
+	}
+
+	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (this.value.length() == 1 && this.type != TYPE_STRING)
@@ -79,28 +92,21 @@ public final class CharPattern extends Pattern
 	}
 
 	@Override
-	public boolean isType(IType type)
+	public Object constantValue()
 	{
-		if (this.value.length() == 1 && this.type != TYPE_STRING)
+		if (this.type == TYPE_CHAR)
 		{
-			if (Types.isSuperType(type, Types.CHAR))
-			{
-				return true;
-			}
+			return this.value.charAt(0);
 		}
-		return this.type != TYPE_CHAR && Types.isSuperType(type, Types.STRING);
+		return this.value;
 	}
+
+	// Switch Resolution
 
 	@Override
 	public boolean isSwitchable()
 	{
 		return true;
-	}
-
-	@Override
-	public int subPatterns()
-	{
-		return 1;
 	}
 
 	@Override
@@ -130,6 +136,8 @@ public final class CharPattern extends Pattern
 	{
 		return this.switchValue();
 	}
+
+	// Compilation
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)

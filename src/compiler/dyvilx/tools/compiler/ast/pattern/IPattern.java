@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.pattern;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -10,7 +11,6 @@ import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -52,6 +52,11 @@ public interface IPattern extends ASTNode, ITyped
 	default boolean isWildcard()
 	{
 		return false;
+	}
+
+	default Object constantValue()
+	{
+		return null;
 	}
 
 	@Override
@@ -97,14 +102,23 @@ public interface IPattern extends ASTNode, ITyped
 		return this;
 	}
 
-	default boolean isSwitchable()
-	{
-		return false;
-	}
+	// Sub Patterns
 
 	default int subPatterns()
 	{
 		return 1;
+	}
+
+	default IPattern subPattern(int index)
+	{
+		return this;
+	}
+
+	// Switch Resolution
+
+	default boolean isSwitchable()
+	{
+		return false;
 	}
 
 	default boolean switchCheck()
@@ -127,10 +141,7 @@ public interface IPattern extends ASTNode, ITyped
 		return -1;
 	}
 
-	default IPattern subPattern(int index)
-	{
-		return this;
-	}
+	// Compilation
 
 	static void loadVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
 	{

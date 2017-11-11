@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.pattern;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -11,9 +13,7 @@ import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ObjectPattern extends Pattern implements IPattern
 {
@@ -49,6 +49,12 @@ public class ObjectPattern extends Pattern implements IPattern
 		}
 		// Type Check Patterns are not required
 		return null;
+	}
+
+	@Override
+	public Object constantValue()
+	{
+		return new ObjectSurrogate(this.type.getInternalName());
 	}
 
 	@Override
@@ -101,7 +107,7 @@ public class ObjectPattern extends Pattern implements IPattern
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
@@ -113,5 +119,34 @@ public class ObjectPattern extends Pattern implements IPattern
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.type.toString(prefix, buffer);
+	}
+}
+
+class ObjectSurrogate
+{
+	private final String type;
+
+	public ObjectSurrogate(String type)
+	{
+		this.type = type;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o != null && this.getClass() == o.getClass() //
+		                    && this.type.equals(((ObjectSurrogate) o).type);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.type.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return "object " + this.type;
 	}
 }
