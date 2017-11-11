@@ -10,11 +10,9 @@ import dyvilx.tools.compiler.ast.constructor.Initializer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.field.Property;
-import dyvilx.tools.compiler.ast.method.CodeMethod;
-import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.type.IType;
 
-public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IDataMemberConsumer<F>
+public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IMethodConsumer, IDataMemberConsumer<F>
 {
 	default boolean acceptEnums()
 	{
@@ -46,12 +44,5 @@ public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, 
 	default IInitializer createInitializer(SourcePosition position, AttributeList attributes)
 	{
 		return new Initializer(position, attributes);
-	}
-
-	void addMethod(IMethod method);
-
-	default IMethod createMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
-	{
-		return new CodeMethod(position, name, type, attributes);
 	}
 }

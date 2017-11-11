@@ -68,8 +68,7 @@ public class ConstructorParser extends AbstractMemberParser
 				return;
 			}
 
-			pm.report(token, "member.declarator");
-			return;
+			// Fallthrough
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
