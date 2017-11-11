@@ -12,14 +12,13 @@ case class TextSource(protected let text: String { public override get }) implem
 	{
 		let lineStarts = this.getLineStarts()
 		let lineCount = lineStarts.size
-		index-- // 1-based to 0-based
 
 		if (index > lineCount) return null
 		if (index == lineCount)
 		{
-			return this.text.substring(lineStarts[index])
+			return this.text.substring(lineStarts[index - 1])
 		}
-		return this.text.substring(lineStarts[index], lineEnd(this.text, lineStarts[index + 1]))
+		return this.text.substring(lineStarts[index - 1], lineEnd(this.text, lineStarts[index]))
 	}
 
 	private func getLineStarts() -> [int]
