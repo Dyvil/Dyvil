@@ -42,6 +42,7 @@ public class Main
 			ReifyTest()
 			SortTest()
 			SuperTest()
+			StringTest()
 			SymbolTest()
 			TypeTest()
 			VarargsTest()
