@@ -149,9 +149,9 @@ abstract class MathUtils
 		return l
 	}
 
-	static func nPr(this: Math, n: long, r: long) -> long = n! \ (n - r)!
+	static func nPr(this: Math, n: long, r: long) -> long = n! _/ (n - r)!
 
-	static func nCr(this: Math, n: long, r: long) -> long = n! \ (r! * (n - r)!)
+	static func nCr(this: Math, n: long, r: long) -> long = n! _/ (r! * (n - r)!)
 
 	// powers of two
 

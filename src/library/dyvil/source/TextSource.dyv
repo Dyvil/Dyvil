@@ -26,7 +26,7 @@ case class TextSource(protected let text: String { public override get }) implem
 		if (let lineStarts = this.lineStarts) return lineStarts
 
 		let length = this.text.length
-		var lineStarts = new [int](length \ EXPECTED_LINE_LENGTH + 1)
+		var lineStarts = new [int](length _/ EXPECTED_LINE_LENGTH + 1)
 		var lineCount = 1
 
 		for (i <- 0 ..< length) match (this.text.charAt(i))
