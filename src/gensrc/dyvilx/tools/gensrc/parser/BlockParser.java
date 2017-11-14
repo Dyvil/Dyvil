@@ -1,6 +1,7 @@
 package dyvilx.tools.gensrc.parser;
 
 import dyvilx.tools.compiler.ast.statement.StatementList;
+import dyvilx.tools.gensrc.ast.Template;
 import dyvilx.tools.gensrc.ast.directive.ProcessedText;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
 import dyvilx.tools.parsing.IParserManager;
@@ -14,10 +15,18 @@ public class BlockParser extends Parser
 	private static final int ELEMENT        = 0;
 	private static final int DIRECTIVE_NAME = 1;
 
+	private final Template      template;
 	private final StatementList directives;
 
 	public BlockParser(StatementList directives)
 	{
+		this.template = null;
+		this.directives = directives;
+	}
+
+	public BlockParser(Template template, StatementList directives)
+	{
+		this.template = template;
 		this.directives = directives;
 	}
 
