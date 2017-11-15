@@ -51,6 +51,11 @@ public class Template extends SourceHeader
 		super(compiler, pack, input, output);
 	}
 
+	public void addTemplateDirective(TemplateDirective directive)
+	{
+		this.templateDirectives.add(directive);
+	}
+
 	// Accessors
 
 	@Override

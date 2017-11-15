@@ -12,6 +12,11 @@ public class TemplateDirective implements ASTNode
 	private SourcePosition position;
 	private List<Name> names = new ArrayList<>();
 
+	public TemplateDirective(@NonNull SourcePosition position)
+	{
+		this.position = position;
+	}
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -22,6 +27,11 @@ public class TemplateDirective implements ASTNode
 	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
+	}
+
+	public void addIdentifier(Name name)
+	{
+		this.names.add(name);
 	}
 
 	@Override

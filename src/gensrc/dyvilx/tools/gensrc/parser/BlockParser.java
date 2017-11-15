@@ -55,6 +55,10 @@ public class BlockParser extends Parser
 		case DIRECTIVE_NAME:
 			switch (type)
 			{
+			case GenSrcSymbols.TEMPLATE:
+				pm.pushParser(new TemplateDirectiveParser(this.template), true);
+				this.mode = ELEMENT;
+				return;
 			case GenSrcSymbols.IF:
 				pm.pushParser(new IfDirectiveParser(this.directives), true);
 				this.mode = ELEMENT;
