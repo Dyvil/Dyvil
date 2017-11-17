@@ -59,6 +59,10 @@ public class BlockParser extends Parser
 				pm.pushParser(new TemplateDirectiveParser(this.template), true);
 				this.mode = ELEMENT;
 				return;
+			case GenSrcSymbols.IMPORT:
+				pm.pushParser(new ImportDirectiveParser(this.template), true);
+				this.mode = ELEMENT;
+				return;
 			case GenSrcSymbols.IF:
 				pm.pushParser(new IfDirectiveParser(this.directives), true);
 				this.mode = ELEMENT;
@@ -87,6 +91,7 @@ public class BlockParser extends Parser
 			if (Tokens.isIdentifier(type))
 			{
 				pm.pushParser(new CallDirectiveParser(this.directives), true);
+				return;
 			}
 
 			pm.report(token, "directive.identifier");
