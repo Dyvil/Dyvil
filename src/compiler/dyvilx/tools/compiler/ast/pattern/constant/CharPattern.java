@@ -140,19 +140,17 @@ public final class CharPattern extends Pattern
 	// Compilation
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		if (this.type == TYPE_STRING)
 		{
-			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
+			StringPattern.writeJumpOnMismatch(writer, varIndex, target, this.value);
 			return;
 		}
 
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.CHAR, this.lineNumber());
+		IPattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value.charAt(0));
-		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, target);
 	}
 
 	@Override

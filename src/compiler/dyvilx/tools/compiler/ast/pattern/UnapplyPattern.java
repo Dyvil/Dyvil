@@ -210,10 +210,10 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target)
 		throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
+		IPattern.loadVar(writer, varIndex);
 
 		final int lineNumer = this.lineNumber();
 		final int localCount = writer.localCount();
@@ -229,7 +229,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 		{
 			writer.visitInsn(Opcodes.DUP);
 			writer.visitVarInsn(Opcodes.ASTORE, localCount);
-			writer.visitJumpInsn(Opcodes.IFNULL, elseLabel);
+			writer.visitJumpInsn(Opcodes.IFNULL, target);
 		}
 		else
 		{
@@ -254,7 +254,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 			Types.OBJECT.writeCast(writer, targetType, lineNumer);
 
 			// Check the pattern
-			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
+			this.patterns[i].writeJumpOnMismatch(writer, -1, target);
 		}
 	}
 

@@ -74,7 +74,7 @@ public interface IPattern extends ASTNode, ITyped
 
 	static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
 	{
-		if (type == primitiveType)
+		if (Types.isSameType(type, primitiveType))
 		{
 			return pattern;
 		}
@@ -143,32 +143,31 @@ public interface IPattern extends ASTNode, ITyped
 
 	// Compilation
 
-	static void loadVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
+	static void loadVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
 		if (varIndex >= 0)
 		{
-			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, varIndex);
 		}
 	}
 
-	static int ensureVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
+	static int ensureVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
 		if (varIndex < 0)
 		{
 			varIndex = writer.localCount();
-			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
+			writer.visitVarInsn(Opcodes.AUTO_STORE, varIndex);
 		}
 		return varIndex;
 	}
 
-	default void writeJump(MethodWriter writer, int varIndex, IType matchedType, Label targetLabel)
-		throws BytecodeException
+	default void writeJumpOnMatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		final Label rightLabel = new Label();
-		this.writeInvJump(writer, varIndex, matchedType, rightLabel);
-		writer.visitJumpInsn(Opcodes.GOTO, targetLabel);
+		this.writeJumpOnMismatch(writer, varIndex, rightLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, target);
 		writer.visitLabel(rightLabel);
 	}
 
-	void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException;
+	void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException;
 }

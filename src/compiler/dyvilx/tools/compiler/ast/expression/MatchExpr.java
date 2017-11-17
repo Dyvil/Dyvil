@@ -425,7 +425,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			MatchCase c = this.cases[i];
 			IValue condition = c.condition;
 
-			c.pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
+			c.pattern.writeJumpOnMismatch(writer, varIndex, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
@@ -665,7 +665,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 				if (pattern.switchCheck())
 				{
-					pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
+					pattern.writeJumpOnMismatch(writer, varIndex, elseLabel);
 				}
 
 				if (matchCase.condition != null)
@@ -694,7 +694,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			if (defaultCase.pattern.switchCheck())
 			{
-				defaultCase.pattern.writeInvJump(writer, varIndex, matchedType, matchErrorLabel);
+				defaultCase.pattern.writeJumpOnMismatch(writer, varIndex, matchErrorLabel);
 			}
 
 			if (defaultCase.condition != null)

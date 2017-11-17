@@ -92,13 +92,12 @@ public final class StringPattern extends Pattern
 	// Compilation
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		writeStringInvJump(writer, varIndex, elseLabel, this.value);
+		writeJumpOnMismatch(writer, varIndex, target, this.value);
 	}
 
-	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value)
+	protected static void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label elseLabel, String value)
 		throws BytecodeException
 	{
 		writer.visitLdcInsn(value);

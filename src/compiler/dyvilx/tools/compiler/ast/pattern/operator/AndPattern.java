@@ -5,7 +5,6 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
-import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
@@ -66,13 +65,12 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+		varIndex = IPattern.ensureVar(writer, varIndex);
 
-		this.left.writeInvJump(writer, varIndex, matchedType, elseLabel);
-		this.right.writeInvJump(writer, varIndex, matchedType, elseLabel);
+		this.left.writeJumpOnMismatch(writer, varIndex, target);
+		this.right.writeJumpOnMismatch(writer, varIndex, target);
 	}
 
 	@Override

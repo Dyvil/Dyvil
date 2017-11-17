@@ -46,13 +46,11 @@ public final class FloatPattern extends Pattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.FLOAT, this.lineNumber());
+		IPattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value);
-		writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_FCMPNE, target);
 	}
 
 	@Override

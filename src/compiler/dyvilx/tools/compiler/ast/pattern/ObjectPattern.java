@@ -106,13 +106,12 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
+		IPattern.loadVar(writer, varIndex);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
 		this.instanceField.writeGet(writer, null, this.lineNumber());
-		writer.visitJumpInsn(Opcodes.IF_ACMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ACMPNE, target);
 	}
 
 	@Override

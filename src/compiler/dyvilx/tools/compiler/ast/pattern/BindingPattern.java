@@ -135,12 +135,12 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target)
 		throws BytecodeException
 	{
 		if (this.variableRequested)
 		{
-			IPattern.loadVar(writer, varIndex, matchedType);
+			IPattern.loadVar(writer, varIndex);
 			this.variable.writeInit(writer, null);
 		}
 		else if (varIndex < 0)

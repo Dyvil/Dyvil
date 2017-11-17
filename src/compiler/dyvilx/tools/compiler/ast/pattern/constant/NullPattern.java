@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.pattern.constant;
 
 import dyvil.lang.internal.Null;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
@@ -9,7 +10,6 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.source.position.SourcePosition;
 
 public final class NullPattern extends Pattern
 {
@@ -37,11 +37,10 @@ public final class NullPattern extends Pattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
-		writer.visitJumpInsn(Opcodes.IFNONNULL, elseLabel);
+		IPattern.loadVar(writer, varIndex);
+		writer.visitJumpInsn(Opcodes.IFNONNULL, target);
 	}
 
 	@Override

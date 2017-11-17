@@ -74,13 +74,11 @@ public final class IntPattern extends Pattern
 	// Compilation
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.INT, this.lineNumber());
+		IPattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value);
-		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, target);
 	}
 
 	@Override

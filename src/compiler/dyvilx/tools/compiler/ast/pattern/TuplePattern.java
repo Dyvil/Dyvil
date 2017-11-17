@@ -198,10 +198,9 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+		varIndex = IPattern.ensureVar(writer, varIndex);
 
 		final int lineNumber = this.lineNumber();
 		final IType tupleType = this.getType();
@@ -223,7 +222,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 			final IType targetType = Types.resolveTypeSafely(tupleType, typeParameters.get(i));
 
 			Types.OBJECT.writeCast(writer, targetType, lineNumber);
-			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
+			this.patterns[i].writeJumpOnMismatch(writer, -1, target);
 		}
 	}
 

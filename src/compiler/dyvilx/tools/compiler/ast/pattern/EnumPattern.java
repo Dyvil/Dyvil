@@ -1,10 +1,10 @@
 package dyvilx.tools.compiler.ast.pattern;
 
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class EnumPattern extends FieldPattern
@@ -32,19 +32,18 @@ public class EnumPattern extends FieldPattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (this.dataMember != null)
+		if (this.dataMember == null)
 		{
-			return super.isType(type) ? this : null;
+			final IDataMember dataMember = type.resolveField(this.name);
+			if (dataMember == null)
+			{
+				return null;
+			}
+
+			this.dataMember = dataMember;
 		}
 
-		final IDataMember dataMember = type.resolveField(this.name);
-		if (dataMember == null)
-		{
-			return null;
-		}
-
-		this.dataMember = dataMember;
-		return this;
+		return super.withType(type, markers);
 	}
 
 	@Override

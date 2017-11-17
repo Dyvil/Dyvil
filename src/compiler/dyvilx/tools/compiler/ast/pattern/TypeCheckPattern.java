@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.pattern;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -9,9 +11,7 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -19,7 +19,7 @@ public class TypeCheckPattern implements IPattern
 	private IType    type;
 
 	// Metadata
-	private IType         fromType;
+	private IType          fromType;
 	private SourcePosition position;
 
 	public TypeCheckPattern(SourcePosition position, IPattern pattern)
@@ -54,15 +54,21 @@ public class TypeCheckPattern implements IPattern
 	}
 
 	@Override
+	public IType getType()
+	{
+		return this.type;
+	}
+
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
 
 	@Override
-	public IType getType()
+	public boolean isType(IType type)
 	{
-		return this.type;
+		return !type.isPrimitive();
 	}
 
 	@Override
@@ -74,12 +80,6 @@ public class TypeCheckPattern implements IPattern
 			return this;
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return !type.isPrimitive();
 	}
 
 	@Override
@@ -114,8 +114,7 @@ public class TypeCheckPattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		if (this.fromType.isPrimitive())
 		{
@@ -124,15 +123,15 @@ public class TypeCheckPattern implements IPattern
 				return;
 			}
 
-			IPattern.loadVar(writer, varIndex, matchedType);
+			IPattern.loadVar(writer, varIndex);
 		}
 		else
 		{
-			varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+			varIndex = IPattern.ensureVar(writer, varIndex);
 
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
-			writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+			writer.visitJumpInsn(Opcodes.IFEQ, target);
 
 			if (this.pattern.getPatternType() == WILDCARD)
 			{
@@ -143,7 +142,7 @@ public class TypeCheckPattern implements IPattern
 		}
 
 		this.fromType.writeCast(writer, this.type, this.lineNumber());
-		this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
+		this.pattern.writeJumpOnMismatch(writer, -1, target);
 	}
 
 	@Override

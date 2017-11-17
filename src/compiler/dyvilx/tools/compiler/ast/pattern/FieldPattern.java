@@ -23,6 +23,7 @@ public class FieldPattern implements IPattern
 
 	// Metadata
 	protected SourcePosition position;
+	private   IType          targetType;
 
 	public FieldPattern(SourcePosition position, IDataMember dataMember)
 	{
@@ -67,7 +68,13 @@ public class FieldPattern implements IPattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		return this.isType(type) ? this : null;
+		if (!this.isType(type))
+		{
+			return null;
+		}
+
+		this.targetType = type;
+		return this;
 	}
 
 	@Override
@@ -132,9 +139,9 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
+		final IType matchedType = this.targetType;
 		final IType fieldType = this.dataMember.getType();
 		final int lineNumber = this.lineNumber();
 
@@ -149,11 +156,11 @@ public class FieldPattern implements IPattern
 
 			if (matchedType != fieldType && Types.isSuperType(matchedType, fieldType))
 			{
-				varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
-				IPattern.loadVar(writer, varIndex, matchedType);
+				varIndex = IPattern.ensureVar(writer, varIndex);
+				IPattern.loadVar(writer, varIndex);
 
 				writer.visitTypeInsn(Opcodes.INSTANCEOF, fieldType.getInternalName());
-				writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+				writer.visitJumpInsn(Opcodes.IFEQ, target);
 			}
 		}
 		else
@@ -161,13 +168,13 @@ public class FieldPattern implements IPattern
 			commonType = Types.ANY;
 		}
 
-		IPattern.loadVar(writer, varIndex, matchedType);
+		IPattern.loadVar(writer, varIndex);
 
 		matchedType.writeCast(writer, commonType, lineNumber);
 		this.dataMember.writeGet(writer, null, lineNumber);
 		fieldType.writeCast(writer, commonType, lineNumber);
 
-		CaseClasses.writeIFNE(writer, commonType, elseLabel);
+		CaseClasses.writeIFNE(writer, commonType, target);
 	}
 
 	@Override
