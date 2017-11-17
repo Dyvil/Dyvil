@@ -25,6 +25,7 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
@@ -164,6 +165,47 @@ public final class PrimitiveType implements IType
 		default:
 			return Types.VOID;
 		}
+	}
+
+	public static PrimitiveType fromFrameType(Object frameType)
+	{
+		if (frameType.getClass() != Integer.class)
+		{
+			return null;
+		}
+
+		switch ((int) frameType)
+		{
+		case 1: // ASMConstants.INTEGER
+			if (frameType == ClassFormat.BOOLEAN)
+			{
+				return Types.BOOLEAN;
+			}
+			if (frameType == ClassFormat.BYTE)
+			{
+				return Types.BYTE;
+			}
+			if (frameType == ClassFormat.SHORT)
+			{
+				return Types.SHORT;
+			}
+			if (frameType == ClassFormat.CHAR)
+			{
+				return Types.CHAR;
+			}
+			if (frameType == ClassFormat.INT)
+			{
+				return Types.INT;
+			}
+			return null;
+		case 2: // ASMConstants.FLOAT
+			return Types.FLOAT;
+		case 3: // ASMConstants.DOUBLE
+			return Types.DOUBLE;
+		case 4: // ASMConstants.LONG
+			return Types.LONG;
+		}
+		return null;
 	}
 
 	@Override
