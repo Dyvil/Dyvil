@@ -3,16 +3,28 @@ package dyvilx.tools.gensrc.ast;
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.classes.ClassBody;
+import dyvilx.tools.compiler.ast.classes.CodeClass;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.header.ICompilable;
+import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.header.ClassUnit;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
-import dyvilx.tools.compiler.ast.header.SourceHeader;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
+import dyvilx.tools.compiler.ast.method.CodeMethod;
+import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.MatchList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.parameter.CodeParameter;
+import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.structure.Package;
-import dyvilx.tools.compiler.config.Formatting;
+import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.sources.FileType;
 import dyvilx.tools.gensrc.ast.header.TemplateDirective;
@@ -23,8 +35,19 @@ import dyvilx.tools.parsing.ParserManager;
 
 import java.io.File;
 
-public class Template extends SourceHeader
+public class Template extends ClassUnit
 {
+
+	public static class LazyTypes
+	{
+		public static final IType SPECIALIZATION = Package.rootPackage
+			                                           .resolveInternalClass("dyvilx/tools/Specialization")
+			                                           .getClassType();
+		public static final IType WRITER         = Package.javaIO.resolveClass("Writer").getClassType();
+
+		public static final IClass BUILTINS_CLASS = Package.rootPackage.resolveInternalClass("dyvilx/tools/Builtins");
+	}
+
 	public static final FileType TEMPLATE = new FileType()
 	{
 		@Override
@@ -41,10 +64,8 @@ public class Template extends SourceHeader
 	};
 
 	private List<TemplateDirective> templateDirectives;
-	private IValue directives;
 
-	// Metadata
-	private List<ICompilable> compilables;
+	private IMethod genMethod;
 
 	public Template(DyvilCompiler compiler, Package pack, File input, File output)
 	{
@@ -56,22 +77,29 @@ public class Template extends SourceHeader
 		this.templateDirectives.add(directive);
 	}
 
-	// Accessors
+	// Resolution
 
 	@Override
-	public void addCompilable(ICompilable compilable)
+	public IDataMember resolveField(Name name)
 	{
-		if (this.compilables == null)
+		final IDataMember superField = super.resolveField(name);
+		if (superField != null)
 		{
-			this.compilables = new ArrayList<>();
+			return superField;
 		}
-		this.compilables.add(compilable);
+		return LazyTypes.BUILTINS_CLASS.resolveField(name);
 	}
 
 	@Override
-	public int compilableCount()
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		return this.compilables == null ? 0 : this.compilables.size();
+		super.getMethodMatches(list, receiver, name, arguments);
+		if (list.hasCandidate())
+		{
+			return;
+		}
+
+		LazyTypes.BUILTINS_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	// Phases
@@ -88,9 +116,31 @@ public class Template extends SourceHeader
 	@Override
 	public void parse()
 	{
+		// class NAME { }
+
+		final CodeClass theClass = new CodeClass(null, this.name, AttributeList.of(Modifiers.PUBLIC));
+		final ClassBody classBody = new ClassBody(theClass);
+		theClass.setBody(classBody);
+
+		// func generate(spec: Specialization, writer: java.io.Writer) -> void
+
+		final CodeMethod genMethod = new CodeMethod(theClass, Name.fromRaw("generate"), Types.VOID,
+		                                            AttributeList.of(Modifiers.PUBLIC));
+		final CodeParameter specParam = new CodeParameter(genMethod, null, Name.fromRaw("spec"), Types.UNKNOWN);
+
+		final CodeParameter writerParam = new CodeParameter(genMethod, null, Name.fromRaw("writer"), Types.UNKNOWN);
+
+		genMethod.getParameters().add(specParam);
+		genMethod.getParameters().add(writerParam);
+
 		final StatementList directives = new StatementList();
-		this.directives = directives;
+
+		genMethod.setValue(directives);
+
+		this.addClass(theClass);
+		this.genMethod = genMethod;
 		this.templateDirectives = new ArrayList<>(1);
+
 		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers)
 			.parse(new BlockParser(this, directives));
 	}
@@ -98,47 +148,11 @@ public class Template extends SourceHeader
 	@Override
 	public void resolveTypes()
 	{
+		final ParameterList params = this.genMethod.getParameters();
+		params.get(0).setType(LazyTypes.SPECIALIZATION);
+		params.get(1).setType(LazyTypes.WRITER);
+
 		super.resolveTypes();
-		final IContext context = this.getContext();
-		this.directives.resolveTypes(this.markers, context);
-	}
-
-	@Override
-	public void resolve()
-	{
-		super.resolve();
-		final IContext context = this.getContext();
-		this.directives = this.directives.resolve(this.markers, context);
-	}
-
-	@Override
-	public void checkTypes()
-	{
-		super.checkTypes();
-		final IContext context = this.getContext();
-		this.directives.checkTypes(this.markers, context);
-	}
-
-	@Override
-	public void check()
-	{
-		super.check();
-		final IContext context = this.getContext();
-		this.directives.check(this.markers, context);
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		super.foldConstants();
-		this.directives = this.directives.foldConstants();
-	}
-
-	@Override
-	public void cleanup()
-	{
-		super.cleanup();
-		this.directives.cleanup(this, null);
 	}
 
 	@Override
@@ -148,49 +162,35 @@ public class Template extends SourceHeader
 	}
 
 	@Override
-	public void compile()
-	{
-		if (this.printMarkers())
-		{
-			return;
-		}
-
-		// TODO
-	}
-
-	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(indent, buffer);
-
-		if (this.importCount > 0)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			for (int i = 0; i < this.importCount; i++)
-			{
-				buffer.append(indent);
-				appendImport(indent, buffer, this.importDeclarations[i]);
-				buffer.append('\n');
-			}
-			if (Formatting.getBoolean("import.newline"))
-			{
-				buffer.append('\n');
-			}
-		}
-
-		if (!this.templateDirectives.isEmpty())
-		{
-			for (TemplateDirective template : this.templateDirectives)
-			{
-				buffer.append(indent);
-				template.toString(indent, buffer);
-				buffer.append('\n');
-			}
+			buffer.append(indent);
+			appendImport(indent, buffer, this.importDeclarations[i]);
 			buffer.append('\n');
 		}
 
-		// FIXME the entire body is placed in a block
-		buffer.append('#');
-		this.directives.toString(indent, buffer);
+		for (TemplateDirective template : this.templateDirectives)
+		{
+			buffer.append(indent);
+			template.toString(indent, buffer);
+			buffer.append('\n');
+		}
+
+		final IValue directives = this.genMethod.getValue();
+		if (!(directives instanceof StatementList))
+		{
+			directives.toString(indent, buffer);
+			return;
+		}
+
+		final StatementList statements = (StatementList) directives;
+		for (int i = 0, count = statements.size(); i < count; i++)
+		{
+			statements.get(i).toString(indent, buffer);
+			buffer.append('\n');
+		}
 	}
 
 	public static void appendImport(@NonNull String indent, @NonNull StringBuilder buffer,
