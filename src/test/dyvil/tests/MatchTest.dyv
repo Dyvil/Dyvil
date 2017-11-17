@@ -7,6 +7,18 @@ using dyvil.Test
 
 class MatchTest
 {
+	static enum TestEnum
+	{
+		case A
+		case B
+		case Aa
+		case BB
+		case AaAa
+		case AaBB
+		case BBAa
+		case BBBB
+	}
+
 	static class KeyValue
 	{
 		postfix func unapply(s: String) -> (String, String)?
@@ -27,6 +39,7 @@ class MatchTest
 		stringCollision()
 		expression()
 		tuples()
+		enums()
 		caseClasses()
 		objects()
 		fields()
@@ -152,6 +165,21 @@ class MatchTest
 			case (2, 2) => fail
 			case (1, 2) => pass
 			case _      => fail
+		}
+	}
+
+	private static func enums() -> Test = test "Enums" {
+		match (TestEnum.BBAa)
+		{
+			case TestEnum.A => fail
+			case TestEnum.B => fail
+			case .Aa        => fail
+			case .AaAa      => fail
+			case .AaBB      => fail
+			case .BB        => fail
+			case .BBAa      => pass
+			case .BBBB      => fail
+			case _          => fail
 		}
 	}
 

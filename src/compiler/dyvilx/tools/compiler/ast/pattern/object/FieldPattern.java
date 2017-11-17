@@ -24,7 +24,7 @@ public class FieldPattern implements Pattern
 
 	// Metadata
 	protected SourcePosition position;
-	private   IType          targetType;
+	protected IType          targetType;
 
 	public FieldPattern(SourcePosition position, IDataMember dataMember)
 	{
@@ -39,15 +39,15 @@ public class FieldPattern implements Pattern
 	}
 
 	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
 	public SourcePosition getPosition()
 	{
 		return this.position;
+	}
+
+	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
 	}
 
 	@Override
@@ -92,6 +92,10 @@ public class FieldPattern implements Pattern
 	@Override
 	public Pattern resolve(MarkerList markers, IContext context)
 	{
+		if (this.dataMember.hasModifier(Modifiers.ENUM_CONST))
+		{
+			return new EnumPattern(this.position, this.dataMember);
+		}
 		if (!this.dataMember.hasModifier(Modifiers.CONST))
 		{
 			return this;

@@ -584,9 +584,15 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
 
-		// Not a primitive type (String) - we need the hashCode
-		if (!matchedType.isPrimitive())
+		if (Types.isSuperClass(Types.ENUM, matchedType))
 		{
+			// Enum - we need the name and the hashCode of that
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Enum", "name", "()Ljava/lang/String;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+		}
+		else if (Types.isSuperType(Types.STRING, matchedType))
+		{
+			// String - we need the hashCode
 			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
 		}
 

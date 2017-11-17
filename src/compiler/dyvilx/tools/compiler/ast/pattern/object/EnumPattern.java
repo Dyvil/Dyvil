@@ -1,11 +1,17 @@
 package dyvilx.tools.compiler.ast.pattern.object;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
+import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class EnumPattern extends FieldPattern
@@ -17,6 +23,12 @@ public class EnumPattern extends FieldPattern
 		super(position, null);
 
 		this.name = name;
+	}
+
+	public EnumPattern(SourcePosition position, @NonNull IDataMember dataMember)
+	{
+		super(position, dataMember);
+		this.name = dataMember.getName();
 	}
 
 	public Name getName()
@@ -58,6 +70,39 @@ public class EnumPattern extends FieldPattern
 	{
 		return this;
 	}
+
+	// Switch Resolution
+
+	@Override
+	public boolean isSwitchable()
+	{
+		return this.targetType != null && Types.isSuperClass(Types.ENUM, this.targetType);
+	}
+
+	@Override
+	public boolean switchCheck()
+	{
+		return true;
+	}
+
+	@Override
+	public int switchValue()
+	{
+		return this.name.qualified.hashCode();
+	}
+
+	// Compilation
+
+	@Override
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
+	{
+		Pattern.loadVar(writer, varIndex);
+		// No need to cast - Reference Equality Comparison (ACMP) handles it
+		this.dataMember.writeGet(writer, null, this.lineNumber());
+		writer.visitJumpInsn(Opcodes.IF_ACMPNE, target);
+	}
+
+	// Formatting
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
