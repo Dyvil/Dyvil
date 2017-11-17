@@ -1,6 +1,8 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -10,6 +12,9 @@ import dyvilx.tools.compiler.ast.expression.access.ClassAccess;
 import dyvilx.tools.compiler.ast.expression.access.MethodCall;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.PatternList;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -21,15 +26,13 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class UnapplyPattern extends Pattern implements IPatternList
+public class UnapplyPattern extends AbstractPattern implements PatternList
 {
 	protected IType type;
-	protected IPattern[] patterns = new IPattern[2];
+	protected Pattern[] patterns = new Pattern[2];
 	protected int patternCount;
 
 	// Metadata
@@ -83,7 +86,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		// PatternType.unapply(_ : MatchedType)
 
@@ -132,8 +135,8 @@ public class UnapplyPattern extends Pattern implements IPatternList
 		{
 			final IType subType = typeArguments.get(i);
 
-			final IPattern pattern = this.patterns[i];
-			final IPattern typedPattern = pattern.withType(subType, markers);
+			final Pattern pattern = this.patterns[i];
+			final Pattern typedPattern = pattern.withType(subType, markers);
 
 			if (typedPattern == null)
 			{
@@ -158,24 +161,24 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern getPattern(int index)
+	public Pattern get(int index)
 	{
 		return this.patterns[index];
 	}
 
 	@Override
-	public void setPattern(int index, IPattern pattern)
+	public void set(int index, Pattern pattern)
 	{
 		this.patterns[index] = pattern;
 	}
 
 	@Override
-	public void addPattern(IPattern pattern)
+	public void add(Pattern pattern)
 	{
 		final int index = this.patternCount++;
 		if (index >= this.patterns.length)
 		{
-			final IPattern[] temp = new IPattern[index + 1];
+			final Pattern[] temp = new Pattern[index + 1];
 			System.arraycopy(this.patterns, 0, temp, 0, this.patterns.length);
 			this.patterns = temp;
 		}
@@ -197,7 +200,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolveType(markers, context);
 
@@ -210,10 +213,9 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex);
+		Pattern.loadVar(writer, varIndex);
 
 		final int lineNumer = this.lineNumber();
 		final int localCount = writer.localCount();

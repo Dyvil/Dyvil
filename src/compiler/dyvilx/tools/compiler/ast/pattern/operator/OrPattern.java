@@ -2,13 +2,13 @@ package dyvilx.tools.compiler.ast.pattern.operator;
 
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public class OrPattern extends BinaryPattern
 {
-	public OrPattern(IPattern left, SourcePosition token, IPattern right)
+	public OrPattern(Pattern left, SourcePosition token, Pattern right)
 	{
 		super(left, token, right);
 	}
@@ -26,7 +26,7 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	protected IPattern withType()
+	protected Pattern withType()
 	{
 		if (this.left.isWildcard())
 		{
@@ -70,7 +70,7 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public IPattern subPattern(int index)
+	public Pattern subPattern(int index)
 	{
 		final int leftCount = this.left.subPatterns();
 		if (index < leftCount)
@@ -85,7 +85,7 @@ public class OrPattern extends BinaryPattern
 	{
 		final int locals = writer.localCount();
 
-		varIndex = IPattern.ensureVar(writer, varIndex);
+		varIndex = Pattern.ensureVar(writer, varIndex);
 
 		final Label targetLabel = new Label();
 

@@ -16,7 +16,7 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class BindingPattern implements IPattern, IDataMemberConsumer<Variable>
+public final class BindingPattern implements Pattern, IDataMemberConsumer<Variable>
 {
 	private Variable variable;
 
@@ -81,7 +81,7 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		final IType thisType = this.getType();
 		if (!thisType.isResolved())
@@ -104,7 +104,7 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		this.setType(this.getType().resolveType(markers, context));
 		return this;
@@ -135,12 +135,11 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		if (this.variableRequested)
 		{
-			IPattern.loadVar(writer, varIndex);
+			Pattern.loadVar(writer, varIndex);
 			this.variable.writeInit(writer, null);
 		}
 		else if (varIndex < 0)

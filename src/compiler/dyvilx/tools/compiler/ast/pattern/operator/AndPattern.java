@@ -4,13 +4,13 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
-public class AndPattern extends BinaryPattern implements IPattern
+public class AndPattern extends BinaryPattern implements Pattern
 {
-	public AndPattern(IPattern left, SourcePosition position, IPattern right)
+	public AndPattern(Pattern left, SourcePosition position, Pattern right)
 	{
 		super(left, position, right);
 	}
@@ -28,7 +28,7 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	protected IPattern withType()
+	protected Pattern withType()
 	{
 		if (this.left.isWildcard())
 		{
@@ -67,7 +67,7 @@ public class AndPattern extends BinaryPattern implements IPattern
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex);
+		varIndex = Pattern.ensureVar(writer, varIndex);
 
 		this.left.writeJumpOnMismatch(writer, varIndex, target);
 		this.right.writeJumpOnMismatch(writer, varIndex, target);

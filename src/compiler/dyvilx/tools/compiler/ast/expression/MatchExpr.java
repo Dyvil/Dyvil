@@ -16,7 +16,7 @@ import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -327,13 +327,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final MatchCase matchCase = this.cases[i];
-			final IPattern pattern = matchCase.pattern;
+			final Pattern pattern = matchCase.pattern;
 
 			matchCase.check(markers, context);
 
 			for (int j = 0, subPatterns = pattern.subPatterns(); j < subPatterns; j++)
 			{
-				final IPattern subPattern = pattern.subPattern(j);
+				final Pattern subPattern = pattern.subPattern(j);
 				final Object constantValue = subPattern.constantValue();
 
 				if (constantValue != null && !values.add(constantValue))
@@ -518,7 +518,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			MatchCase matchCase = this.cases[i];
-			IPattern pattern = matchCase.pattern;
+			Pattern pattern = matchCase.pattern;
 
 			if (switchVar || pattern.switchCheck())
 			{
@@ -598,12 +598,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final MatchCase matchCase = this.cases[i];
-			final IPattern pattern = matchCase.pattern;
+			final Pattern pattern = matchCase.pattern;
 			final int subPatterns = pattern.subPatterns();
 
 			for (int j = 0; j < subPatterns; j++)
 			{
-				final IPattern subPattern = pattern.subPattern(j);
+				final Pattern subPattern = pattern.subPattern(j);
 				if (subPattern.isExhaustive())
 				{
 					continue;
@@ -645,7 +645,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			{
 				final KeyCache.Entry next = entry.next;
 				final MatchCase matchCase = entry.matchCase;
-				final IPattern pattern = entry.pattern;
+				final Pattern pattern = entry.pattern;
 
 				Label elseLabel;
 				if (next != null && next.key == key)

@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -8,6 +8,8 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -15,7 +17,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ObjectPattern extends Pattern implements IPattern
+public class ObjectPattern extends AbstractPattern implements Pattern
 {
 	protected IType type;
 
@@ -41,7 +43,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		if (this.isType(type))
 		{
@@ -58,7 +60,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (this.type.typeTag() == IType.NAMED)
 		{
@@ -108,7 +110,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex);
+		Pattern.loadVar(writer, varIndex);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
 		this.instanceField.writeGet(writer, null, this.lineNumber());
 		writer.visitJumpInsn(Opcodes.IF_ACMPNE, target);

@@ -13,22 +13,22 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class TypeCheckPattern implements IPattern
+public class TypeCheckPattern implements Pattern
 {
-	private IPattern pattern;
-	private IType    type;
+	private Pattern pattern;
+	private IType   type;
 
 	// Metadata
 	private IType          fromType;
 	private SourcePosition position;
 
-	public TypeCheckPattern(SourcePosition position, IPattern pattern)
+	public TypeCheckPattern(SourcePosition position, Pattern pattern)
 	{
 		this.position = position;
 		this.pattern = pattern;
 	}
 
-	public TypeCheckPattern(IPattern pattern, IType fromType, IType toType)
+	public TypeCheckPattern(Pattern pattern, IType fromType, IType toType)
 	{
 		this.pattern = pattern;
 		this.fromType = fromType;
@@ -72,7 +72,7 @@ public class TypeCheckPattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		if (Types.isSuperType(type, this.type))
 		{
@@ -89,7 +89,7 @@ public class TypeCheckPattern implements IPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (this.pattern != null)
 		{
@@ -123,11 +123,11 @@ public class TypeCheckPattern implements IPattern
 				return;
 			}
 
-			IPattern.loadVar(writer, varIndex);
+			Pattern.loadVar(writer, varIndex);
 		}
 		else
 		{
-			varIndex = IPattern.ensureVar(writer, varIndex);
+			varIndex = Pattern.ensureVar(writer, varIndex);
 
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());

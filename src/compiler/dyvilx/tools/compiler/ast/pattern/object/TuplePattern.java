@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
@@ -9,6 +9,10 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.PatternList;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -23,10 +27,10 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
 
-public final class TuplePattern extends Pattern implements IPatternList
+public final class TuplePattern extends AbstractPattern implements PatternList
 {
-	private IPattern[] patterns;
-	private int        patternCount;
+	private Pattern[] patterns;
+	private int       patternCount;
 
 	// Metadata
 	private IType tupleType;
@@ -34,7 +38,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	public TuplePattern(SourcePosition position)
 	{
 		this.position = position;
-		this.patterns = new IPattern[3];
+		this.patterns = new Pattern[3];
 	}
 
 	@Override
@@ -50,24 +54,24 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern getPattern(int index)
+	public Pattern get(int index)
 	{
 		return this.patterns[index];
 	}
 
 	@Override
-	public void setPattern(int index, IPattern pattern)
+	public void set(int index, Pattern pattern)
 	{
 		this.patterns[index] = pattern;
 	}
 
 	@Override
-	public void addPattern(IPattern pattern)
+	public void add(Pattern pattern)
 	{
 		int index = this.patternCount++;
 		if (this.patternCount > this.patterns.length)
 		{
-			IPattern[] temp = new IPattern[this.patternCount];
+			Pattern[] temp = new Pattern[this.patternCount];
 			System.arraycopy(this.patterns, 0, temp, 0, index);
 			this.patterns = temp;
 		}
@@ -105,7 +109,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		final IClass tupleClass = TupleType.getTupleClass(this.patternCount);
 		if (tupleClass == null)
@@ -125,8 +129,8 @@ public final class TuplePattern extends Pattern implements IPatternList
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
-			final IPattern pattern = this.patterns[i];
-			final IPattern typedPattern = pattern.withType(elementType, markers);
+			final Pattern pattern = this.patterns[i];
+			final Pattern typedPattern = pattern.withType(elementType, markers);
 
 			if (typedPattern == null)
 			{
@@ -154,7 +158,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		final Object[] subValues = new Object[this.patternCount];
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			final Object subValue = this.getPattern(i).constantValue();
+			final Object subValue = this.get(i).constantValue();
 			if (subValue == null)
 			{
 				return null;
@@ -182,7 +186,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (this.patternCount == 1)
 		{
@@ -200,7 +204,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex);
+		varIndex = Pattern.ensureVar(writer, varIndex);
 
 		final int lineNumber = this.lineNumber();
 		final IType tupleType = this.getType();

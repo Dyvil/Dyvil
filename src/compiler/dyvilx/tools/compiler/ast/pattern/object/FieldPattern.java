@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
 import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.constant.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -17,7 +18,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaseClasses;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class FieldPattern implements IPattern
+public class FieldPattern implements Pattern
 {
 	protected IDataMember dataMember;
 
@@ -66,7 +67,7 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		if (!this.isType(type))
 		{
@@ -89,7 +90,7 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (!this.dataMember.hasModifier(Modifiers.CONST))
 		{
@@ -156,8 +157,8 @@ public class FieldPattern implements IPattern
 
 			if (matchedType != fieldType && Types.isSuperType(matchedType, fieldType))
 			{
-				varIndex = IPattern.ensureVar(writer, varIndex);
-				IPattern.loadVar(writer, varIndex);
+				varIndex = Pattern.ensureVar(writer, varIndex);
+				Pattern.loadVar(writer, varIndex);
 
 				writer.visitTypeInsn(Opcodes.INSTANCEOF, fieldType.getInternalName());
 				writer.visitJumpInsn(Opcodes.IFEQ, target);
@@ -168,7 +169,7 @@ public class FieldPattern implements IPattern
 			commonType = Types.ANY;
 		}
 
-		IPattern.loadVar(writer, varIndex);
+		Pattern.loadVar(writer, varIndex);
 
 		matchedType.writeCast(writer, commonType, lineNumber);
 		this.dataMember.writeGet(writer, null, lineNumber);

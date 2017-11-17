@@ -3,8 +3,8 @@ package dyvilx.tools.compiler.ast.pattern.constant;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class CharPattern extends Pattern
+public final class CharPattern extends AbstractPattern
 {
 	private static final byte TYPE_CHAR   = 1;
 	private static final byte TYPE_STRING = 2;
@@ -38,7 +38,7 @@ public final class CharPattern extends Pattern
 	@Override
 	public int getPatternType()
 	{
-		return IPattern.CHAR;
+		return Pattern.CHAR;
 	}
 
 	@Override
@@ -61,11 +61,11 @@ public final class CharPattern extends Pattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
-			final IPattern pattern = IPattern.primitiveWithType(this, type, Types.CHAR);
+			final Pattern pattern = Pattern.primitiveWithType(this, type, Types.CHAR);
 			if (this.type == TYPE_CHAR || pattern != null)
 			{
 				this.type = TYPE_CHAR;
@@ -148,7 +148,7 @@ public final class CharPattern extends Pattern
 			return;
 		}
 
-		IPattern.loadVar(writer, varIndex);
+		Pattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value.charAt(0));
 		writer.visitJumpInsn(Opcodes.IF_ICMPNE, target);
 	}
