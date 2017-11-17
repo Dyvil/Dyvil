@@ -133,12 +133,12 @@ public interface Pattern extends ASTNode, ITyped
 
 	default int minValue()
 	{
-		return -1;
+		return this.switchValue();
 	}
 
 	default int maxValue()
 	{
-		return -1;
+		return this.switchValue();
 	}
 
 	// Compilation

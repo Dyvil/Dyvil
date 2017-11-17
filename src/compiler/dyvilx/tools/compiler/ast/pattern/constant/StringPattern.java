@@ -77,18 +77,6 @@ public final class StringPattern extends AbstractPattern
 		return this.value.hashCode();
 	}
 
-	@Override
-	public int minValue()
-	{
-		return this.value.hashCode();
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return this.value.hashCode();
-	}
-
 	// Compilation
 
 	@Override

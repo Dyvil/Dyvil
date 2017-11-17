@@ -59,18 +59,6 @@ public final class BooleanPattern extends AbstractPattern
 		return this.value ? 1 : 0;
 	}
 
-	@Override
-	public int minValue()
-	{
-		return this.value ? 1 : 0;
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return this.value ? 1 : 0;
-	}
-
 	// Compilation
 
 	@Override

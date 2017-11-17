@@ -3,8 +3,8 @@ package dyvilx.tools.compiler.ast.pattern.constant;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -110,6 +110,12 @@ public final class CharPattern extends AbstractPattern
 	}
 
 	@Override
+	public boolean switchCheck()
+	{
+		return this.type != TYPE_CHAR;
+	}
+
+	@Override
 	public int switchValue()
 	{
 		if (this.type == TYPE_CHAR)
@@ -117,24 +123,6 @@ public final class CharPattern extends AbstractPattern
 			return this.value.charAt(0);
 		}
 		return this.value.hashCode();
-	}
-
-	@Override
-	public boolean switchCheck()
-	{
-		return this.type != TYPE_CHAR;
-	}
-
-	@Override
-	public int minValue()
-	{
-		return this.switchValue();
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return this.switchValue();
 	}
 
 	// Compilation

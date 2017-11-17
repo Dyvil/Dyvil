@@ -59,18 +59,6 @@ public final class IntPattern extends AbstractPattern
 		return this.value;
 	}
 
-	@Override
-	public int minValue()
-	{
-		return this.value;
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return this.value;
-	}
-
 	// Compilation
 
 	@Override
