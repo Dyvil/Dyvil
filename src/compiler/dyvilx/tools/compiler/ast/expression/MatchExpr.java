@@ -30,15 +30,17 @@ import java.util.Arrays;
 
 public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
-	protected SourcePosition position;
+	public static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"match.value.type.incompatible");
 
 	protected IValue matchedValue;
 	protected MatchCase[] cases = new MatchCase[3];
 	protected int caseCount;
 
 	// Metadata
-	private boolean exhaustive;
-	private IType   returnType;
+	protected SourcePosition position;
+	private   boolean        exhaustive;
+	private   IType          returnType;
 
 	public MatchExpr(SourcePosition position)
 	{
@@ -162,9 +164,6 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		// reset type cache
-		this.returnType = null;
-
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final MatchCase matchCase = this.cases[i];
@@ -175,11 +174,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				continue;
 			}
 
-			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context,
-			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
+			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context, MARKER_SUPPLIER);
 		}
 
-		return Types.isVoid(type) || Types.isSuperType(type, this.getType()) ? this : null;
+		this.returnType = type;
+		return this;
 	}
 
 	@Override
