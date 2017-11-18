@@ -1,0 +1,89 @@
+package dyvil.tests
+
+using dyvil.Test
+
+class TreeMatchTest
+{
+	static func apply() -> Test = test "Tree Match" {
+		let a = Var "a"
+		let b = Var "b"
+
+		let expr = a + 3 * b + 6 * (5 + a * b)
+		let ctxt = [ "a": 4.0, "b": 10.0 ]
+
+		if let result = eval(expr, ctxt)
+		{
+			result =?= 304.0
+		}
+		else
+		{
+			fail('Evaluation failed')
+		}
+	}
+
+	interface Context
+	{
+		func resolve(name: String) -> Expr?
+	}
+
+	@SwitchOptimized
+	interface Expr
+
+	@SwitchOptimized
+	static case class Var(let name: String) implements Expr
+
+	@SwitchOptimized
+	static case class Const(let value: double) implements Expr
+
+	@SwitchOptimized
+	static case class Add(let lhs: Expr, let rhs: Expr) implements Expr
+
+	@SwitchOptimized
+	static case class Multiply(let lhs: Expr, let rhs: Expr) implements Expr
+
+	// Syntax Sugar Methods
+
+	static implicit func s2Var(s: String) -> Var = Var(s)
+
+	static implicit func d2Const(d: double) -> Const = Const(d)
+
+	static implicit func exprMap2Context(map: [String:Expr]) -> Context = s => map[s]
+
+	static implicit func constMap2Context(map: [String:double]) -> Context = s => if let d = map[s] { Const(d) } else null
+
+	infix func +(lhs: Expr, rhs: Expr) -> Expr = Add(lhs, rhs)
+
+	infix func *(lhs: Expr, rhs: Expr) -> Expr = Multiply(lhs, rhs)
+
+	// Evaluation
+
+	static func eval(expr: Expr, context: Context) -> double?
+	{
+		return simplify(expr, context) match {
+			case Const(var d) => d
+			case _ => null
+		}
+	}
+
+	static func simplify(expr: Expr, context: Context) -> Expr = expr match {
+		case Var(let name) => context.resolve(name) ?? expr
+		case Const(let value) => expr
+
+		case Add(let lhs, let rhs) => (simplify(lhs, context), simplify(rhs, context)) match {
+			case (Const(0), var r) => r
+			case (var l, Const(0)) => l
+
+			case (Const(var x), Const(var y)) => Const(x + y)
+			case (var l, var r) => Add(l, r)
+		}
+
+		case Multiply(let lhs, let rhs) => (simplify(lhs, context), simplify(rhs, context)) match {
+			case (Const(0), _) | (_, Const(0)) => Const(0)
+			case (Const(1), var r) => r
+			case (var l, Const(1)) => l
+
+			case (Const(var x), Const(var y)) => Const(x * y)
+			case (var l, var r) => Multiply(l, r)
+		}
+	}
+}
