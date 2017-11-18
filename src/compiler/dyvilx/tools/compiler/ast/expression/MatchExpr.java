@@ -586,14 +586,21 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		if (Types.isSuperClass(Types.ENUM, matchedType))
 		{
-			// Enum - we need the name and the hashCode of that
+			// x.name().hashCode()
 			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Enum", "name", "()Ljava/lang/String;", false);
-			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
 		}
-		else if (Types.isSuperType(Types.STRING, matchedType))
+		else if (Types.isSuperClass(Types.STRING, matchedType))
 		{
-			// String - we need the hashCode
-			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+			// x.hashCode()
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+		}
+		else if (matchedType.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null)
+		{
+			// x.getClass().getName().hashCode()
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
 		}
 
 		final int localCount = writer.localCount();

@@ -12,14 +12,15 @@ import dyvilx.tools.compiler.ast.expression.access.ClassAccess;
 import dyvilx.tools.compiler.ast.expression.access.MethodCall;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.PatternList;
-import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.NullableType;
 import dyvilx.tools.compiler.ast.type.compound.TupleType;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
@@ -32,11 +33,13 @@ import dyvilx.tools.parsing.marker.MarkerList;
 public class UnapplyPattern extends AbstractPattern implements PatternList
 {
 	protected IType type;
+
 	protected Pattern[] patterns = new Pattern[2];
 	protected int patternCount;
 
 	// Metadata
-	protected IValue unapplyCall;
+	protected IValue  unapplyCall;
+	private   Integer switchValue;
 
 	public UnapplyPattern(SourcePosition position)
 	{
@@ -98,8 +101,8 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 
 		final MethodCall methodCall = new MethodCall(this.position, new ClassAccess(this.type), Names.unapply,
 		                                             new ArgumentList(new DummyValue(type)));
-		final IValue method = methodCall.resolveCall(MarkerList.BLACKHOLE, matchClass, false);
-		return method != null && this.withMethod(method, markers) ? this : null;
+		final IValue resolvedCall = methodCall.resolveCall(MarkerList.BLACKHOLE, matchClass, false);
+		return resolvedCall != null && this.withMethod(type, resolvedCall, markers) ? this : null;
 	}
 
 	@Override
@@ -108,11 +111,11 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 		return true;
 	}
 
-	protected boolean withMethod(IValue methodCall, MarkerList markers)
+	protected boolean withMethod(IType matchedType, IValue methodCall, MarkerList markers)
 	{
 		final IType type = NullableType.unapply(methodCall.getType());
 		final String className = type.getInternalName();
-		if (!className.startsWith("dyvil/tuple/Tuple$Of"))
+		if (!className.startsWith("dyvil/tuple/Tuple$Of")) // return type must be a tuple type
 		{
 			return false;
 		}
@@ -149,6 +152,14 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 			{
 				this.patterns[i] = typedPattern;
 			}
+		}
+
+		if (Types.isSuperClass(matchedType, this.type) // matched type is super-type of enclosing type
+		    && this.type.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null // and both types are @SwitchOptimized
+		    && matchedType.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null)
+		{
+			// Compute the switch value from the hash code of the class name
+			this.switchValue = ClassFormat.internalToPackage(this.type.getInternalName()).hashCode();
 		}
 
 		return true;
@@ -212,13 +223,35 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 		return this;
 	}
 
+	// Switch Resolution
+
+	@Override
+	public boolean isSwitchable()
+	{
+		return this.switchValue != null;
+	}
+
+	@Override
+	public boolean switchCheck()
+	{
+		return true;
+	}
+
+	@Override
+	public int switchValue()
+	{
+		return this.switchValue;
+	}
+
+	// Compilation
+
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		Pattern.loadVar(writer, varIndex);
 
 		final int lineNumer = this.lineNumber();
-		final int localCount = writer.localCount();
+		final int tupleVarIndex = writer.localCount();
 
 		this.unapplyCall.writeExpression(writer, null);
 		final IType methodType = this.unapplyCall.getType();
@@ -230,12 +263,12 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 		if (methodType != tupleType) // nullable
 		{
 			writer.visitInsn(Opcodes.DUP);
-			writer.visitVarInsn(Opcodes.ASTORE, localCount);
+			writer.visitVarInsn(Opcodes.ASTORE, tupleVarIndex);
 			writer.visitJumpInsn(Opcodes.IFNULL, target);
 		}
 		else
 		{
-			writer.visitVarInsn(Opcodes.ASTORE, localCount);
+			writer.visitVarInsn(Opcodes.ASTORE, tupleVarIndex);
 		}
 
 		for (int i = 0; i < this.patternCount; i++)
@@ -248,7 +281,7 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 
 			final IType targetType = typeArgs.get(i);
 
-			writer.visitVarInsn(Opcodes.ALOAD, localCount);
+			writer.visitVarInsn(Opcodes.ALOAD, tupleVarIndex);
 
 			// Get and cast the tuple element
 			// FIXME not ready for Tuple.OfN

@@ -1,0 +1,12 @@
+package dyvil.annotation
+
+import java.lang.annotation._
+
+/**
+ * Marker annotation for classes that are optimized for switch-based match expressions.
+ * If a class has this annotation and is `final`, it is eligible for switch optimizations when used in match
+ * expressions.
+ */
+@Target([ .TYPE ])
+@Retention(.CLASS)
+@interface SwitchOptimized
