@@ -104,11 +104,11 @@ public final class LambdaType extends ResolvedGenericType
 	}
 
 	@Override
-	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.arguments.size() != 1 || value.isType(this))
+		if (!this.isConvertibleFrom(type))
 		{
-			return value.withType(this, typeContext, markers, context);
+			return null;
 		}
 
 		final IValue typedReturnValue = value.withType(this.arguments.get(0), typeContext, markers, context);

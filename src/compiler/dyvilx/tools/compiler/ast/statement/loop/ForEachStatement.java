@@ -104,12 +104,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type != Types.VOID)
-		{
-			return null;
-		}
-
-		return this;
+		return Types.isVoid(type) ? this : null;
 	}
 
 	@Override

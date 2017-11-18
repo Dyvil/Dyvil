@@ -137,41 +137,34 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			return this.returnType;
 		}
 
-		int len = this.caseCount;
-		if (len == 0)
-		{
-			this.returnType = Types.VOID;
-			return this.returnType;
-		}
-
-		IType t = null;
-		for (int i = 0; i < len; i++)
-		{
-			IValue v = this.cases[i].action;
-			if (v == null)
-			{
-				continue;
-			}
-			IType t1 = v.getType();
-			if (t == null)
-			{
-				t = t1;
-				continue;
-			}
-
-			t = Types.combine(t, t1);
-		}
-
-		if (t == null)
+		final int cases = this.caseCount;
+		if (cases == 0)
 		{
 			return this.returnType = Types.VOID;
 		}
-		return this.returnType = t;
+
+		IType result = null;
+		for (int i = 0; i < cases; i++)
+		{
+			final IValue action = this.cases[i].action;
+			if (action == null)
+			{
+				continue;
+			}
+
+			final IType actionType = action.getType();
+			result = result != null ? Types.combine(result, actionType) : actionType;
+		}
+
+		return this.returnType = (result == null ? Types.VOID : result);
 	}
 
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		// reset type cache
+		this.returnType = null;
+
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final MatchCase matchCase = this.cases[i];

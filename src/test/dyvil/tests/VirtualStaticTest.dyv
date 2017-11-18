@@ -38,20 +38,14 @@ class VirtualStaticTest
 	static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(i: int) -> T = T(i) as T
 
 	static func apply() -> Test = test "Virtual Static Methods" {
-		expect(class AbstractMethodError, from: {
-			getFoo<Interface>
-			()
-		})
+		expect(class AbstractMethodError, from: => { getFoo<Interface>(); () })
 
-		getFoo<Base> =?= "Base"
-		getFoo<Derived> =?= "Derived"
+		getFoo<Base>() =?= "Base"
+		getFoo<Derived>() =?= "Derived"
 		getBar<Base>("") =?= "_Base"
 		getBar<Derived>("") =?= "_Derived"
 
-		expect(class AbstractMethodError, from: {
-			create<IntConstructible>(10)
-			()
-		})
+		expect(class AbstractMethodError, from: => create<IntConstructible>(10))
 
 		let customInt = create<CustomInt>(10)
 		let myInt = create<MyInt>(20)

@@ -206,7 +206,7 @@ public class LiteralConversion extends AbstractCall
 		}
 
 		// T! -> T, if necessary
-		final IValue value = thisType.convertValueTo(this, type, typeContext, markers, context);
+		final IValue value = thisType.convertTo(this, type, typeContext, markers, context);
 		if (value != null)
 		{
 			return value;

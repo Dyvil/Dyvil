@@ -83,16 +83,22 @@ public final class TypeChecker
 
 	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IValue typedValue = type.convertValue(value, typeContext, markers, context);
+		final IValue typedValue = value.withType(type, typeContext, markers, context);
 		if (typedValue != null)
 		{
 			return typedValue;
 		}
 
-		final IValue convertedValue = value.getType().convertValueTo(value, type, typeContext, markers, context);
-		if (convertedValue != null)
+		final IValue converted1 = type.convertFrom(value, value.getType(), typeContext, markers, context);
+		if (converted1 != null)
 		{
-			return convertedValue;
+			return converted1;
+		}
+
+		final IValue converted2 = value.getType().convertTo(value, type, typeContext, markers, context);
+		if (converted2 != null)
+		{
+			return converted2;
 		}
 
 		final IMethod converter = IContext.resolveImplicits(context, value, type).getBestMember();

@@ -46,10 +46,9 @@ public class ImplicitNullableType extends NullableType
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
-		                            IContext context)
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!this.isConvertibleTo(targetType))
+		if (!this.isConvertibleTo(type))
 		{
 			return null;
 		}
