@@ -141,13 +141,16 @@ repositories {
 }
 
 dependencies {
+	// This is only here so IDEs recognize these files as dependencies
+	compile fileTree('libs/')
+
 	// Runtime Dependencies (Resources)
 
 	def libRun = files("$buildDir/classes/dyvil/library")
 	def dpfRun = files("$buildDir/classes/dyvil/dpf")
 	def testRun = files("$buildDir/classes/dyvil/test")
 
-	def bootstrap = files('libs/dyvil-bootstrap.jar')
+	def bootstrap = files('libs/dyvil-library.jar')
 	def libComp = sourceSets.library.output
 
 	libraryCompile libRun
@@ -179,9 +182,7 @@ dependencies {
 	testCompile bootstrap
 }
 
-wrapper {
-	distributionType = Wrapper.DistributionType.ALL
-}
+wrapper.setDistributionType(Wrapper.DistributionType.ALL)
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
@@ -287,7 +288,7 @@ task genDPF(type: JavaExec) { JavaExec exec ->
 }
 
 /**
- * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
+ * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the previous version of the compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
 	runCompiler exec, 'config/lib.dyc', "$buildDir/classes/dyvil/library", "$buildDir/src/dyvil/library/"
@@ -309,7 +310,7 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	exec.outputs.dir target
 
 	exec.main = compilerMainClass
-	exec.classpath = sourceSets.compiler.runtimeClasspath
+	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
 	exec.args = [ "@$config", 'compile', '--ansi' ]
 
 	for (String src : srcs)
@@ -320,17 +321,12 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	}
 }
 
-/* // Add a / at the start of this line to skip all compilation tasks
-tasks.withType(JavaExec).forEach{it.enabled = false}
-tasks.withType(JavaCompile).forEach{it.enabled = false}
-//*/
-
 private void runGenSrc(JavaExec exec, String target, String... srcs)
 {
 	exec.outputs.dirs target
 
 	exec.main = genSrcMainClass
-	exec.classpath = files("libs/dyvil-bootstrap.jar")
+	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
 	exec.args = [ "target=$target", '--ansi' ]
 
 	for (String src : srcs)
@@ -344,6 +340,11 @@ private void runGenSrc(JavaExec exec, String target, String... srcs)
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
+
+/* // Add a / at the start of this line to skip all compilation tasks
+tasks.withType(JavaExec).forEach{it.enabled = false}
+tasks.withType(JavaCompile).forEach{it.enabled = false}
+//*/
 
 task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	main = 'dyvil.test.Main'
@@ -447,13 +448,14 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 /**
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
-task bootstrap(type: Jar, dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildGenSrc' ]) {
-	from zipTree(buildLibrary.archivePath)
-	from zipTree(buildCompiler.archivePath)
-	from zipTree(buildGenSrc.archivePath)
+task bootstrap(type: Copy, dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildGenSrc' ]) {
+	from("$buildDir/libs/")
 
-	destinationDir = file("libs/")
-	archiveName = "dyvil-bootstrap.jar"
+	include('dyvil-library-*.jar', 'dyvil-compiler-*.jar', 'dyvil-gensrc-*.jar')
+
+	rename('(\\w+-\\w+)-.*\\.jar', '$1.jar')
+
+	into('libs/')
 }
 
 tasks.withType(Jar).forEach {
