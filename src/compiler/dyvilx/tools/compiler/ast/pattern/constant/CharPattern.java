@@ -5,7 +5,6 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
-import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -77,16 +76,11 @@ public final class CharPattern extends AbstractPattern
 			return null;
 		}
 
-		if (type.getTheClass() == Types.STRING_CLASS)
-		{
-			// also accepts String! or String?
-			this.type = TYPE_STRING;
-			return this;
-		}
 		if (Types.isSuperType(type, Types.STRING))
 		{
 			this.type = TYPE_STRING;
-			return new TypeCheckPattern(this, type, Types.STRING);
+			// See StringPattern.withType for implementation note
+			return this;
 		}
 		return null;
 	}

@@ -4,9 +4,8 @@ import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
-import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -39,14 +38,12 @@ public final class StringPattern extends AbstractPattern
 	@Override
 	public Pattern withType(IType type, MarkerList markers)
 	{
-		if (type.getTheClass() == Types.STRING_CLASS)
-		{
-			// also accepts String! or String?
-			return this;
-		}
 		if (Types.isSuperType(type, Types.STRING))
 		{
-			return new TypeCheckPattern(this, type, Types.STRING);
+			// also accepts String! or String?
+			// Strings don't need type checks because the match is performed via "literal".equals(value)
+			// thus value can have any type (that is a super-type of String)
+			return this;
 		}
 		return null;
 	}
