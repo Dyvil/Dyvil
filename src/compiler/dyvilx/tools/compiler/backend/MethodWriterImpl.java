@@ -783,7 +783,7 @@ public final class MethodWriterImpl implements MethodWriter
 		else if (opcode == AUTO_STORE)
 		{
 			final PrimitiveType primitiveType = PrimitiveType.fromFrameType(this.frame.peek());
-			opcode = primitiveType != null ? primitiveType.getStoreOpcode() : Opcodes.ALOAD;
+			opcode = primitiveType != null ? primitiveType.getStoreOpcode() : Opcodes.ASTORE;
 		}
 
 		this.frame.visitVarInsn(opcode, index);

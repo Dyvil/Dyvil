@@ -6,6 +6,19 @@ import java.io._
 
 class CaseClassTest
 {
+	// Tree / Leaf / Node
+
+	@SwitchOptimized
+	static interface Tree<T>
+
+	@SwitchOptimized
+	static case class Leaf<T>(value: T) implements Tree<T>
+
+	@SwitchOptimized
+	static case class Node<T>(value: T, left: Tree<T>, right: Tree<T>) implements Tree<T>
+
+	// ------
+
 	static case class Person(
 		let id: long
 		let name: String

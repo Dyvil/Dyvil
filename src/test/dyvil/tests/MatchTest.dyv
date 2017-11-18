@@ -224,6 +224,17 @@ class MatchTest
 			}
 		}
 
+		test "Optimized" {
+			let tree: Tree<String> = Node("a", Leaf("b"), Leaf("c"))
+
+			match (tree)
+			{
+				case Leaf(var s) => fail
+				case Node("a", Leaf("b"), Leaf("c")) => pass
+				case _ => fail
+			}
+		}
+
 		test "Custom" {
 			var key: String! = null
 			var value: String! = null
