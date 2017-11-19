@@ -76,9 +76,9 @@ interface Representable
 
 	private static func reflect(value: any!, builder: StringBuilder, dejaVu: Set<any>) -> void
 	{
-		if (value is Representable)
+		if let repr = value as? Representable
 		{
-			(value as Representable).represent(to: builder)
+			repr.represent(to: builder)
 		}
 		else if (let value = value)
 		{

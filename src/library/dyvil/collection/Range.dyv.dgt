@@ -33,7 +33,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 				= #(TYPE_NAME)Range(from, toExclusive: toExclusive)
 		}
 	}
-	
+
 	@BytecodeName("closed")
 	static func apply<T extends Rangeable<T>>(from: T, to: T) -> Range<T>
 		= new dyvil.collection.range.closed.ObjectRange<T>(from, to)
@@ -65,9 +65,9 @@ interface Range<+T> extends Queryable<T>, Serializable
 	func asClosed() -> Range<T>
 
 	func isHalfOpen() -> boolean
-	
+
 	override func iterator() -> Iterator<T>
-	
+
 	override func spliterator() -> Spliterator<T>
 	{
 		let size = this.size
@@ -94,7 +94,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 	@Mutating
 	override func filter(predicate: Predicate<-T>) -> void
 		= throw new ImmutableException("filter() on Immutable Range")
-	
+
 	override func mapped<R>(mapper: Function<-T, +R>) -> Queryable<R>
 	{
 		let builder = new immutable.ArrayList.Builder<R>(this.size())
@@ -108,7 +108,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 		for (value <- this) for (result <- mapper(value)) builder.add(result)
 		return builder.build
 	}
-	
+
 	override func filtered(predicate: Predicate<-T>) -> Queryable<T>
 	{
 		let builder = new immutable.ArrayList.Builder<T>(this.size)
@@ -137,12 +137,9 @@ interface Range<+T> extends Queryable<T>, Serializable
 
 	// toString, equals and hashCode
 
-	static func rangeEquals(range: Range<_>, obj: any!) -> boolean
-		= obj is Range && rangeEquals(range, obj as Range)
+	static func rangeEquals(range: Range<_>, obj: any!) -> boolean = obj is Range && rangeEquals(range, obj as Range)
 
-	static func rangeEquals(range: Range<_>, other: Range<_>) -> boolean
-		= range.first == other.first && range.last == other.last && range.size == other.size
+	static func rangeEquals(range: Range<_>, other: Range<_>) -> boolean = range.first == other.first && range.last == other.last && range.size == other.size
 
-	static func rangeHashCode(range: Range<_>) -> int
-		= ((range.first.hashCode * 31) + range.last.hashCode) * 31 + range.size
+	static func rangeHashCode(range: Range<_>) -> int = ((range.first.hashCode * 31) + range.last.hashCode) * 31 + range.size
 }

@@ -100,14 +100,9 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		buffer.append('"')
 	}
 
-	override func equals(obj: any!) -> boolean
-	{
-		if (this === obj) return true
-		if (!(obj is StringInterpolation)) return false
+	override func equals(obj: any!) -> boolean = this === obj || obj is StringInterpolation && this.equals(obj as StringInterpolation)
 
-		let that = obj as StringInterpolation
-		return this.strings == that.strings && this.values == that.values
-	}
+	func equals(that: StringInterpolation) -> boolean = this === that || this.strings == that.strings && this.values == that.values
 
 	override func hashCode() -> int = 31 * this.strings.hashCode + this.values.hashCode
 }
