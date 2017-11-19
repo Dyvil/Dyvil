@@ -8,7 +8,7 @@ public abstract class BigDecimalOperators
 
 	postfix implicit inline func toBigDecimal(i: int)        -> BigDecimal = BigDecimal.valueOf(i as long)
 	postfix implicit inline func toBigDecimal(i: long)       -> BigDecimal = BigDecimal.valueOf(i)
-	postfix implicit inline func toBigDecimal(i: float)      -> BigDecimal = BigDecimal.valueOf(i as double)
+	postfix implicit inline func toBigDecimal(i: float)      -> BigDecimal = BigDecimal.valueOf(i)
 	postfix implicit inline func toBigDecimal(i: double)     -> BigDecimal = BigDecimal.valueOf(i)
 	postfix implicit inline func toBigDecimal(i: BigInteger) -> BigDecimal = new BigDecimal(i)
 
