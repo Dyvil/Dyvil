@@ -12,11 +12,11 @@ import static Constants.*
 
 class Constants
 {
-	public static String version = '0.36.0'
-	public static String libraryVersion = '0.36.0'
-	public static String compilerVersion = '0.36.0'
-	public static String replVersion = '0.22.0'
-	public static String dpfVersion = '0.15.0'
+	public static String version = '0.37.0'
+	public static String libraryVersion = '0.37.0'
+	public static String compilerVersion = '0.37.0'
+	public static String replVersion = '0.23.0'
+	public static String dpfVersion = '0.15.1'
 	public static String genSrcVersion = '0.8.0'
 
 	public static final String devStage = 'delta'
