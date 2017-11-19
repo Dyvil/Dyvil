@@ -402,13 +402,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	private void generateBranched(MethodWriter writer, Object frameType) throws BytecodeException
 	{
 		final boolean expr = frameType != null;
-		final int varIndex = writer.localCount();
+		final int localCount = writer.localCount();
 		final IType matchedType = this.matchedValue.getType();
 
-		this.matchedValue.writeExpression(writer, null);
-		writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
+		final int varIndex = this.matchedValue.writeStore(writer, null);
 
-		final int localCount = writer.localCount();
+		final int localCountInner = writer.localCount();
 
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
@@ -425,7 +424,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			this.writeAction(writer, expr, frameType, c.action);
 
-			writer.resetLocals(localCount);
+			writer.resetLocals(localCountInner);
 
 			if (!writer.hasReturn())
 			{
@@ -451,7 +450,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 
 		writer.visitLabel(endLabel);
-		writer.resetLocals(varIndex);
+		writer.resetLocals(localCount);
 	}
 
 	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
@@ -565,15 +564,18 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		// Write the value
 		final IType matchedType = this.matchedValue.getType();
-		this.matchedValue.writeExpression(writer, null);
 
-		int varIndex = -1;
+		final int localCount = writer.localCount();
+
+		final int varIndex;
 		if (switchVar)
 		{
-			varIndex = writer.localCount();
-			// Need a variable - store and load the value
-			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
-			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
+			varIndex = this.matchedValue.writeStoreLoad(writer, null);
+		}
+		else
+		{
+			varIndex = -1;
+			this.matchedValue.writeExpression(writer, null);
 		}
 
 		if (Types.isSuperClass(Types.ENUM, matchedType))
@@ -595,7 +597,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
 		}
 
-		final int localCount = writer.localCount();
+		final int localCountInner = writer.localCount();
 
 		final KeyCache keyCache = new KeyCache(cases);
 
@@ -680,7 +682,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 				this.writeAction(writer, expr, frameType, matchCase.action);
 
-				writer.resetLocals(localCount);
+				writer.resetLocals(localCountInner);
 
 				if (!writer.hasReturn())
 				{
@@ -709,7 +711,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			this.writeAction(writer, expr, frameType, defaultCase.action);
 
-			writer.resetLocals(localCount);
+			writer.resetLocals(localCountInner);
 
 			if (!writer.hasReturn())
 			{
@@ -726,10 +728,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		writer.visitLabel(endLabel);
 
-		if (switchVar)
-		{
-			writer.resetLocals(varIndex);
-		}
+		writer.resetLocals(localCount);
 	}
 
 	/**
