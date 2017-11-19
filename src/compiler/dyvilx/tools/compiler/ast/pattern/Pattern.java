@@ -7,7 +7,6 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.ITyped;
-import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -70,20 +69,6 @@ public interface Pattern extends ASTNode, ITyped
 	default Pattern withType(IType type, MarkerList markers)
 	{
 		return this.isType(type) ? this : null;
-	}
-
-	static Pattern primitiveWithType(Pattern pattern, IType type, PrimitiveType primitiveType)
-	{
-		if (Types.isSameType(type, primitiveType))
-		{
-			return pattern;
-		}
-
-		if (Types.isSuperType(type, primitiveType))
-		{
-			return new TypeCheckPattern(pattern, type, primitiveType);
-		}
-		return null;
 	}
 
 	@Override

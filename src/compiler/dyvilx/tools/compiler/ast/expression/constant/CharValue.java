@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
@@ -9,6 +10,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LiteralConversion;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -59,11 +61,7 @@ public final class CharValue implements IConstantValue
 	@Override
 	public IType getType()
 	{
-		if (this.type == TYPE_CHAR)
-		{
-			return Types.CHAR;
-		}
-		return Types.STRING;
+		return this.type == TYPE_CHAR ? Types.CHAR : Types.STRING;
 	}
 
 	@Override
@@ -87,10 +85,18 @@ public final class CharValue implements IConstantValue
 
 		if (this.type != TYPE_STRING && this.value.length() == 1)
 		{
-			if (Types.isSuperType(type, Types.CHAR))
+			switch (type.getTypecode())
 			{
+			// char is binary assignment compatible to these primitive types
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.INT_CODE:
+			case PrimitiveType.CHAR_CODE:
 				this.type = TYPE_CHAR;
 				return this;
+			case PrimitiveType.LONG_CODE:
+				// assigning char literal to long -> convert the literal
+				return new LongValue(this.position, this.value.charAt(0));
 			}
 
 			final Annotation annotation = type.getAnnotation(Types.FROMCHAR_CLASS);
@@ -105,57 +111,40 @@ public final class CharValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isType(IType type)
-	{
-		if (this.value.length() == 1 && this.type != TYPE_STRING)
-		{
-			if (Types.isSuperType(type, Types.CHAR) || type.getAnnotation(Types.FROMCHAR_CLASS) != null)
-			{
-				return true;
-			}
-		}
-		else if (this.type == TYPE_CHAR)
-		{
-			return false;
-		}
-
-		return Types.isSuperType(type, Types.STRING) || (type.getAnnotation(Types.FROMSTRING_CLASS) != null);
-	}
-
-	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.value.length() == 1 && this.type != TYPE_STRING)
+		if (this.type != TYPE_CHAR)
 		{
-			if (Types.isSameType(type, Types.CHAR))
+			if (Types.isSameType(type, Types.STRING))
 			{
 				return EXACT_MATCH;
 			}
-			if (Types.isSuperType(type, Types.CHAR))
+			if (Types.isSuperType(type, Types.STRING))
 			{
 				return SUBTYPE_MATCH;
 			}
-			if (type.getAnnotation(Types.FROMCHAR_CLASS) != null)
+			if (type.getAnnotation(Types.FROMSTRING_CLASS) != null)
 			{
 				return CONVERSION_MATCH;
 			}
 		}
 
-		if (this.type == TYPE_CHAR)
+		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
-			return MISMATCH;
-		}
-		if (Types.isSameType(type, Types.STRING))
-		{
-			return SECONDARY_MATCH;
-		}
-		if (Types.isSuperType(type, Types.STRING))
-		{
-			return SECONDARY_SUBTYPE_MATCH;
-		}
-		if (type.getAnnotation(Types.FROMSTRING_CLASS) != null)
-		{
-			return CONVERSION_MATCH;
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.CHAR_CODE:
+				return SECONDARY_MATCH;
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.INT_CODE:
+			case PrimitiveType.LONG_CODE:
+				return CONVERSION_MATCH;
+			}
+			if (type.getAnnotation(Types.FROMCHAR_CLASS) != null)
+			{
+				return CONVERSION_MATCH;
+			}
 		}
 		return MISMATCH;
 	}
@@ -241,7 +230,7 @@ public final class CharValue implements IConstantValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		StringLiterals.appendCharLiteral(this.value, buffer);
 	}

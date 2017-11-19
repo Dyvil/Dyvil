@@ -811,18 +811,18 @@ public final class PrimitiveType implements IType
 		switch (this.typecode)
 		{
 		case BOOLEAN_CODE:
-			return BooleanValue.TRUE;
+			return BooleanValue.FALSE;
 		case BYTE_CODE:
 		case SHORT_CODE:
 		case CHAR_CODE:
 		case INT_CODE:
-			return IntValue.getNull();
+			return IntValue.ZERO;
 		case LONG_CODE:
-			return LongValue.getNull();
+			return LongValue.ZERO;
 		case FLOAT_CODE:
-			return FloatValue.getNull();
+			return FloatValue.ZERO;
 		case DOUBLE_CODE:
-			return DoubleValue.getNull();
+			return DoubleValue.ZERO;
 		}
 		return null;
 	}

@@ -1,11 +1,14 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -36,7 +39,18 @@ public final class FloatPattern extends AbstractPattern
 	@Override
 	public Pattern withType(IType type, MarkerList markers)
 	{
-		return Pattern.primitiveWithType(this, type, Types.FLOAT);
+		switch (type.getTypecode())
+		{
+		case PrimitiveType.FLOAT_CODE:
+			return new FloatPattern(this.position, this.value);
+		case PrimitiveType.DOUBLE_CODE:
+			return new DoublePattern(this.position, this.value);
+		}
+		if (Types.isSuperType(type, Types.FLOAT.getObjectType()))
+		{
+			return new TypeCheckPattern(this, type, Types.FLOAT);
+		}
+		return null;
 	}
 
 	@Override
@@ -54,7 +68,7 @@ public final class FloatPattern extends AbstractPattern
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value).append('F');
 	}

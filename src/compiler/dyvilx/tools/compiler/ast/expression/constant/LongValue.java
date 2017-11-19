@@ -1,9 +1,11 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LiteralConversion;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -16,7 +18,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class LongValue implements IConstantValue
 {
-	private static LongValue NULL;
+	public static final LongValue ZERO = new LongValue(0);
 
 	protected SourcePosition position;
 	protected long           value;
@@ -30,15 +32,6 @@ public class LongValue implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
-	}
-
-	public static LongValue getNull()
-	{
-		if (NULL == null)
-		{
-			NULL = new LongValue(0L);
-		}
-		return NULL;
 	}
 
 	@Override
@@ -68,23 +61,19 @@ public class LongValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.LONG)
+		switch (type.getTypecode())
 		{
+		case PrimitiveType.LONG_CODE:
 			return this;
+		case PrimitiveType.FLOAT_CODE:
+			return new FloatValue(this.position, this.value);
+		case PrimitiveType.DOUBLE_CODE:
+			return new DoubleValue(this.position, this.value);
 		}
-		if (type.isPrimitive())
+
+		if (Types.isSuperType(type, Types.LONG.getObjectType()))
 		{
-			switch (type.getTypecode())
-			{
-			case PrimitiveType.FLOAT_CODE:
-				return new FloatValue(this.position, this.value);
-			case PrimitiveType.DOUBLE_CODE:
-				return new DoubleValue(this.position, this.value);
-			}
-		}
-		if (Types.isSuperType(type, Types.LONG))
-		{
-			return this;
+			return new CastOperator(this, Types.LONG.getObjectType());
 		}
 
 		final Annotation annotation = type.getAnnotation(Types.FROMLONG_CLASS);
@@ -93,12 +82,6 @@ public class LongValue implements IConstantValue
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return Types.isSuperType(type, Types.LONG) || type.getAnnotation(Types.FROMLONG_CLASS) != null;
 	}
 
 	@Override
@@ -177,7 +160,7 @@ public class LongValue implements IConstantValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value).append('L');
 	}
