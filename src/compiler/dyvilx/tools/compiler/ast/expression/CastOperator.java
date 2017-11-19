@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
@@ -20,22 +21,19 @@ public final class CastOperator extends AbstractValue
 {
 	protected IValue value;
 	protected IType  type;
-	
-	// Metadata
-	private boolean typeHint;
-	
+
 	public CastOperator(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	public CastOperator(IValue value, IType type)
 	{
 		this.value = value;
 		this.type = type;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
@@ -71,7 +69,7 @@ public final class CastOperator extends AbstractValue
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
@@ -100,7 +98,7 @@ public final class CastOperator extends AbstractValue
 			markers.add(Markers.semanticError(this.position, "cast.value.invalid"));
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -112,49 +110,44 @@ public final class CastOperator extends AbstractValue
 		}
 
 		this.value = this.value.resolve(markers, context);
-		
+
 		if (!this.type.isResolved())
 		{
 			return this;
 		}
-		
-		IType valueType = this.value.getType();
-		
-		final IValue typedValue = TypeChecker.convertValue(this.value, this.type, this.type, markers, context);
+
+		final IType valueType = this.value.getType();
+		final IValue typedValue = TypeChecker.convertValue(this.value, this.type, null, markers, context);
+
 		if (typedValue != null)
 		{
-			this.value = typedValue;
-			
-			final IType newType = typedValue.getType();
-			if (!Types.isExactType(valueType, newType) && Types.isSuperClass(this.type, newType)
-					&& newType.isPrimitive() == this.type.isPrimitive())
+			if (Types.isExactType(this.type, valueType))
 			{
-				this.typeHint = true;
-				this.type = newType;
-				return this;
+				// the cast type and the type of the value before type hinting are the exact same
+				// so we create a warning
+				markers.add(Markers.semantic(this.position, "cast.unnecessary"));
+				return typedValue;
 			}
-			
-			valueType = newType;
-		}
-		
-		final boolean primitiveType = this.type.isPrimitive();
-		final boolean primitiveValue = valueType.isPrimitive();
-		
-		if (typedValue == null && !(primitiveType && primitiveValue) && !Types.isSuperClass(valueType, this.type))
-		{
-			markers.add(Markers.semantic(this.position, "cast.incompatible", valueType, this.type));
+
+			// the cast was a type hint that was not useless
+			this.value = typedValue;
 			return this;
 		}
-		
-		if (!this.typeHint && this.type.isSameType(valueType) && primitiveType == primitiveValue)
+
+		// type hinting failed, this is an actual cast
+
+		final boolean primitiveType = this.type.isPrimitive();
+		final boolean primitiveValue = valueType.isPrimitive();
+
+		if (!(primitiveType && primitiveValue) && !Types.isSuperClass(valueType, this.type))
 		{
-			markers.add(Markers.semantic(this.position, "cast.unnecessary"));
-			this.typeHint = true;
+			markers.add(Markers.semanticError(this.position, "cast.incompatible", valueType, this.type));
+			return this;
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -164,7 +157,7 @@ public final class CastOperator extends AbstractValue
 			this.value.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -174,7 +167,7 @@ public final class CastOperator extends AbstractValue
 			this.value.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -182,20 +175,15 @@ public final class CastOperator extends AbstractValue
 		this.value = this.value.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.typeHint)
-		{
-			return this.value.cleanup(compilableList, classCompilableList);
-		}
-		
 		this.type.cleanup(compilableList, classCompilableList);
 		this.value = this.value.cleanup(compilableList, classCompilableList);
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -221,10 +209,10 @@ public final class CastOperator extends AbstractValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		this.value.toString(prefix, buffer);
+		this.value.toString(indent, buffer);
 		buffer.append(" as ");
-		this.type.toString(prefix, buffer);
+		this.type.toString(indent, buffer);
 	}
 }
