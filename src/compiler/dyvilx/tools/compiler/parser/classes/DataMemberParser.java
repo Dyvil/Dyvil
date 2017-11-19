@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.parser.classes;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -18,12 +20,18 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 	protected static final int NAME       = 1;
 	protected static final int TYPE       = 2;
 
-	protected IDataMemberConsumer<T> consumer;
+	protected final IDataMemberConsumer<T> consumer;
 
 	private T dataMember;
 
 	public DataMemberParser(IDataMemberConsumer<T> consumer)
 	{
+		this.consumer = consumer;
+	}
+
+	public DataMemberParser(@NonNull AttributeList attributes, IDataMemberConsumer<T> consumer)
+	{
+		super(attributes);
 		this.consumer = consumer;
 	}
 

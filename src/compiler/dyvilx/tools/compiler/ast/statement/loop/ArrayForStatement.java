@@ -43,16 +43,13 @@ public class ArrayForStatement extends ForEachStatement
 		final int localCount = writer.localCount();
 
 		// Load the array
-		var.getValue().writeExpression(writer, null);
+		final int arrayVarIndex = var.getValue().writeStore(writer, null);
 
 		// Local Variables
-		final int arrayVarIndex = writer.localCount();
-		final int lengthVarIndex = arrayVarIndex + 1;
-		final int indexVarIndex = arrayVarIndex + 2;
+		final int lengthVarIndex = writer.localCount();
+		final int indexVarIndex = lengthVarIndex + 1;
 
-		writer.visitInsn(Opcodes.DUP);
-
-		writer.visitVarInsn(Opcodes.ASTORE, arrayVarIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, arrayVarIndex);
 		// Load the length
 		writer.visitLineNumber(lineNumber);
 		writer.visitInsn(Opcodes.ARRAYLENGTH);
@@ -93,8 +90,8 @@ public class ArrayForStatement extends ForEachStatement
 		writer.visitJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 
 		// Local Variables
-		writer.resetLocals(localCount);
 		writer.visitLabel(endLabel);
+		writer.resetLocals(localCount);
 
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}

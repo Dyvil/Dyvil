@@ -142,7 +142,7 @@ class BinaryReader(private let dataInput: DataInput)
 
 	func readNode(visitor: NodeVisitor) -> void throws IOException = this.readNode(this.dataInput.readByte(), visitor)
 
-	private func readNode(tag: int, visitor: NodeVisitor) throws IOException
+	private func readNode(tag: int, visitor: NodeVisitor) -> void throws IOException
 	{
 		match (tag)
 		{

@@ -20,7 +20,7 @@ extends DPFValueVisitor implements Value, Expandable
 	static func apply(value: Value, name: Name) -> NameAccess = new NameAccess(value, name)
 
 	override func visitValue(value: Value) -> void = this.value = value
-	
+
 	override func accept(visitor: ValueVisitor) -> void
 	{
 		if (this.value == null)
@@ -60,14 +60,9 @@ extends DPFValueVisitor implements Value, Expandable
 		buffer.append(this.name)
 	}
 
-	override func equals(obj: any!) -> boolean
-	{
-		if (this === obj) return true
-		if (!(obj is NameAccess)) return false
+	override func equals(obj: any!) -> boolean = this === obj || obj is NameAccess && this.equals(obj as NameAccess)
 
-		let that = obj as NameAccess
-		return this.name === that.name && this.value == that.value
-	}
+	func equals(that: NameAccess) -> boolean = this === that || this.name === that.name && this.value == that.value
 
 	override func hashCode() -> int = 31 * this.name.hashCode + (this.value?.hashCode ?? 0)
 }

@@ -1,0 +1,10 @@
+package dyvil.source
+
+interface Source
+{
+	var lineCount: int { get }
+
+	var text: String { get }
+
+	func line(at index: int) -> String!
+}

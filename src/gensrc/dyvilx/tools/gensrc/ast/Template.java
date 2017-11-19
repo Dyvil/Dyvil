@@ -22,7 +22,7 @@ import java.util.List;
 
 public class Template
 {
-	private final FileSource sourceFile;
+	private final FileSource fileSource;
 	private final File       targetDirectory;
 	private final String     fileName;
 
@@ -30,16 +30,16 @@ public class Template
 
 	private DirectiveList directives;
 
-	public Template(File sourceFile, File targetDir, String fileName)
+	public Template(File fileSource, File targetDir, String fileName)
 	{
-		this.sourceFile = new FileSource(sourceFile);
+		this.fileSource = new FileSource(fileSource);
 		this.targetDirectory = targetDir;
 		this.fileName = fileName;
 	}
 
-	public FileSource getSourceFile()
+	public FileSource getFileSource()
 	{
-		return this.sourceFile;
+		return this.fileSource;
 	}
 
 	public String getFileName()
@@ -56,7 +56,7 @@ public class Template
 	{
 		try
 		{
-			this.sourceFile.load();
+			this.fileSource.load();
 		}
 		catch (IOException ignored)
 		{
@@ -65,7 +65,7 @@ public class Template
 
 		this.directives = new DirectiveList();
 
-		final TokenList tokens = new GenSrcLexer(markers).tokenize(this.sourceFile.getText());
+		final TokenList tokens = new GenSrcLexer(markers).tokenize(this.fileSource.text());
 
 		new ParserManager(GenSrcSymbols.INSTANCE, tokens.iterator(), markers).parse(new BlockParser(this.directives));
 
@@ -83,7 +83,7 @@ public class Template
 		final MarkerList markers = new MarkerList(I18n.INSTANCE);
 		if (!this.load(markers))
 		{
-			gensrc.getOutput().println(I18n.get("template.file.error", this.sourceFile.getInputFile()));
+			gensrc.getOutput().println(I18n.get("template.file.error", this.fileSource.file()));
 			return;
 		}
 
@@ -95,7 +95,7 @@ public class Template
 
 		final int count = this.specializeAll(gensrc);
 
-		gensrc.getOutput().println(I18n.get("template.specialized", count, this.sourceFile.getInputFile()));
+		gensrc.getOutput().println(I18n.get("template.specialized", count, this.fileSource.file()));
 	}
 
 	private void printMarkers(GenSrc gensrc, MarkerList markers, Specialization spec)
@@ -104,17 +104,17 @@ public class Template
 
 		if (spec == null)
 		{
-			builder.append(I18n.get("template.problems", this.sourceFile.getInputFile()));
+			builder.append(I18n.get("template.problems", this.fileSource.file()));
 		}
 		else
 		{
-			builder.append(I18n.get("template.problems.for_spec", this.sourceFile.getInputFile(), spec.getFileName()));
+			builder.append(I18n.get("template.problems.for_spec", this.fileSource.file(), spec.getFileName()));
 		}
 
 		builder.append('\n').append('\n');
 
 		final boolean colors = gensrc.useAnsiColors();
-		markers.log(this.sourceFile, builder, colors);
+		markers.log(this.fileSource, builder, colors);
 		gensrc.getOutput().println(builder);
 	}
 
@@ -146,12 +146,12 @@ public class Template
 			return;
 		}
 
-		final int estSize = this.sourceFile.getText().length() * 2;
+		final int estSize = this.fileSource.text().length() * 2;
 
 		final ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream(estSize);
 		final PrintStream writer = new PrintStream(byteArrayOut);
 
-		final File inputFile = this.sourceFile.getInputFile();
+		final File inputFile = this.fileSource.file();
 		final TemplateScope scope = new TemplateScope(inputFile, spec);
 
 		// Specialize and check for errors

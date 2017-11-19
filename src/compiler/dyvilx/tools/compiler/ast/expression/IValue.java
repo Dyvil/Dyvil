@@ -460,6 +460,27 @@ public interface IValue extends ASTNode, ITyped
 		this.writeExpression(writer, type);
 	}
 
+	default int writeStore(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer, type);
+		final int localIndex = writer.localCount();
+
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
+		writer.visitVarInsn(type.getStoreOpcode(), localIndex);
+		return localIndex;
+	}
+
+	default int writeStoreLoad(MethodWriter writer, IType type) throws BytecodeException
+	{
+		final int localIndex = this.writeStore(writer, type);
+		writer.visitVarInsn(Opcodes.AUTO_LOAD, localIndex);
+		return localIndex;
+	}
+
 	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer, Types.BOOLEAN);

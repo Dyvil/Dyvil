@@ -6,16 +6,20 @@ public abstract class Booleans
 {
 	private init() {}
 
-	// Boolean Operators
+	// Unary Operators
 
 	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_NOT)
 	prefix func !(rhs: boolean) -> boolean = !rhs
+
+	// Relational Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	infix func ==(lhs: boolean, rhs: boolean) -> boolean = lhs == rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
 	infix func !=(lhs: boolean, rhs: boolean) -> boolean = lhs != rhs
+
+	// Boolean Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
 	infix func &(lhs: boolean, rhs: boolean) -> boolean = lhs & rhs
@@ -29,7 +33,7 @@ public abstract class Booleans
 	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_OR)
 	infix func ||(lhs: boolean, rhs: boolean) -> boolean = lhs || rhs
 
-	@Deprecated(replacements: [ "!=(boolean, boolean) -> boolean" ])
+	@Deprecated(replacements: [ "!= (boolean, boolean): boolean" ])
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	infix func ^(lhs: boolean, rhs: boolean) -> boolean = lhs != rhs
 

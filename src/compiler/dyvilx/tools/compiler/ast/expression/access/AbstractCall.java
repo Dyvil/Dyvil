@@ -342,7 +342,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 			this.method
 				.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 
-			if (!this.method.getType().isResolved())
+			if (!this.getType().isResolved())
 			{
 				markers.add(Markers.semanticError(this.position, "method.access.unresolved_type", this.getName()));
 			}

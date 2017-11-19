@@ -13,7 +13,7 @@ abstract class Primitives
 
 	#define(LOAD_CALL){LOAD_0, INVOKESTATIC, 0, 1, 2}
 
-	// --- Conversion Methods ---
+	// --- Primitive <-> Wrapper Conversion Methods ---
 
 	// Void Conversions
 
@@ -32,7 +32,7 @@ abstract class Primitives
 		// TYPE_NAME Conversions
 
 		@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-		static func apply(this: WRAPPER, value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)!!
+		implicit static func apply(this: WRAPPER, value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)!!
 
 		@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
 		  strings: [ "java/lang/WRAPPER", "#(PRIMITIVE)Value", "()DESC_CHAR" ])

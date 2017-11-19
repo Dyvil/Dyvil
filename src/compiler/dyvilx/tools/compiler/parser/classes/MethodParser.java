@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.classes;
 
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
+import dyvilx.tools.compiler.ast.consumer.IMethodConsumer;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
@@ -30,17 +30,17 @@ public class MethodParser extends AbstractMemberParser
 	protected static final int EXCEPTIONS     = 7;
 	protected static final int BODY           = 8;
 
-	protected final IMemberConsumer<?> consumer;
+	protected final IMethodConsumer consumer;
 
 	private IMethod method;
 
-	public MethodParser(IMemberConsumer<?> consumer)
+	public MethodParser(IMethodConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = DECLARATOR;
 	}
 
-	public MethodParser(IMemberConsumer<?> consumer, AttributeList attributes)
+	public MethodParser(IMethodConsumer consumer, AttributeList attributes)
 	{
 		super(attributes);
 		this.consumer = consumer;
@@ -70,10 +70,8 @@ public class MethodParser extends AbstractMemberParser
 				return;
 			}
 
-			pm.report(token, "member.declarator");
-			return;
+			// Fallthrough
 		case METHOD_NAME:
-		{
 			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "method.identifier");
@@ -84,7 +82,6 @@ public class MethodParser extends AbstractMemberParser
 
 			this.mode = GENERICS;
 			return;
-		}
 		// Fallthrough
 		case GENERICS:
 			if (TypeParser.isGenericStart(token, type))

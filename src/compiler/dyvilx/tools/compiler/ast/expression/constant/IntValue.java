@@ -1,9 +1,11 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LiteralConversion;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -16,7 +18,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class IntValue implements IConstantValue
 {
-	private static IntValue NULL;
+	public static final IntValue ZERO = new IntValue(0);
 
 	protected SourcePosition position;
 	protected int            value;
@@ -30,15 +32,6 @@ public final class IntValue implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
-	}
-
-	public static IntValue getNull()
-	{
-		if (NULL == null)
-		{
-			NULL = new IntValue(0);
-		}
-		return NULL;
 	}
 
 	@Override
@@ -68,31 +61,25 @@ public final class IntValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.INT)
+		switch (type.getTypecode())
 		{
+		case PrimitiveType.CHAR_CODE:
+			return new CharValue(this.position, String.valueOf((char) this.value), true);
+		case PrimitiveType.BYTE_CODE:
+		case PrimitiveType.SHORT_CODE:
+		case PrimitiveType.INT_CODE:
 			return this;
+		case PrimitiveType.LONG_CODE:
+			return new LongValue(this.position, this.value);
+		case PrimitiveType.FLOAT_CODE:
+			return new FloatValue(this.position, this.value);
+		case PrimitiveType.DOUBLE_CODE:
+			return new DoubleValue(this.position, this.value);
 		}
-		if (type.isPrimitive())
+
+		if (Types.isSuperType(type, Types.INT.getObjectType()))
 		{
-			switch (type.getTypecode())
-			{
-			case PrimitiveType.CHAR_CODE:
-				return new CharValue(this.position, String.valueOf((char) this.value), true);
-			case PrimitiveType.BYTE_CODE:
-			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.INT_CODE:
-				return this;
-			case PrimitiveType.LONG_CODE:
-				return new LongValue(this.position, this.value);
-			case PrimitiveType.FLOAT_CODE:
-				return new FloatValue(this.position, this.value);
-			case PrimitiveType.DOUBLE_CODE:
-				return new DoubleValue(this.position, this.value);
-			}
-		}
-		if (Types.isSuperType(type, Types.INT))
-		{
-			return this;
+			return new CastOperator(this, Types.INT.getObjectType());
 		}
 
 		final Annotation annotation = type.getAnnotation(Types.FROMINT_CLASS);
@@ -185,7 +172,7 @@ public final class IntValue implements IConstantValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value);
 	}

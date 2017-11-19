@@ -30,7 +30,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 		}
 
 		let gcd = gcd(numerator, denominator)
-		return new Rational(numerator \ gcd, denominator \ gcd)
+		return new Rational(numerator _/ gcd, denominator _/ gcd)
 	}
 
 	@Experimental

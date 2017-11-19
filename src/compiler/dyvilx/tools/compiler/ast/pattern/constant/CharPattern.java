@@ -1,19 +1,21 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class CharPattern extends Pattern
+public final class CharPattern extends AbstractPattern
 {
 	private static final byte TYPE_CHAR   = 1;
 	private static final byte TYPE_STRING = 2;
@@ -38,44 +40,13 @@ public final class CharPattern extends Pattern
 	@Override
 	public int getPatternType()
 	{
-		return IPattern.CHAR;
+		return Pattern.CHAR;
 	}
 
 	@Override
 	public IType getType()
 	{
 		return Types.CHAR;
-	}
-
-	@Override
-	public IPattern withType(IType type, MarkerList markers)
-	{
-		if (this.value.length() == 1 && this.type != TYPE_STRING)
-		{
-			final IPattern pattern = IPattern.primitiveWithType(this, type, Types.CHAR);
-			if (this.type == TYPE_CHAR || pattern != null)
-			{
-				this.type = TYPE_CHAR;
-				return pattern;
-			}
-		}
-		if (this.type == TYPE_CHAR)
-		{
-			return null;
-		}
-
-		if (type.getTheClass() == Types.STRING_CLASS)
-		{
-			// also accepts String! or String?
-			this.type = TYPE_STRING;
-			return this;
-		}
-		if (Types.isSuperType(type, Types.STRING))
-		{
-			this.type = TYPE_STRING;
-			return new TypeCheckPattern(this, type, Types.STRING);
-		}
-		return null;
 	}
 
 	@Override
@@ -92,15 +63,62 @@ public final class CharPattern extends Pattern
 	}
 
 	@Override
+	public Pattern withType(IType type, MarkerList markers)
+	{
+		if (this.value.length() == 1 && this.type != TYPE_STRING)
+		{
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.INT_CODE:
+			case PrimitiveType.CHAR_CODE:
+				this.type = CHAR;
+				return this;
+			}
+
+			if (Types.isSuperType(type, Types.CHAR.getObjectType()))
+			{
+				this.type = CHAR;
+				return new TypeCheckPattern(this, type, Types.CHAR);
+			}
+		}
+		if (this.type == TYPE_CHAR)
+		{
+			return null;
+		}
+
+		if (Types.isSuperType(type, Types.STRING))
+		{
+			this.type = TYPE_STRING;
+			// See StringPattern.withType for implementation note
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public Object constantValue()
+	{
+		if (this.type == TYPE_CHAR)
+		{
+			return this.value.charAt(0);
+		}
+		return this.value;
+	}
+
+	// Switch Resolution
+
+	@Override
 	public boolean isSwitchable()
 	{
 		return true;
 	}
 
 	@Override
-	public int subPatterns()
+	public boolean switchCheck()
 	{
-		return 1;
+		return this.type != TYPE_CHAR;
 	}
 
 	@Override
@@ -113,42 +131,24 @@ public final class CharPattern extends Pattern
 		return this.value.hashCode();
 	}
 
-	@Override
-	public boolean switchCheck()
-	{
-		return this.type != TYPE_CHAR;
-	}
+	// Compilation
 
 	@Override
-	public int minValue()
-	{
-		return this.switchValue();
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return this.switchValue();
-	}
-
-	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		if (this.type == TYPE_STRING)
 		{
-			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
+			StringPattern.writeJumpOnMismatch(writer, varIndex, target, this.value);
 			return;
 		}
 
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.CHAR, this.lineNumber());
+		Pattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value.charAt(0));
-		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, target);
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		StringLiterals.appendCharLiteral(this.value, buffer);
 	}

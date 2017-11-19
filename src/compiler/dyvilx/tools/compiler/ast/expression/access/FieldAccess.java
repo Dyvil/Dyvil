@@ -90,8 +90,9 @@ public class FieldAccess extends AbstractFieldAccess
 	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
-		// x op= z
-		// -> x = x.op(z)
+		// x (op)= z
+		// -> x = x (op) z
+		// note that x is only evaluated once
 
 		final IValue fieldReceiver = helper.processValue(this.receiver);
 		this.receiver = fieldReceiver;
@@ -286,5 +287,16 @@ public class FieldAccess extends AbstractFieldAccess
 		}
 
 		this.field.getType().writeCast(writer, type, lineNumber);
+	}
+
+	@Override
+	public int writeStore(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.field.hasModifier(Modifiers.FINAL) && this.field.isLocal() && this.field instanceof IVariable)
+		{
+			// no extra read+store necessary for final variables
+			return ((IVariable) this.field).getLocalIndex();
+		}
+		return super.writeStore(writer, type);
 	}
 }

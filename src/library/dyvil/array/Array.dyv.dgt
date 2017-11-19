@@ -231,7 +231,7 @@ public abstract class #(TYPE_NAME)Array
 
 	#if (IS_GENERIC /* Object Arrays do not need a specialized mapped method */ ) {}
 	#else {
-		infix func mapped(array: [T], mapper: T -> T) -> [T]
+		infix func mappedTo#(TYPE_NAME)(array: [T], mapper: T -> T) -> [T]
 		{
 			let size = array.size
 			let result = APPLY_T(size)
@@ -251,7 +251,7 @@ public abstract class #(TYPE_NAME)Array
 
 	#if (IS_GENERIC /* Object Arrays do not need a specialized flatMapped method */) {}
 	#else {
-		infix func flatMapped(array: [T], mapper: T -> [T]) -> [T]
+		infix func flatMappedTo#(TYPE_NAME)(array: [T], mapper: T -> [T]) -> [T]
 		{
 			var size = 0
 			var result = APPLY_T(array.size << 2)

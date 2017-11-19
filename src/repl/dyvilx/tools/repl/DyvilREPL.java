@@ -1,27 +1,29 @@
 package dyvilx.tools.repl;
 
+import dyvil.collection.List;
 import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.TreeMap;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
-import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.parser.SemicolonInference;
+import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
-import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
+import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.repl.command.*;
 import dyvilx.tools.repl.context.REPLClassLoader;
 import dyvilx.tools.repl.context.REPLContext;
+import dyvilx.tools.repl.input.InputManager;
 import dyvilx.tools.repl.input.REPLParser;
 import dyvilx.tools.repl.lang.I18n;
 
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
 
 public final class DyvilREPL
 {
@@ -34,6 +36,7 @@ public final class DyvilREPL
 	protected REPLClassLoader classLoader = new REPLClassLoader(this);
 
 	protected File dumpDir;
+	private List<File> autoLoadFiles = new ArrayList<>();
 
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
@@ -50,6 +53,7 @@ public final class DyvilREPL
 		registerCommand(new RenameCommand());
 		registerCommand(new VariablesCommand());
 		registerCommand(new VersionCommand());
+		registerCommand(new LoadCommand());
 	}
 
 	public DyvilREPL(PrintStream output)
@@ -133,6 +137,11 @@ public final class DyvilREPL
 
 			this.compiler.log(I18n.get("repl.loaded", Util.toTime(endTime - startTime)));
 		}
+
+		for (File file : this.autoLoadFiles)
+		{
+			this.processFile(file);
+		}
 	}
 
 	private void baseInit(String[] args)
@@ -147,9 +156,14 @@ public final class DyvilREPL
 
 	private void processArgument(String arg)
 	{
-		if (arg.startsWith("dumpDir"))
+		if (arg.startsWith("dumpDir="))
 		{
-			this.dumpDir = new File(arg.substring(arg.indexOf('=') + 1).trim());
+			this.dumpDir = new File(arg.substring(8).trim());
+			return;
+		}
+		if (arg.startsWith("load="))
+		{
+			this.autoLoadFiles.add(new File(arg.substring(5).trim()));
 			return;
 		}
 
@@ -159,6 +173,23 @@ public final class DyvilREPL
 	public void shutdown()
 	{
 		this.compiler.shutdown();
+	}
+
+	public void processFile(File file)
+	{
+		try (InputStream fileInput = new FileInputStream(file))
+		{
+			InputManager input = new InputManager(null, fileInput);
+			String line;
+			while ((line = input.readInput()) != null)
+			{
+				this.processInput(line);
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace(this.getErrorOutput());
+		}
 	}
 
 	public void processInput(String input)

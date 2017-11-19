@@ -3,42 +3,42 @@ package dyvilx.tools.compiler.ast.pattern.operator;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public abstract class BinaryPattern implements IPattern
+public abstract class BinaryPattern implements Pattern
 {
-	protected IPattern      left;
-	protected IPattern      right;
+	protected Pattern        left;
+	protected Pattern        right;
 	protected SourcePosition position;
 	// Metadata
-	private   IType         commonType;
+	private   IType          commonType;
 
-	public BinaryPattern(IPattern left, SourcePosition token, IPattern right)
+	public BinaryPattern(Pattern left, SourcePosition token, Pattern right)
 	{
 		this.right = right;
 		this.left = left;
 		this.position = token;
 	}
 
-	public IPattern getLeft()
+	public Pattern getLeft()
 	{
 		return this.left;
 	}
 
-	public void setLeft(IPattern left)
+	public void setLeft(Pattern left)
 	{
 		this.left = left;
 	}
 
-	public IPattern getRight()
+	public Pattern getRight()
 	{
 		return this.right;
 	}
 
-	public void setRight(IPattern right)
+	public void setRight(Pattern right)
 	{
 		this.right = right;
 	}
@@ -78,15 +78,15 @@ public abstract class BinaryPattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
-		final IPattern left = this.left.withType(type, markers);
+		final Pattern left = this.left.withType(type, markers);
 		if (left == null)
 		{
 			return null;
 		}
 
-		final IPattern right = this.right.withType(type, markers);
+		final Pattern right = this.right.withType(type, markers);
 		if (right == null)
 		{
 			return null;
@@ -97,10 +97,10 @@ public abstract class BinaryPattern implements IPattern
 		return this.withType();
 	}
 
-	protected abstract IPattern withType();
+	protected abstract Pattern withType();
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		this.left = this.left.resolve(markers, context);
 		this.right = this.right.resolve(markers, context);

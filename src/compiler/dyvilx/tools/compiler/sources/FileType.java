@@ -6,11 +6,9 @@ import dyvilx.tools.compiler.ast.structure.Package;
 
 import java.io.File;
 
-public interface IFileType
+public interface FileType
 {
-	String getExtension();
-
 	String getLocalizedName();
-	
+
 	ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
 }

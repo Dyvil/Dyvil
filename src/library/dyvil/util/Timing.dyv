@@ -17,7 +17,7 @@ final class Timing
 	{
 		var start = milliTime()
 		for (i <- 0 ..< iterations) f()
-		return (milliTime() - start) \ iterations
+		return (milliTime() - start) _/ iterations
 	}
 
 	static func measureNanos(f: -> void) -> long = measureNanos(1, f)
@@ -26,7 +26,7 @@ final class Timing
 	{
 		var start = nanoTime()
 		for (i <- 0 ..< iterations) f()
-		return (nanoTime() - start) \ iterations
+		return (nanoTime() - start) _/ iterations
 	}
 
 	// Measurement with Result

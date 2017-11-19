@@ -351,13 +351,8 @@ public class NamedArgumentList extends ArgumentList
 				final IType parameterType = parameter.getCovariantType();
 				final IValue value = this.values[i];
 
-				final int localIndex = writer.localCount();
-				writer.setLocalType(localIndex, parameterType.getFrameType());
-
+				final int localIndex = value.writeStore(writer, parameterType);
 				targets[parameter.getIndex() - startIndex] = localIndex;
-
-				value.writeExpression(writer, parameterType);
-				writer.visitVarInsn(parameterType.getStoreOpcode(), localIndex);
 			}
 
 			// Step 4: Load the local variables in order

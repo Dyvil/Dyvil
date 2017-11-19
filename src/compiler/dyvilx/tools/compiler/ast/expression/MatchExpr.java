@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.collection.Collection;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Formattable;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
@@ -14,7 +16,7 @@ import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -28,15 +30,17 @@ import java.util.Arrays;
 
 public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
-	protected SourcePosition position;
+	public static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"match.value.type.incompatible");
 
 	protected IValue matchedValue;
 	protected MatchCase[] cases = new MatchCase[3];
 	protected int caseCount;
 
 	// Metadata
-	private boolean exhaustive;
-	private IType   returnType;
+	protected SourcePosition position;
+	private   boolean        exhaustive;
+	private   IType          returnType;
 
 	public MatchExpr(SourcePosition position)
 	{
@@ -135,36 +139,26 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			return this.returnType;
 		}
 
-		int len = this.caseCount;
-		if (len == 0)
-		{
-			this.returnType = Types.VOID;
-			return this.returnType;
-		}
-
-		IType t = null;
-		for (int i = 0; i < len; i++)
-		{
-			IValue v = this.cases[i].action;
-			if (v == null)
-			{
-				continue;
-			}
-			IType t1 = v.getType();
-			if (t == null)
-			{
-				t = t1;
-				continue;
-			}
-
-			t = Types.combine(t, t1);
-		}
-
-		if (t == null)
+		final int cases = this.caseCount;
+		if (cases == 0)
 		{
 			return this.returnType = Types.VOID;
 		}
-		return this.returnType = t;
+
+		IType result = null;
+		for (int i = 0; i < cases; i++)
+		{
+			final IValue action = this.cases[i].action;
+			if (action == null)
+			{
+				continue;
+			}
+
+			final IType actionType = action.getType();
+			result = result != null ? Types.combine(result, actionType) : actionType;
+		}
+
+		return this.returnType = (result == null ? Types.VOID : result);
 	}
 
 	@Override
@@ -180,11 +174,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				continue;
 			}
 
-			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context,
-			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
+			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context, MARKER_SUPPLIER);
 		}
 
-		return Types.isVoid(type) || Types.isSuperType(type, this.getType()) ? this : null;
+		this.returnType = type;
+		return this;
 	}
 
 	@Override
@@ -321,9 +315,24 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.matchedValue.check(markers, context);
 		}
 
+		final Set<Object> values = new HashSet<>(this.caseCount);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].check(markers, context);
+			final MatchCase matchCase = this.cases[i];
+			final Pattern pattern = matchCase.pattern;
+
+			matchCase.check(markers, context);
+
+			for (int j = 0, subPatterns = pattern.subPatterns(); j < subPatterns; j++)
+			{
+				final Pattern subPattern = pattern.subPattern(j);
+				final Object constantValue = subPattern.constantValue();
+
+				if (constantValue != null && !values.add(constantValue))
+				{
+					markers.add(Markers.semanticError(subPattern.getPosition(), "match.case.duplicate", constantValue));
+				}
+			}
 		}
 	}
 
@@ -393,13 +402,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	private void generateBranched(MethodWriter writer, Object frameType) throws BytecodeException
 	{
 		final boolean expr = frameType != null;
-		final int varIndex = writer.localCount();
+		final int localCount = writer.localCount();
 		final IType matchedType = this.matchedValue.getType();
 
-		this.matchedValue.writeExpression(writer, null);
-		writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
+		final int varIndex = this.matchedValue.writeStore(writer, null);
 
-		final int localCount = writer.localCount();
+		final int localCountInner = writer.localCount();
 
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
@@ -408,7 +416,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			MatchCase c = this.cases[i];
 			IValue condition = c.condition;
 
-			c.pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
+			c.pattern.writeJumpOnMismatch(writer, varIndex, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
@@ -416,7 +424,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			this.writeAction(writer, expr, frameType, c.action);
 
-			writer.resetLocals(localCount);
+			writer.resetLocals(localCountInner);
 
 			if (!writer.hasReturn())
 			{
@@ -442,7 +450,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 
 		writer.visitLabel(endLabel);
-		writer.resetLocals(varIndex);
+		writer.resetLocals(localCount);
 	}
 
 	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
@@ -501,7 +509,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			MatchCase matchCase = this.cases[i];
-			IPattern pattern = matchCase.pattern;
+			Pattern pattern = matchCase.pattern;
 
 			if (switchVar || pattern.switchCheck())
 			{
@@ -556,24 +564,40 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		// Write the value
 		final IType matchedType = this.matchedValue.getType();
-		this.matchedValue.writeExpression(writer, null);
-
-		int varIndex = -1;
-		if (switchVar)
-		{
-			varIndex = writer.localCount();
-			// Need a variable - store and load the value
-			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
-			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
-		}
-
-		// Not a primitive type (String) - we need the hashCode
-		if (!matchedType.isPrimitive())
-		{
-			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
-		}
 
 		final int localCount = writer.localCount();
+
+		final int varIndex;
+		if (switchVar)
+		{
+			varIndex = this.matchedValue.writeStoreLoad(writer, null);
+		}
+		else
+		{
+			varIndex = -1;
+			this.matchedValue.writeExpression(writer, null);
+		}
+
+		if (Types.isSuperClass(Types.ENUM, matchedType))
+		{
+			// x.name().hashCode()
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Enum", "name", "()Ljava/lang/String;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+		}
+		else if (Types.isSuperClass(Types.STRING, matchedType))
+		{
+			// x.hashCode()
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+		}
+		else if (matchedType.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null)
+		{
+			// x.getClass().getName().hashCode()
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+		}
+
+		final int localCountInner = writer.localCount();
 
 		final KeyCache keyCache = new KeyCache(cases);
 
@@ -581,12 +605,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final MatchCase matchCase = this.cases[i];
-			final IPattern pattern = matchCase.pattern;
+			final Pattern pattern = matchCase.pattern;
 			final int subPatterns = pattern.subPatterns();
 
 			for (int j = 0; j < subPatterns; j++)
 			{
-				final IPattern subPattern = pattern.subPattern(j);
+				final Pattern subPattern = pattern.subPattern(j);
 				if (subPattern.isExhaustive())
 				{
 					continue;
@@ -628,7 +652,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			{
 				final KeyCache.Entry next = entry.next;
 				final MatchCase matchCase = entry.matchCase;
-				final IPattern pattern = entry.pattern;
+				final Pattern pattern = entry.pattern;
 
 				Label elseLabel;
 				if (next != null && next.key == key)
@@ -648,7 +672,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 				if (pattern.switchCheck())
 				{
-					pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
+					pattern.writeJumpOnMismatch(writer, varIndex, elseLabel);
 				}
 
 				if (matchCase.condition != null)
@@ -658,7 +682,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 				this.writeAction(writer, expr, frameType, matchCase.action);
 
-				writer.resetLocals(localCount);
+				writer.resetLocals(localCountInner);
 
 				if (!writer.hasReturn())
 				{
@@ -677,7 +701,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			if (defaultCase.pattern.switchCheck())
 			{
-				defaultCase.pattern.writeInvJump(writer, varIndex, matchedType, matchErrorLabel);
+				defaultCase.pattern.writeJumpOnMismatch(writer, varIndex, matchErrorLabel);
 			}
 
 			if (defaultCase.condition != null)
@@ -687,7 +711,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 			this.writeAction(writer, expr, frameType, defaultCase.action);
 
-			writer.resetLocals(localCount);
+			writer.resetLocals(localCountInner);
 
 			if (!writer.hasReturn())
 			{
@@ -704,10 +728,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		writer.visitLabel(endLabel);
 
-		if (switchVar)
-		{
-			writer.resetLocals(varIndex);
-		}
+		writer.resetLocals(localCount);
 	}
 
 	/**

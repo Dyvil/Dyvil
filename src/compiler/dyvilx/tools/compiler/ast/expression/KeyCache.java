@@ -4,7 +4,7 @@ import dyvil.collection.Collection;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.math.MathUtils;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 
 public class KeyCache
 {
@@ -12,12 +12,12 @@ public class KeyCache
 	{
 		public int       key;
 		public MatchCase matchCase;
-		public IPattern  pattern;
+		public Pattern   pattern;
 		public Label     switchLabel;
 
 		protected Entry next;
 
-		public Entry(int key, MatchCase matchCase, IPattern pattern)
+		public Entry(int key, MatchCase matchCase, Pattern pattern)
 		{
 			this.key = key;
 			this.matchCase = matchCase;
@@ -61,7 +61,7 @@ public class KeyCache
 
 	private static int index(int key, int len) {return key & (len - 1);}
 
-	public void add(int key, MatchCase matchCase, IPattern pattern)
+	public void add(int key, MatchCase matchCase, Pattern pattern)
 	{
 		this.uniqueEntries = null;
 

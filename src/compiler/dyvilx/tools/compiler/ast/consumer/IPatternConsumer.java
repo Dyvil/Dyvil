@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.ast.consumer;
 
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 
 public interface IPatternConsumer
 {
-	void setPattern(IPattern pattern);
+	void setPattern(Pattern pattern);
 }

@@ -85,6 +85,7 @@ public final class Types
 	public static IClass IMMUTABLE_CLASS;
 	public static IClass REIFIED_CLASS;
 	public static IClass OVERLOADPRIORITY_CLASS;
+	public static IClass SWITCHOPTIMIZED_CLASS;
 
 	public static IClass LITERALCONVERTIBLE_CLASS;
 	public static IClass FROMBOOLEAN_CLASS;
@@ -144,6 +145,7 @@ public final class Types
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
 		REIFIED_CLASS = Package.dyvilAnnotation.resolveClass("Reified");
 		OVERLOADPRIORITY_CLASS = Package.dyvilAnnotation.resolveClass("OverloadPriority");
+		SWITCHOPTIMIZED_CLASS = Package.dyvilAnnotation.resolveClass("SwitchOptimized");
 
 		LITERALCONVERTIBLE_CLASS = Package.dyvilLang.resolveClass("LiteralConvertible");
 		FROMINT_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromInt"));

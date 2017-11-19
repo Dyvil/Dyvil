@@ -67,13 +67,11 @@ final class Optionals
 	@Intrinsic([], compilerCode: Intrinsic.NULL_COALESCING)
 	infix func ?? <type T: any, type U>(lhs: T?, rhs: U) -> T|U = lhs ?? rhs
 
-	/*
 	@OverloadPriority(-1)
 	@Deprecated('The null coalescing operator should not be used with a non-optional left-hand operand')
 	@BytecodeName('$qmark$qmark_1')
 	@Intrinsic([ LOAD_0 ])
 	infix func ?? <type T: any, type U>(lhs: T, rhs: U) -> T = lhs
-	*/
 
 	// --------------- Equality ---------------
 

@@ -1,56 +1,72 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public final class DoublePattern extends Pattern
+public final class DoublePattern extends AbstractPattern
 {
 	private double value;
-	
+
 	public DoublePattern(SourcePosition position, double value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	@Override
 	public int getPatternType()
 	{
 		return DOUBLE;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.DOUBLE;
 	}
-	
+
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
-		return IPattern.primitiveWithType(this, type, Types.DOUBLE);
+		switch (type.getTypecode())
+		{
+		case PrimitiveType.DOUBLE_CODE:
+			return new DoublePattern(this.position, this.value);
+		}
+		if (Types.isSuperType(type, Types.DOUBLE.getObjectType()))
+		{
+			return new TypeCheckPattern(this, type, Types.DOUBLE);
+		}
+		return null;
 	}
-	
+
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+	public Object constantValue()
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.DOUBLE, this.lineNumber());
+		return this.value;
+	}
+
+	@Override
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
+	{
+		Pattern.loadVar(writer, varIndex);
 		writer.visitLdcInsn(this.value);
-		writer.visitJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_DCMPNE, target);
 	}
-	
+
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value).append('D');
 	}

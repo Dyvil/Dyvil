@@ -1,13 +1,16 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LiteralConversion;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -15,7 +18,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class DoubleValue implements IConstantValue
 {
-	private static DoubleValue NULL;
+	public static final DoubleValue ZERO = new DoubleValue(0);
 
 	protected SourcePosition position;
 	protected double         value;
@@ -29,15 +32,6 @@ public class DoubleValue implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
-	}
-
-	public static DoubleValue getNull()
-	{
-		if (NULL == null)
-		{
-			NULL = new DoubleValue(0D);
-		}
-		return NULL;
 	}
 
 	@Override
@@ -67,9 +61,15 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (Types.isSuperType(type, Types.DOUBLE))
+		switch (type.getTypecode())
 		{
+		case PrimitiveType.DOUBLE_CODE:
 			return this;
+		}
+
+		if (Types.isSuperType(type, Types.DOUBLE.getObjectType()))
+		{
+			return new CastOperator(this, Types.DOUBLE.getObjectType());
 		}
 
 		final Annotation annotation = type.getAnnotation(Types.FROMDOUBLE_CLASS);
@@ -78,12 +78,6 @@ public class DoubleValue implements IConstantValue
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return Types.isSuperType(type, Types.DOUBLE) || type.getAnnotation(Types.FROMDOUBLE_CLASS) != null;
 	}
 
 	@Override
@@ -166,7 +160,7 @@ public class DoubleValue implements IConstantValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value);
 		if (Double.isFinite(this.value))

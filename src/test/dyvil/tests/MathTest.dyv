@@ -37,7 +37,7 @@ public class MathTest
 				if value % prime == 0 && isPrime(prime)
 				{
 					res.add(prime)
-					value \= prime
+					value _/= prime
 					continue outer
 				}
 			}

@@ -31,6 +31,7 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -495,7 +496,7 @@ public class CodeClass extends AbstractClass
 
 		// Source
 
-		writer.visitSource(this.getHeader().getName() + ".dyvil", null);
+		writer.visitSource(this.getHeader().getName() + DyvilFileType.DYVIL_EXTENSION, null);
 
 		// Outer Class
 

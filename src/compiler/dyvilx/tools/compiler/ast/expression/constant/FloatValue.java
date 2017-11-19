@@ -1,13 +1,16 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LiteralConversion;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -15,7 +18,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class FloatValue implements IConstantValue
 {
-	private static FloatValue NULL;
+	public static final FloatValue ZERO = new FloatValue(0);
 
 	protected SourcePosition position;
 	protected float          value;
@@ -29,15 +32,6 @@ public class FloatValue implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
-	}
-
-	public static FloatValue getNull()
-	{
-		if (NULL == null)
-		{
-			NULL = new FloatValue(0F);
-		}
-		return NULL;
 	}
 
 	@Override
@@ -67,17 +61,17 @@ public class FloatValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.FLOAT)
+		switch (type.getTypecode())
 		{
+		case PrimitiveType.FLOAT_CODE:
 			return this;
-		}
-		if (Types.isExactType(type, Types.DOUBLE))
-		{
+		case PrimitiveType.LONG_CODE:
 			return new DoubleValue(this.position, this.value);
 		}
-		if (Types.isSuperType(type, Types.FLOAT))
+
+		if (Types.isSuperType(type, Types.FLOAT.getObjectType()))
 		{
-			return this;
+			return new CastOperator(this, Types.FLOAT.getObjectType());
 		}
 
 		final Annotation annotation = type.getAnnotation(Types.FROMFLOAT_CLASS);
@@ -86,12 +80,6 @@ public class FloatValue implements IConstantValue
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return Types.isSuperType(type, Types.FLOAT) || type.getAnnotation(Types.FROMFLOAT_CLASS) != null;
 	}
 
 	@Override
@@ -174,7 +162,7 @@ public class FloatValue implements IConstantValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value);
 		if (Float.isFinite(this.value))

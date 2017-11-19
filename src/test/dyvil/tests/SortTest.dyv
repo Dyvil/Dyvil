@@ -36,7 +36,7 @@ public class SortTest
 	{
 		if (list.isEmpty) return list
 
-		let pivot = list[list.size \ 2]
+		let pivot = list[list.size >> 1]
 		let less = quicksort(list.filtered(_ < pivot))
 		let equal = list.filtered(_ == pivot)
 		let greater = quicksort(list.filtered(_ > pivot))
@@ -57,7 +57,7 @@ public class SortTest
 	{
 		var i = left
 		var j = right
-		let pivot = list[left + (right - left) \ 2]
+		let pivot = list[left + (right - left) _/ 2]
 
 		while i <= j
 		{

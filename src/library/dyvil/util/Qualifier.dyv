@@ -27,50 +27,50 @@ class Qualifier
 
 	func replaceString(s: String) -> int = s match
 	{
-		case AMPERSAND     => return '&'
-		case ASTERISK      => return '*'
-		case AT            => return '@'
-		case BACKSLASH     => return '\\'
-		case BAR           => return '|'
-		case CARET         => return '^'
-		case COLON         => return ':'
-		case DOT           => return '.'
-		case EQ            => return '='
-		case EXCLAMATION   => return '!'
-		case GREATER       => return '>'
-		case HASH          => return '#'
-		case LESS          => return '<'
-		case MINUS         => return '-'
-		case PERCENT       => return '%'
-		case PLUS          => return '+'
-		case QUESTION_MARK => return '?'
-		case SLASH         => return '/'
-		case TILDE         => return '~'
-		case _             => return 0
+		case AMPERSAND     => '&'
+		case ASTERISK      => '*'
+		case AT            => '@'
+		case BACKSLASH     => '\\'
+		case BAR           => '|'
+		case CARET         => '^'
+		case COLON         => ':'
+		case DOT           => '.'
+		case EQ            => '='
+		case EXCLAMATION   => '!'
+		case GREATER       => '>'
+		case HASH          => '#'
+		case LESS          => '<'
+		case MINUS         => '-'
+		case PERCENT       => '%'
+		case PLUS          => '+'
+		case QUESTION_MARK => '?'
+		case SLASH         => '/'
+		case TILDE         => '~'
+		case _             => 0
 	}
 
 	func replaceCodePoint(c: int) -> String? = c match
 	{
-		case '&'  => return AMPERSAND
-		case '*'  => return ASTERISK
-		case '@'  => return AT
-		case '\\' => return BACKSLASH
-		case '|'  => return BAR
-		case '^'  => return CARET
-		case ':'  => return COLON
-		case '.'  => return DOT
-		case '='  => return EQ
-		case '!'  => return EXCLAMATION
-		case '>'  => return GREATER
-		case '#'  => return HASH
-		case '<'  => return LESS
-		case '-'  => return MINUS
-		case '%'  => return PERCENT
-		case '+'  => return PLUS
-		case '?'  => return QUESTION_MARK
-		case '/'  => return SLASH
-		case '~'  => return TILDE
-		case _    => return null
+		case '&'  => AMPERSAND
+		case '*'  => ASTERISK
+		case '@'  => AT
+		case '\\' => BACKSLASH
+		case '|'  => BAR
+		case '^'  => CARET
+		case ':'  => COLON
+		case '.'  => DOT
+		case '='  => EQ
+		case '!'  => EXCLAMATION
+		case '>'  => GREATER
+		case '#'  => HASH
+		case '<'  => LESS
+		case '-'  => MINUS
+		case '%'  => PERCENT
+		case '+'  => PLUS
+		case '?'  => QUESTION_MARK
+		case '/'  => SLASH
+		case '~'  => TILDE
+		case _    => null
 	}
 
 	static func qualify(string: String) -> String = qualify(string, INSTANCE)

@@ -6,7 +6,7 @@ public abstract class BigIntegerOperators
 {
 	private init() {}
 
-	postfix implicit inline func toBigInteger(i: int) ->    BigInteger = BigInteger.valueOf(i as long)
+	postfix implicit inline func toBigInteger(i: int) ->    BigInteger = BigInteger.valueOf(i)
 	postfix implicit inline func toBigInteger(i: long) ->   BigInteger = BigInteger.valueOf(i)
 
 	prefix inline func + (rhs: BigInteger) -> BigInteger = rhs
