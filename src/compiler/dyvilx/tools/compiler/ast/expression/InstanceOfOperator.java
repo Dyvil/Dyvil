@@ -1,8 +1,9 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -12,25 +13,24 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class InstanceOfOperator extends AbstractValue
 {
 	protected IValue value;
 	protected IType  type;
-	
+
 	public InstanceOfOperator(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	public InstanceOfOperator(IValue value, IType type)
 	{
 		this.value = value;
 		this.type = type;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
@@ -42,19 +42,19 @@ public final class InstanceOfOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -76,7 +76,7 @@ public final class InstanceOfOperator extends AbstractValue
 			markers.add(Markers.semanticError(this.position, "instanceof.value.invalid"));
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -90,7 +90,7 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -103,7 +103,7 @@ public final class InstanceOfOperator extends AbstractValue
 			this.value.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -114,7 +114,6 @@ public final class InstanceOfOperator extends AbstractValue
 			if (this.type.isPrimitive())
 			{
 				markers.add(Markers.semanticError(this.position, "instanceof.type.primitive"));
-				return;
 			}
 		}
 		else
@@ -131,7 +130,7 @@ public final class InstanceOfOperator extends AbstractValue
 		{
 			return;
 		}
-		
+
 		final IType valueType = this.value.getType();
 		if (valueType.isPrimitive())
 		{
@@ -153,7 +152,7 @@ public final class InstanceOfOperator extends AbstractValue
 			markers.add(Markers.semanticError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -161,24 +160,24 @@ public final class InstanceOfOperator extends AbstractValue
 		this.value = this.value.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		this.type.cleanup(compilableList, classCompilableList);
 		this.value = this.value.cleanup(compilableList, classCompilableList);
-		
+
 		if (this.value.isType(this.type))
 		{
 			return BooleanValue.TRUE;
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer, Types.OBJECT);
+		this.value.writeExpression(writer, null);
 		writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 
 		if (type != null)
@@ -186,7 +185,7 @@ public final class InstanceOfOperator extends AbstractValue
 			Types.BOOLEAN.writeCast(writer, type, this.lineNumber());
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

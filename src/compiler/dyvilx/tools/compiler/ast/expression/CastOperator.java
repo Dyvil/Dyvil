@@ -4,6 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -11,6 +12,7 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.ast.type.compound.NullableType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -22,6 +24,8 @@ public final class CastOperator extends AbstractValue
 	protected IValue value;
 	protected IType  type;
 
+	protected boolean optional;
+
 	public CastOperator(SourcePosition position, IValue value)
 	{
 		this.position = position;
@@ -32,6 +36,12 @@ public final class CastOperator extends AbstractValue
 	{
 		this.value = value;
 		this.type = type;
+	}
+
+	public CastOperator(@NonNull SourcePosition position, IValue value, boolean optional)
+	{
+		this(position, value);
+		this.optional = optional;
 	}
 
 	@Override
@@ -67,7 +77,7 @@ public final class CastOperator extends AbstractValue
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return this.optional ? NullableType.apply(this.type) : this.type;
 	}
 
 	@Override
@@ -125,12 +135,13 @@ public final class CastOperator extends AbstractValue
 			{
 				// the cast type and the type of the value before type hinting are the exact same
 				// so we create a warning
-				markers.add(Markers.semantic(this.position, "cast.unnecessary"));
+				markers.add(Markers.semantic(this.position, "cast.unnecessary", this.type));
 				return typedValue;
 			}
 
 			// the cast was a type hint that was not useless
 			this.value = typedValue;
+			this.optional = false;
 			return this;
 		}
 
@@ -145,13 +156,18 @@ public final class CastOperator extends AbstractValue
 			return this;
 		}
 
+		if (this.optional && (primitiveType || primitiveValue))
+		{
+			markers.add(Markers.semanticError(this.position, "cast.optional.primitive", valueType, this.type));
+		}
+
 		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.RETURN_TYPE);
+		this.type.checkType(markers, context, this.optional ? TypePosition.TYPE : TypePosition.PARAMETER_TYPE);
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
@@ -199,7 +215,36 @@ public final class CastOperator extends AbstractValue
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
+		if (!this.optional)
+		{
+			this.value.getType().writeCast(writer, type, this.lineNumber());
+			return;
+		}
+
+		final int localIndex = writer.localCount();
+		final Label elseLabel = new Label();
+		final Label endLabel = new Label();
+
+		// Generate the following code:
+		// { let a = <expr>; if a is <Type> { a as Type } else null }
+
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitVarInsn(Opcodes.ASTORE, localIndex);
+
+		// if (a is <Type>)
+		writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
+		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+		// { a as Type
+		writer.visitVarInsn(Opcodes.ALOAD, localIndex);
 		this.value.getType().writeCast(writer, type, this.lineNumber());
+		writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+		// } else { null
+		writer.visitTargetLabel(elseLabel);
+		writer.visitInsn(Opcodes.ACONST_NULL);
+		// }
+		writer.visitTargetLabel(endLabel);
+
+		writer.resetLocals(localIndex);
 	}
 
 	@Override
