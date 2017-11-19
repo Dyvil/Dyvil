@@ -44,6 +44,40 @@ public final class CastOperator extends AbstractValue
 		this.optional = optional;
 	}
 
+	// Getters and Setters
+
+	public boolean isOptional()
+	{
+		return this.optional;
+	}
+
+	public void setOptional(boolean optional)
+	{
+		this.optional = optional;
+	}
+
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+
+	public IType getTargetType()
+	{
+		return this.type;
+	}
+
+	public void setTargetType(IType type)
+	{
+		this.type = type;
+	}
+
+	// IValue Overrides
+
 	@Override
 	public int valueTag()
 	{
@@ -203,8 +237,6 @@ public final class CastOperator extends AbstractValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer, null);
-
 		if (type == null)
 		{
 			type = this.type;
@@ -212,30 +244,31 @@ public final class CastOperator extends AbstractValue
 
 		if (Types.isVoid(type))
 		{
+			this.value.writeExpression(writer, null);
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
 		if (!this.optional)
 		{
+			this.value.writeExpression(writer, null);
 			this.value.getType().writeCast(writer, type, this.lineNumber());
 			return;
 		}
 
-		final int localIndex = writer.localCount();
 		final Label elseLabel = new Label();
 		final Label endLabel = new Label();
 
 		// Generate the following code:
 		// { let a = <expr>; if a is <Type> { a as Type } else null }
 
-		writer.visitInsn(Opcodes.DUP);
-		writer.visitVarInsn(Opcodes.ASTORE, localIndex);
+		final int localCount = writer.localCount();
+		final int varIndex = this.value.writeStoreLoad(writer, null);
 
 		// if (a is <Type>)
 		writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 		// { a as Type
-		writer.visitVarInsn(Opcodes.ALOAD, localIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 		this.value.getType().writeCast(writer, type, this.lineNumber());
 		writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		// } else { null
@@ -244,7 +277,7 @@ public final class CastOperator extends AbstractValue
 		// }
 		writer.visitTargetLabel(endLabel);
 
-		writer.resetLocals(localIndex);
+		writer.resetLocals(localCount);
 	}
 
 	@Override
