@@ -66,16 +66,21 @@ public final class AnnotationUtil
 			value = parameter.getValue();
 		}
 
-		switch (value.valueTag())
+		try
 		{
-		case IValue.ENUM_ACCESS:
-			return Enum.valueOf(type, ((EnumValue) value).getInternalName());
-		case IValue.FIELD_ACCESS:
-			if (Types.isSameType(parameter.getCovariantType(), value.getType()))
+			switch (value.valueTag())
 			{
-				return Enum.valueOf(type, ((FieldAccess) value).getName().qualified);
+			case IValue.ENUM_ACCESS:
+				return Enum.valueOf(type, ((EnumValue) value).getInternalName());
+			case IValue.FIELD_ACCESS:
+				if (Types.isSameType(parameter.getCovariantType(), value.getType()))
+				{
+					return Enum.valueOf(type, ((FieldAccess) value).getName().qualified);
+				}
 			}
-			break;
+		}
+		catch (IllegalArgumentException ignored)
+		{
 		}
 		return null;
 	}
