@@ -30,7 +30,8 @@ public class ImplicitTest
 
 	static implicit func b2s(b: boolean) -> String = b.toString
 
-	static func implicitS(implicit s: String = "default") -> String = s
+	// Uses implicitly to ensure s is also eligible for implicit resolution
+	static func implicitS(implicit s: String = "default") -> String = implicitly<String>()
 
 	static func implicitly<type T>(implicit value: T) -> T = value
 

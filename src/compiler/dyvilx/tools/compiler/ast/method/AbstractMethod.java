@@ -21,6 +21,7 @@ import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.GenericData;
@@ -299,6 +300,24 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public IDataMember resolveField(Name name)
 	{
 		return this.parameters.get(name);
+	}
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		if (type == null)
+		{
+			return null;
+		}
+
+		for (IParameter param : this.parameters)
+		{
+			if (param.isImplicit() && Types.isSuperType(type, param.getType()))
+			{
+				return new FieldAccess(param);
+			}
+		}
+		return null;
 	}
 
 	@Override
