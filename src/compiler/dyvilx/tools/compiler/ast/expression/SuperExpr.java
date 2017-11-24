@@ -179,7 +179,7 @@ public final class SuperExpr implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		this.type.checkType(markers, context, TypePosition.SUPER_TYPE);
 	}
 
 	@Override
