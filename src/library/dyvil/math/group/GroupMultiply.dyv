@@ -1,0 +1,26 @@
+package dyvil.math.group
+
+interface GroupMultiply<T>
+{
+	abstract func _1() -> T
+
+	abstract func multiply(lhs: T, rhs: T) -> T
+
+	func power(lhs: T, rhs: int) -> T
+	{
+		if (rhs < 0) throw new UnsupportedOperationException('negative exponent')
+		if (rhs == 0) return this._1
+		if (rhs == 1) return lhs
+
+		// exp by squaring
+		if ((rhs & 1) == 0)
+		{
+			return this.power(this.multiply(lhs, lhs), rhs >> 1)
+		}
+		else
+		{
+			// use (rhs >> 1) instead of (rhs - 1) \ 2
+			return this.multiply(lhs, this.power(this.multiply(lhs, lhs), rhs >> 1))
+		}
+	}
+}

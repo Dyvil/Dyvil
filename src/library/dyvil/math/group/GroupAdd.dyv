@@ -1,0 +1,8 @@
+package dyvil.math.group
+
+interface GroupAdd<T>
+{
+	abstract func _0() -> T
+
+	abstract func add(lhs: T, rhs: T) -> T
+}

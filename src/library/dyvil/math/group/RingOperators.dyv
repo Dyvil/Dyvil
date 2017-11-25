@@ -1,0 +1,30 @@
+package dyvil.math.group
+
+abstract class RingOperators
+{
+	private init() {} // no instances
+
+	// Constants
+
+	static func _0<T>(implicit t: GroupAdd<T>) -> T = t._0
+
+	static func _1<T>(implicit t: GroupMultiply<T>) -> T = t._1
+
+	// Unary Operators
+
+	prefix func + <T>(rhs: T, implicit t: GroupAdd<T>) -> T = rhs
+
+	prefix func - <T>(rhs: T, implicit t: GroupAddNegate<T>) -> T = t.negate(rhs)
+
+	// Binary Operators
+
+	infix func + <T>(lhs: T, rhs: T, implicit t: GroupAdd<T>) -> T = t.add(lhs, rhs)
+
+	infix func - <T>(lhs: T, rhs: T, implicit t: GroupAddNegate<T>) -> T = t.subtract(lhs, rhs)
+
+	infix func * <T>(lhs: T, rhs: T, implicit t: GroupMultiply<T>) -> T = t.multiply(lhs, rhs)
+
+	infix func / <T>(lhs: T, rhs: T, implicit t: GroupMultiplyInverse<T>) -> T = t.divide(lhs, rhs)
+
+	infix func ** <T>(lhs: T, rhs: int, implicit t: GroupMultiply<T>) -> T = t.power(lhs, rhs)
+}
