@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
 import dyvil.lang.Name;
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -21,6 +20,8 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import static dyvil.reflect.Modifiers.*;
 
 public final class ObjectClassMetadata extends ClassMetadata
 {
@@ -68,11 +69,13 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & INSTANCE_FIELD) == 0)
 		{
+			final int flags = PUBLIC | CONST | (this.theClass.isImplicit() ? IMPLICIT : 0);
+
 			final Field field = new Field(this.theClass, Names.instance, this.theClass.getClassType(),
-			                              AttributeList.of(Modifiers.PUBLIC | Modifiers.CONST));
+			                              AttributeList.of(flags));
 			this.instanceField = field;
 
-			this.constructor.setAttributes(AttributeList.of(Modifiers.PRIVATE));
+			this.constructor.setAttributes(AttributeList.of(PRIVATE));
 			final ConstructorCall call = new ConstructorCall(null, this.constructor, ArgumentList.EMPTY);
 			field.setValue(call);
 		}
@@ -117,7 +120,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			// Generate a toString() method that simply returns the name of this
 			// object type.
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString",
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PUBLIC, "toString",
 			                                                                      "()Ljava/lang/String;", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
@@ -130,7 +133,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			// Generate an equals(Object) method that compares the objects for
 			// identity
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals",
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PUBLIC, "equals",
 			                                                                      "(Ljava/lang/Object;)Z", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
@@ -149,8 +152,8 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & HASHCODE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I",
-			                                                                      null, null));
+			MethodWriterImpl mw = new MethodWriterImpl(writer,
+			                                           writer.visitMethod(PUBLIC, "hashCode", "()I", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
 			mw.visitLdcInsn(internalName.hashCode());
@@ -160,19 +163,15 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & READ_RESOLVE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer
-				                                                   .visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC,
-				                                                                "readResolve", "()Ljava/lang/Object;",
-				                                                                null, null));
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "readResolve",
+			                                                                      "()Ljava/lang/Object;", null, null));
 			writeResolveMethod(mw, internalName);
 		}
 
 		if ((this.members & WRITE_REPLACE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer
-				                                                   .visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC,
-				                                                                "writeReplace", "()Ljava/lang/Object;",
-				                                                                null, null));
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "writeReplace",
+			                                                                      "()Ljava/lang/Object;", null, null));
 			writeResolveMethod(mw, internalName);
 		}
 	}
