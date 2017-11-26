@@ -57,10 +57,10 @@ public class REPLContext extends AbstractHeader
 	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	// Updated for every input
-	private int resultIndex;
-	private int classIndex;
+	private   int        resultIndex;
+	private   int        classIndex;
 	protected TextSource currentSource;
-	private CodeClass currentClass;
+	private   CodeClass  currentClass;
 
 	// Cleared for every input
 	protected final MarkerList        markers        = new MarkerList(Markers.INSTANCE);
@@ -194,6 +194,11 @@ public class REPLContext extends AbstractHeader
 			this.properties.put(member.getName(), (IProperty) member);
 			break;
 		case CLASS:
+		case INTERFACE:
+		case TRAIT:
+		case ANNOTATION:
+		case ENUM:
+		case OBJECT:
 			this.classes.put(member.getName(), (IClass) member);
 			break;
 		}

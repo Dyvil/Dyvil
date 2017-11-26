@@ -134,7 +134,6 @@ public final class ModifierUtil
 
 		if (memberKind == MemberKind.CLASS)
 		{
-			if ((mod & FUNCTIONAL) == FUNCTIONAL) { builder.append("functional "); }
 			if ((mod & CASE_CLASS) == CASE_CLASS) { builder.append("case "); }
 		}
 		else if (memberKind == MemberKind.FIELD)

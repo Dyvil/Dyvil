@@ -23,6 +23,7 @@ import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilable;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -110,6 +111,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public IType getClassType()
 	{
 		return this.classType;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return this.metadata.getKind();
 	}
 
 	@Override

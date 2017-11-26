@@ -29,10 +29,7 @@ public interface IClass
 	extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
 	@Override
-	default MemberKind getKind()
-	{
-		return MemberKind.CLASS;
-	}
+	MemberKind getKind();
 
 	@Override
 	IHeaderUnit getHeader();

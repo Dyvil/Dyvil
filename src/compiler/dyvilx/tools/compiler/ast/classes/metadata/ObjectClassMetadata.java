@@ -11,6 +11,7 @@ import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
@@ -30,6 +31,12 @@ public final class ObjectClassMetadata extends ClassMetadata
 	public ObjectClassMetadata(IClass iclass)
 	{
 		super(iclass);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.OBJECT;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.field.IField;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
@@ -20,6 +21,12 @@ public class TraitMetadata extends InterfaceMetadata
 	public TraitMetadata(IClass theClass)
 	{
 		super(theClass);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.TRAIT;
 	}
 
 	@Override
