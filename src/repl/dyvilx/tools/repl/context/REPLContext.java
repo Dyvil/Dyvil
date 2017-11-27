@@ -419,18 +419,33 @@ public class REPLContext extends AbstractHeader
 		}
 
 		IValue candidate = null;
-		for (IField field : this.fields.values())
+
+		for (IClass iclass : this.classes.values())
 		{
-			if (!field.hasModifier(Modifiers.IMPLICIT) || !Types.isSuperType(type, field.getType()))
+			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
 				continue;
 			}
 			if (candidate != null)
 			{
-				return null; // more than one match -> ambiguous
+				return null; // ambiguous
+			}
+			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
+		}
+
+		for (IField field : this.fields.values())
+		{
+			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous
 			}
 			candidate = new FieldAccess(field);
 		}
+
 		return candidate;
 	}
 

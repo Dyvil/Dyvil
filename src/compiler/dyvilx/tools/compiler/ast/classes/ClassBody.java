@@ -214,7 +214,22 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			return null;
 		}
 
-		IField candidate = null;
+		IValue candidate = null;
+
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass iclass = this.classes[i];
+			if (!iclass.isImplicit() && !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous
+			}
+			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
+		}
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IField field = this.fields[i];
@@ -224,18 +239,14 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			}
 			if (candidate != null)
 			{
-				return null; // ambiguous -> pick none
+				return null; // ambiguous
 			}
-			candidate = field;
+
+			// this<Class> is added automatically later
+			candidate = new FieldAccess(field);
 		}
 
-		if (candidate == null)
-		{
-			return null;
-		}
-
-		// this<Class> is added automatically later
-		return new FieldAccess(candidate);
+		return candidate;
 	}
 
 	// endregion

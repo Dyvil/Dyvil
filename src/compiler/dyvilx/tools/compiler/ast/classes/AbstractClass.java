@@ -674,10 +674,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return null;
 		}
 
+		// for implicit objects
+		if (this.isImplicit() && this.isObject() && Types.isSuperType(type, this.getClassType()))
+		{
+			return new FieldAccess(this.metadata.getInstanceField());
+		}
+
 		IParameter candidate = null;
 		for (IParameter param : this.parameters)
 		{
-			if (!param.isImplicit() || !Types.isSuperType(param.getType(), type))
+			if (!param.isImplicit() || !Types.isSuperType(type, param.getType()))
 			{
 				continue;
 			}

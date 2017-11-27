@@ -1,6 +1,6 @@
 package dyvil.lang.`internal`
 
-final object None
+object None
 {
 	inline static func apply() -> None = instance
 }
