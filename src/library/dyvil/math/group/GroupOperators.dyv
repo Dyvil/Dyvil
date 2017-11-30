@@ -1,6 +1,6 @@
 package dyvil.math.group
 
-abstract class RingOperators
+abstract class GroupOperators
 {
 	private init() {} // no instances
 

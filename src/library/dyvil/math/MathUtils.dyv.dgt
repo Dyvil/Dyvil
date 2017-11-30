@@ -3,7 +3,7 @@
 
 package dyvil.math
 
-using java.lang.Math._
+using dyvil.Math
 
 abstract class MathUtils
 {
@@ -53,10 +53,19 @@ abstract class MathUtils
 		}
 	}
 
-	static func sum(this: Math, k start: long, to end: long, _ f: long -> double) -> double
+	static func sum<T>(_ values: T..., implicit t: GroupAdd<T>) -> T = sum(values as Iterable<T>, t)
+
+	static func sum<T>(_ values: Iterable<T>, implicit t: GroupAdd<T>) -> T
 	{
-		var sum = 0.0D
-		for (k <- start .. end) sum += f(k)
+		var sum = t._0
+		for (k <- values) sum += k
+		return sum
+	}
+
+	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupAdd<T>) -> T
+	{
+		var sum = t._0
+		for (k <- values) sum += f(k)
 		return sum
 	}
 
@@ -72,10 +81,19 @@ abstract class MathUtils
 		}
 	}
 
-	static func product(this: Math, k start: long, to end: long, _ f: long -> double) -> double
+	static func product<T>(_ values: T..., implicit t: GroupMultiply<T>) -> T = product(values as Iterable<T>, t)
+
+	static func product<T>(_ values: Iterable<T>, implicit t: GroupMultiply<T>) -> T
 	{
-		var product = 1.0D
-		for (k <- start .. end) product *= f(k)
+		var product = t._1
+		for (k <- values) product *= k
+		return product
+	}
+
+	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupMultiply<T>) -> T
+	{
+		var product = t._1
+		for (k <- values) product *= f(k)
 		return product
 	}
 

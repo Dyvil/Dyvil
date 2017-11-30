@@ -2,8 +2,9 @@ package dyvil
 
 // Rings
 
-import  dyvil.math.ring._
-using   dyvil.math.ring.RingOperators._
+import  dyvil.math.group._
+using   dyvil.math.group.RingOperators._
+using   dyvil.math.group.RingImplicits._
 
 // Math Utilities
 using   dyvil.math.MathUtils._
