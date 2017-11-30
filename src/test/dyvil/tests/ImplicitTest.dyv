@@ -2,8 +2,10 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class ImplicitTest
+class ImplicitTest
 {
+	implicit object ImplicitObject
+
 	@FunctionalInterface
 	public static interface DebugPrintable
 	{
@@ -60,6 +62,10 @@ public class ImplicitTest
 				implicit let s = "implicit let"
 				implicitS =?= s
 			}
+		}
+
+		test "Implicit Objects" {
+			implicitly<ImplicitObject>() =?= ImplicitObject
 		}
 
 		test "Generic Arguments" {
