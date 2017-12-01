@@ -147,7 +147,7 @@ public final class InstanceOfOperator extends AbstractValue
 			markers.add(Markers.semantic(this.position, "instanceof.type.subtype", valueType, this.type));
 			return;
 		}
-		if (!Types.isSuperType(valueType, this.type))
+		if (!Types.isSuperClass(valueType, this.type))
 		{
 			markers.add(Markers.semanticError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}

@@ -410,6 +410,8 @@ public class ArgumentList implements IResolvable, IValueList
 	{
 		if (this == EMPTY)
 		{
+			// cannot infer missing arguments if the argument list is EMPTY (i.e. not denoted)
+
 			final Marker marker = Markers.semanticError(position, "method.access.argument.empty", param.getName());
 			marker.addInfo(Markers.getSemantic("method.access.argument.empty.info"));
 			markers.add(marker);
@@ -418,38 +420,70 @@ public class ArgumentList implements IResolvable, IValueList
 
 		if (param.isVarargs())
 		{
+			// varargs parameter
+
 			final IValue value = convertValue(new ArrayExpr(position, EMPTY), param, genericData, markers, context);
 			this.add(param.getLabel(), value);
 			return;
 		}
 
-		if (param.isImplicit())
+		if (!param.isImplicit())
 		{
-			genericData.lockAvailable();
-			final IType type = param.getCovariantType().getConcreteType(genericData);
-			final IValue implicit = context.resolveImplicit(type);
-			if (implicit != null)
+			// not implicit, possible default
+
+			if (this.resolveDefault(param))
 			{
-				// make sure to resolve and type-check the implicit value
-				// (implicit values should be only field accesses, but might need some capture or "this<Outer" resolution)
-				final IValue value = convertValue(implicit.resolve(markers, context), param, genericData, markers, context);
-				this.add(param.getLabel(), value);
 				return;
 			}
 
-			markers.add(Markers.semanticError(position, "method.access.argument.implicit", param.getName(), type));
+			markers.add(Markers.semanticError(position, "method.access.argument.missing", param.getName()));
 			return;
 		}
-		if (param.isDefault())
+
+		// implicit parameter, possibly default
+
+		final IType type;
+		if (genericData != null)
 		{
-			final DummyValue value = new DummyValue(param.getCovariantType(),
-			                                             (writer, type) -> param.writeGetDefaultValue(writer));
+			genericData.lockAvailable();
+			type = param.getCovariantType().getConcreteType(genericData);
+		}
+		else
+		{
+			type = param.getCovariantType();
+		}
+
+		final IValue implicit = context.resolveImplicit(type);
+		if (implicit != null)
+		{
+			// make sure to resolve and type-check the implicit value
+			// (implicit values should be only field accesses, but might need some capture or "this<Outer" resolution)
+			final IValue value = convertValue(implicit.resolve(markers, context), param, genericData, markers,
+			                                  context);
 			this.add(param.getLabel(), value);
 			return;
 		}
 
-		markers.add(Markers.semanticError(position, "method.access.argument.missing", param.getName()));
+		// default resolution only if implicit resolution fails
+		if (this.resolveDefault(param))
+		{
+			return;
+		}
+
+		markers.add(Markers.semanticError(position, "method.access.argument.implicit", param.getName(), type));
 		return;
+	}
+
+	private boolean resolveDefault(IParameter param)
+	{
+		if (param.isDefault())
+		{
+			final DummyValue value = new DummyValue(param.getCovariantType(),
+			                                        (writer, type) -> param.writeGetDefaultValue(writer));
+			this.add(param.getLabel(), value);
+			return true;
+		}
+		return false;
 	}
 
 	public void checkValue(int index, IParameter param, GenericData genericData, SourcePosition position,

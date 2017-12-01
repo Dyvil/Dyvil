@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.type.generic;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -15,11 +17,8 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
-import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.WildcardType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -93,8 +92,7 @@ public class ClassGenericType extends GenericType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		return this == subType || super.isSuperTypeOf(subType) && (!subType.isGenericType() || this.argumentsMatch(
-			subType));
+		return this == subType || super.isSuperTypeOf(subType) && this.argumentsMatch(subType);
 	}
 
 	protected boolean argumentsMatch(IType type)
@@ -105,9 +103,9 @@ public class ClassGenericType extends GenericType
 		{
 			final ITypeParameter typeVar = classTypeParams.get(i);
 			final IType thisArgument = this.arguments.get(i);
-			final IType thatArgument = Types.resolveTypeSafely(type, typeVar);
+			final IType thatArgument = type.resolveType(typeVar);
 
-			if (!Variance.checkCompatible(typeVar.getVariance(), thisArgument, thatArgument))
+			if (thatArgument != null && !Variance.checkCompatible(typeVar.getVariance(), thisArgument, thatArgument))
 			{
 				return false;
 			}
