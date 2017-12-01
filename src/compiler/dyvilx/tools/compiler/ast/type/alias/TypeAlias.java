@@ -114,6 +114,12 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
+	public IContext getTypeParameterContext()
+	{
+		return this;
+	}
+
+	@Override
 	public boolean isVariadic()
 	{
 		return false;

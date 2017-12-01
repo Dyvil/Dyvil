@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.generic;
 
+import dyvilx.tools.compiler.ast.context.IContext;
+
 public interface ITypeParametric
 {
 	boolean isTypeParametric();
@@ -10,4 +12,6 @@ public interface ITypeParametric
 	}
 
 	TypeParameterList getTypeParameters();
+
+	IContext getTypeParameterContext();
 }

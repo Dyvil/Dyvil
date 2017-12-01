@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
@@ -294,6 +295,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		return this.typeParameters == null ? null : this.typeParameters.get(name);
+	}
+
+	@Override
+	public IContext getTypeParameterContext()
+	{
+		return this.enclosingClass == null || this.isStatic() ?
+			       this :
+			       new CombiningContext(this, this.enclosingClass.getTypeParameterContext());
 	}
 
 	@Override

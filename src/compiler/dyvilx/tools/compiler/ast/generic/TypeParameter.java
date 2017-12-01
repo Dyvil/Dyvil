@@ -50,7 +50,7 @@ public abstract class TypeParameter implements ITypeParameter
 	private   IType   safeUpperBound;
 	protected IType[] upperBounds;
 
-	private   ITypeParametric generic;
+	protected ITypeParametric generic;
 	protected Reified.Type    reifiedKind; // defaults to null (not reified)
 
 	private final IType covariantType = new CovariantTypeVarType(this);

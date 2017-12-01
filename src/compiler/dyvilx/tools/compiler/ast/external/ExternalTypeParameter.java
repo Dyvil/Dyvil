@@ -89,7 +89,7 @@ public class ExternalTypeParameter extends TypeParameter
 			this.resolved |= UPPER_BOUND;
 			for (int i = 0; i < this.upperBoundCount; i++)
 			{
-				this.upperBounds[i] = this.upperBounds[i].resolveType(null, RootPackage.rootPackage);
+				this.upperBounds[i] = this.upperBounds[i].resolveType(null, this.generic.getTypeParameterContext());
 			}
 		}
 		return this.upperBound = createUpperBound(this.upperBounds, 0, this.upperBoundCount);
