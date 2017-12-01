@@ -56,9 +56,11 @@ class ImplicitTest
 				implicitS() =?= "default"
 			}
 
-			test "Provided" { implicitS("provided") =?= "provided" }
+			test "Provided" {
+				implicitS("provided") =?= "provided"
+			}
 
-			test "Implicit Let" {
+			test "Available" {
 				implicit let s = "implicit let"
 				implicitS =?= s
 			}
