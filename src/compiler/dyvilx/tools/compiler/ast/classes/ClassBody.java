@@ -219,7 +219,7 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		for (int i = 0; i < this.classCount; i++)
 		{
 			final IClass iclass = this.classes[i];
-			if (!iclass.isImplicit() && !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
+			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
 				continue;
 			}

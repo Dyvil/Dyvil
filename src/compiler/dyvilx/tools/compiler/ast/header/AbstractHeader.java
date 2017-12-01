@@ -679,7 +679,27 @@ class HeaderContext implements IStaticContext
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		return this.header.resolveImplicit(type);
+		final IValue headerValue = this.header.resolveImplicit(type);
+		if (headerValue != null)
+		{
+			return headerValue;
+		}
+
+		IValue candidate = null;
+		for (int i = 0; i < this.header.importCount; i++)
+		{
+			final IValue value = this.header.importDeclarations[i].getContext().resolveImplicit(type);
+			if (value == null)
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous
+			}
+			candidate = value;
+		}
+		return candidate;
 	}
 
 	@Override

@@ -3,8 +3,8 @@ package dyvil
 // Rings
 
 import  dyvil.math.group._
-using   dyvil.math.group.RingOperators._
-using   dyvil.math.group.RingImplicits._
+using   dyvil.math.group.GroupOperators._
+using   dyvil.math.group.GroupImplicits._
 
 // Math Utilities
 using   dyvil.math.MathUtils._
