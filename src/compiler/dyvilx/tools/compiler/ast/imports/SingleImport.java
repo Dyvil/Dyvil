@@ -156,9 +156,16 @@ public final class SingleImport extends Import implements IDefaultContext
 		if (!resolved)
 		{
 			this.asParentContext = IDefaultContext.DEFAULT;
+
+			if (mask == KindedImport.PARENT)
+			{
+				// when resolving as a parent import, the resolve method is never called,
+				// so we need the error reporting to happen here.
+				this.reportResolve(markers);
+			}
 		}
 
-		// error later
+		// otherwise error later
 	}
 
 	@Override
@@ -197,6 +204,11 @@ public final class SingleImport extends Import implements IDefaultContext
 			return;
 		}
 
+		this.reportResolve(markers);
+	}
+
+	public void reportResolve(MarkerList markers)
+	{
 		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
 	}
 

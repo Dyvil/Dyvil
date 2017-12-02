@@ -1,5 +1,4 @@
 package dyvil
 
 using	dyvil.string.CharUtils._
-using	dyvil.string.StringUtils._
 using	dyvil.string.StringConversions._

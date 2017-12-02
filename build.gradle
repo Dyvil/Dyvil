@@ -459,6 +459,8 @@ task bootstrap(type: Copy, dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildG
 }
 
 tasks.withType(Jar).forEach {
+	it.preserveFileTimestamps = false
+
 	it.from('.') {
 		include '*LICENSE*.txt'
 	}
