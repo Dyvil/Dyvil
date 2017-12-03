@@ -2,6 +2,7 @@ package dyvilx.tools.gensrc.parser;
 
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.gensrc.ast.Template;
+import dyvilx.tools.gensrc.ast.directive.HashLiteral;
 import dyvilx.tools.gensrc.ast.directive.ProcessedText;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
 import dyvilx.tools.parsing.IParserManager;
@@ -45,7 +46,7 @@ public class BlockParser extends Parser
 			case Tokens.EOF:
 				return;
 			case Tokens.STRING:
-				this.directives.add(new ProcessedText(token.stringValue()));
+				this.directives.add(new ProcessedText(token.raw(), token.stringValue()));
 				return;
 			case BaseSymbols.HASH:
 				this.mode = DIRECTIVE_NAME;
@@ -84,6 +85,10 @@ public class BlockParser extends Parser
 			case BaseSymbols.OPEN_PARENTHESIS:
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new ScopeDirectiveParser(this.directives), true);
+				this.mode = ELEMENT;
+				return;
+			case BaseSymbols.HASH:
+				this.directives.add(new HashLiteral(token.raw()));
 				this.mode = ELEMENT;
 				return;
 			}

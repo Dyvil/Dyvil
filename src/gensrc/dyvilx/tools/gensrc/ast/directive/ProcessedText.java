@@ -1,9 +1,15 @@
 package dyvilx.tools.gensrc.ast.directive;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
+import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.StringInterpolationExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.expression.constant.StringValue;
+import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -11,14 +17,26 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.gensrc.ast.GenSrcValue;
+import dyvilx.tools.gensrc.ast.Template;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ProcessedText implements GenSrcValue
 {
-	private final String value;
+	protected String value;
+
+	// Metadata
+	protected SourcePosition position;
+	protected IValue         parts; // StringInterpolationExpr
 
 	public ProcessedText(String value)
 	{
+		this.value = value;
+	}
+
+	public ProcessedText(SourcePosition position, String value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 
@@ -26,6 +44,16 @@ public class ProcessedText implements GenSrcValue
 	public int valueTag()
 	{
 		return PROCESSED_TEXT;
+	}
+
+	public String getValue()
+	{
+		return this.value;
+	}
+
+	public void setValue(String value)
+	{
+		this.value = value;
 	}
 
 	@Override
@@ -59,28 +87,94 @@ public class ProcessedText implements GenSrcValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		final int startLine = this.position.startLine();
+		final int startColumn = this.position.startColumn();
+		final StringInterpolationExpr parts = new StringInterpolationExpr();
+
+		final String text = this.value;
+		final int length = text.length();
+		int prev = 0;
+
+		for (int startIndex = 0; startIndex < length; )
+		{
+			final int c = text.codePointAt(startIndex);
+
+			// advance to an identifier character
+			if (!Character.isJavaIdentifierStart(c))
+			{
+				startIndex += Character.charCount(c);
+				continue;
+			}
+
+			final int endIndex = identifierEnd(text, startIndex + 1, length);
+			final String key = text.substring(startIndex, endIndex);
+			final IDataMember field = context.resolveField(Name.fromRaw(key));
+
+			if (field != null)
+			{
+				// append contents before this identifier
+				parts.append(new StringValue(text.substring(prev, startIndex)));
+
+				@NonNull final SourcePosition position = SourcePosition.apply(startLine, startColumn + startIndex,
+				                                                              startColumn + endIndex);
+				parts.append(new FieldAccess(position, null, field));
+
+				// advance to the end of the identifier
+				prev = endIndex;
+				startIndex = endIndex;
+				continue;
+			}
+
+			startIndex += Character.charCount(c);
+		}
+
+		if (prev != length)
+		{
+			parts.append(new StringValue(text.substring(prev, length)));
+		}
+
+		this.parts = parts.resolve(markers, context);
 		return this;
+	}
+
+	private static int identifierEnd(String text, int start, int end)
+	{
+		while (start < end)
+		{
+			final int cp = text.codePointAt(start);
+			if (!CharacterTypes.isIdentifierPart(cp))
+			{
+				return start;
+			}
+
+			start += Character.charCount(cp);
+		}
+		return end;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.parts.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.parts.check(markers, context);
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
+		this.parts = this.parts.foldConstants();
 		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
+		this.parts = this.parts.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 
@@ -93,6 +187,10 @@ public class ProcessedText implements GenSrcValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		// TODO
+		Template.writeGetWriter(writer);
+
+		this.parts.writeExpression(writer, Types.STRING);
+
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/Writer", "write", "(Ljava/lang/String;)V", false);
 	}
 }
