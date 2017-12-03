@@ -2,8 +2,8 @@ package dyvilx.tools.gensrc.parser;
 
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.gensrc.ast.Util;
 import dyvilx.tools.gensrc.ast.directive.IfDirective;
+import dyvilx.tools.gensrc.lexer.GenSrcLexer;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
@@ -142,6 +142,6 @@ public class IfDirectiveParser extends Parser
 	private static boolean isBlank(String value)
 	{
 		final int length = value.length();
-		return Util.skipWhitespace(value, 0, length) == length;
+		return GenSrcLexer.skipWhitespace(value, 0, length) == length;
 	}
 }

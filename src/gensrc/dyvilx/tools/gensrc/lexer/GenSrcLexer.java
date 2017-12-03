@@ -1,7 +1,6 @@
 package dyvilx.tools.gensrc.lexer;
 
 import dyvil.lang.Name;
-import dyvilx.tools.gensrc.ast.Util;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
@@ -197,7 +196,7 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 	{
 		final int current = this.codePoint();
 
-		final int indexOfNonWhite = Util.skipWhitespace(this.code, this.cursor, this.length);
+		final int indexOfNonWhite = skipWhitespace(this.code, this.cursor, this.length);
 		if (indexOfNonWhite >= this.length)
 		{
 			return false;
@@ -289,5 +288,33 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 		this.cursor = sublexer.getCursor();
 		this.line = sublexer.getLine();
 		this.column = sublexer.getColumn();
+	}
+
+	// Utility Methods
+
+	/**
+	 * Returns the first index greater than or equal to {@code start} where the character in {@code line} is NOT
+	 * whitespace. If no such index is found, {@code end} is returned.
+	 *
+	 * @param line
+	 * 	the string to check
+	 * @param start
+	 * 	the first index (inclusive) to check
+	 * @param end
+	 * 	the last index (exclusive) to check
+	 *
+	 * @return the first index {@code >= start} and {@code < end} where the character in the {@code string} is
+	 * non-whitespace, or {@code end}.
+	 */
+	public static int skipWhitespace(String line, int start, int end)
+	{
+		for (; start < end; start++)
+		{
+			if (!Character.isWhitespace(line.charAt(start)))
+			{
+				return start;
+			}
+		}
+		return end;
 	}
 }
