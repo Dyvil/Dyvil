@@ -29,7 +29,6 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
-import dyvilx.tools.gensrc.ast.header.TemplateDirective;
 import dyvilx.tools.gensrc.lexer.GenSrcLexer;
 import dyvilx.tools.gensrc.parser.BlockParser;
 import dyvilx.tools.gensrc.sources.GenSrcFileType;
@@ -50,18 +49,11 @@ public class Template extends ClassUnit
 		public static final IClass BUILTINS_CLASS = Package.rootPackage.resolveInternalClass("dyvilx/tools/gensrc/Builtins");
 	}
 
-	private List<TemplateDirective> templateDirectives;
-
 	private IMethod genMethod;
 
 	public Template(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
-	}
-
-	public void addTemplateDirective(TemplateDirective directive)
-	{
-		this.templateDirectives.add(directive);
 	}
 
 	// Resolution
@@ -126,13 +118,10 @@ public class Template extends ClassUnit
 
 		// func generate(in: File, out: File) -> void
 
-
-
 		// Assign the new AST nodes
 
 		this.addClass(theClass);
 		this.genMethod = genMethod;
-		this.templateDirectives = new ArrayList<>(1);
 
 		// Parse
 
@@ -175,13 +164,6 @@ public class Template extends ClassUnit
 		{
 			buffer.append(indent);
 			appendImport(indent, buffer, this.importDeclarations[i]);
-			buffer.append('\n');
-		}
-
-		for (TemplateDirective template : this.templateDirectives)
-		{
-			buffer.append(indent);
-			template.toString(indent, buffer);
 			buffer.append('\n');
 		}
 
