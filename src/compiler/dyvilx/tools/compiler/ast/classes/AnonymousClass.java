@@ -10,6 +10,7 @@ import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.field.*;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -153,6 +154,12 @@ class AnonymousClassMetadata implements IClassMetadata
 	public AnonymousClassMetadata(AnonymousClass theClass)
 	{
 		this.theClass = theClass;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.OBJECT;
 	}
 
 	@Override

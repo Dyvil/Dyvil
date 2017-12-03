@@ -148,7 +148,7 @@ public final class MarkerList implements Iterable<Marker>
 
 		for (int line : lines)
 		{
-			buffer.append(String.format(formatString, line, source.getLine(line)));
+			buffer.append(String.format(formatString, line, source.line(line)));
 
 			while (markerIndex < this.markerCount && line == this.markers[markerIndex].getPosition().endLine())
 			{

@@ -56,21 +56,10 @@ public class ImplicitReferenceType extends ReferenceType
 	}
 
 	@Override
-	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IType valueType = value.getType();
-		if (this.isSuperTypeOf(valueType))
-		{
-			return value;
-		}
-
 		IValue typedValue = value.withType(this.type, typeContext, markers, context);
-		if (typedValue == null)
-		{
-			return null;
-		}
-
-		if (!this.isConvertibleFrom(typedValue.getType()))
+		if (typedValue == null || !this.isConvertibleFrom(typedValue.getType()))
 		{
 			return null;
 		}
@@ -92,10 +81,10 @@ public class ImplicitReferenceType extends ReferenceType
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers,
 		                            IContext context)
 	{
-		if (!this.isConvertibleTo(targetType))
+		if (!this.isConvertibleTo(type))
 		{
 			return null;
 		}

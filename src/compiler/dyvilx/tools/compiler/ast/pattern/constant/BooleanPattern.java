@@ -1,85 +1,86 @@
 package dyvilx.tools.compiler.ast.pattern.constant;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public final class BooleanPattern extends Pattern
+public final class BooleanPattern extends AbstractPattern
 {
 	private boolean value;
-	
+
 	public BooleanPattern(SourcePosition position, boolean value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	@Override
 	public int getPatternType()
 	{
 		return BOOLEAN;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;
 	}
-	
+
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
-		return IPattern.primitiveWithType(this, type, Types.BOOLEAN);
+		if (type.getTypecode() == PrimitiveType.BOOLEAN_CODE)
+		{
+			return this;
+		}
+		if (Types.isSuperType(type, Types.BOOLEAN.getObjectType()))
+		{
+			return new TypeCheckPattern(this, type, Types.BOOLEAN);
+		}
+		return null;
 	}
-	
+
+	@Override
+	public Object constantValue()
+	{
+		return this.value;
+	}
+
+	// Switch Resolution
+
 	@Override
 	public boolean isSwitchable()
 	{
 		return true;
 	}
-	
-	@Override
-	public int subPatterns()
-	{
-		return 1;
-	}
-	
+
 	@Override
 	public int switchValue()
 	{
 		return this.value ? 1 : 0;
 	}
-	
+
+	// Compilation
+
 	@Override
-	public int minValue()
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		return this.value ? 1 : 0;
+		Pattern.loadVar(writer, varIndex);
+		writer.visitJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, target);
 	}
-	
+
 	@Override
-	public int maxValue()
-	{
-		return this.value ? 1 : 0;
-	}
-	
-	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
-	{
-		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.BOOLEAN, this.lineNumber());
-		writer.visitJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.value);
 	}

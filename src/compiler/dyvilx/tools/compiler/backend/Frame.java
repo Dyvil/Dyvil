@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.backend;
 
 import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.asm.MethodVisitor;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.exception.StackUnderflowException;
 
@@ -124,53 +125,26 @@ public class Frame
 		}
 	}
 
-	public static String frameTypeName(Object o)
+	public static String frameTypeName(Object frameType)
 	{
-		if (o == BOOLEAN)
+		final PrimitiveType primitive = PrimitiveType.fromFrameType(frameType);
+		if (primitive != null)
 		{
-			return "boolean";
+			return primitive.toString();
 		}
-		if (o == BYTE)
-		{
-			return "byte";
-		}
-		if (o == SHORT)
-		{
-			return "short";
-		}
-		if (o == CHAR)
-		{
-			return "char";
-		}
-		if (o == INT)
-		{
-			return "int";
-		}
-		if (o == LONG)
-		{
-			return "long";
-		}
-		if (o == FLOAT)
-		{
-			return "float";
-		}
-		if (o == DOUBLE)
-		{
-			return "double";
-		}
-		if (o == ClassFormat.NULL)
+		if (frameType == ClassFormat.NULL)
 		{
 			return "null";
 		}
-		if (o == UNINITIALIZED_THIS)
+		if (frameType == UNINITIALIZED_THIS)
 		{
 			return "uninit_this";
 		}
-		if (o == null)
+		if (frameType == null)
 		{
 			return "INVALID";
 		}
-		return o.toString();
+		return frameType.toString();
 	}
 
 	public void setInstance(String type)
@@ -740,6 +714,7 @@ public class Frame
 			this.push(DOUBLE);
 			return;
 		case ALOAD:
+		case AUTO_LOAD:
 			this.push(this.locals[index]);
 			return;
 		case ISTORE:
@@ -759,6 +734,7 @@ public class Frame
 			this.pop();
 			return;
 		case ASTORE:
+		case AUTO_STORE:
 			this.setLocal(index, this.pop());
 			return;
 		}

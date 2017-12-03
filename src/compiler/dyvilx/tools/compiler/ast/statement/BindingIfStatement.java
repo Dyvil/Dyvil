@@ -9,6 +9,7 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
@@ -183,21 +184,33 @@ public class BindingIfStatement extends IfStatement
 	{
 		for (IVariable var : this.variables)
 		{
-			final IValue value = getOptionalValue(var);
+			IValue value = getOptionalValue(var);
+			final CastOperator castOp;
+			final int localCount = writer.localCount();
+			final int varIndex;
 
-			value.writeExpression(writer, null);
-			final int varIndex = writer.localCount();
+			if (value instanceof CastOperator && (castOp = (CastOperator) value).isOptional())
+			{
+				// optimization for optional cast operators
 
-			// first store the nullable value in the variable
-			writer.visitVarInsn(Opcodes.ASTORE, varIndex);
-			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+				value = castOp.getValue();
+				varIndex = value.writeStoreLoad(writer, null);
 
-			// branch if necessary
-			writer.visitJumpInsn(Opcodes.IFNULL, elseStart);
+				// branch if necessary (also branches if null)
+				writer.visitTypeInsn(Opcodes.INSTANCEOF, castOp.getType().getInternalName());
+				writer.visitJumpInsn(Opcodes.IFEQ, elseStart);
+			}
+			else
+			{
+				varIndex = value.writeStoreLoad(writer, null);
+
+				// branch if necessary
+				writer.visitJumpInsn(Opcodes.IFNULL, elseStart);
+			}
 
 			// load and unwrap the variable
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-			writer.resetLocals(varIndex);
+			writer.resetLocals(localCount);
 
 			value.getType().writeCast(writer, var.getType(), value.lineNumber());
 

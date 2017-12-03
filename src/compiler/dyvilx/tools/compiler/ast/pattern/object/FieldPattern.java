@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
 import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.constant.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -17,12 +18,13 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaseClasses;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class FieldPattern implements IPattern
+public class FieldPattern implements Pattern
 {
 	protected IDataMember dataMember;
 
 	// Metadata
 	protected SourcePosition position;
+	protected IType          targetType;
 
 	public FieldPattern(SourcePosition position, IDataMember dataMember)
 	{
@@ -37,15 +39,15 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
 	public SourcePosition getPosition()
 	{
 		return this.position;
+	}
+
+	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
 	}
 
 	@Override
@@ -59,20 +61,41 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
-	{
-		return this.isType(type) ? this : null;
-	}
-
-	@Override
 	public boolean isType(IType type)
 	{
 		return this.dataMember == null || Types.isSuperType(type, this.dataMember.getType());
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern withType(IType type, MarkerList markers)
 	{
+		if (!this.isType(type))
+		{
+			return null;
+		}
+
+		this.targetType = type;
+		return this;
+	}
+
+	@Override
+	public Object constantValue()
+	{
+		if (this.dataMember.hasConstantValue())
+		{
+			final IValue value = this.dataMember.getValue();
+			return value != null ? value.toObject() : null;
+		}
+		return null;
+	}
+
+	@Override
+	public Pattern resolve(MarkerList markers, IContext context)
+	{
+		if (this.dataMember.hasModifier(Modifiers.ENUM_CONST))
+		{
+			return new EnumPattern(this.position, this.dataMember);
+		}
 		if (!this.dataMember.hasModifier(Modifiers.CONST))
 		{
 			return this;
@@ -121,9 +144,9 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
+		final IType matchedType = this.targetType;
 		final IType fieldType = this.dataMember.getType();
 		final int lineNumber = this.lineNumber();
 
@@ -138,11 +161,11 @@ public class FieldPattern implements IPattern
 
 			if (matchedType != fieldType && Types.isSuperType(matchedType, fieldType))
 			{
-				varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
-				IPattern.loadVar(writer, varIndex, matchedType);
+				varIndex = Pattern.ensureVar(writer, varIndex);
+				Pattern.loadVar(writer, varIndex);
 
 				writer.visitTypeInsn(Opcodes.INSTANCEOF, fieldType.getInternalName());
-				writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+				writer.visitJumpInsn(Opcodes.IFEQ, target);
 			}
 		}
 		else
@@ -150,13 +173,13 @@ public class FieldPattern implements IPattern
 			commonType = Types.ANY;
 		}
 
-		IPattern.loadVar(writer, varIndex, matchedType);
+		Pattern.loadVar(writer, varIndex);
 
 		matchedType.writeCast(writer, commonType, lineNumber);
 		this.dataMember.writeGet(writer, null, lineNumber);
 		fieldType.writeCast(writer, commonType, lineNumber);
 
-		CaseClasses.writeIFNE(writer, commonType, elseLabel);
+		CaseClasses.writeIFNE(writer, commonType, target);
 	}
 
 	@Override

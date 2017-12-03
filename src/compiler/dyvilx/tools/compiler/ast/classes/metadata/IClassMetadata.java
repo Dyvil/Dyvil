@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -25,13 +26,15 @@ import java.util.Set;
 
 public interface IClassMetadata extends IClassCompilable, IResolvable
 {
-	default void setInstanceField(IField field)
-	{
-	}
+	MemberKind getKind();
 
 	default IField getInstanceField()
 	{
 		return null;
+	}
+
+	default void setInstanceField(IField field)
+	{
 	}
 
 	default IConstructor getConstructor()

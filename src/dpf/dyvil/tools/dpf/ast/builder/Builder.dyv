@@ -21,7 +21,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, mutable.ArrayList(parameters...), null)
 
 	static func apply(name: Name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
-	
+
 	public init(name: Name) : this(name, new mutable.ArrayList<Parameter>, null)
 
 	@BytecodeName("withNode")
@@ -40,9 +40,9 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 		if (this.node != null) return this.node!!
 		return this.node = new Node(this.name)
 	}
-	
+
 	override func visitEnd() -> void { }
-	
+
 	override func accept(visitor: ValueVisitor) -> void
 	{
 		let builderVisitor = visitor.visitBuilder(this.name)
@@ -78,23 +78,23 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 	}
 
 	override func toString() -> String = String(this)
-	
+
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		buffer.append(this.name)
-		
+
 		let parameterCount = this.parameters.size
 		if (parameterCount > 0)
 		{
 			buffer.append('(')
-			
+
 			this.parameters[0].toString(indent, buffer)
 			for (i <- 1 ..< parameterCount)
 			{
 				buffer.append(", ")
 				this.parameters[i].toString(indent, buffer)
 			}
-			
+
 			buffer.append(')')
 		}
 		else if (this.node == null)
@@ -102,7 +102,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 			buffer.append("()")
 			return
 		}
-		
+
 		if let node = this.node
 		{
 			buffer.append(" {\n")
@@ -111,14 +111,9 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 		}
 	}
 
-	override func equals(obj: Object!) -> boolean
-	{
-		if (this === obj) return true
-		if (!(obj is Builder)) return false
+	override func equals(obj: Object!) -> boolean = this === obj || obj is Builder && this.equals(obj as Builder)
 
-		let that = obj as Builder
-		return this.name === that.name && this.parameters == that.parameters && this.node == that.node
-	}
+	func equals(that: Builder) -> boolean = this === that || this.name === that.name && this.parameters == that.parameters && this.node == that.node
 
 	override func hashCode() -> int
 	{

@@ -161,7 +161,21 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// EXPRESSION as
 
-				final CastOperator castOperator = new CastOperator(token.raw(), this.value);
+				final IToken next = token.next();
+				final boolean optional;
+				if (next.type() == Tokens.SYMBOL_IDENTIFIER && next.nameValue() == Names.qmark && token.isNeighboring(next))
+				{
+					// EXPRESSION as?
+					optional = true;
+					pm.skip();
+				}
+				else
+				{
+					optional = false;
+				}
+
+
+				final CastOperator castOperator = new CastOperator(token.raw(), this.value, optional);
 				pm.pushParser(new TypeParser(castOperator).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = castOperator;
 				return;

@@ -8,7 +8,7 @@ import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.config.Formatting;
@@ -23,17 +23,17 @@ public class MatchCase implements IResolvable, IDefaultContext, IPatternConsumer
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.condition.type");
 
-	protected IPattern pattern;
-	protected IValue   condition;
-	protected IValue   action;
+	protected Pattern pattern;
+	protected IValue  condition;
+	protected IValue  action;
 
-	public IPattern getPattern()
+	public Pattern getPattern()
 	{
 		return this.pattern;
 	}
 
 	@Override
-	public void setPattern(IPattern pattern)
+	public void setPattern(Pattern pattern)
 	{
 		this.pattern = pattern;
 	}
@@ -103,7 +103,7 @@ public class MatchCase implements IResolvable, IDefaultContext, IPatternConsumer
 		{
 			this.pattern = this.pattern.resolve(markers, context);
 
-			final IPattern typedPattern = this.pattern.withType(type, markers);
+			final Pattern typedPattern = this.pattern.withType(type, markers);
 			if (typedPattern == null)
 			{
 				Marker marker = Markers.semanticError(this.pattern.getPosition(), "pattern.type.incompatible");

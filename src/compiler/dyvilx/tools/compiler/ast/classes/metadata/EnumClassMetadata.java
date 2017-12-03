@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.field.EnumConstant;
 import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -46,6 +47,12 @@ public class EnumClassMetadata extends ClassMetadata
 	public EnumClassMetadata(IClass forClass)
 	{
 		super(forClass);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.ENUM;
 	}
 
 	@Override

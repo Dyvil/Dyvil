@@ -48,12 +48,37 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	public static final String CLASS_MODIFIERS = MEMBER_MODIFIERS + "abstract,case,sealed,enum,";
+	public static final String CLASS_MODIFIERS = MEMBER_MODIFIERS + "abstract,case,sealed,";
+
+	/**
+	 * The modifiers that can be used on interfaces.
+	 */
+	public static final String INTERFACE_MODIFIERS = ACCESS_MODIFIERS + "static,sealed,";
+
+	/**
+	 * The modifiers that can be used on traits.
+	 */
+	public static final String TRAIT_MODIFIERS = ACCESS_MODIFIERS + "static,sealed,";
+
+	/**
+	 * The modifiers that can be used on annotations.
+	 */
+	public static final String ANNOTATION_MODIFIERS = ACCESS_MODIFIERS + "static,";
+
+	/**
+	 * The modifiers that can be used on enums.
+	 */
+	public static final String ENUM_MODIFIERS = ACCESS_MODIFIERS + "static,";
+
+	/**
+	 * The modifiers that can be used on objects.
+	 */
+	public static final String OBJECT_MODIFIERS = ACCESS_MODIFIERS + "static,implicit,";
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,enum,implicit,";
+	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,implicit,";
 
 	/**
 	 * The modifiers that can be used on methods.

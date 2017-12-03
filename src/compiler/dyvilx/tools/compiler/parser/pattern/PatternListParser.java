@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.parser.pattern;
 
 import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
-import dyvilx.tools.compiler.ast.pattern.IPatternList;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.PatternList;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -13,11 +13,11 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	private static final int PATTERN = 0;
 	private static final int COMMA   = 1;
 
-	protected IPatternList patternList;
+	protected PatternList patternList;
 
-	private IPattern pattern;
+	private Pattern pattern;
 
-	public PatternListParser(IPatternList list)
+	public PatternListParser(PatternList list)
 	{
 		this.patternList = list;
 		// this.mode = PATTERN;
@@ -31,7 +31,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 		{
 			if (this.pattern != null)
 			{
-				this.patternList.addPattern(this.pattern);
+				this.patternList.add(this.pattern);
 			}
 			pm.popParser(true);
 			return;
@@ -47,7 +47,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 			this.mode = PATTERN;
 			if (type == BaseSymbols.COMMA)
 			{
-				this.patternList.addPattern(this.pattern);
+				this.patternList.add(this.pattern);
 				return;
 			}
 			pm.report(token, "pattern.list.comma");
@@ -55,7 +55,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	}
 
 	@Override
-	public void setPattern(IPattern Pattern)
+	public void setPattern(Pattern Pattern)
 	{
 		this.pattern = Pattern;
 	}

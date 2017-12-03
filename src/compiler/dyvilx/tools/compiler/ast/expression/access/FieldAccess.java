@@ -288,4 +288,15 @@ public class FieldAccess extends AbstractFieldAccess
 
 		this.field.getType().writeCast(writer, type, lineNumber);
 	}
+
+	@Override
+	public int writeStore(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.field.hasModifier(Modifiers.FINAL) && this.field.isLocal() && this.field instanceof IVariable)
+		{
+			// no extra read+store necessary for final variables
+			return ((IVariable) this.field).getLocalIndex();
+		}
+		return super.writeStore(writer, type);
+	}
 }

@@ -8,14 +8,14 @@ public class ArrayTest
 		test "Element Types" {
 			[]   .elementType =?= class any
 			[[]] .elementType =?= class [any]
-			[1]  .elementType =?= class int
+			[1]  .elementType =?= class Int
 			["a"].elementType =?= class String
 		}
 
 		test "Nested Element Types" {
 			[]     .nestedElementType =?= class any
 			[[]]   .nestedElementType =?= class any
-			[[1]]  .nestedElementType =?= class int
+			[[1]]  .nestedElementType =?= class Int
 			[["a"]].nestedElementType =?= class String
 		}
 
@@ -28,9 +28,9 @@ public class ArrayTest
 		}
 	}
 
-	postfix func elementType <@Reified(Reified.Type.ANY_CLASS) T>(array: [T]) -> Class<T> = class T
+	postfix func elementType <@Reified(Reified.Type.OBJECT_CLASS) T>(array: [T]) -> Class<T> = class T
 
-	postfix func nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>(array: [[T]]) -> Class<T> = class T
+	postfix func nestedElementType <@Reified(Reified.Type.OBJECT_CLASS) T>(array: [[T]]) -> Class<T> = class T
 
 	static func genericTest<type T: any!>(array: [T]) -> [Object!] = boxed<Object!>(array)
 

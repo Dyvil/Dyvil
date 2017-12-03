@@ -1,15 +1,14 @@
 package dyvilx.tools.compiler.ast.pattern.operator;
 
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
-import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.source.position.SourcePosition;
 
 public class OrPattern extends BinaryPattern
 {
-	public OrPattern(IPattern left, SourcePosition token, IPattern right)
+	public OrPattern(Pattern left, SourcePosition token, Pattern right)
 	{
 		super(left, token, right);
 	}
@@ -27,7 +26,7 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	protected IPattern withType()
+	protected Pattern withType()
 	{
 		if (this.left.isWildcard())
 		{
@@ -71,7 +70,7 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public IPattern subPattern(int index)
+	public Pattern subPattern(int index)
 	{
 		final int leftCount = this.left.subPatterns();
 		if (index < leftCount)
@@ -82,20 +81,19 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		final int locals = writer.localCount();
 
-		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+		varIndex = Pattern.ensureVar(writer, varIndex);
 
 		final Label targetLabel = new Label();
 
-		this.left.writeJump(writer, varIndex, matchedType, targetLabel);
+		this.left.writeJumpOnMatch(writer, varIndex, targetLabel);
 
 		writer.resetLocals(locals);
 
-		this.right.writeInvJump(writer, varIndex, matchedType, elseLabel);
+		this.right.writeJumpOnMismatch(writer, varIndex, target);
 
 		writer.visitLabel(targetLabel);
 

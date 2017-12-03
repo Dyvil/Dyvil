@@ -4,9 +4,8 @@ import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.pattern.IPattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
-import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -14,7 +13,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.lexer.StringLiterals;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class StringPattern extends Pattern
+public final class StringPattern extends AbstractPattern
 {
 	private String value;
 
@@ -37,19 +36,25 @@ public final class StringPattern extends Pattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
-		if (type.getTheClass() == Types.STRING_CLASS)
-		{
-			// also accepts String! or String?
-			return this;
-		}
 		if (Types.isSuperType(type, Types.STRING))
 		{
-			return new TypeCheckPattern(this, type, Types.STRING);
+			// also accepts String! or String?
+			// Strings don't need type checks because the match is performed via "literal".equals(value)
+			// thus value can have any type (that is a super-type of String)
+			return this;
 		}
 		return null;
 	}
+
+	@Override
+	public Object constantValue()
+	{
+		return this.value;
+	}
+
+	// Switch Resolution
 
 	@Override
 	public boolean isSwitchable()
@@ -64,37 +69,20 @@ public final class StringPattern extends Pattern
 	}
 
 	@Override
-	public int subPatterns()
-	{
-		return 1;
-	}
-
-	@Override
 	public int switchValue()
 	{
 		return this.value.hashCode();
 	}
 
-	@Override
-	public int minValue()
-	{
-		return this.value.hashCode();
-	}
+	// Compilation
 
 	@Override
-	public int maxValue()
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		return this.value.hashCode();
+		writeJumpOnMismatch(writer, varIndex, target, this.value);
 	}
 
-	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
-	{
-		writeStringInvJump(writer, varIndex, elseLabel, this.value);
-	}
-
-	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value)
+	protected static void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label elseLabel, String value)
 		throws BytecodeException
 	{
 		writer.visitLdcInsn(value);

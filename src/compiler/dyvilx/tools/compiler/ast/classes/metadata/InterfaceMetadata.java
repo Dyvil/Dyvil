@@ -11,6 +11,7 @@ import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -27,6 +28,12 @@ public class InterfaceMetadata implements IClassMetadata
 	public InterfaceMetadata(IClass theClass)
 	{
 		this.theClass = theClass;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.INTERFACE;
 	}
 
 	@Override

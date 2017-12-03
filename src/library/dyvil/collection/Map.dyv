@@ -300,10 +300,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 		return builder.toString()
 	}
 
-	static func mapEquals(map: [_ : _], obj: any!) -> boolean
-	{
-		return obj is Map && mapEquals(map, obj as Map)
-	}
+	static func mapEquals(map: [_ : _], obj: any!) -> boolean = obj is Map && mapEquals(map, obj as Map)
 
 	static func mapEquals(map: [_ : _], other: [_ : _]) -> boolean
 	{

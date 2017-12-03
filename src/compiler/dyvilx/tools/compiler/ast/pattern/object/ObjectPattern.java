@@ -1,21 +1,23 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class ObjectPattern extends Pattern implements IPattern
+public class ObjectPattern extends AbstractPattern implements Pattern
 {
 	protected IType type;
 
@@ -41,7 +43,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		if (this.isType(type))
 		{
@@ -52,7 +54,13 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Object constantValue()
+	{
+		return new ObjectSurrogate(this.type.getInternalName());
+	}
+
+	@Override
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (this.type.typeTag() == IType.NAMED)
 		{
@@ -100,18 +108,46 @@ public class ObjectPattern extends Pattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		IPattern.loadVar(writer, varIndex, matchedType);
+		Pattern.loadVar(writer, varIndex);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
 		this.instanceField.writeGet(writer, null, this.lineNumber());
-		writer.visitJumpInsn(Opcodes.IF_ACMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ACMPNE, target);
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.type.toString(prefix, buffer);
+	}
+}
+
+class ObjectSurrogate
+{
+	private final String type;
+
+	public ObjectSurrogate(String type)
+	{
+		this.type = type;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o != null && this.getClass() == o.getClass() //
+		                    && this.type.equals(((ObjectSurrogate) o).type);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.type.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return "object " + this.type;
 	}
 }

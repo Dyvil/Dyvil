@@ -1,12 +1,5 @@
 package dyvil
 
-// Random Extensions
-using	dyvil.random.JavaRandoms._
-
-// Collection Utilities and Conversions
-using	dyvil.collection.JavaCollections._
-using	dyvil.collection.JavaMaps._
-
 // Common Java Types
 type	JCollection<E>	= java.util.Collection<E>
 

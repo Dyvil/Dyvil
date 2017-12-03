@@ -2,6 +2,8 @@ package dyvilx.tools.compiler.ast.generic;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.collection.iterator.ArrayIterator;
+import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.external.ExternalTypeParameter;
@@ -12,14 +14,14 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.IResolvable;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
 
-public class TypeParameterList implements IResolvable
+public class TypeParameterList implements IResolvable, Iterable<ITypeParameter>
 {
 	private static final int DEFAULT_CAPACITY = 3;
 
@@ -93,6 +95,12 @@ public class TypeParameterList implements IResolvable
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public Iterator<ITypeParameter> iterator()
+	{
+		return new ArrayIterator<>(this.typeParams, this.size);
 	}
 
 	// Resolution

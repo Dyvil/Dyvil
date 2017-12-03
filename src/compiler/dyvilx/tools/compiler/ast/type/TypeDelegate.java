@@ -169,17 +169,12 @@ public abstract class TypeDelegate implements IType, ITyped
 		return this.type.getUnboxMethod();
 	}
 
-	@Override
-	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return this.type.convertValue(value, typeContext, markers, context);
-	}
+	// Subtyping
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
-		                            IContext context)
+	public int subTypeCheckLevel()
 	{
-		return this.type.convertValueTo(value, targetType, typeContext, markers, context);
+		return this.type.subTypeCheckLevel();
 	}
 
 	@Override
@@ -231,10 +226,18 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public int subTypeCheckLevel()
+	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return this.type.subTypeCheckLevel();
+		return this.type.convertFrom(value, type, typeContext, markers, context);
 	}
+
+	@Override
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.type.convertTo(value, type, typeContext, markers, context);
+	}
+
+	// Generics
 
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)

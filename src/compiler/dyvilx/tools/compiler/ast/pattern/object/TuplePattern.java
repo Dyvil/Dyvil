@@ -1,12 +1,18 @@
-package dyvilx.tools.compiler.ast.pattern;
+package dyvilx.tools.compiler.ast.pattern.object;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.PatternList;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -16,15 +22,15 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public final class TuplePattern extends Pattern implements IPatternList
+import java.util.Arrays;
+
+public final class TuplePattern extends AbstractPattern implements PatternList
 {
-	private IPattern[] patterns;
-	private int        patternCount;
+	private Pattern[] patterns;
+	private int       patternCount;
 
 	// Metadata
 	private IType tupleType;
@@ -32,7 +38,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	public TuplePattern(SourcePosition position)
 	{
 		this.position = position;
-		this.patterns = new IPattern[3];
+		this.patterns = new Pattern[3];
 	}
 
 	@Override
@@ -48,28 +54,28 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public void setPattern(int index, IPattern pattern)
+	public Pattern get(int index)
+	{
+		return this.patterns[index];
+	}
+
+	@Override
+	public void set(int index, Pattern pattern)
 	{
 		this.patterns[index] = pattern;
 	}
 
 	@Override
-	public void addPattern(IPattern pattern)
+	public void add(Pattern pattern)
 	{
 		int index = this.patternCount++;
 		if (this.patternCount > this.patterns.length)
 		{
-			IPattern[] temp = new IPattern[this.patternCount];
+			Pattern[] temp = new Pattern[this.patternCount];
 			System.arraycopy(this.patterns, 0, temp, 0, index);
 			this.patterns = temp;
 		}
 		this.patterns[index] = pattern;
-	}
-
-	@Override
-	public IPattern getPattern(int index)
-	{
-		return this.patterns[index];
 	}
 
 	@Override
@@ -103,7 +109,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern withType(IType type, MarkerList markers)
+	public Pattern withType(IType type, MarkerList markers)
 	{
 		final IClass tupleClass = TupleType.getTupleClass(this.patternCount);
 		if (tupleClass == null)
@@ -123,8 +129,8 @@ public final class TuplePattern extends Pattern implements IPatternList
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
-			final IPattern pattern = this.patterns[i];
-			final IPattern typedPattern = pattern.withType(elementType, markers);
+			final Pattern pattern = this.patterns[i];
+			final Pattern typedPattern = pattern.withType(elementType, markers);
 
 			if (typedPattern == null)
 			{
@@ -147,6 +153,24 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
+	public Object constantValue()
+	{
+		final Object[] subValues = new Object[this.patternCount];
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			final Object subValue = this.get(i).constantValue();
+			if (subValue == null)
+			{
+				return null;
+			}
+
+			subValues[i] = subValue;
+		}
+
+		return new TupleSurrogate(subValues);
+	}
+
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.patternCount; i++)
@@ -162,7 +186,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	public Pattern resolve(MarkerList markers, IContext context)
 	{
 		if (this.patternCount == 1)
 		{
@@ -178,10 +202,9 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-		throws BytecodeException
+	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+		varIndex = Pattern.ensureVar(writer, varIndex);
 
 		final int lineNumber = this.lineNumber();
 		final IType tupleType = this.getType();
@@ -203,7 +226,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 			final IType targetType = Types.resolveTypeSafely(tupleType, typeParameters.get(i));
 
 			Types.OBJECT.writeCast(writer, targetType, lineNumber);
-			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
+			this.patterns[i].writeJumpOnMismatch(writer, -1, target);
 		}
 	}
 
@@ -237,5 +260,34 @@ public final class TuplePattern extends Pattern implements IPatternList
 			buffer.append(' ');
 		}
 		buffer.append(')');
+	}
+}
+
+class TupleSurrogate
+{
+	private final Object[] values;
+
+	public TupleSurrogate(Object[] values)
+	{
+		this.values = values;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return this == o || o != null && this.getClass() == o.getClass() //
+		                    && Arrays.equals(this.values, ((TupleSurrogate) o).values);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Arrays.hashCode(this.values);
+	}
+
+	@Override
+	public String toString()
+	{
+		return dyvil.collection.immutable.ArrayList.apply(this.values).toString("(", ", ", ")");
 	}
 }

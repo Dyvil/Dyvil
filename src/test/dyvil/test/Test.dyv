@@ -56,9 +56,11 @@ interface Test
 
 	static func require(predicate: -> boolean, message: String) -> RequireTest = RequireTest(predicate, message)
 
+	static func pass() -> RequireTest = require(true)
+
 	static func fail() -> RequireTest = fail("Generic Failure")
 
-	static func fail(message: String) -> RequireTest = RequireTest(false, message)
+	static func fail(message: String) -> RequireTest = require(false, message)
 
 	// Equality Tests
 

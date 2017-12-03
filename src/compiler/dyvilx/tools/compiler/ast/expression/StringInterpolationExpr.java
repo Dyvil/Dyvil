@@ -57,23 +57,23 @@ public final class StringInterpolationExpr implements IValue
 	{
 		if (lhs.valueTag() == STRING_INTERPOLATION)
 		{
-			final StringInterpolationExpr interpol = (StringInterpolationExpr) lhs;
+			final StringInterpolationExpr lhsInterpol = (StringInterpolationExpr) lhs;
 			if (rhs.valueTag() == STRING_INTERPOLATION)
 			{
-				interpol.appendAll((StringInterpolationExpr) rhs);
+				lhsInterpol.appendAll((StringInterpolationExpr) rhs);
 			}
 			else
 			{
-				interpol.append(rhs);
+				lhsInterpol.append(rhs);
 			}
 
-			return interpol;
+			return lhsInterpol;
 		}
 		if (rhs.valueTag() == STRING_INTERPOLATION)
 		{
-			final StringInterpolationExpr interpol = (StringInterpolationExpr) rhs;
-			interpol.prepend(rhs);
-			return interpol;
+			final StringInterpolationExpr rhsInterpol = (StringInterpolationExpr) rhs;
+			rhsInterpol.prepend(lhs);
+			return rhsInterpol;
 		}
 		return new StringInterpolationExpr(lhs, rhs);
 	}

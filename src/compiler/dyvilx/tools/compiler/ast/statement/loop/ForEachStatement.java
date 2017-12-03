@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.statement.loop;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.CombiningLabelContext;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -25,7 +26,6 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -104,12 +104,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type != Types.VOID)
-		{
-			return null;
-		}
-
-		return this;
+		return Types.isVoid(type) ? this : null;
 	}
 
 	@Override
@@ -426,17 +421,18 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append("for");
 		Formatting.appendSeparator(buffer, "for.open_paren", '(');
 
-		this.variable.getType().toString(prefix, buffer);
-		buffer.append(' ').append(this.variable.getName());
+		buffer.append(this.variable.getName());
+		Formatting.appendSeparator(buffer, "field.type_ascription", ':');
+		this.variable.getType().toString(indent, buffer);
 
-		Formatting.appendSeparator(buffer, "for.each.separator", ':');
+		Formatting.appendSeparator(buffer, "for.each.separator", "<-");
 
-		this.variable.getValue().toString(prefix, buffer);
+		this.variable.getValue().toString(indent, buffer);
 
 		if (Formatting.getBoolean("for.close_paren.space_before"))
 		{
@@ -444,9 +440,9 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		}
 		buffer.append(')');
 
-		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
+		if (this.action != null && !Util.formatStatementList(indent, buffer, this.action))
 		{
-			String actionPrefix = Formatting.getIndent("for.indent", prefix);
+			String actionPrefix = Formatting.getIndent("for.indent", indent);
 			if (Formatting.getBoolean("for.close_paren.newline_after"))
 			{
 				buffer.append('\n').append(actionPrefix);

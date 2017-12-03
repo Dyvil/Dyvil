@@ -263,7 +263,7 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 		toString(this.coefficients[size - 1], size - 1, buffer)
 	}
 
-	private static func toString(coefficient: double, degree: int, buffer: StringBuilder)
+	private static func toString(coefficient: double, degree: int, buffer: StringBuilder) -> void
 	{
 		buffer.append(coefficient).append(' x^').append(degree)
 	}

@@ -64,7 +64,7 @@ public interface Value extends ASTNode, dyvil.tools.dpf.model.value.Value
 
 	static final func wrap(value: any!) -> Value
 	{
-		if (value is Value) return value as Value
+		if let value = value as? Value { return value }
 
 		let valueClass = value.dynamicClass
 
@@ -76,9 +76,10 @@ public interface Value extends ASTNode, dyvil.tools.dpf.model.value.Value
 		if (valueClass === class Name)    return NameAccess(value as Name)
 		if (valueClass === class Boolean) return Value(value as boolean)
 
-		if (value is DPFConvertible) return value as DPFConvertible
-		if (value is List)           return ListValue(value as List)
-		if (value is Map)            return MapValue(value as Map)
+		if let conv = value as? DPFConvertible { return conv }
+		if let list = value as? List { return ListValue(list) }
+		if let map = value as? Map { return MapValue(map) }
+
 		if (value.getClass.isArray)
 		{
 			// Convert Arrays using Reflection

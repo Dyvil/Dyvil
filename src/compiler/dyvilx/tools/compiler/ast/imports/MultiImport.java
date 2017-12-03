@@ -198,6 +198,26 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		IValue candidate = null;
+		for (int i = 0; i < this.importCount; i++)
+		{
+			final IValue value = this.imports[i].asContext().resolveImplicit(type);
+			if (value == null)
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous
+			}
+			candidate = value;
+		}
+		return candidate;
+	}
+
+	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		for (int i = 0; i < this.importCount; i++)

@@ -218,6 +218,10 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		return Mutability.UNDEFINED;
 	}
 
+	IMethod getBoxMethod();
+
+	IMethod getUnboxMethod();
+
 	// Nullability
 
 	default boolean useNonNullAnnotation()
@@ -225,7 +229,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		return true;
 	}
 
-	// Super Type
+	// Subtyping
 
 	/**
 	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
@@ -260,16 +264,6 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 	boolean isSameClass(IType type);
 
-	default boolean isConvertibleFrom(IType type)
-	{
-		return false;
-	}
-
-	default boolean isConvertibleTo(IType type)
-	{
-		return false;
-	}
-
 	int SUBTYPE_BASE               = 0;
 	int SUBTYPE_NULLABLE           = 1;
 	int SUBTYPE_NULL               = 2;
@@ -293,23 +287,61 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		throw new UnsupportedOperationException(this.getClass().getName() + ".isSubTypeOf");
 	}
 
-	// Resolve
+	// Conversion
 
-	IMethod getBoxMethod();
-
-	IMethod getUnboxMethod();
-
-	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	default boolean isConvertibleFrom(IType type)
 	{
-		if (!this.isResolved())
-		{
-			return value;
-		}
-		return value.withType(this, typeContext, markers, context);
+		return false;
 	}
 
-	default IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
-		                             IContext context)
+	default boolean isConvertibleTo(IType type)
+	{
+		return false;
+	}
+
+	/**
+	 * Provides an expression that has this type and is a conversion of sorts from the given value.
+	 * <p>
+	 * Should return null iff !this.isConvertibleFrom(type)
+	 *
+	 * @param value
+	 * 	the value to convert
+	 * @param type
+	 * 	the type of the value
+	 * @param typeContext
+	 * 	the type conversion context
+	 * @param markers
+	 * 	the list of markers for diagnostics
+	 * @param context
+	 * 	the resolution context
+	 *
+	 * @return a conversion expression
+	 */
+	default IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return null;
+	}
+
+	/**
+	 * Provides an expression that has the given type and is a conversion of sorts from the given value. Here it can be
+	 * assumed that value.getType() == this
+	 * <p>
+	 * Should return iff !this.isConvertibleTo(type)
+	 *
+	 * @param value
+	 * 	the value to convert
+	 * @param type
+	 * 	the type to convert to
+	 * @param typeContext
+	 * 	the type conversion context
+	 * @param markers
+	 * 	the list of markers for diagnostics
+	 * @param context
+	 * 	the resolution context
+	 *
+	 * @return a conversion expression
+	 */
+	default IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return null;
 	}

@@ -1,15 +1,13 @@
 package dyvilx.tools.repl.context;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.io.Console;
+import dyvil.source.TextSource;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.TextSource;
 import dyvilx.tools.parsing.token.IToken;
 
 public class Colorizer
@@ -18,13 +16,14 @@ public class Colorizer
 	{
 		final TextSource source = new TextSource(text);
 
-		final TokenList tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
-			                             .tokenize(text);
+		final TokenList tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE).tokenize(text);
 
-		final List<StringBuilder> lines = new ArrayList<>(source.lineCount());
-		for (int i = 0, count = source.lineCount(); i < count; i++)
+		// Split into lines
+		final int lineCount = source.lineCount();
+		final StringBuilder[] lines = new StringBuilder[lineCount];
+		for (int i = 0; i < lineCount; i++)
 		{
-			lines.add(new StringBuilder(source.getLine(i + 1)));
+			lines[i] = new StringBuilder(source.line(i + 1));
 		}
 
 		// iterate, starting from the last token
@@ -33,32 +32,39 @@ public class Colorizer
 			final String color = tokenColor(token, context);
 			if (color != null)
 			{
-				//noinspection MismatchedQueryAndUpdateOfStringBuilder
-				final StringBuilder line = lines.get(token.startLine() - 1);
+				// insert ANSI color codes before and after the token
+				final StringBuilder line = lines[token.startLine() - 1];
 				line.insert(token.endColumn(), Console.ANSI_RESET);
 				line.insert(token.startColumn(), color);
 			}
 		}
 
-		return lines.reduce((stringBuilder, s) -> stringBuilder.append('\n').append(s)).toString();
+		// Merge back together
+		final StringBuilder first = lines[0];
+		for (int i = 1; i < lineCount; i++)
+		{
+			first.append('\n').append(lines[i]);
+		}
+		return first.toString();
 	}
 
-	private static String tokenColor(IToken last, REPLContext context)
+	private static String tokenColor(IToken token, REPLContext context)
 	{
-		final int type = last.type();
-		if ((type & (Tokens.STRING | Tokens.INT | Tokens.LONG | Tokens.FLOAT | Tokens.DOUBLE)) != 0)
+		final int type = token.type();
+		if ((type & (Tokens.INT | Tokens.LONG | Tokens.FLOAT | Tokens.DOUBLE)) != 0) // number literals
 		{
 			return Console.ANSI_BLUE;
 		}
-		if ((type & Tokens.SYMBOL) != 0)
+		if ((type & (Tokens.STRING | Tokens.VERBATIM_STRING | Tokens.SINGLE_QUOTED_STRING | Tokens.VERBATIM_CHAR))
+		    != 0) // string literals
 		{
-			return Console.ANSI_ESCAPE + "[1m"; // BOLD
+			return Console.ANSI_BLUE + Console.ANSI_ITALIC;
 		}
-		if ((type & (Tokens.KEYWORD | Tokens.SYMBOL)) != 0)
+		if ((type & (Tokens.KEYWORD | Tokens.SYMBOL)) != 0) // keywords and symbols
 		{
-			return Console.ANSI_ESCAPE + "[1m"; // BOLD
+			return Console.ANSI_BOLD;
 		}
-		if ((type & Tokens.IDENTIFIER) != 0 && context.isMember(last.nameValue()))
+		if ((type & Tokens.IDENTIFIER) != 0 && context.isMember(token.nameValue())) // members / identifiers
 		{
 			return Console.ANSI_BLUE;
 		}

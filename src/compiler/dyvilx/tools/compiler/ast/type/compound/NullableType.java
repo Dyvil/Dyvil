@@ -154,14 +154,15 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!Types.isSuperType(this, value.getType()))
+		if (!this.isConvertibleFrom(type))
 		{
-			return this.type.convertValue(value, typeContext, markers, context);
+			return null;
 		}
 
-		return IObjectType.super.convertValue(value, typeContext, markers, context);
+		return value.withType(this.type, typeContext, markers, context);
+		// was: return this.type.convertFrom(value, typeContext, markers, context);
 	}
 
 	@Override

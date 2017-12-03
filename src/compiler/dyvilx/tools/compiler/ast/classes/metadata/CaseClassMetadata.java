@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.expression.access.MethodCall;
 import dyvilx.tools.compiler.ast.expression.constant.NullValue;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -45,6 +46,12 @@ public final class CaseClassMetadata extends ClassMetadata
 	public CaseClassMetadata(IClass iclass)
 	{
 		super(iclass);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.CLASS;
 	}
 
 	@Override

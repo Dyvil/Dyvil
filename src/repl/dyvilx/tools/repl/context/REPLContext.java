@@ -57,10 +57,10 @@ public class REPLContext extends AbstractHeader
 	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	// Updated for every input
-	private int resultIndex;
-	private int classIndex;
-	protected TextSource currentSource = new TextSource();
-	private CodeClass currentClass;
+	private   int        resultIndex;
+	private   int        classIndex;
+	protected TextSource currentSource;
+	private   CodeClass  currentClass;
 
 	// Cleared for every input
 	protected final MarkerList        markers        = new MarkerList(Markers.INSTANCE);
@@ -102,7 +102,7 @@ public class REPLContext extends AbstractHeader
 		final String className = CLASS_PREFIX + this.classIndex++;
 		this.currentClass = new CodeClass(this, Name.fromRaw(className));
 		this.currentClass.setBody(new ClassBody(this.currentClass));
-		this.currentSource.read(text);
+		this.currentSource = new TextSource(text);
 	}
 
 	public MarkerList getMarkers()
@@ -194,6 +194,11 @@ public class REPLContext extends AbstractHeader
 			this.properties.put(member.getName(), (IProperty) member);
 			break;
 		case CLASS:
+		case INTERFACE:
+		case TRAIT:
+		case ANNOTATION:
+		case ENUM:
+		case OBJECT:
 			this.classes.put(member.getName(), (IClass) member);
 			break;
 		}
@@ -414,18 +419,33 @@ public class REPLContext extends AbstractHeader
 		}
 
 		IValue candidate = null;
-		for (IField field : this.fields.values())
+
+		for (IClass iclass : this.classes.values())
 		{
-			if (!field.hasModifier(Modifiers.IMPLICIT) || !Types.isSuperType(type, field.getType()))
+			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
 				continue;
 			}
 			if (candidate != null)
 			{
-				return null; // more than one match -> ambiguous
+				return null; // ambiguous
+			}
+			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
+		}
+
+		for (IField field : this.fields.values())
+		{
+			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
+			{
+				continue;
+			}
+			if (candidate != null)
+			{
+				return null; // ambiguous
 			}
 			candidate = new FieldAccess(field);
 		}
+
 		return candidate;
 	}
 

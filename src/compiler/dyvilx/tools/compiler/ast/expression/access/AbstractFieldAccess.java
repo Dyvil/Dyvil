@@ -251,7 +251,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 			this.receiver.check(markers, context);
 		}
 
-		if (this.field != null && !this.field.getType().isResolved())
+		if (this.field != null && !this.getType().isResolved())
 		{
 			markers.add(Markers.semanticError(this.position, "field.access.unresolved_type", this.name));
 		}

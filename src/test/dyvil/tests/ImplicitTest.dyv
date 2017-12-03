@@ -2,8 +2,10 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class ImplicitTest
+class ImplicitTest
 {
+	implicit object ImplicitObject
+
 	@FunctionalInterface
 	public static interface DebugPrintable
 	{
@@ -30,7 +32,8 @@ public class ImplicitTest
 
 	static implicit func b2s(b: boolean) -> String = b.toString
 
-	static func implicitS(implicit s: String = "default") -> String = s
+	// Uses implicitly to ensure s is also eligible for implicit resolution
+	static func implicitS(implicit s: String = "default") -> String = implicitly<String>()
 
 	static func implicitly<type T>(implicit value: T) -> T = value
 
@@ -53,12 +56,18 @@ public class ImplicitTest
 				implicitS() =?= "default"
 			}
 
-			test "Provided" { implicitS("provided") =?= "provided" }
+			test "Provided" {
+				implicitS("provided") =?= "provided"
+			}
 
-			test "Implicit Let" {
+			test "Available" {
 				implicit let s = "implicit let"
 				implicitS =?= s
 			}
+		}
+
+		test "Implicit Objects" {
+			implicitly<ImplicitObject>() =?= ImplicitObject
 		}
 
 		test "Generic Arguments" {

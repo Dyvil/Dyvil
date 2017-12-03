@@ -42,7 +42,7 @@ abstract class AbstractBitSet implements Set<int>
 
 	// Utility Methods
 
-	protected static func wordIndex(bit: int) -> int = bit \ 64
+	protected static func wordIndex(bit: int) -> int = bit _/ 64
 
 	protected static func bitIndex(bit: int) -> int = bit % 64
 

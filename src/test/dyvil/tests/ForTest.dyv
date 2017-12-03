@@ -14,7 +14,7 @@ public class ForTest
 		string()
 		nested()
 	}
-	
+
 	static func iterative() -> Test = test "Iterative" {
 		let list = List<int>()
 
@@ -25,7 +25,7 @@ public class ForTest
 
 		list =?= List(0, 1, 2)
 	}
-	
+
 	static func array() -> Test = test "Array" {
 		let array = [ 1, 2, 3 ]
 		let list = List<int>()
@@ -37,7 +37,7 @@ public class ForTest
 
 		list =?= List(1, 2, 3)
 	}
-	
+
 	static func iterable() -> Test = test "Iterable" {
 		let iterable: Iterable<int> = List(1, 2, 3)
 		let list = List<int>()
@@ -61,7 +61,7 @@ public class ForTest
 
 		list =?= iterable
 	}
-	
+
 	static func string() -> Test = test "String" {
 		let testString = "abc"
 		var string = ""

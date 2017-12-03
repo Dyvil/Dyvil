@@ -173,7 +173,7 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 	protected boolean printMarkers()
 	{
 		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_UNIT, this.name, this.sourceFile);
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_UNIT, this.name, this.fileSource);
 	}
 
 	@Override
