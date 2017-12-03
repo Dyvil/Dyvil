@@ -91,6 +91,7 @@ public class BlockParser extends Parser
 			if (Tokens.isIdentifier(type))
 			{
 				pm.pushParser(new CallDirectiveParser(this.directives), true);
+				this.mode = ELEMENT;
 				return;
 			}
 

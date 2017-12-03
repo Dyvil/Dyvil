@@ -35,6 +35,7 @@ public class CallDirectiveParser extends Parser
 		case NAME:
 			if (Tokens.isIdentifier(type))
 			{
+				this.mode = OPEN_PAREN;
 				this.directive = new CallDirective(token.raw(), token.nameValue());
 				return;
 			}

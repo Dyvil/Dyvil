@@ -52,6 +52,7 @@ public class FuncDirectiveParser extends Parser implements IMethodConsumer
 			}
 
 			pm.pushParser(new MethodParser(this));
+			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)

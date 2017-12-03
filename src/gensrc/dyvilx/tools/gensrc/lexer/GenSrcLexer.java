@@ -1,6 +1,7 @@
 package dyvilx.tools.gensrc.lexer;
 
 import dyvil.lang.Name;
+import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
@@ -268,9 +269,8 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 
 	private void parseDyvilArguments()
 	{
-		final DyvilLexer sublexer = new DyvilLexer(this.markers, GenSrcSymbols.INSTANCE);
+		final DyvilLexer sublexer = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE);
 		sublexer.setInterpolationEnd();
-
 		this.useSubLexer(sublexer);
 	}
 
