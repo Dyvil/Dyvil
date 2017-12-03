@@ -455,7 +455,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		// Variable Name Shadowing
 		final IDataMember dataMember = context.resolveField(variableName);
-		if (dataMember != null && dataMember.isLocal())
+		if (dataMember != null && dataMember.isLocal() && !variable.hasModifier(Modifiers.GENERATED))
 		{
 			markers.add(Markers.semantic(initializer.getPosition(), "variable.shadow", variableName));
 		}

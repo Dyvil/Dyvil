@@ -65,7 +65,7 @@ public class VarDirectiveParser extends Parser implements IDataMemberConsumer<IV
 				return;
 			}
 
-			pm.pushParser(new DataMemberParser<>(this));
+			pm.pushParser(new DataMemberParser<>(this).withFlags(DataMemberParser.PARSE_VALUE));
 			return;
 		case CLOSE_PAREN:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)

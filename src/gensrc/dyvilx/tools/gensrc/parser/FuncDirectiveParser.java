@@ -1,8 +1,13 @@
 package dyvilx.tools.gensrc.parser;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IMethodConsumer;
 import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.NestedMethod;
 import dyvilx.tools.compiler.ast.statement.StatementList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.classes.MethodParser;
 import dyvilx.tools.gensrc.ast.directive.FuncDirective;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
@@ -81,6 +86,12 @@ public class FuncDirectiveParser extends Parser implements IMethodConsumer
 			this.directives.add(this.funcDirective);
 			pm.popParser();
 		}
+	}
+
+	@Override
+	public IMethod createMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
+	{
+		return new NestedMethod(position, name, type, attributes);
 	}
 
 	@Override

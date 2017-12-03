@@ -12,16 +12,16 @@ public class VarDirective extends VariableStatement
 		super(variable);
 	}
 
+	public void setBlock(StatementList block)
+	{
+		this.variable.setValue(FuncDirective.convertBlock(block));
+	}
+
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append('#');
 		super.toString(indent, buffer);
-		// TODO
-	}
-
-	public void setBlock(StatementList block)
-	{
 		// TODO
 	}
 }
