@@ -1,11 +1,8 @@
 package dyvilx.tools.gensrc.ast;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
@@ -15,6 +12,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.ClassUnit;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
+import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -26,13 +24,13 @@ import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.gensrc.lang.I18n;
 import dyvilx.tools.gensrc.lexer.GenSrcLexer;
 import dyvilx.tools.gensrc.parser.BlockParser;
 import dyvilx.tools.gensrc.sources.GenSrcFileType;
 import dyvilx.tools.parsing.ParserManager;
+import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.File;
 
@@ -44,9 +42,11 @@ public class Template extends ClassUnit
 			                                           .resolveInternalClass("dyvilx/tools/gensrc/Specialization")
 			                                           .getClassType();
 		public static final IType WRITER         = Package.javaIO.resolveClass("Writer").getClassType();
+		public static final IType STRING_WRITER  = Package.javaIO.resolveClass("StringWriter").getClassType();
 		public static final IType IO_EXCEPTION   = Package.javaIO.resolveClass("IOException").getClassType();
 
-		public static final IClass BUILTINS_CLASS = Package.rootPackage.resolveInternalClass("dyvilx/tools/gensrc/Builtins");
+		public static final IClass BUILTINS_CLASS = Package.rootPackage
+			                                            .resolveInternalClass("dyvilx/tools/gensrc/Builtins");
 	}
 
 	private IMethod genMethod;
@@ -54,6 +54,7 @@ public class Template extends ClassUnit
 	public Template(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
+		this.markers = new MarkerList(I18n.INSTANCE);
 	}
 
 	// Resolution
@@ -121,6 +122,8 @@ public class Template extends ClassUnit
 		// Assign the new AST nodes
 
 		this.addClass(theClass);
+		classBody.addMethod(genMethod);
+
 		this.genMethod = genMethod;
 
 		// Parse
@@ -138,23 +141,17 @@ public class Template extends ClassUnit
 
 		this.genMethod.getExceptions().add(LazyTypes.IO_EXCEPTION);
 
+		// automatically infer package declaration
+		this.packageDeclaration = new PackageDeclaration(null, this.getPackage().getFullName());
+
 		super.resolveTypes();
 	}
 
 	@Override
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, GenSrcFileType.TEMPLATE, this.name, this.fileSource);
-	}
-
-	public static void writeGetSpec(MethodWriter writer) throws BytecodeException
-	{
-		writer.visitVarInsn(Opcodes.ALOAD, 0);
-	}
-
-	public static void writeGetWriter(MethodWriter writer) throws BytecodeException
-	{
-		writer.visitVarInsn(Opcodes.ALOAD, 1);
+		return ICompilationUnit
+			       .printMarkers(this.compiler, this.markers, GenSrcFileType.TEMPLATE, this.name, this.fileSource);
 	}
 
 	@Override
@@ -183,7 +180,7 @@ public class Template extends ClassUnit
 	}
 
 	public static void appendImport(@NonNull String indent, @NonNull StringBuilder buffer,
-		                               ImportDeclaration importDeclaration)
+		ImportDeclaration importDeclaration)
 	{
 		buffer.append('#');
 		final int position = buffer.length() + "import".length();

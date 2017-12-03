@@ -2,7 +2,6 @@ package dyvilx.tools.gensrc.ast.directive;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
-import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -13,31 +12,28 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.gensrc.ast.GenSrcValue;
-import dyvilx.tools.gensrc.ast.Template;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ProcessedText implements GenSrcValue
 {
-	protected String value;
+	protected String text;
 
 	// Metadata
 	protected SourcePosition position;
-	protected IValue         parts; // StringInterpolationExpr
 
 	public ProcessedText(String value)
 	{
-		this.value = value;
+		this.text = value;
 	}
 
-	public ProcessedText(SourcePosition position, String value)
+	public ProcessedText(SourcePosition position, String text)
 	{
 		this.position = position;
-		this.value = value;
+		this.text = text;
 	}
 
 	@Override
@@ -46,37 +42,32 @@ public class ProcessedText implements GenSrcValue
 		return PROCESSED_TEXT;
 	}
 
-	public String getValue()
-	{
-		return this.value;
-	}
-
-	public void setValue(String value)
-	{
-		this.value = value;
-	}
-
 	@Override
 	public SourcePosition getPosition()
 	{
-		return null;
+		return this.position;
 	}
 
 	@Override
 	public void setPosition(SourcePosition position)
 	{
+		this.position = position;
+	}
+
+	public String getText()
+	{
+		return this.text;
+	}
+
+	public void setText(String text)
+	{
+		this.text = text;
 	}
 
 	@Override
 	public boolean isResolved()
 	{
 		return true;
-	}
-
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
 	}
 
 	@Override
@@ -91,7 +82,7 @@ public class ProcessedText implements GenSrcValue
 		final int startColumn = this.position.startColumn();
 		final StringInterpolationExpr parts = new StringInterpolationExpr();
 
-		final String text = this.value;
+		final String text = this.text;
 		final int length = text.length();
 		int prev = 0;
 
@@ -115,8 +106,8 @@ public class ProcessedText implements GenSrcValue
 				// append contents before this identifier
 				parts.append(new StringValue(text.substring(prev, startIndex)));
 
-				@NonNull final SourcePosition position = SourcePosition.apply(startLine, startColumn + startIndex,
-				                                                              startColumn + endIndex);
+				final SourcePosition position = SourcePosition
+					                                .apply(startLine, startColumn + startIndex, startColumn + endIndex);
 				parts.append(new FieldAccess(position, null, field));
 
 				// advance to the end of the identifier
@@ -133,8 +124,7 @@ public class ProcessedText implements GenSrcValue
 			parts.append(new StringValue(text.substring(prev, length)));
 		}
 
-		this.parts = parts.resolve(markers, context);
-		return this;
+		return new WriteCall(parts.resolve(markers, context));
 	}
 
 	private static int identifierEnd(String text, int start, int end)
@@ -155,42 +145,33 @@ public class ProcessedText implements GenSrcValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.parts.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.parts.check(markers, context);
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		this.parts = this.parts.foldConstants();
 		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.parts = this.parts.cleanup(compilableList, classCompilableList);
 		return this;
-	}
-
-	@Override
-	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
-	{
-		buffer.append(this.value);
 	}
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		Template.writeGetWriter(writer);
+	}
 
-		this.parts.writeExpression(writer, Types.STRING);
-
-		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/Writer", "write", "(Ljava/lang/String;)V", false);
+	@Override
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		buffer.append(this.text);
 	}
 }

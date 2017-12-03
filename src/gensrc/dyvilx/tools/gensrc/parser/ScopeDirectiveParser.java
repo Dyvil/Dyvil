@@ -34,7 +34,7 @@ public class ScopeDirectiveParser extends Parser
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.directive = new ScopeDirective();
-				pm.pushParser(new ExpressionParser(this.directive::setExpression));
+				pm.pushParser(new ExpressionParser(this.directive::setValue));
 				this.mode = CLOSE_PAREN;
 				return;
 			}

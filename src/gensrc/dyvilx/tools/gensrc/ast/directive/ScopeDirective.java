@@ -1,21 +1,20 @@
 package dyvilx.tools.gensrc.ast.directive;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.StringInterpolationExpr;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.gensrc.ast.GenSrcValue;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ScopeDirective implements GenSrcValue
+public class ScopeDirective extends WriteCall
 {
-	protected IValue expression;
 	protected IValue block;
 
 	public ScopeDirective()
@@ -31,24 +30,20 @@ public class ScopeDirective implements GenSrcValue
 	// Getters and Setters
 
 	@Override
-	public SourcePosition getPosition()
+	public IValue getValue()
 	{
-		return null;
+		if (this.value instanceof StringInterpolationExpr)
+		{
+			final ArgumentList values = ((StringInterpolationExpr) this.value).getValues();
+			return values.isEmpty() ? null : values.get(0);
+		}
+		return this.value;
 	}
 
 	@Override
-	public void setPosition(SourcePosition position)
+	public void setValue(IValue value)
 	{
-	}
-
-	public IValue getExpression()
-	{
-		return this.expression;
-	}
-
-	public void setExpression(IValue expression)
-	{
-		this.expression = expression;
+		this.value = new StringInterpolationExpr(value);
 	}
 
 	public IValue getBlock()
@@ -61,8 +56,6 @@ public class ScopeDirective implements GenSrcValue
 		this.block = block;
 	}
 
-	//
-
 	@Override
 	public boolean isResolved()
 	{
@@ -70,18 +63,9 @@ public class ScopeDirective implements GenSrcValue
 	}
 
 	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.expression != null)
-		{
-			this.expression.resolveTypes(markers, context);
-		}
+		super.resolveTypes(markers, context);
 		if (this.block != null)
 		{
 			this.block.resolveTypes(markers, context);
@@ -91,35 +75,28 @@ public class ScopeDirective implements GenSrcValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.expression != null)
-		{
-			this.expression = this.expression.resolve(markers, context);
-			// TODO withType
-		}
+		super.resolve(markers, context);
 		if (this.block != null)
 		{
 			this.block = this.block.resolve(markers, context);
 		}
-
 		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.expression != null)
-			this.expression.checkTypes(markers, context);
+		super.checkTypes(markers, context);
 		if (this.block != null)
+		{
 			this.block.checkTypes(markers, context);
+		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.expression != null)
-		{
-			this.expression.check(markers, context);
-		}
+		super.check(markers, context);
 		if (this.block != null)
 		{
 			this.block.check(markers, context);
@@ -129,24 +106,18 @@ public class ScopeDirective implements GenSrcValue
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.expression != null)
-		{
-			this.expression = this.expression.foldConstants();
-		}
+		super.foldConstants();
 		if (this.block != null)
 		{
 			this.block = this.block.foldConstants();
 		}
-		return null;
+		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.expression != null)
-		{
-			this.expression = this.expression.cleanup(compilableList, classCompilableList);
-		}
+		super.cleanup(compilableList, classCompilableList);
 		if (this.block != null)
 		{
 			this.block.cleanup(compilableList, classCompilableList);
@@ -157,17 +128,24 @@ public class ScopeDirective implements GenSrcValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		// TODO
+		super.writeExpression(writer, type);
+
+		if (this.block != null)
+		{
+			this.block.writeExpression(writer, Types.VOID);
+		}
 	}
 
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append('#');
-		if (this.expression != null)
+
+		final IValue value = this.getValue();
+		if (value != null)
 		{
 			buffer.append('(');
-			this.expression.toString(indent, buffer);
+			value.toString(indent, buffer);
 			buffer.append(')');
 
 			if (this.block != null)

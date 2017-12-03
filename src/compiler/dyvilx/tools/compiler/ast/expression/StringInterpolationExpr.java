@@ -101,6 +101,11 @@ public final class StringInterpolationExpr implements IValue
 		this.position = position;
 	}
 
+	public ArgumentList getValues()
+	{
+		return this.values;
+	}
+
 	public void append(IValue value)
 	{
 		this.values.add(value);
