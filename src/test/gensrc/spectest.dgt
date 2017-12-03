@@ -1,4 +1,7 @@
-#template(COUNT: int, SUBSTITUTION: String, ENABLED: boolean, NESTED: boolean)
+#let(COUNT:        int     = Int.parseInt(spec['COUNT']))
+#let(SUBSTITUTION: String  = spec['SUBSTITUTION'])
+#let(ENABLED:      boolean = Boolean.parseBoolean(spec['ENABLED']))
+#let(NESTED:       boolean = Boolean.parseBoolean(spec['NESTED']))
 
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
