@@ -25,7 +25,7 @@ public final class TestThread extends Thread
 	public void run()
 	{
 		final String mainClassName = this.compiler.config.getMainType();
-		final String[] args = this.compiler.config.getMainArgs();
+		final String[] args = this.compiler.config.getMainArgs().toArray(String.class);
 
 		try
 		{

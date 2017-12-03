@@ -3,7 +3,9 @@ package dyvilx.tools.compiler;
 import dyvil.collection.List;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.TreeSet;
+import dyvil.io.Console;
 import dyvil.io.FileUtils;
+import dyvilx.tools.BasicTool;
 import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -13,18 +15,18 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
 import dyvilx.tools.compiler.phase.PrintPhase;
-import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.sources.FileFinder;
 import dyvilx.tools.compiler.util.TestThread;
 import dyvilx.tools.compiler.util.Util;
-import dyvilx.tools.BasicTool;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public final class DyvilCompiler extends BasicTool
+import static dyvilx.tools.compiler.sources.DyvilFileType.*;
+
+public class DyvilCompiler extends BasicTool
 {
 	public static final String VERSION         = "$$compilerVersion$$";
 	public static final String DYVIL_VERSION   = "$$version$$";
@@ -39,12 +41,53 @@ public final class DyvilCompiler extends BasicTool
 	@Override
 	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
 	{
+		final long startTime = System.nanoTime();
+
 		this.initOutput(out, err);
 
+		this.log(I18n.get("compiler.init", DyvilCompiler.VERSION, DyvilCompiler.DYVIL_VERSION));
+		this.log("");
+
+		final int exitCode = this.run(arguments);
+
+		final long endTime = System.nanoTime();
+		final boolean colors = this.config.useAnsiColors();
+
+		final StringBuilder builder = new StringBuilder();
+
+		if (exitCode != 0)
+		{
+			if (colors)
+			{
+				builder.append(Console.ANSI_RED);
+			}
+			builder.append(I18n.get("compilation.failure"));
+		}
+		else
+		{
+			if (colors)
+			{
+				builder.append(Console.ANSI_GREEN);
+			}
+			builder.append(I18n.get("compilation.success"));
+		}
+		if (colors)
+		{
+			builder.append(Console.ANSI_RESET);
+		}
+
+		builder.append(" (").append(Util.toTime(endTime - startTime)).append(')');
+
+		this.log(builder.toString());
+		return this.getExitCode();
+	}
+
+	private int run(String[] arguments)
+	{
 		if (!this.baseInit(arguments))
 		{
 			this.shutdown();
-			return 1;
+			return -1;
 		}
 
 		this.loadLibraries();
@@ -53,7 +96,7 @@ public final class DyvilCompiler extends BasicTool
 		if (!this.applyPhases())
 		{
 			this.shutdown();
-			return 1;
+			return -1;
 		}
 
 		this.shutdown();
@@ -242,7 +285,7 @@ public final class DyvilCompiler extends BasicTool
 		                  Util.toTime(endTime - startTime)));
 	}
 
-	private void findFiles()
+	protected void findFiles()
 	{
 		final long startTime = System.nanoTime();
 
@@ -252,7 +295,7 @@ public final class DyvilCompiler extends BasicTool
 		this.log(I18n.get("compilation.init", sourceDir, outputDir));
 
 		// Scan for Packages and Compilation Units
-		DyvilFileType.setupFileFinder(this.fileFinder);
+		this.setupFileFinder();
 		this.config.findUnits(this.fileFinder);
 
 		Package.init();
@@ -266,6 +309,14 @@ public final class DyvilCompiler extends BasicTool
 		                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
 		                  Util.toTime(endTime - startTime)));
 		this.log("");
+	}
+
+	protected void setupFileFinder()
+	{
+		this.fileFinder.registerFileType(DYVIL_EXTENSION, DYVIL_UNIT);
+		this.fileFinder.registerFileType(".dyvil", DYVIL_UNIT); // legacy
+		this.fileFinder.registerFileType(HEADER_EXTENSION, DYVIL_HEADER);
+		this.fileFinder.registerFileType(".dyvilh", DYVIL_HEADER); // legacy
 	}
 
 	public boolean applyPhases()

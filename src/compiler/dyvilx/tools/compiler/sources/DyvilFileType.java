@@ -13,7 +13,7 @@ import java.io.File;
 public class DyvilFileType implements FileType
 {
 	@FunctionalInterface
-	interface HeaderSupplier
+	protected interface HeaderSupplier
 	{
 		ISourceHeader newHeader(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
 	}
@@ -26,14 +26,6 @@ public class DyvilFileType implements FileType
 
 	public static final FileType DYVIL_UNIT   = new DyvilFileType("unit", ClassUnit::new);
 	public static final FileType DYVIL_HEADER = new DyvilFileType("header", SourceHeader::new);
-
-	public static void setupFileFinder(FileFinder fileFinder)
-	{
-		fileFinder.registerFileType(DYVIL_EXTENSION, DYVIL_UNIT);
-		fileFinder.registerFileType(".dyvil", DYVIL_UNIT); // legacy
-		fileFinder.registerFileType(HEADER_EXTENSION, DYVIL_HEADER);
-		fileFinder.registerFileType(".dyvilh", DYVIL_HEADER); // legacy
-	}
 
 	protected final String         identifier;
 	protected final HeaderSupplier headerSupplier;
@@ -54,6 +46,11 @@ public class DyvilFileType implements FileType
 	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile)
 	{
 		final ISourceHeader header = this.headerSupplier.newHeader(compiler, pack, inputFile, outputFile);
+		if (header == null)
+		{
+			return null;
+		}
+
 		pack.addHeader(header);
 		return header;
 	}

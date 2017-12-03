@@ -90,6 +90,11 @@ public class CompilerConfig
 		this.mainType = mainType;
 	}
 
+	public List<String> getMainArgs()
+	{
+		return this.mainArgs;
+	}
+
 	public File getOutputDir()
 	{
 		return this.outputDir;
@@ -241,11 +246,6 @@ public class CompilerConfig
 	public String getJarName()
 	{
 		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
-	}
-
-	public String[] getMainArgs()
-	{
-		return this.mainArgs.toArray(String.class);
 	}
 
 	@Override
