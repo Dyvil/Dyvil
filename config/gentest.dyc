@@ -1,0 +1,2 @@
+source_dirs = [src/test/]
+output_dir = build/classes/dyvil-gen/test

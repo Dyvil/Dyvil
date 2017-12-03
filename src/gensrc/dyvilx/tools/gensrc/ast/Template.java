@@ -5,6 +5,7 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
@@ -25,43 +26,29 @@ import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
-import dyvilx.tools.compiler.sources.FileType;
 import dyvilx.tools.gensrc.ast.header.TemplateDirective;
-import dyvilx.tools.gensrc.lang.I18n;
 import dyvilx.tools.gensrc.lexer.GenSrcLexer;
 import dyvilx.tools.gensrc.parser.BlockParser;
+import dyvilx.tools.gensrc.sources.GenSrcFileType;
 import dyvilx.tools.parsing.ParserManager;
 
 import java.io.File;
 
 public class Template extends ClassUnit
 {
-
 	public static class LazyTypes
 	{
 		public static final IType SPECIALIZATION = Package.rootPackage
-			                                           .resolveInternalClass("dyvilx/tools/Specialization")
+			                                           .resolveInternalClass("dyvilx/tools/gensrc/Specialization")
 			                                           .getClassType();
 		public static final IType WRITER         = Package.javaIO.resolveClass("Writer").getClassType();
+		public static final IType IO_EXCEPTION   = Package.javaIO.resolveClass("IOException").getClassType();
 
-		public static final IClass BUILTINS_CLASS = Package.rootPackage.resolveInternalClass("dyvilx/tools/Builtins");
+		public static final IClass BUILTINS_CLASS = Package.rootPackage.resolveInternalClass("dyvilx/tools/gensrc/Builtins");
 	}
-
-	public static final FileType TEMPLATE = new FileType()
-	{
-		@Override
-		public String getLocalizedName()
-		{
-			return I18n.get("unit.filetype.template");
-		}
-
-		@Override
-		public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File input, File output)
-		{
-			return new Template(compiler, pack, input, output);
-		}
-	};
 
 	private List<TemplateDirective> templateDirectives;
 
@@ -109,7 +96,7 @@ public class Template extends ClassUnit
 	{
 		if (this.load())
 		{
-			this.tokens = new GenSrcLexer(this.markers).tokenize(this.sourceFile.getText());
+			this.tokens = new GenSrcLexer(this.markers).tokenize(this.fileSource.text());
 		}
 	}
 
@@ -125,7 +112,7 @@ public class Template extends ClassUnit
 		// func generate(spec: Specialization, writer: java.io.Writer) -> void
 
 		final CodeMethod genMethod = new CodeMethod(theClass, Name.fromRaw("generate"), Types.VOID,
-		                                            AttributeList.of(Modifiers.PUBLIC));
+		                                            AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 		final CodeParameter specParam = new CodeParameter(genMethod, null, Name.fromRaw("spec"), Types.UNKNOWN);
 
 		final CodeParameter writerParam = new CodeParameter(genMethod, null, Name.fromRaw("writer"), Types.UNKNOWN);
@@ -137,9 +124,17 @@ public class Template extends ClassUnit
 
 		genMethod.setValue(directives);
 
+		// func generate(in: File, out: File) -> void
+
+
+
+		// Assign the new AST nodes
+
 		this.addClass(theClass);
 		this.genMethod = genMethod;
 		this.templateDirectives = new ArrayList<>(1);
+
+		// Parse
 
 		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers)
 			.parse(new BlockParser(this, directives));
@@ -152,13 +147,25 @@ public class Template extends ClassUnit
 		params.get(0).setType(LazyTypes.SPECIALIZATION);
 		params.get(1).setType(LazyTypes.WRITER);
 
+		this.genMethod.getExceptions().add(LazyTypes.IO_EXCEPTION);
+
 		super.resolveTypes();
 	}
 
 	@Override
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, TEMPLATE, this.name, this.sourceFile);
+		return ICompilationUnit.printMarkers(this.compiler, this.markers, GenSrcFileType.TEMPLATE, this.name, this.fileSource);
+	}
+
+	public static void writeGetSpec(MethodWriter writer) throws BytecodeException
+	{
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
+	}
+
+	public static void writeGetWriter(MethodWriter writer) throws BytecodeException
+	{
+		writer.visitVarInsn(Opcodes.ALOAD, 1);
 	}
 
 	@Override
