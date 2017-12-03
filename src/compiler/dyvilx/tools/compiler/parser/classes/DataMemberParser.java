@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -19,14 +20,26 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 	protected static final int DECLARATOR = 0;
 	protected static final int NAME       = 1;
 	protected static final int TYPE       = 2;
+	protected static final int VALUE = 3;
+
+	// Flags
+
+	public static final int PARSE_VALUE = 1;
 
 	protected final IDataMemberConsumer<T> consumer;
+	private byte flags;
 
 	private T dataMember;
 
 	public DataMemberParser(IDataMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
+	}
+
+	public DataMemberParser<T> withFlags(int flags)
+	{
+		this.flags |= flags;
+		return this;
 	}
 
 	public DataMemberParser(@NonNull AttributeList attributes, IDataMemberConsumer<T> consumer)
@@ -77,6 +90,14 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 			{
 				// ... IDENTIFIER : TYPE ...
 				pm.pushParser(new TypeParser(this.dataMember));
+				this.mode = VALUE;
+				return;
+			}
+			// Fallthrough
+		case VALUE:
+			if (type == BaseSymbols.EQUALS && (this.flags & PARSE_VALUE) != 0)
+			{
+				pm.pushParser(new ExpressionParser(this.dataMember));
 				this.mode = END;
 				return;
 			}
