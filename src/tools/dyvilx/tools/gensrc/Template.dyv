@@ -1,0 +1,51 @@
+package dyvilx.tools.gensrc
+
+import java.io.{ IOException, Writer, FileWriter }
+using dyvilx.tools.gensrc.Builtins._
+
+// name = pack/age/TemplateName
+abstract class Template(let name: String)
+{
+	func getPathPrefix() -> String
+	{
+		let index = this.name.lastIndexOf('/')
+		return index < 0 ? "" : this.name.substring(0, index + 1)
+	}
+
+	func mainImpl(args: [String]) -> void
+	{
+		var count = 0
+		for (s <- args)
+		{
+			try
+			{
+				if (this.generate(s)) count++
+			}
+			catch (ex: IOException)
+			{
+				print("Failed generate specialization '\(s)' for template '\(this.name)'")
+				ex.printStackTrace(System.out)
+			}
+		}
+
+		print("Generated \(count) specializations for template '\(this.name)'")
+	}
+
+	func generate(specFile: String) -> boolean throws IOException
+	{
+		if (!specFile.contains(this.name)) return false
+
+		let spec = spec(specFile)
+		if (!Boolean.parseBoolean(spec['@enabled'])) return false
+
+		let outputFile = this.getPathPrefix() ++ spec['@fileName']
+		let writer = new FileWriter(outputFile)
+
+		try this.generate(spec, writer)
+		finally writer.close()
+
+		return true
+	}
+
+	abstract func generate(spec: Specialization, writer: Writer) -> void throws IOException
+}

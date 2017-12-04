@@ -2,5 +2,5 @@ package dyvilx.tools.gensrc
 
 interface Specialization
 {
-	func subscript(key: String) -> String
+	func subscript(key: String) -> String!
 }

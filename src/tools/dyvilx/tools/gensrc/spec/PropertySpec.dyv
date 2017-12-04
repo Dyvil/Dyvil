@@ -1,0 +1,40 @@
+package dyvilx.tools.gensrc.spec
+
+using dyvilx.tools.gensrc.Builtins._
+
+import dyvilx.tools.gensrc.Specialization
+import java.util.Properties
+
+class PropertySpec(properties: Properties) implements Specialization
+{
+	protected var parent: Specialization!
+
+	protected func resolveParent() -> Specialization!
+	{
+		if let parent = this.parent
+		{
+			return parent
+		}
+
+		if let inheritFrom = this.getOwn('@inheritFrom')
+		{
+			let spec = spec(inheritFrom)
+			this.parent = spec
+			return spec
+		}
+
+		return null
+	}
+
+	protected func getOwn(key: String) -> String! = this.properties.getProperty(key)
+
+	override func subscript(key: String) -> String!
+	{
+		if let own = this.getOwn(key)
+		{
+			return own
+		}
+
+		return this.resolveParent()[key]
+	}
+}

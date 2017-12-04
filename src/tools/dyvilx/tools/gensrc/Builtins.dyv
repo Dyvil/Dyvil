@@ -1,5 +1,7 @@
 package dyvilx.tools.gensrc
 
+import dyvilx.tools.gensrc.spec._
+
 import java.util.Properties
 import java.io.{ File, BufferedInputStream, FileInputStream, IOException }
 import java.time.{ LocalDateTime, format.DateTimeFormatter }
@@ -22,9 +24,9 @@ abstract class Builtins
 
 	// Specializations
 
-	static func spec(fileName: String) -> Specialization = spec(new File(fileName))
+	static func spec(fileName: String) -> Specialization! = spec(new File(fileName))
 
-	static func spec(file: File) -> Specialization
+	static func spec(file: File) -> Specialization!
 	{
 		try
 		{
@@ -32,15 +34,11 @@ abstract class Builtins
 			let props = new Properties()
 			props.load(input)
 			input.close()
+			return new PropertySpec(props)
+		}
+		catch (ex: IOException) {}
 
-			return new Specialization() {
-				override func subscript(key: String) -> String = props.getProperty(key)
-			}
-		}
-		catch (ex: IOException)
-		{
-			throw new RuntimeException(ex)
-		}
+		return DefaultSpec
 	}
 
 	// Include
