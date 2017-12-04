@@ -9,6 +9,10 @@ import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.CodeClass;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.access.ClassAccess;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.expression.access.MethodCall;
+import dyvilx.tools.compiler.ast.expression.constant.StringValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.ClassUnit;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
@@ -24,6 +28,7 @@ import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.ast.type.compound.ArrayType;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.gensrc.lang.I18n;
 import dyvilx.tools.gensrc.lexer.GenSrcLexer;
@@ -38,18 +43,23 @@ public class Template extends ClassUnit
 {
 	public static class LazyTypes
 	{
-		public static final IType SPECIALIZATION = Package.rootPackage
-			                                           .resolveInternalClass("dyvilx/tools/gensrc/Specialization")
-			                                           .getClassType();
-		public static final IType WRITER         = Package.javaIO.resolveClass("Writer").getClassType();
-		public static final IType STRING_WRITER  = Package.javaIO.resolveClass("StringWriter").getClassType();
-		public static final IType IO_EXCEPTION   = Package.javaIO.resolveClass("IOException").getClassType();
+		public static final Package dyvilxToolsGensrc = Package.rootPackage
+			                                                .resolveInternalPackage("dyvilx/tools/gensrc");
 
-		public static final IClass BUILTINS_CLASS = Package.rootPackage
-			                                            .resolveInternalClass("dyvilx/tools/gensrc/Builtins");
+		public static final IType Writer       = Package.javaIO.resolveClass("Writer").getClassType();
+		public static final IType StringWriter = Package.javaIO.resolveClass("StringWriter").getClassType();
+		public static final IType IOException  = Package.javaIO.resolveClass("IOException").getClassType();
+
+		public static final IType Specialization = dyvilxToolsGensrc.resolveClass("Specialization").getClassType();
+		public static final IType Template       = dyvilxToolsGensrc.resolveClass("Template").getClassType();
+
+		public static final IClass Builtins_CLASS = dyvilxToolsGensrc.resolveClass("Builtins");
 	}
 
+	private IClass templateClass;
+
 	private IMethod genMethod;
+	private IMethod mainMethod;
 
 	public Template(DyvilCompiler compiler, Package pack, File input, File output)
 	{
@@ -67,7 +77,7 @@ public class Template extends ClassUnit
 		{
 			return superField;
 		}
-		return LazyTypes.BUILTINS_CLASS.resolveField(name);
+		return LazyTypes.Builtins_CLASS.resolveField(name);
 	}
 
 	@Override
@@ -79,7 +89,7 @@ public class Template extends ClassUnit
 			return;
 		}
 
-		LazyTypes.BUILTINS_CLASS.getMethodMatches(list, receiver, name, arguments);
+		LazyTypes.Builtins_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	// Phases
@@ -96,35 +106,33 @@ public class Template extends ClassUnit
 	@Override
 	public void parse()
 	{
-		// class NAME { }
+		// object NAME { }
 
-		final CodeClass theClass = new CodeClass(null, this.name, AttributeList.of(Modifiers.PUBLIC));
+		final CodeClass theClass = new CodeClass(null, this.name,
+		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.OBJECT_CLASS));
 		final ClassBody classBody = new ClassBody(theClass);
 		theClass.setBody(classBody);
 
-		// func generate(spec: Specialization, writer: java.io.Writer) -> void
+		this.addClass(theClass);
+		this.templateClass = theClass;
+
+		// func generate(spec, writer) -> void = { ... }
 
 		final CodeMethod genMethod = new CodeMethod(theClass, Name.fromRaw("generate"), Types.VOID,
-		                                            AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
-		final CodeParameter specParam = new CodeParameter(genMethod, null, Name.fromRaw("spec"), Types.UNKNOWN);
-
-		final CodeParameter writerParam = new CodeParameter(genMethod, null, Name.fromRaw("writer"), Types.UNKNOWN);
-
-		genMethod.getParameters().add(specParam);
-		genMethod.getParameters().add(writerParam);
+		                                            AttributeList.of(Modifiers.PUBLIC | Modifiers.OVERRIDE));
 
 		final StatementList directives = new StatementList();
-
 		genMethod.setValue(directives);
 
-		// func generate(in: File, out: File) -> void
-
-		// Assign the new AST nodes
-
-		this.addClass(theClass);
 		classBody.addMethod(genMethod);
-
 		this.genMethod = genMethod;
+
+		// func main(args) -> void
+
+		final CodeMethod mainMethod = new CodeMethod(theClass, Name.fromRaw("main"), Types.VOID,
+		                                             AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
+		classBody.addMethod(mainMethod);
+		this.mainMethod = mainMethod;
 
 		// Parse
 
@@ -135,16 +143,47 @@ public class Template extends ClassUnit
 	@Override
 	public void resolveTypes()
 	{
-		final ParameterList params = this.genMethod.getParameters();
-		params.get(0).setType(LazyTypes.SPECIALIZATION);
-		params.get(1).setType(LazyTypes.WRITER);
-
-		this.genMethod.getExceptions().add(LazyTypes.IO_EXCEPTION);
+		this.makeGenerateSpecMethod();
+		this.makeMainMethod();
 
 		// automatically infer package declaration
 		this.packageDeclaration = new PackageDeclaration(null, this.getPackage().getFullName());
 
+		this.templateClass.setSuperType(LazyTypes.Template);
+		this.templateClass.setSuperConstructorArguments(new ArgumentList(new StringValue(this.getInternalName())));
+
 		super.resolveTypes();
+	}
+
+	private void makeMainMethod()
+	{
+		// func main(args: [String]) -> void = TemplateName.mainImpl(args)
+
+		final ParameterList params = this.mainMethod.getParameters();
+		final CodeParameter argsParam = new CodeParameter(this.mainMethod, null, Name.fromRaw("args"),
+		                                                  new ArrayType(Types.STRING));
+		params.add(argsParam);
+
+		this.mainMethod.setValue(
+			new MethodCall(null, new ClassAccess(null, this.templateClass.getClassType()), Name.fromRaw("mainImpl"),
+			               new ArgumentList(new FieldAccess(argsParam))));
+	}
+
+	private void makeGenerateSpecMethod()
+	{
+		// func generate(spec: Specialization, writer: java.io.Writer) throws IOException -> void = { ... }
+
+		final ParameterList params = this.genMethod.getParameters();
+		final CodeParameter specParam = new CodeParameter(this.genMethod, null, Name.fromRaw("spec"),
+		                                                  Template.LazyTypes.Specialization);
+
+		final CodeParameter writerParam = new CodeParameter(this.genMethod, null, Name.fromRaw("writer"),
+		                                                    Template.LazyTypes.Writer);
+
+		params.add(specParam);
+		params.add(writerParam);
+
+		this.genMethod.getExceptions().add(Template.LazyTypes.IOException);
 	}
 
 	@Override

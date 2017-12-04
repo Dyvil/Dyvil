@@ -32,10 +32,10 @@ public class FuncDirective extends MemberStatement
 		final StatementList value = new StatementList();
 
 		// new StringWriter()
-		final ConstructorCall newStringWriter = new ConstructorCall(null, Template.LazyTypes.STRING_WRITER, ArgumentList.EMPTY);
+		final ConstructorCall newStringWriter = new ConstructorCall(null, Template.LazyTypes.StringWriter, ArgumentList.EMPTY);
 
 		// let writer = new StringWriter()
-		final Variable writer = new Variable(Name.fromRaw("writer"), Template.LazyTypes.WRITER,
+		final Variable writer = new Variable(Name.fromRaw("writer"), Template.LazyTypes.Writer,
 		                                     newStringWriter);
 		writer.getAttributes().addFlag(Modifiers.FINAL | Modifiers.GENERATED);
 
