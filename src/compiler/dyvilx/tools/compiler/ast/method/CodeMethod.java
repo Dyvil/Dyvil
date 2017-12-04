@@ -139,10 +139,6 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.value.resolveTypes(markers, context);
 		}
-		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
-		{
-			this.attributes.addFlag(Modifiers.ABSTRACT);
-		}
 
 		context.pop();
 	}
@@ -233,6 +229,10 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.value.resolveStatement(this, markers);
 			this.value.checkTypes(markers, context);
+		}
+		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
+		{
+			this.attributes.addFlag(Modifiers.ABSTRACT);
 		}
 
 		// Check for duplicate methods
