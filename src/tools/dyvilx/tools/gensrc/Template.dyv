@@ -1,11 +1,22 @@
 package dyvilx.tools.gensrc
 
-import java.io.{ IOException, Writer, FileWriter }
+import java.io.{ File, IOException, Writer, FileWriter }
 using dyvilx.tools.gensrc.Builtins._
 
 // name = pack/age/TemplateName
 abstract class Template(let name: String)
 {
+	var outputDir: File = new File('.')
+	{
+		public get
+		public set
+	}
+
+	let specs: List<String> = new mutable.ArrayList<String>()
+	{
+		public get
+	}
+
 	func getPathPrefix() -> String
 	{
 		let index = this.name.lastIndexOf('/')
@@ -14,31 +25,50 @@ abstract class Template(let name: String)
 
 	func mainImpl(args: [String]) -> void
 	{
+		// parses output dir and specs from arguments
+		for (arg <- args)
+		{
+			if (arg.startsWith('output_dir='))
+			{
+				this.outputDir = new File(arg.substring(11))
+				continue
+			}
+
+			this.specs.add(arg)
+		}
+
+		this.generate()
+	}
+
+	func generate() -> int
+	{
 		var count = 0
-		for (s <- args)
+
+		for (spec <- this.specs)
 		{
 			try
 			{
-				if (this.generate(s)) count++
+				if (this.generate(this.outputDir, spec)) count++
 			}
 			catch (ex: IOException)
 			{
-				print("Failed generate specialization '\(s)' for template '\(this.name)'")
+				print("Failed to generate specialization '\(spec)' for template '\(this.name)'")
 				ex.printStackTrace(System.out)
 			}
 		}
 
 		print("Generated \(count) specializations for template '\(this.name)'")
+		return count
 	}
 
-	func generate(specFile: String) -> boolean throws IOException
+	func generate(outputDir: File, specFile: String) -> boolean throws IOException
 	{
 		if (!specFile.contains(this.name)) return false
 
 		let spec = spec(specFile)
 		if (!Boolean.parseBoolean(spec['@enabled'])) return false
 
-		let outputFile = this.getPathPrefix() ++ spec['@fileName']
+		let outputFile = new File(outputDir, this.getPathPrefix() ++ spec['@fileName'])
 		let writer = new FileWriter(outputFile)
 
 		try this.generate(spec, writer)
