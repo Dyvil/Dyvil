@@ -223,24 +223,72 @@ public class CompilerConfig
 		}
 	}
 
-	private static Package packageFromFile(String file, boolean isDirectory)
+	public boolean addProperty(String name, String value)
 	{
-		int index = 0;
-		Package pack = Package.rootPackage;
-		do
+		switch (name)
 		{
-			int nextIndex = file.indexOf('/', index + 1);
-			if (nextIndex < 0)
-			{
-				return isDirectory ? pack.resolvePackage(file.substring(index)) : pack;
-			}
-
-			pack = pack.createSubPackage(file.substring(index, nextIndex));
-			index = nextIndex + 1;
+		case "source_dirs":
+			this.addSourceDir(value);
+			return true;
+		case "main_args":
+			this.mainArgs.add(value);
+			return true;
+		case "includes":
+			this.includeFile(value);
+			return true;
+		case "excludes":
+			this.excludeFile(value);
+			return true;
+		case "libraries":
+			this.addLibraryFile(value);
+			return true;
 		}
-		while (index < file.length());
+		return false;
+	}
 
-		return pack;
+	public boolean setProperty(String name, String value)
+	{
+		switch (name)
+		{
+		case "jar_name":
+			this.setJarName(value);
+			return true;
+		case "jar_vendor":
+			this.setJarVendor(value);
+			return true;
+		case "jar_version":
+			this.setJarVersion(value);
+			return true;
+		case "jar_format":
+			this.setJarNameFormat(value);
+			return true;
+		case "log_file":
+			this.setLogFile(value);
+			return true;
+		case "source_dir":
+		case "source_dirs": // deprecated
+			this.addSourceDir(value);
+			return true;
+		case "output_dir":
+			this.setOutputDir(value);
+			return true;
+		case "main_type":
+			this.setMainType(value);
+			return true;
+		case "main_args": // deprecated
+			this.mainArgs.add(value);
+			return true;
+		case "include":
+			this.includeFile(value);
+			return true;
+		case "exclude":
+			this.excludeFile(value);
+			return true;
+		case "libraries": // deprecated
+			this.addLibraryFile(value);
+			return true;
+		}
+		return false;
 	}
 
 	public String getJarName()

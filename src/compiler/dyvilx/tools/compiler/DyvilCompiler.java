@@ -35,8 +35,14 @@ public class DyvilCompiler extends BasicTool
 	public static final int OPTIMIZE_CONSTANT_FOLDING = 5;
 
 	private final Set<ICompilerPhase> phases     = new TreeSet<>();
-	public final  CompilerConfig      config     = new CompilerConfig(this);
+	public final  CompilerConfig      config     = this.createConfig();
+
 	public final  FileFinder          fileFinder = new FileFinder();
+
+	protected CompilerConfig createConfig()
+	{
+		return new CompilerConfig(this);
+	}
 
 	@Override
 	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
