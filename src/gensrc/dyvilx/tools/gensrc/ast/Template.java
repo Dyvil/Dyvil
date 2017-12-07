@@ -9,7 +9,7 @@ import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.CodeClass;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.access.ClassAccess;
+import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.access.MethodCall;
 import dyvilx.tools.compiler.ast.expression.constant.StringValue;
@@ -106,10 +106,9 @@ public class Template extends ClassUnit
 	@Override
 	public void parse()
 	{
-		// object NAME { }
+		// class NAME { }
 
-		final CodeClass theClass = new CodeClass(null, this.name,
-		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.OBJECT_CLASS));
+		final CodeClass theClass = new CodeClass(null, this.name, AttributeList.of(Modifiers.PUBLIC));
 		final ClassBody classBody = new ClassBody(theClass);
 		theClass.setBody(classBody);
 
@@ -157,16 +156,16 @@ public class Template extends ClassUnit
 
 	private void makeMainMethod()
 	{
-		// func main(args: [String]) -> void = TemplateName.mainImpl(args)
+		// func main(args: [String]) -> void = new TemplateName().mainImpl(args)
 
 		final ParameterList params = this.mainMethod.getParameters();
 		final CodeParameter argsParam = new CodeParameter(this.mainMethod, null, Name.fromRaw("args"),
 		                                                  new ArrayType(Types.STRING));
 		params.add(argsParam);
 
+		final IValue newTemplate = new ConstructorCall(null, this.templateClass.getClassType(), ArgumentList.EMPTY);
 		this.mainMethod.setValue(
-			new MethodCall(null, new ClassAccess(null, this.templateClass.getClassType()), Name.fromRaw("mainImpl"),
-			               new ArgumentList(new FieldAccess(argsParam))));
+			new MethodCall(null, newTemplate, Name.fromRaw("mainImpl"), new ArgumentList(new FieldAccess(argsParam))));
 	}
 
 	private void makeGenerateSpecMethod()
