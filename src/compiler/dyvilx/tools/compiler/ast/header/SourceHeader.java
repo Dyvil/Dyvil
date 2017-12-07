@@ -42,16 +42,22 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		this.pack = pack;
 		this.fileSource = new FileSource(input);
 
-		String name = input.getAbsolutePath();
-		int start = name.lastIndexOf(File.separatorChar);
-		int end = name.lastIndexOf('.');
-		this.name = Name.fromQualified(name.substring(start + 1, end));
+		this.setNameFromFile(input);
 
-		name = output.getPath();
-		start = name.lastIndexOf(File.separatorChar);
-		end = name.lastIndexOf('.');
+		final String name = output.getPath();
+		final int start = name.lastIndexOf(File.separatorChar);
+		final int end = name.lastIndexOf('.');
+
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
+	}
+
+	protected void setNameFromFile(File input)
+	{
+		final String name = input.getAbsolutePath();
+		final int start = name.lastIndexOf(File.separatorChar);
+		final int end = name.lastIndexOf('.');
+		this.name = Name.fromQualified(name.substring(start + 1, end));
 	}
 
 	@Override
