@@ -1,6 +1,7 @@
 package dyvilx.tools.gensrc.parser;
 
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
+import dyvilx.tools.compiler.ast.imports.KindedImport;
 import dyvilx.tools.compiler.parser.header.ImportParser;
 import dyvilx.tools.gensrc.ast.Template;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
@@ -20,6 +21,8 @@ public class ImportDirectiveParser extends Parser
 
 	private ImportDeclaration declaration;
 
+	private int mask = KindedImport.ANY;
+
 	public ImportDirectiveParser(Template template)
 	{
 		this.template = template;
@@ -32,15 +35,22 @@ public class ImportDirectiveParser extends Parser
 		switch (this.mode)
 		{
 		case KEYWORD:
-			assert type == GenSrcSymbols.IMPORT;
-
-			this.declaration = new ImportDeclaration(token.raw());
-			if (this.template == null)
+			switch (type)
 			{
-				pm.report(token, "import.context");
+			case GenSrcSymbols.USING:
+				this.mask = KindedImport.USING_DECLARATION;
+				// Fallthrough
+			case GenSrcSymbols.IMPORT:
+				this.declaration = new ImportDeclaration(token.raw());
+				if (this.template == null)
+				{
+					pm.report(token, "import.context");
+				}
+				this.mode = OPEN_PAREN;
+				return;
 			}
-			this.mode = OPEN_PAREN;
-			return;
+
+			throw new Error();
 		case OPEN_PAREN:
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
@@ -49,7 +59,7 @@ public class ImportDirectiveParser extends Parser
 				return;
 			}
 
-			pm.pushParser(new ImportParser(this.declaration));
+			pm.pushParser(new ImportParser(this.declaration, this.mask));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:

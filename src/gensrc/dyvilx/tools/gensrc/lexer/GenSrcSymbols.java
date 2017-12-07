@@ -18,7 +18,7 @@ public class GenSrcSymbols implements Symbols
 	public static final int IF       = DyvilKeywords.IF;
 	public static final int IMPORT   = DyvilKeywords.IMPORT;
 	public static final int LET      = DyvilKeywords.LET;
-	public static final int TEMPLATE = DyvilKeywords.TEMPLATE;
+	public static final int USING    = DyvilKeywords.USING;
 	public static final int VAR      = DyvilKeywords.VAR;
 
 	private GenSrcSymbols()
@@ -38,7 +38,7 @@ public class GenSrcSymbols implements Symbols
 		case "if": return IF;
 		case "import": return IMPORT;
 		case "let": return LET;
-		case "template": return TEMPLATE;
+		case "using": return USING;
 		case "var": return VAR;
 		// @formatter:on
 		}
@@ -73,7 +73,7 @@ public class GenSrcSymbols implements Symbols
 		case IF: return "if";
 		case IMPORT: return "import";
 		case LET: return "let";
-		case TEMPLATE: return "template";
+		case USING: return "using";
 		case VAR: return "var";
 		// @formatter:on
 		}

@@ -57,6 +57,7 @@ public class BlockParser extends Parser
 			switch (type)
 			{
 			case GenSrcSymbols.IMPORT:
+			case GenSrcSymbols.USING:
 				pm.pushParser(new ImportDirectiveParser(this.template), true);
 				this.mode = ELEMENT;
 				return;
