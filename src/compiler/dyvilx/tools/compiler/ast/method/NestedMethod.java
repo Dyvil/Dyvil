@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.method;
 
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -24,6 +25,17 @@ public class NestedMethod extends CodeMethod
 	public NestedMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
 		super(position, name, type, attributes);
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (context.isStaticOnly())
+		{
+			this.attributes.addFlag(Modifiers.STATIC);
+		}
+
+		super.resolveTypes(markers, context);
 	}
 
 	@Override

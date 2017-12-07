@@ -236,9 +236,11 @@ public class CompilerConfig
 		case "main_args":
 			this.mainArgs.add(value);
 			return true;
+		case "include":
 		case "includes":
 			this.includeFile(value);
 			return true;
+		case "exclude":
 		case "excludes":
 			this.excludeFile(value);
 			return true;
