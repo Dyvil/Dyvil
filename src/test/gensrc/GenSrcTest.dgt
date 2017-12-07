@@ -36,7 +36,7 @@ line with ## in the middle
 	the value of #('COUNT') in SPEC_NAME is COUNT
 }
 
-#for (spec <- [ spec './spectest-Test.dgs', spec './spectest-Base.dgs' ]) {
+#for (spec <- [ this.spec('GenSrcTest-Test.dgs'), this.spec('GenSrcTest-Base.dgs') ]) {
 	#myFunction(spec['SPEC_NAME'], count: Integer.parseInt(spec['COUNT']))
 }
 
@@ -48,6 +48,6 @@ More Counting:
 	INDEX
 }
 
------- spectest-Base.dgs ------
-#include('./spectest-Base.dgs')
--------------------------------
+------ GenSrcTest-Base.dgs ------
+#include('src/test/gensrc/GenSrcTest-Base.dgs')
+---------------------------------

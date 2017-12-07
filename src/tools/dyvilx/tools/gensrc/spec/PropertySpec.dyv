@@ -1,11 +1,11 @@
 package dyvilx.tools.gensrc.spec
 
-using dyvilx.tools.gensrc.Builtins._
+import dyvilx.tools.gensrc._
 
-import dyvilx.tools.gensrc.Specialization
+import java.io.{ IOException, File }
 import java.util.Properties
 
-class PropertySpec(properties: Properties) implements Specialization
+class PropertySpec(let file: File { override get }, private let properties: Properties) implements Specialization
 {
 	protected var parent: Specialization!
 
@@ -18,12 +18,18 @@ class PropertySpec(properties: Properties) implements Specialization
 
 		if let inheritFrom = this.getOwn('@inheritFrom')
 		{
-			let spec = spec(inheritFrom)
-			this.parent = spec
-			return spec
+			try
+			{
+				let spec = Builtins.spec(inheritFrom)
+				this.parent = spec
+				return spec
+			}
+			catch (ex: IOException)
+			{
+			}
 		}
 
-		return null
+		return DefaultSpec
 	}
 
 	protected func getOwn(key: String) -> String! = this.properties.getProperty(key)
@@ -37,4 +43,6 @@ class PropertySpec(properties: Properties) implements Specialization
 
 		return this.resolveParent()[key]
 	}
+
+	override func toString() -> String = this.file.toString
 }

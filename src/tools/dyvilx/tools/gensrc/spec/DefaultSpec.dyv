@@ -2,7 +2,11 @@ package dyvilx.tools.gensrc.spec
 
 import dyvilx.tools.gensrc.Specialization
 
+import java.io.File
+
 object DefaultSpec implements Specialization
 {
+	override func file() -> File! = null
+
 	override func subscript(key: String) -> String! = null
 }

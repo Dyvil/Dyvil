@@ -1,6 +1,10 @@
 package dyvilx.tools.gensrc
 
+import java.io.File
+
 interface Specialization
 {
+	func file() -> File!
+
 	func subscript(key: String) -> String!
 }

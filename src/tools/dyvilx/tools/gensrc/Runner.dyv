@@ -6,7 +6,8 @@ class Runner
 {
 	static func main(args: [String])
 	{
-		print("Generating sources from templates...")
+		let basePath = new File('.').getAbsolutePath
+		print("Generating sources from templates in '\(basePath)'")
 
 		var specs = 0
 		let templates = parseTemplates(args)
@@ -44,7 +45,7 @@ class Runner
 				continue
 			}
 
-			currentTemplate.specs.add(arg)
+			currentTemplate.addSpec(arg)
 		}
 
 		return templates

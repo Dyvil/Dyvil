@@ -12,15 +12,39 @@ abstract class Template(let name: String)
 		public set
 	}
 
-	let specs: List<String> = new mutable.ArrayList<String>()
+	let specs: List<Specialization> = new mutable.ArrayList<Specialization>()
+
+	func addSpec(name: String) -> void
 	{
-		public get
+		if (!name.contains(this.name)) return
+
+		try
+		{
+			this.specs.add(Builtins.spec(name))
+		}
+		catch (ex: IOException)
+		{
+		}
 	}
 
 	func getPathPrefix() -> String
 	{
 		let index = this.name.lastIndexOf('/')
 		return index < 0 ? "" : this.name.substring(0, index + 1)
+	}
+
+	func spec(name: String) -> Specialization throws IOException
+	{
+		// try to find the spec from our list of specs, by filename
+		for (spec <- this.specs)
+		{
+			if (spec.file.getName() == name)
+			{
+				return spec
+			}
+		}
+
+		return Builtins.spec(name)
 	}
 
 	func mainImpl(args: [String]) -> void
@@ -34,7 +58,7 @@ abstract class Template(let name: String)
 				continue
 			}
 
-			this.specs.add(arg)
+			this.addSpec(arg)
 		}
 
 		this.generate()
@@ -42,38 +66,46 @@ abstract class Template(let name: String)
 
 	func generate() -> int
 	{
-		var count = 0
+		this.outputDir.mkdirs()
 
+		var count = 0
 		for (spec <- this.specs)
 		{
 			try
 			{
-				if (this.generate(this.outputDir, spec)) count++
+				if (this.generate(spec)) count++
 			}
 			catch (ex: IOException)
 			{
-				print("Failed to generate specialization '\(spec)' for template '\(this.name)'")
+				print("Failed to generate spec '\(spec)' for template '\(this.name)'")
 				ex.printStackTrace(System.out)
 			}
 		}
 
-		print("Generated \(count) specializations for template '\(this.name)'")
+		print("Generated \(count) spec(s) for template '\(this.name)'")
 		return count
 	}
 
-	func generate(outputDir: File, specFile: String) -> boolean throws IOException
+	func generate(spec: Specialization) -> boolean throws IOException
 	{
-		if (!specFile.contains(this.name)) return false
-
-		let spec = spec(specFile)
 		if (!Boolean.parseBoolean(spec['@enabled'])) return false
 
-		let outputFile = new File(outputDir, this.getPathPrefix() ++ spec['@fileName'])
+		let outputFile = new File(this.outputDir, this.getPathPrefix() ++ spec['@fileName'])
+		outputFile.getParentFile().mkdirs()
+
 		let writer = new FileWriter(outputFile)
 
-		try this.generate(spec, writer)
-		finally writer.close()
+		try
+		{
+			this.generate(spec, writer)
+		}
+		catch (ex: IOException)
+		{
+			writer.close()
+			throw ex
+		}
 
+		writer.close()
 		return true
 	}
 

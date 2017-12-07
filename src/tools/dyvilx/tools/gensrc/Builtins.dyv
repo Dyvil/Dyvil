@@ -24,36 +24,41 @@ abstract class Builtins
 
 	// Specializations
 
-	static func spec(fileName: String) -> Specialization! = spec(new File(fileName))
 
-	static func spec(file: File) -> Specialization!
+	private static const SPEC_MAP: [String:Specialization] = new mutable.HashMap<String, Specialization>()
+
+	static func spec(fileName: String) -> Specialization throws IOException = spec(new File(fileName))
+
+	static func spec(file: File) -> Specialization throws IOException
 	{
+		let canonPath = file.getCanonicalPath()
+		if let loaded = SPEC_MAP[canonPath]
+		{
+			return loaded
+		}
+
+		let input = new BufferedInputStream(new FileInputStream(file))
+		let props = new Properties()
+
 		try
 		{
-			let input = new BufferedInputStream(new FileInputStream(file))
-			let props = new Properties()
 			props.load(input)
-			input.close()
-			return new PropertySpec(props)
 		}
-		catch (ex: IOException) {}
+		catch (ex: IOException)
+		{
+			input.close()
+			throw ex
+		}
 
-		return DefaultSpec
+		input.close()
+		let spec = new PropertySpec(file, props)
+		SPEC_MAP.put(canonPath, spec)
+		return spec
 	}
 
 	// Include
 
-	static func include(fileName: String) -> String = include(new File(fileName))
+	static func include(fileName: String) -> String throws IOException = include(new File(fileName))
 
-	static func include(file: File) -> String
-	{
-		try
-		{
-			return dyvil.io.FileUtils.read(file)
-		}
-		catch (ex: IOException)
-		{
-			throw new RuntimeException(ex)
-		}
-	}
+	static func include(file: File) -> String throws IOException = dyvil.io.FileUtils.read(file)
 }
