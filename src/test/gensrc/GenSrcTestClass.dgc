@@ -1,0 +1,8 @@
+package gensrc
+
+class GenSrcTestClass
+{
+	public const CONSTANT: String = "Constant"
+
+	public const COUNT_MAX: int = 5
+}

@@ -1,3 +1,5 @@
+#using(gensrc.GenSrcTestClass._)
+
 #let(COUNT:        int     = Int.parseInt(spec['COUNT']))
 #let(SUBSTITUTION: String  = spec['SUBSTITUTION'])
 #let(ENABLED:      boolean = Boolean.parseBoolean(spec['ENABLED']))
@@ -40,11 +42,12 @@ line with ## in the middle
 	#myFunction(spec['SPEC_NAME'], count: Integer.parseInt(spec['COUNT']))
 }
 
-Counting:#for (INDEX <- 0 .. 10) { INDEX}
+Counting:#for (INDEX <- 0 .. COUNT_MAX) { INDEX}
 
+CONSTANT
 
 More Counting:
-#for (INDEX <- 1 .. 5) {
+#for (INDEX <- 1 .. COUNT_MAX) {
 	INDEX
 }
 

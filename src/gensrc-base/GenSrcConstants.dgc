@@ -1,0 +1,10 @@
+class GenSrcConstants
+{
+	public const MAIN_SPECS = [ spec "Base-Int.dgs", spec "Base-Long.dgs", spec "Base-Float.dgs", spec "Base-Double.dgs" ]
+
+	public const SUBRANGE_SPECS = [ spec "Base-Byte.dgs", spec "Base-Short.dgs" ]
+
+	public const NUMBER_SPECS = SUBRANGE_SPECS ++ MAIN_SPECS
+
+	public const PRIMITIVE_SPECS = [ spec "Base-Boolean.dgs" ] ++ SUBRANGE_SPECS ++ [ spec "Base-Char.dgs" ] ++ MAIN_SPECS
+}

@@ -10,18 +10,17 @@ public class GenSrcFileType extends DyvilFileType
 {
 	public static final String TEMPLATE_EXTENSION = ".dgt";
 	public static final String SPEC_EXTENSION     = ".dgs";
+	public static final String CODE_EXTENSION     = ".dgc";
+	public static final String HEADER_EXTENSION   = ".dgh";
 
-	public static final FileType TEMPLATE = new GenSrcFileType("template",
-	                                                           (compiler, pack, input, output) -> {
+	public static final FileType TEMPLATE = new GenSrcFileType("template", (compiler, pack, input, output) -> {
 
-		                                                           final Template template = new Template(compiler,
-		                                                                                                  pack, input,
-		                                                                                                  output);
-		                                                           ((GenSrc) compiler).addTemplate(template);
-		                                                           return template;
-	                                                           });
+		final Template template = new Template(compiler, pack, input, output);
+		((GenSrc) compiler).addTemplate(template);
+		return template;
+	});
 
-	public static final FileType SPEC     = new GenSrcFileType("spec", (compiler, pack, inputFile, outputFile) -> {
+	public static final FileType SPEC = new GenSrcFileType("spec", (compiler, pack, inputFile, outputFile) -> {
 		((GenSrc) compiler).addSpec(inputFile);
 		return null;
 	});
