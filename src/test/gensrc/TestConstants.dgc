@@ -1,6 +1,6 @@
 package gensrc
 
-class GenSrcTestClass
+class TestConstants
 {
 	public const CONSTANT: String = "Constant"
 

@@ -1,4 +1,4 @@
-#using(gensrc.GenSrcTestClass._)
+#using(gensrc.TestConstants._)
 
 #let(COUNT:        int     = Int.parseInt(spec['COUNT']))
 #let(SUBSTITUTION: String  = spec['SUBSTITUTION'])
@@ -38,7 +38,7 @@ line with ## in the middle
 	the value of #('COUNT') in SPEC_NAME is COUNT
 }
 
-#for (spec <- [ this.spec('GenSrcTest-Test.dgs'), this.spec('GenSrcTest-Base.dgs') ]) {
+#for (spec <- [ this.spec('GenSrcTest.txt-Test.dgs'), this.spec('GenSrcTest.txt-Base.dgs') ]) {
 	#myFunction(spec['SPEC_NAME'], count: Integer.parseInt(spec['COUNT']))
 }
 
@@ -52,5 +52,5 @@ More Counting:
 }
 
 ------ GenSrcTest-Base.dgs ------
-#include('src/test/gensrc/GenSrcTest-Base.dgs')
+#include('src/test/gensrc/GenSrcTest.txt-Base.dgs')
 ---------------------------------
