@@ -19,6 +19,7 @@ public class ScopeDirective extends WriteCall
 
 	public ScopeDirective()
 	{
+		this.value = new StringInterpolationExpr();
 	}
 
 	@Override
@@ -128,7 +129,10 @@ public class ScopeDirective extends WriteCall
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		super.writeExpression(writer, type);
+		if (this.getValue() != null)
+		{
+			super.writeExpression(writer, type);
+		}
 
 		if (this.block != null)
 		{

@@ -56,7 +56,7 @@ public class ImportDirectiveParser extends Parser
 			switch (type)
 			{
 			case BaseSymbols.CLOSE_PARENTHESIS:
-				if (this.template != null)
+				if (this.template != null && this.declaration.getImport() != null)
 				{
 					this.template.addImport(this.declaration);
 				}

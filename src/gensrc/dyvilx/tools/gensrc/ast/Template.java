@@ -64,7 +64,7 @@ public class Template extends ClassUnit
 	public Template(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
-		this.markers = new MarkerList(I18n.INSTANCE);
+		this.markers = new MarkerList(I18n.SYNTAX);
 	}
 
 	// Resolution
