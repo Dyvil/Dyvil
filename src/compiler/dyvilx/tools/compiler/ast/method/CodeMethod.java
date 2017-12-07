@@ -572,12 +572,7 @@ public class CodeMethod extends AbstractMethod
 
 		this.writeAnnotations(methodWriter, flags);
 
-		this.parameters.write(methodWriter);
-
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.writeParameters(methodWriter);
-		}
+		this.writeParameters(methodWriter);
 
 		final Label start = new Label();
 		final Label end = new Label();
@@ -693,6 +688,16 @@ public class CodeMethod extends AbstractMethod
 			this.type.writeCast(methodWriter, overrideReturnType, lineNumber);
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
+		}
+	}
+
+	protected void writeParameters(MethodWriter methodWriter)
+	{
+		this.parameters.write(methodWriter);
+
+		if (this.typeParameters != null)
+		{
+			this.typeParameters.writeParameters(methodWriter);
 		}
 	}
 
