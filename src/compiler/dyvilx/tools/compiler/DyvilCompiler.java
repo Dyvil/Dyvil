@@ -398,16 +398,9 @@ public class DyvilCompiler extends BasicTool
 
 	public void test()
 	{
-		String mainType = this.config.getMainType();
-		if (mainType == null)
+		if (this.config.getMainType() == null)
 		{
-			return;
-		}
-
-		File file = new File(this.config.getOutputDir(), this.config.getMainType().replace('.', '/') + ".class");
-		if (!file.exists())
-		{
-			this.log(I18n.get("test.main_type.not_found", this.config.getMainType()));
+			this.log(I18n.get("test.skipped"));
 			return;
 		}
 

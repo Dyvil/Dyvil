@@ -88,8 +88,10 @@ public abstract class AbstractArrayList<E> implements List<E>
 
 	protected void addAllInternal(@NonNull Collection<? extends E> collection)
 	{
-		this.ensureCapacityInternal(this.size + collection.size());
+		final int size = collection.size();
+		this.ensureCapacityInternal(this.size + size);
 		collection.toArray(this.size, this.elements);
+		this.size += size;
 	}
 
 	protected void ensureCapacityInternal(int minCapacity)
