@@ -42,14 +42,26 @@ public class GenSrc extends DyvilCompiler
 	{
 		if (this.config.getMainType() == null)
 		{
-			this.config.setMainType("GenerateSources");
+			this.config.setMainType("dyvilx.tools.gensrc.Runner");
 
 			final List<String> mainArgs = this.config.getMainArgs();
 			mainArgs.clear();
-			for (File spec : this.specs)
+			mainArgs.add("output_dir=" + ((GenSrcConfig) this.config).getGenSrcDir());
+			for (Template template : this.templates)
 			{
-				// the paths of the specs become the main arguments
-				mainArgs.add(spec.getPath());
+				final String internalName = template.getInternalName();
+
+				mainArgs.add("-t");
+				mainArgs.add(template.getFullName());
+
+				for (File spec : this.specs)
+				{
+					final String path = spec.getPath();
+					if (path.contains(internalName))
+					{
+						mainArgs.add(path);
+					}
+				}
 			}
 		}
 		super.test();
