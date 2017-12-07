@@ -41,7 +41,7 @@ public class LibraryCommand implements ICommand
 		{
 			final Library library = Library.load(path);
 			library.loadLibrary();
-			repl.getCompiler().config.addLibrary(library);
+			repl.getCompiler().config.libraries.add(library);
 
 			repl.getOutput().println(I18n.get("command.library.success", library));
 		}

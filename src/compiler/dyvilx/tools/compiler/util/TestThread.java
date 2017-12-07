@@ -6,7 +6,6 @@ import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -23,7 +22,7 @@ public final class TestThread extends Thread
 	public void run()
 	{
 		final ProcessBuilder pb = new ProcessBuilder(this.getCommand());
-		pb.directory(new File("."));
+		pb.directory(this.compiler.config.getTestDir());
 		pb.inheritIO();
 
 		try

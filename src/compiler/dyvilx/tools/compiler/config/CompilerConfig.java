@@ -23,15 +23,18 @@ public class CompilerConfig
 	private String jarNameFormat = "%1$s-%2$s.jar";
 
 	private File logFile;
-	public final List<File> sourceDirs = new ArrayList<>();
-	private File outputDir;
+
+	public final List<File>    sourceDirs = new ArrayList<>();
+	public final List<Pattern> include    = new ArrayList<>();
+	public final List<Pattern> exclude    = new ArrayList<>();
+
 	public final List<Library> libraries = new ArrayList<>();
 
-	public final List<Pattern> include = new ArrayList<>();
-	public final List<Pattern> exclude = new ArrayList<>();
+	private File outputDir;
 
 	private String mainType;
 	public final List<String> mainArgs = new ArrayList<>();
+	private      File         testDir  = new File(".");
 
 	private boolean debug;
 	private boolean ansiColors;
@@ -95,19 +98,24 @@ public class CompilerConfig
 		return this.mainArgs;
 	}
 
+	public File getTestDir()
+	{
+		return this.testDir;
+	}
+
+	public void setTestDir(String testDir)
+	{
+		this.testDir = new File(testDir);
+	}
+
 	public File getOutputDir()
 	{
 		return this.outputDir;
 	}
 
-	public void setOutputDir(String outputDir)
+	public void setOutputDir(File outputDir)
 	{
-		this.outputDir = new File(outputDir);
-	}
-
-	public void addSourceDir(String sourceDir)
-	{
-		this.sourceDirs.add(new File(sourceDir));
+		this.outputDir = outputDir;
 	}
 
 	public File getLogFile()
@@ -115,9 +123,9 @@ public class CompilerConfig
 		return this.logFile;
 	}
 
-	public void setLogFile(String logFile)
+	public void setLogFile(File logFile)
 	{
-		this.logFile = new File(logFile);
+		this.logFile = logFile;
 	}
 
 	public void addLibraryFile(String file)
@@ -130,11 +138,6 @@ public class CompilerConfig
 		{
 			this.compiler.error(I18n.get("library.not_found", file), ex);
 		}
-	}
-
-	public void addLibrary(Library library)
-	{
-		this.libraries.add(library);
 	}
 
 	public void includeFile(String pattern)
@@ -228,7 +231,7 @@ public class CompilerConfig
 		switch (name)
 		{
 		case "source_dirs":
-			this.addSourceDir(value);
+			this.sourceDirs.add(new File(value));
 			return true;
 		case "main_args":
 			this.mainArgs.add(value);
@@ -263,20 +266,23 @@ public class CompilerConfig
 			this.setJarNameFormat(value);
 			return true;
 		case "log_file":
-			this.setLogFile(value);
+			this.setLogFile(new File(value));
 			return true;
 		case "source_dir":
 		case "source_dirs": // deprecated
-			this.addSourceDir(value);
+			this.sourceDirs.add(new File(value));
 			return true;
 		case "output_dir":
-			this.setOutputDir(value);
+			this.setOutputDir(new File(value));
 			return true;
 		case "main_type":
 			this.setMainType(value);
 			return true;
 		case "main_args": // deprecated
 			this.mainArgs.add(value);
+			return true;
+		case "test_dir":
+			this.setTestDir(value);
 			return true;
 		case "include":
 			this.includeFile(value);
@@ -300,7 +306,7 @@ public class CompilerConfig
 	public String toString()
 	{
 		return "CompilerConfig(jarName: " + this.getJarName() + ", sourceDirs: " + this.sourceDirs + ", outputDir: "
-			       + this.outputDir + ", libraries: " + this.libraries + ", include: " + this.include + ", exclude: "
-			       + this.exclude + ", mainType: " + this.mainType + ", mainArgs: " + this.mainArgs + ")";
+		       + this.outputDir + ", libraries: " + this.libraries + ", include: " + this.include + ", exclude: "
+		       + this.exclude + ", mainType: " + this.mainType + ", mainArgs: " + this.mainArgs + ")";
 	}
 }
