@@ -1,0 +1,6 @@
+source_dirs = [ src/dpf/, src/gensrc-base/ ]
+output_dir = build/classes/dyvil-gen/dpf/
+
+gensrc_dir = build/gensrc/dpf/
+
+libraries = [ libs/dyvil-library.jar ]
