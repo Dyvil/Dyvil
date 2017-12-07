@@ -1,4 +1,4 @@
-@fileName=spectest.txt
+@fileName=GenSrcTest.txt
 @enabled=true
 
 SUBSTITUTION=Substitution
