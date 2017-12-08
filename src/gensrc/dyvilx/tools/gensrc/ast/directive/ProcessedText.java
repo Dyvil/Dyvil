@@ -2,6 +2,7 @@ package dyvilx.tools.gensrc.ast.directive;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -101,7 +102,7 @@ public class ProcessedText implements GenSrcValue
 			final String key = text.substring(startIndex, endIndex);
 			final IDataMember field = context.resolveField(Name.fromRaw(key));
 
-			if (field != null)
+			if (field != null && (field.isLocal() || field.hasModifier(Modifiers.PUBLIC)))
 			{
 				// append contents before this identifier
 				parts.append(new StringValue(text.substring(prev, startIndex)));
