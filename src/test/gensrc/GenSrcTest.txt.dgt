@@ -52,5 +52,5 @@ More Counting:
 }
 
 ------ GenSrcTest-Base.dgs ------
-#include('src/test/gensrc/GenSrcTest.txt-Base.dgs')
+#include('gensrc/GenSrcTest.txt-Base.dgs')
 ---------------------------------

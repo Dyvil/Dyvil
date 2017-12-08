@@ -108,7 +108,7 @@ public class CharacterTypes
 	{
 		if (c <= 0xA0)
 		{
-			return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
+			return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_' || c == '$';
 		}
 
 		return Character.isUnicodeIdentifierPart(c);

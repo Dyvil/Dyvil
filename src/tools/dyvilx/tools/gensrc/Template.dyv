@@ -64,6 +64,11 @@ abstract class Template(let name: String)
 				this.outputDir = new File(arg.substring(11))
 				continue
 			}
+			if (arg.startsWith('source_dir='))
+			{
+				Builtins.addSourceDir(arg.substring(11))
+				continue
+			}
 
 			this.addSpec(arg)
 		}

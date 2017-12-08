@@ -2,21 +2,23 @@ package dyvilx.tools.gensrc;
 
 import dyvilx.tools.compiler.config.CompilerConfig;
 
+import java.io.File;
+
 public class GenSrcConfig extends CompilerConfig
 {
-	private String genSrcDir;
+	private File genSrcDir;
 
 	public GenSrcConfig(GenSrc gensrc)
 	{
 		super(gensrc);
 	}
 
-	public String getGenSrcDir()
+	public File getGenSrcDir()
 	{
 		return this.genSrcDir;
 	}
 
-	public void setGenSrcDir(String genSrcDir)
+	public void setGenSrcDir(File genSrcDir)
 	{
 		this.genSrcDir = genSrcDir;
 	}
@@ -26,7 +28,7 @@ public class GenSrcConfig extends CompilerConfig
 	{
 		if ("gensrc_dir".equals(name))
 		{
-			this.setGenSrcDir(value);
+			this.setGenSrcDir(new File(value));
 			return true;
 		}
 

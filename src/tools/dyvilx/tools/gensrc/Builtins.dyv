@@ -22,12 +22,31 @@ abstract class Builtins
 
 	static func timeStamp(format formatter: DateTimeFormatter) -> String = LocalDateTime.now().format(formatter)
 
-	// Specializations
+	// Files
 
+	private static const SOURCE_DIRS: List<String> = new mutable.ArrayList<String>()
+
+	protected static func addSourceDir(dir: String) -> void = SOURCE_DIRS.add(dir)
+
+	static func file(name: String) -> File
+	{
+		for (srcDir <- SOURCE_DIRS)
+		{
+			let file = new File(srcDir, name)
+			if (file.exists())
+			{
+				return file
+			}
+		}
+		// Fallback
+		return new File(name)
+	}
+
+	// Specializations
 
 	private static const SPEC_MAP: [String:Specialization] = new mutable.HashMap<String, Specialization>()
 
-	static func spec(fileName: String) -> Specialization throws IOException = spec(new File(fileName))
+	static func spec(name: String) -> Specialization throws IOException = spec(file(name))
 
 	static func spec(file: File) -> Specialization throws IOException
 	{
@@ -58,7 +77,7 @@ abstract class Builtins
 
 	// Include
 
-	static func include(fileName: String) -> String throws IOException = include(new File(fileName))
+	static func include(name: String) -> String throws IOException = include(file(name))
 
 	static func include(file: File) -> String throws IOException = dyvil.io.FileUtils.read(file)
 }

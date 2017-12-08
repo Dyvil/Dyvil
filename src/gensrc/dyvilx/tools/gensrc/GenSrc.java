@@ -54,6 +54,12 @@ public class GenSrc extends DyvilCompiler
 
 		final List<String> mainArgs = this.config.getMainArgs();
 		mainArgs.clear();
+
+		for (File sourceDir : this.config.sourceDirs)
+		{
+			mainArgs.add("source_dir=" + sourceDir);
+		}
+
 		mainArgs.add("output_dir=" + ((GenSrcConfig) this.config).getGenSrcDir());
 
 		for (Template template : this.templates)
