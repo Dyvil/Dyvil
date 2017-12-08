@@ -7,9 +7,10 @@ abstract class PrimitiveObjectArray
 {
 	package private init() {} // no instances from outside this package
 
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
 		// TYPE_NAME wrapper array methods
 
 		infix func flatten(array: [[PRIMITIVE]]) -> [PRIMITIVE]

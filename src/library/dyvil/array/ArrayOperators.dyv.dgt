@@ -10,43 +10,40 @@ abstract class ArrayOperators
 		// no instances
 	}
 
-	#define(opfunc) {infix inline func}
-
 	// Generic Object array operators
 
-	opfunc in <T>(value: T, array: [T]) -> boolean = array.contains(value)
-	
-	opfunc ? <T>(lhs: [T], rhs: T) -> boolean = lhs.contains(rhs)
+	inline infix func in <T>(value: T, array: [T]) -> boolean = array.contains(value)
 
-	opfunc + <T>(lhs: [T], rhs: T) -> [T] = lhs.added(rhs)
+	inline infix func ? <T>(lhs: [T], rhs: T) -> boolean = lhs.contains(rhs)
 
-	opfunc + <T>(lhs: T, rhs: [T]) -> [T] = rhs.added(lhs)
+	inline infix func + <T>(lhs: [T], rhs: T) -> [T] = lhs.added(rhs)
 
-	opfunc ++ <T>(lhs: [T], rhs: [T]) -> [T] = lhs.union(rhs)
+	inline infix func + <T>(lhs: T, rhs: [T]) -> [T] = rhs.added(lhs)
 
-	opfunc - <T>(lhs: [T], rhs: T) -> [T] = lhs.removed(rhs)
+	inline infix func ++ <T>(lhs: [T], rhs: [T]) -> [T] = lhs.union(rhs)
 
-	opfunc -- <T>(lhs: [T], rhs: [T]) -> [T] = lhs.difference(rhs)
+	inline infix func - <T>(lhs: [T], rhs: T) -> [T] = lhs.removed(rhs)
+
+	inline infix func -- <T>(lhs: [T], rhs: [T]) -> [T] = lhs.difference(rhs)
 
 	// Primitive array operators
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		// TYPE_NAME array operators
 
-		opfunc in(value: PRIMITIVE, array: [PRIMITIVE]) -> boolean = array.contains(value)
+		inline infix func in(value: PRIMITIVE, array: [PRIMITIVE]) -> boolean = array.contains(value)
 
-		opfunc ? (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> boolean = lhs.contains(rhs)
+		inline infix func ? (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> boolean = lhs.contains(rhs)
 
-		opfunc + (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.added(rhs)
+		inline infix func + (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.added(rhs)
 
-		opfunc + (lhs: PRIMITIVE, rhs: [PRIMITIVE]) -> [PRIMITIVE] = rhs.added(lhs)
+		inline infix func + (lhs: PRIMITIVE, rhs: [PRIMITIVE]) -> [PRIMITIVE] = rhs.added(lhs)
 
-		opfunc ++ (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.union(rhs)
+		inline infix func ++ (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.union(rhs)
 
-		opfunc - (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.removed(rhs)
+		inline infix func - (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.removed(rhs)
 
-		opfunc -- (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.difference(rhs)
+		inline infix func -- (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.difference(rhs)
 	}
 }

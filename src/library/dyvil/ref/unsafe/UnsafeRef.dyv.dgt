@@ -1,3 +1,6 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
@@ -8,7 +11,7 @@ import dyvil.reflect.ReflectUtils.UNSAFE
 
 import java.lang.reflect.Field
 
-#if (IS_OBJECT) {
+#if (TYPE_NAME == 'Object') {
 	class UnsafeObjectRef<type T>(
 		protected let base: Object!
 		protected let offset: long
@@ -25,7 +28,7 @@ import java.lang.reflect.Field
 
 	public init(receiver: Object!, field: Field) : this(receiver, UNSAFE.objectFieldOffset(field))
 
-	#if (IS_OBJECT) {
+	#if (TYPE_NAME == 'Object') {
 		override func get() -> T = UNSAFE.getObject(this.base, this.offset) as T
 	}
 	#else {
