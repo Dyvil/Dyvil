@@ -79,6 +79,11 @@ public class Template extends ClassUnit
 		this.name = Name.fromRaw(name);
 	}
 
+	public String getTemplateName()
+	{
+		return this.getPackage().getInternalName() + this.fileSource.file().getName();
+	}
+
 	// Resolution
 
 	@Override
@@ -161,7 +166,7 @@ public class Template extends ClassUnit
 		this.packageDeclaration = new PackageDeclaration(null, this.getPackage().getFullName());
 
 		this.templateClass.setSuperType(LazyTypes.Template);
-		this.templateClass.setSuperConstructorArguments(new ArgumentList(new StringValue(this.getInternalName())));
+		this.templateClass.setSuperConstructorArguments(new ArgumentList(new StringValue(this.getTemplateName())));
 
 		super.resolveTypes();
 	}

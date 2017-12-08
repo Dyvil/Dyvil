@@ -5,7 +5,9 @@ import java.io.{ File, IOException, Writer, FileWriter }
 import dyvilx.tools.gensrc.spec.DefaultSpec
 using dyvilx.tools.gensrc.Builtins._
 
-// name = pack/age/TemplateName_ext
+// name = pack/age/name/TemplateName.ext.dgt
+//        ^^^^^^^^^ file name ^^^^^^^^^^
+//        ^ pathprefix ^
 abstract class Template(let name: String)
 {
 	var outputDir: File = new File('.')
@@ -14,11 +16,29 @@ abstract class Template(let name: String)
 		public set
 	}
 
+	// Paths
+
+	static func getPathPrefix(name: String) -> String
+	{
+		let index = name.lastIndexOf('/')
+		return index < 0 ? "" : name.substring(0, index + 1)
+	}
+
+	static func getFileName(name: String) -> String
+	{
+		let index = name.lastIndexOf('.')
+		return index < 0 ? name : name.substring(0, index)
+	}
+
+	// Spec Resolution
+
 	let specs: List<Specialization> = new mutable.ArrayList<Specialization>()
 
 	static func nameMatches(templateName: String, specName: String)
 	{
-		return specName.replace('.', '_').contains(templateName)
+		// specName = src/pack/age/name/TemplateName.ext-SpecID.dgs
+		//                ^^^^^^^^^ file name ^^^^^^^^^^
+		return specName.contains(getFileName(templateName))
 	}
 
 	func addSpec(name: String) -> void
@@ -32,12 +52,6 @@ abstract class Template(let name: String)
 		catch (ex: IOException)
 		{
 		}
-	}
-
-	func getPathPrefix() -> String
-	{
-		let index = this.name.lastIndexOf('/')
-		return index < 0 ? "" : this.name.substring(0, index + 1)
 	}
 
 	func spec(name: String) -> Specialization throws IOException
@@ -117,7 +131,8 @@ abstract class Template(let name: String)
 	{
 		if (let enabled = spec['@enabled'], !Boolean.parseBoolean(enabled)) return false
 
-		let outputFile = new File(this.outputDir, this.getPathPrefix() ++ spec['@fileName'])
+		let fileName = if (let prop = spec['@fileName']) { getPathPrefix(this.name) ++ prop } else getFileName(this.name)
+		let outputFile = new File(this.outputDir, fileName)
 		outputFile.getParentFile().mkdirs()
 
 		let writer = new FileWriter(outputFile)

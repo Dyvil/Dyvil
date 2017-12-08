@@ -64,7 +64,7 @@ public class GenSrc extends DyvilCompiler
 
 		for (Template template : this.templates)
 		{
-			final String templateName = template.getInternalName();
+			final String templateName = template.getTemplateName();
 
 			mainArgs.add("-t");
 			mainArgs.add(template.getFullName());

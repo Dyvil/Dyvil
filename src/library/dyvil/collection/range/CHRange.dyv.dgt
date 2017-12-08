@@ -47,12 +47,8 @@ class #(TYPE_NAME)Range(
 		override func last() -> PRIMITIVE = this.end
 	}
 
-	#if (IS_HALF_OPEN) {
-		override func size() -> int = (this.end - this.start) as int
-	}
-	#else {
-		override func size() -> int = (this.end - this.start + 1) as int
-	}
+	override func size() -> int = (this.end - this.start#if (IS_HALF_OPEN) { + 1})#if(TYPE_NAME != 'Int'){ as int}
+
 
 	override func iterator() -> Iterator<PRIMITIVE> = new Iterator<PRIMITIVE>() {
 		var value = this<#(TYPE_NAME)Range>.start

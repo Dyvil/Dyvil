@@ -10,6 +10,7 @@ abstract class StringConversions
 	#for (spec <- LibraryGenConstants.NUMBER_SPECS) {
 		#let(TYPE_NAME = spec['TYPE_NAME'])
 		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
 
 		postfix func to#(TYPE_NAME)(_ string: String) -> PRIMITIVE? = string.to#(TYPE_NAME)(radix: 10)
 
