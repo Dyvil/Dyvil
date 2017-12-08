@@ -704,7 +704,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					genericData.setFallbackTypeContext(receiverType);
 				}
 
-				if (!this.enclosingClass.isAnonymous())
+				if (!this.isNested() && !this.enclosingClass.isAnonymous())
 				{
 					markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
 				}

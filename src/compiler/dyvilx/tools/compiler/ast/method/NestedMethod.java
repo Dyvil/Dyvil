@@ -28,6 +28,12 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
+	public boolean isNested()
+	{
+		return true;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (context.isStaticOnly())
