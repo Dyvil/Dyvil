@@ -1,3 +1,24 @@
+#let(TYPE_NAME        = spec['TYPE_NAME'])
+#let(PRIMITIVE        = spec['PRIMITIVE'])
+#let(WRAPPER          = spec['WRAPPER'])
+#let(HAS_RANGE_CLASS  = Boolean.parseBoolean(spec['HAS_RANGE_CLASS']))
+#let(IS_RANGEABLE     = Boolean.parseBoolean(spec['IS_RANGEABLE']))
+#let(RANGE_CAST       = Boolean.parseBoolean(spec['RANGE_CAST']))
+#let(IS_GENERIC       = Boolean.parseBoolean(spec['IS_GENERIC']))
+#let(ARRAY_LOAD_INSN  = spec['ARRAY_LOAD_INSN'])
+#let(ARRAY_STORE_INSN = spec['ARRAY_STORE_INSN'])
+
+#let(ERASURE         = spec['ERASURE'] ?? PRIMITIVE)
+#let(REIFIED         = "@Reified(.OBJECT_CLASS)")
+#let(GENERIC         = IS_GENERIC ? "<T>" : "")
+#let(GENERIC_2       = IS_GENERIC ? "<T, " ++ REIFIED ++ " U>" : "<" ++ REIFIED ++ " U>")
+#let(GENERIC_REIFIED = IS_GENERIC ? "<" ++ REIFIED ++ "T>" : "")
+#let(T               = IS_GENERIC ? "T" : PRIMITIVE)
+#let(APPLY_T         = IS_GENERIC ? "ObjectArray<T>" : "new [" ++ PRIMITIVE ++ "]")
+#let(APPLY_WITH_SIZE = IS_GENERIC ? "ObjectArray(size, of: array.elementType)" : "new [" ++ PRIMITIVE ++ "](size)")
+
+#print(spec, spec['PRIMITIVE'])
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
@@ -15,26 +36,6 @@ import static dyvil.reflect.Opcodes._
 
 public abstract class #(TYPE_NAME)Array
 {
-	#import("Base.dgs")
-
-	#define(REIFIED) {@Reified(Reified.Type.OBJECT_CLASS)}
-	#if (IS_GENERIC) {
-		#define(GENERIC) {<T>}
-		#define(GENERIC_2) {<T, REIFIED U>}
-		#define(GENERIC_REIFIED) {<REIFIED T>}
-		#define(APPLY_T) {ObjectArray<T>}
-		#define(APPLY_WITH_SIZE) {ObjectArray(size, of: array.elementType)}
-	}
-	#else {
-		#define(T) {PRIMITIVE}
-		#define(ERASURE) {PRIMITIVE}
-		#define(GENERIC) {}
-		#define(GENERIC_2) {<REIFIED U>}
-		#define(GENERIC_REIFIED) {}
-		#define(APPLY_T) {new [PRIMITIVE]}
-		#define(APPLY_WITH_SIZE) {new [PRIMITIVE](size)}
-	}
-
 	private init() {} // no instances
 
 	#if (IS_GENERIC) {
@@ -249,8 +250,7 @@ public abstract class #(TYPE_NAME)Array
 		return result
 	}
 
-	#if (IS_GENERIC /* Object Arrays do not need a specialized flatMapped method */) {}
-	#else {
+	#if (TYPE_NAME != 'Object' /* Object Arrays do not need a specialized flatMapped method */) {
 		infix func flatMappedTo#(TYPE_NAME)(array: [T], mapper: T -> [T]) -> [T]
 		{
 			var size = 0
@@ -295,7 +295,7 @@ public abstract class #(TYPE_NAME)Array
 
 	infix func sorted GENERIC(array: [T]) -> [T]
 	{
-		#if (IS_BOOLEAN) {
+		#if (TYPE_NAME == 'Boolean') {
 			let size = array.size
 			let result = new [T](size)
 
@@ -356,8 +356,7 @@ public abstract class #(TYPE_NAME)Array
 
 	infix func trim GENERIC(array: [T], toSize size: int) -> [T] = array.size <= size ? array : array.copy(size)
 
-	#if (IS_OBJECT /* Object arrays cannot be boxed */) {}
-	#else {
+	#if(TYPE_NAME != 'Object' /* Object arrays cannot be boxed */) {
 		infix func boxed(array: [T]) -> [WRAPPER]
 		{
 			let size = array.size
@@ -372,7 +371,7 @@ public abstract class #(TYPE_NAME)Array
 
 	implicit inline infix func asList GENERIC(array: [final T]) -> ImmutableList<T> = array.toList
 
-	infix func toList GENERIC(array: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(#if (IS_OBJECT) {array} #else {array.boxed, trusted: true})
+	infix func toList GENERIC(array: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(#if (TYPE_NAME == 'Object') {array} #else {array.boxed, trusted: true})
 
 	// equals, hashCode and toString
 
@@ -453,10 +452,10 @@ public abstract class #(TYPE_NAME)Array
 			let objectClass = obj!!.dynamicClass
 			if (!objectClass.isArray) return obj!!.toString
 
-			#for (spec <- PRIMITIVE_SPECS) {#import(spec)
-				if (objectClass === class [PRIMITIVE]) return (obj as [PRIMITIVE]).toString
+			#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+				#let(P = spec['PRIMITIVE'])
+				if (objectClass === class [P]) return (obj as [P]).toString
 			}
-
 			return (obj as [ERASURE]).toString
 		}
 
@@ -475,11 +474,10 @@ public abstract class #(TYPE_NAME)Array
 				return
 			}
 
-			#for (spec <- PRIMITIVE_SPECS) {
-				#import(spec)
-				if (objectClass === class [PRIMITIVE]) { (obj as [PRIMITIVE]).toString(builder); return }
+			#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+				#let(P = spec['PRIMITIVE'])
+				if (objectClass === class [P]) { (obj as [P]).toString(builder); return }
 			}
-
 			(obj as [ERASURE]).toString(builder)
 		}
 	}

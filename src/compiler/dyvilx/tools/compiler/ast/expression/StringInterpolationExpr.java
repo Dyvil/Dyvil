@@ -39,6 +39,11 @@ public final class StringInterpolationExpr implements IValue
 
 	private ArgumentList values;
 
+	public StringInterpolationExpr()
+	{
+		this.values = new ArgumentList();
+	}
+
 	public StringInterpolationExpr(SourcePosition position)
 	{
 		this.values = new ArgumentList(3);
@@ -48,7 +53,7 @@ public final class StringInterpolationExpr implements IValue
 	public StringInterpolationExpr(IValue... values)
 	{
 		final int size = values.length;
-		this.position = SourcePosition.$dot$dot(values[0].getPosition(), values[size - 1].getPosition());
+		this.position = size == 0 ? null : SourcePosition.$dot$dot(values[0].getPosition(), values[size - 1].getPosition());
 
 		this.values = new ArgumentList(values);
 	}
@@ -94,6 +99,11 @@ public final class StringInterpolationExpr implements IValue
 	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
+	}
+
+	public ArgumentList getValues()
+	{
+		return this.values;
 	}
 
 	public void append(IValue value)

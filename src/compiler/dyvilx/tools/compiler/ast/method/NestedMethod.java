@@ -3,23 +3,19 @@ package dyvilx.tools.compiler.ast.method;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.CaptureVariable;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.header.IClassCompilableList;
-import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.CaptureHelper;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class NestedMethod extends CodeMethod
@@ -34,12 +30,24 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (context.hasStaticAccess())
+		if (context.isStaticOnly())
 		{
 			this.attributes.addFlag(Modifiers.STATIC);
 		}
 
 		super.resolveTypes(markers, context);
+	}
+
+	@Override
+	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
+		ArgumentList arguments, ITypeContext typeContext)
+	{
+		if (position != null && this.position != null && position.isBefore(this.position))
+		{
+			markers.add(Markers.semanticError(position, "method.nested.access.early", this.name));
+		}
+
+		super.checkCall(markers, position, context, instance, arguments, typeContext);
 	}
 
 	@Override
@@ -51,17 +59,6 @@ public class NestedMethod extends CodeMethod
 		}
 
 		return this.captureHelper.capture(variable);
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		super.cleanup(compilableList, classCompilableList);
-
-		if (!this.captureHelper.isThisCaptured())
-		{
-			this.attributes.addFlag(Modifiers.STATIC);
-		}
 	}
 
 	@Override
@@ -90,40 +87,11 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
+	protected void writeParameters(MethodWriter methodWriter)
 	{
-		final int modifiers = this.attributes.flags() & ModifierUtil.JAVA_MODIFIER_MASK;
-
-		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers,
-		                                                                                  this.getInternalName(),
-		                                                                                  this.getDescriptor(),
-		                                                                                  this.getSignature(),
-		                                                                                  this.getInternalExceptions()));
-
-		this.writeAnnotations(methodWriter, modifiers);
-
-		if (this.captureHelper.isThisCaptured())
-		{
-			methodWriter.setThisType(this.enclosingClass.getInternalName());
-		}
-
-		this.parameters.write(methodWriter);
+		super.writeParameters(methodWriter);
 
 		this.captureHelper.writeCaptureParameters(methodWriter, methodWriter.localCount());
-
-		Label start = new Label();
-		Label end = new Label();
-
-		if (this.value != null)
-		{
-			methodWriter.visitCode();
-			methodWriter.visitLabel(start);
-			this.value.writeExpression(methodWriter, this.type);
-			methodWriter.visitLabel(end);
-			methodWriter.visitEnd(this.type);
-		}
-
-		this.parameters.writeLocals(methodWriter, start, end);
 	}
 
 	@Override

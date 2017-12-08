@@ -42,17 +42,6 @@ public final class ImportParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		switch (type)
-		{
-		case BaseSymbols.COMMA:
-			pm.reparse();
-			// Fallthrough
-		case Tokens.EOF:
-			this.end();
-			pm.popParser();
-			return;
-		}
-
 		switch (this.mode)
 		{
 		case IMPORT:
@@ -107,7 +96,7 @@ public final class ImportParser extends Parser
 			pm.report(token, "import.identifier");
 			if (BaseSymbols.isTerminator(type))
 			{
-				pm.popParser(true);
+				pm.popParser(type != Tokens.EOF);
 			}
 
 			return;
@@ -142,10 +131,16 @@ public final class ImportParser extends Parser
 				}
 				pm.report(next, "import.alias.identifier");
 				return;
+			case BaseSymbols.COMMA:
 			case BaseSymbols.SEMICOLON:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
+			case BaseSymbols.CLOSE_PARENTHESIS:
 				this.end();
 				pm.popParser(true);
+				return;
+			case Tokens.EOF:
+				this.end();
+				pm.popParser();
 				return;
 			}
 			pm.report(token, "import.dot");
@@ -162,7 +157,7 @@ public final class ImportParser extends Parser
 			return;
 		case END:
 			this.end();
-			pm.popParser(true);
+			pm.popParser(type != Tokens.EOF);
 		}
 	}
 

@@ -8,7 +8,7 @@ public final class ConfigParser
 	public static final int EQUALS = 2;
 	public static final int VALUE  = 4;
 	public static final int ARRAY  = 8;
-	
+
 	public static void parse(String source, CompilerConfig config)
 	{
 		int len = source.length();
@@ -71,7 +71,7 @@ public final class ConfigParser
 					mode = KEY;
 					continue;
 				}
-				setProperty(config, key, source.substring(l, i));
+				config.setProperty(key, source.substring(l, i));
 				mode = KEY;
 				continue;
 			}
@@ -96,65 +96,34 @@ public final class ConfigParser
 						return;
 					}
 				}
-				setProperty(config, key, source.substring(l, i));
+				config.addProperty(key, source.substring(l, i));
 			}
 		}
 	}
-	
+
 	public static boolean readProperty(CompilerConfig config, String arg)
 	{
-		int index = arg.indexOf('=');
-		if (index >= 0)
+		final int index = arg.indexOf('=');
+		if (index <= 1)
 		{
-			String name = arg.substring(0, index);
-			String value = arg.substring(index + 1);
-			setProperty(config, name, value);
-			return true;
+			return false;
 		}
-		return false;
-	}
-	
-	public static void setProperty(CompilerConfig config, String name, String value)
-	{
-		switch (name)
+
+		final String key;
+		final String value = arg.substring(index + 1);
+
+		if (arg.charAt(index - 1) == '+')
 		{
-		case "jar_name":
-			config.setJarName(value);
-			return;
-		case "jar_vendor":
-			config.setJarVendor(value);
-			return;
-		case "jar_version":
-			config.setJarVersion(value);
-			return;
-		case "jar_format":
-			config.setJarNameFormat(value);
-			return;
-		case "log_file":
-			config.setLogFile(value);
-			return;
-		case "source_dir":
-		case "source_dirs":
-			config.addSourceDir(value);
-			return;
-		case "output_dir":
-			config.setOutputDir(value);
-			return;
-		case "main_type":
-			config.setMainType(value);
-			return;
-		case "main_args":
-			config.mainArgs.add(value);
-			return;
-		case "include":
-			config.includeFile(value);
-			return;
-		case "exclude":
-			config.excludeFile(value);
-			return;
-		case "libraries":
-			config.addLibraryFile(value);
-			return;
+			// key+=value
+			key = arg.substring(0, index - 1);
+			return config.addProperty(key, value);
 		}
+		else
+		{
+			// key=value
+			key = arg.substring(0, index);
+			return config.setProperty(key, value);
+		}
+
 	}
 }

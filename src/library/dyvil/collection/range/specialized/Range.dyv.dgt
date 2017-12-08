@@ -1,3 +1,7 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(WRAPPER = spec['WRAPPER'])
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 

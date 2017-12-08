@@ -11,7 +11,7 @@ abstract class Primitives
 
 	private init() {}
 
-	#define(LOAD_CALL){LOAD_0, INVOKESTATIC, 0, 1, 2}
+	#let(LOAD_CALL = "LOAD_0, INVOKESTATIC, 0, 1, 2")
 
 	// --- Primitive <-> Wrapper Conversion Methods ---
 
@@ -25,9 +25,12 @@ abstract class Primitives
 	@Intrinsic([ /* NOOP */ ])
 	implicit static func toVoid(value: Void!) -> void {}
 
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
+		#let(DEST_CHAR = spec['DESC_CHAR'])
+		#let(DEFAULT_VALUE = spec['DEFAULT_VALUE'])
 
 		// TYPE_NAME Conversions
 
@@ -44,12 +47,12 @@ abstract class Primitives
 
 	// --- equals Methods ---
 
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+
 		// TYPE_NAME equals
 
 		infix inline func equals(lhs: PRIMITIVE, rhs: PRIMITIVE) -> boolean = lhs == rhs
-
 	}
 
 	infix func compareTo(lhs: boolean, rhs: boolean) -> int = lhs == rhs ? 0 : lhs ? 1 : -1

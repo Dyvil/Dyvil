@@ -27,7 +27,7 @@ class Constants
 
 	public static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 	public static final List<String> javaFilters = [ '**/*.java' ]
-	public static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
+	public static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs', '**/*.dgc', '**/*.dgh' ]
 	public static final List<String> resourceFilters = [ '**/*.properties' ]
 	public static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
 }
@@ -171,8 +171,8 @@ dependencies {
 	replCompile libRun, dpfRun, testRun
 	replCompile bootstrap
 
-	// gensrc -> library
-	gensrcCompile libComp
+	// gensrc -> library, compiler
+	gensrcCompile libComp, sourceSets.compiler.output
 	gensrcCompile libRun
 	gensrcCompile bootstrap
 
@@ -257,6 +257,19 @@ task copyDPFDyvil(type: Sync, dependsOn: 'genDPF') {
 	include dyvilFilters
 }
 
+// GenSrc
+
+task copyGensrcJava(type: Sync) {
+	from sourceSets.gensrc.java
+	into "$buildDir/src/java/gensrc"
+
+	include javaFilters
+	includeEmptyDirs = false
+}
+
+compileGensrcJava.dependsOn copyGensrcJava
+compileGensrcJava.source = "$buildDir/src/java/gensrc"
+
 // Tests
 
 task copyTestDyvil(type: Sync) {
@@ -280,11 +293,11 @@ tasks.withType(JavaCompile) {
 }
 
 task genLibrary(type: JavaExec) { JavaExec exec ->
-	runGenSrc exec, "$buildDir/gensrc/library/", 'src/library/', 'src/gensrc-base'
+	runGenSrc exec, 'config/genlib.dyc', "$buildDir/gensrc/library/", 'src/library/', 'src/gensrc-base'
 }
 
 task genDPF(type: JavaExec) { JavaExec exec ->
-	runGenSrc exec, "$buildDir/gensrc/dpf/", 'src/dpf/', 'src/gensrc-base'
+	runGenSrc exec, 'config/gendpf.dyc', "$buildDir/gensrc/dpf/", 'src/dpf/', 'src/gensrc-base'
 }
 
 /**
@@ -321,18 +334,16 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	}
 }
 
-private void runGenSrc(JavaExec exec, String target, String... srcs)
+private void runGenSrc(JavaExec exec, String config, String target, String... srcs)
 {
 	exec.outputs.dirs target
 
 	exec.main = genSrcMainClass
 	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
-	exec.args = [ "target=$target", '--ansi' ]
+	exec.args = [ "@$config", 'compile', 'test', '--ansi' ]
 
 	for (String src : srcs)
 	{
-		exec.args += "source=$src"
-
 		exec.inputs.file fileTree(src) {
 			include genSrcFilters
 		}
@@ -352,7 +363,7 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 }
 
 task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
-	runGenSrc(exec, "$buildDir/gensrc/test", "src/test/gensrc")
+	runGenSrc(exec, 'config/gentest.dyc', "$buildDir/gensrc/test/", 'src/test/')
 }
 
 test.dependsOn 'testDyvil', 'testGenSrc'

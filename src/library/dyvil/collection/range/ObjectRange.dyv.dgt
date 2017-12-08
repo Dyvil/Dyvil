@@ -1,17 +1,15 @@
+#let(IS_HALF_OPEN = Boolean.parseBoolean(spec['IS_HALF_OPEN']))
+#let(LESS_OP = IS_HALF_OPEN ? "<" : "<=")
+#let(RANGE_OP = IS_HALF_OPEN ? "..<" : "..")
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 #if (IS_HALF_OPEN) {
 	package dyvil.collection.range.halfopen
-
-	#define (LESS_OP) {<}
-	#define (RANGE_OP) {..<}
 }
 #else {
 	package dyvil.collection.range.closed
-
-	#define (LESS_OP) {<=}
-	#define (RANGE_OP) {..}
 }
 
 import dyvil.collection.range.Rangeable
@@ -76,19 +74,19 @@ case class ObjectRange<type +T: Rangeable<T>>(
 		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"
 	}
 
-	#define(FOR_EACH) {for (var current = this.start; current LESS_OP this.end; current = current.next)}
+	#func(forEach(varName NAME: String) -> String) {for (var NAME = this.start; NAME LESS_OP this.end; NAME = NAME.next)}
 
-	override func forEach(action: T -> void) -> void = FOR_EACH action(current)
+	override func forEach(action: T -> void) -> void = #forEach("current") action(current)
 
 	override func contains(element: any!)
 	{
-		FOR_EACH if (element == current) return true
+		#forEach("value") if (element == value) return true
 		return false
 	}
 
 	override func copy() -> ObjectRange<T> = new ObjectRange<T>(this.start, this.end)
 
-	override func copy(to: [Object!], index: int) -> void = FOR_EACH to[index++] = current
+	override func copy(to: [Object!], index: int) -> void = #forEach("value") to[index++] = value
 
 	override func toString() -> String = "\(this.start) RANGE_OP \(this.end)"
 

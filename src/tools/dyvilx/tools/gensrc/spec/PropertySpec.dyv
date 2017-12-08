@@ -1,0 +1,48 @@
+package dyvilx.tools.gensrc.spec
+
+import dyvilx.tools.gensrc._
+
+import java.io.{ IOException, File }
+import java.util.Properties
+
+class PropertySpec(let file: File { override get }, private let properties: Properties) implements Specialization
+{
+	protected var parent: Specialization!
+
+	protected func resolveParent() -> Specialization!
+	{
+		if let parent = this.parent
+		{
+			return parent
+		}
+
+		if let inheritFrom = this.getOwn('@inheritFrom')
+		{
+			try
+			{
+				let spec = Builtins.spec(inheritFrom)
+				this.parent = spec
+				return spec
+			}
+			catch (ex: IOException)
+			{
+			}
+		}
+
+		return DefaultSpec
+	}
+
+	protected func getOwn(key: String) -> String! = this.properties.getProperty(key)
+
+	override func subscript(key: String) -> String!
+	{
+		if let own = this.getOwn(key)
+		{
+			return own
+		}
+
+		return this.resolveParent()[key]
+	}
+
+	override func toString() -> String = this.file.toString
+}

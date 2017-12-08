@@ -1,17 +1,17 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(IS_HALF_OPEN = Boolean.parseBoolean(spec['IS_HALF_OPEN']))
+#let(LESS_OP = IS_HALF_OPEN ? "<" : "<=")
+#let(RANGE_OP = IS_HALF_OPEN ? "..<" : "..")
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 #if (IS_HALF_OPEN) {
 	package dyvil.collection.range.halfopen
-
-	#define (LESS_OP) {<}
-	#define (RANGE_OP) {..<}
 }
 #else {
 	package dyvil.collection.range.closed
-
-	#define (LESS_OP) {<=}
-	#define (RANGE_OP) {..}
 }
 
 import java.util.Iterator

@@ -1,0 +1,140 @@
+package dyvilx.tools.gensrc
+
+import java.io.{ File, IOException, Writer, FileWriter }
+
+import dyvilx.tools.gensrc.spec.DefaultSpec
+using dyvilx.tools.gensrc.Builtins._
+
+// name = pack/age/TemplateName_ext
+abstract class Template(let name: String)
+{
+	var outputDir: File = new File('.')
+	{
+		public get
+		public set
+	}
+
+	let specs: List<Specialization> = new mutable.ArrayList<Specialization>()
+
+	static func nameMatches(templateName: String, specName: String)
+	{
+		return specName.replace('.', '_').contains(templateName)
+	}
+
+	func addSpec(name: String) -> void
+	{
+		if (!nameMatches(this.name, name)) return
+
+		try
+		{
+			this.specs.add(Builtins.spec(name))
+		}
+		catch (ex: IOException)
+		{
+		}
+	}
+
+	func getPathPrefix() -> String
+	{
+		let index = this.name.lastIndexOf('/')
+		return index < 0 ? "" : this.name.substring(0, index + 1)
+	}
+
+	func spec(name: String) -> Specialization throws IOException
+	{
+		// try to find the spec from our list of specs, by filename
+		for (spec <- this.specs)
+		{
+			if (spec.file.getName() == name)
+			{
+				return spec
+			}
+		}
+
+		return Builtins.spec(name)
+	}
+
+	func mainImpl(args: [String]) -> void
+	{
+		// parses output dir and specs from arguments
+		for (arg <- args)
+		{
+			if (arg.startsWith('output_dir='))
+			{
+				this.outputDir = new File(arg.substring(11))
+				continue
+			}
+			if (arg.startsWith('source_dir='))
+			{
+				Builtins.addSourceDir(arg.substring(11))
+				continue
+			}
+
+			this.addSpec(arg)
+		}
+
+		this.generate()
+	}
+
+	func generate() -> int
+	{
+		this.outputDir.mkdirs()
+		if (this.specs.isEmpty())
+		{
+			try
+			{
+				this.generate(DefaultSpec)
+				print("Generated source for template '\(this.name)'")
+			}
+			catch (ex: IOException)
+			{
+				print("Failed to generate source for template '\(this.name)'")
+				ex.printStackTrace()
+			}
+
+			return 1
+		}
+
+		var count = 0
+		for (spec <- this.specs)
+		{
+			try
+			{
+				if (this.generate(spec)) count++
+			}
+			catch (ex: IOException)
+			{
+				print("Failed to generate spec '\(spec)' for template '\(this.name)'")
+				ex.printStackTrace()
+			}
+		}
+
+		print("Generated \(count) spec(s) for template '\(this.name)'")
+		return count
+	}
+
+	func generate(spec: Specialization) -> boolean throws IOException
+	{
+		if (let enabled = spec['@enabled'], !Boolean.parseBoolean(enabled)) return false
+
+		let outputFile = new File(this.outputDir, this.getPathPrefix() ++ spec['@fileName'])
+		outputFile.getParentFile().mkdirs()
+
+		let writer = new FileWriter(outputFile)
+
+		try
+		{
+			this.generate(spec, writer)
+		}
+		catch (ex: IOException)
+		{
+			writer.close()
+			throw ex
+		}
+
+		writer.close()
+		return true
+	}
+
+	abstract func generate(spec: Specialization, writer: Writer) -> void throws IOException
+}

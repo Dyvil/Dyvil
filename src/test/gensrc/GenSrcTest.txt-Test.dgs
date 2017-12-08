@@ -1,0 +1,12 @@
+@fileName=GenSrcTest.txt
+@enabled=true
+
+SUBSTITUTION=Substitution
+MACRO=Macro Substitution
+
+# Override COUNT
+COUNT=2
+SPEC_NAME=test
+
+ENABLED=false
+NESTED=false

@@ -1,0 +1,83 @@
+package dyvilx.tools.gensrc
+
+import dyvilx.tools.gensrc.spec._
+
+import java.util.Properties
+import java.io.{ File, BufferedInputStream, FileInputStream, IOException }
+import java.time.{ LocalDateTime, format.DateTimeFormatter }
+
+abstract class Builtins
+{
+	private init() {} // no instances
+
+	public const GEN_NOTICE: String = 'GENERATED SOURCE - DO NOT EDIT'
+
+	public const TIME_STAMP: String = timeStamp()
+
+	// Time Stamps
+
+	static func timeStamp() -> String = LocalDateTime.now().toString()
+
+	static func timeStamp(format: String) -> String = timeStamp(DateTimeFormatter.ofPattern(format))
+
+	static func timeStamp(format formatter: DateTimeFormatter) -> String = LocalDateTime.now().format(formatter)
+
+	// Files
+
+	private static const SOURCE_DIRS: List<String> = new mutable.ArrayList<String>()
+
+	protected static func addSourceDir(dir: String) -> void = SOURCE_DIRS.add(dir)
+
+	static func file(name: String) -> File
+	{
+		for (srcDir <- SOURCE_DIRS)
+		{
+			let file = new File(srcDir, name)
+			if (file.exists())
+			{
+				return file
+			}
+		}
+		// Fallback
+		return new File(name)
+	}
+
+	// Specializations
+
+	private static const SPEC_MAP: [String:Specialization] = new mutable.HashMap<String, Specialization>()
+
+	static func spec(name: String) -> Specialization throws IOException = spec(file(name))
+
+	static func spec(file: File) -> Specialization throws IOException
+	{
+		let canonPath = file.getCanonicalPath()
+		if let loaded = SPEC_MAP[canonPath]
+		{
+			return loaded
+		}
+
+		let input = new BufferedInputStream(new FileInputStream(file))
+		let props = new Properties()
+
+		try
+		{
+			props.load(input)
+		}
+		catch (ex: IOException)
+		{
+			input.close()
+			throw ex
+		}
+
+		input.close()
+		let spec = new PropertySpec(file, props)
+		SPEC_MAP.put(canonPath, spec)
+		return spec
+	}
+
+	// Include
+
+	static func include(name: String) -> String throws IOException = include(file(name))
+
+	static func include(file: File) -> String throws IOException = dyvil.io.FileUtils.read(file)
+}

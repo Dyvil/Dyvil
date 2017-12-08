@@ -20,10 +20,10 @@ interface Range<+T> extends Queryable<T>, Serializable
 	static func apply<T>() -> Range<T> = EmptyRange.instance
 
 	// Primitive Factory Methods
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
-		#if (HAS_RANGE_CLASS) {
+	#for (spec <- LibraryGenConstants.BASIC_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#if (Boolean.parseBoolean(spec['HAS_RANGE_CLASS'])) {
 
 			@BytecodeName("closed")
 			static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range = #(TYPE_NAME)Range(from, to: to)
@@ -54,7 +54,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 
 	/**
 	 * Returns the exact number of elements in this range, i.e. the number of elements that would be returned by the
-	 * {@link #iterator()}.
+	 * {@link ##iterator()}.
 	 *
 	 * @return the number of elements in this range
 	 */

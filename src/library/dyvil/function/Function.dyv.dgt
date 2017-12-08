@@ -55,8 +55,7 @@ abstract class Function
 		postfix func tupled<A, B, C>(_ f: (A, B) -> C) -> (((A, B)) -> C) = tuple => f(tuple._1, tuple._2)
 	}
 
-	#import("Base.dgs")
-	#for (ARITY <- 3 .. MAX_ARITY) {
+	#for (ARITY <- 3 .. LibraryGenConstants.MAX_ARITY) {
 
 		@FunctionalInterface
 		interface Of#(ARITY)<#for (INDEX <- 1 .. ARITY) {type -P#(INDEX), }type +R>

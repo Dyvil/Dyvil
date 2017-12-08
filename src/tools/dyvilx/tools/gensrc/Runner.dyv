@@ -1,0 +1,58 @@
+package dyvilx.tools.gensrc
+
+import java.io.File
+
+class Runner
+{
+	static func main(args: [String])
+	{
+		let basePath = new File('.').getAbsolutePath
+		print("Generating sources from templates in '\(basePath)'...")
+
+		var specs = 0
+		let templates = parseTemplates(args)
+		for (temp <- templates)
+		{
+			specs += temp.generate()
+		}
+
+		print("Generated sources for \(templates.size) template(s) and \(specs) spec(s).")
+	}
+
+	private static func parseTemplates(args: [String]) -> List<Template>
+	{
+		let argc = args.size
+		var outputDir: File = new File('.')
+		var currentTemplate: Template! = null
+		var templates: List<Template> = new mutable.ArrayList<Template>()
+
+		for (var i = 0; i < argc; i++)
+		{
+			let arg = args[i]
+			if (arg.startsWith('output_dir='))
+			{
+				outputDir = new File(arg.substring(11))
+				continue
+			}
+			if (arg.startsWith('source_dir='))
+			{
+				Builtins.addSourceDir(arg.substring(11))
+				continue
+			}
+
+			if (arg == '-t' && i < argc - 1)
+			{
+				let tempName = args[i + 1]
+				currentTemplate = Class.forName(tempName).newInstance() as Template
+				currentTemplate.outputDir = outputDir
+				templates.add(currentTemplate)
+				i++ // skip
+				continue
+			}
+
+			currentTemplate.addSpec(arg)
+		}
+
+		return templates
+	}
+}

@@ -688,7 +688,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// no receiver, non-static method
 
-			if (context.hasStaticAccess())
+			if (context.isStaticOnly())
 			{
 				// called from static context -> error
 

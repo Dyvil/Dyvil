@@ -1,0 +1,6 @@
+source_dirs = [ src/test/ ]
+output_dir = build/classes/dyvil-gen/test/
+
+gensrc_dir = build/gensrc/test/
+
+libraries = [ libs/dyvil-library.jar ]

@@ -159,7 +159,7 @@ public class Field extends Member implements IField
 		{
 			if (!this.isStatic())
 			{
-				if (context.hasStaticAccess())
+				if (context.isStaticOnly())
 				{
 					markers.add(Markers.semanticError(position, "field.access.instance", this.name));
 				}

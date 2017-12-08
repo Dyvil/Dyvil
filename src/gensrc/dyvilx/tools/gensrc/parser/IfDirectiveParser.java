@@ -1,10 +1,10 @@
 package dyvilx.tools.gensrc.parser;
 
-import dyvilx.tools.gensrc.ast.Util;
-import dyvilx.tools.gensrc.ast.directive.DirectiveList;
+import dyvilx.tools.compiler.ast.statement.StatementList;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.gensrc.ast.directive.IfDirective;
+import dyvilx.tools.gensrc.lexer.GenSrcLexer;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
-import dyvilx.tools.gensrc.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -22,11 +22,11 @@ public class IfDirectiveParser extends Parser
 	public static final int ELSE_BODY     = 6;
 	public static final int ELSE_BODY_END = 7;
 
-	private final DirectiveList list;
+	private final StatementList list;
 
 	private IfDirective directive;
 
-	public IfDirectiveParser(DirectiveList list)
+	public IfDirectiveParser(StatementList list)
 	{
 		this.list = list;
 	}
@@ -75,9 +75,9 @@ public class IfDirectiveParser extends Parser
 				return;
 			}
 
-			final DirectiveList thenBlock = new DirectiveList();
+			final StatementList thenBlock = new StatementList();
 			pm.pushParser(new BlockParser(thenBlock));
-			this.directive.setThenBlock(thenBlock);
+			this.directive.setThen(thenBlock);
 			this.mode = THEN_BODY_END;
 			return;
 		case THEN_BODY_END:
@@ -119,9 +119,9 @@ public class IfDirectiveParser extends Parser
 				return;
 			}
 
-			final DirectiveList elseBlock = new DirectiveList();
+			final StatementList elseBlock = new StatementList();
 			pm.pushParser(new BlockParser(elseBlock));
-			this.directive.setElseBlock(elseBlock);
+			this.directive.setElse(elseBlock);
 			this.mode = ELSE_BODY_END;
 			return;
 		case ELSE_BODY_END:
@@ -142,6 +142,6 @@ public class IfDirectiveParser extends Parser
 	private static boolean isBlank(String value)
 	{
 		final int length = value.length();
-		return Util.skipWhitespace(value, 0, length) == length;
+		return GenSrcLexer.skipWhitespace(value, 0, length) == length;
 	}
 }
