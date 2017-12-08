@@ -1,5 +1,5 @@
 source_dirs = [ src/dpf/, src/gensrc-base/ ]
-output_dir = build/classes/dyvil-gen/dpf/
+output_dir = build/classes/dyvil/dpf-gen/
 
 gensrc_dir = build/gensrc/dpf/
 

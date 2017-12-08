@@ -1,5 +1,5 @@
 source_dirs = [ src/library/, src/gensrc-base/ ]
-output_dir = build/classes/dyvil-gen/library/
+output_dir = build/classes/dyvil/library-gen/
 
 gensrc_dir = build/gensrc/library/
 
