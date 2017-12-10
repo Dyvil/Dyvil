@@ -8,8 +8,6 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.LinkOption;
 
 public abstract class Library
@@ -89,9 +87,9 @@ public abstract class Library
 
 	public abstract void unloadLibrary();
 
-	public URL getURL() throws MalformedURLException
+	public File getFile()
 	{
-		return this.file.toURI().toURL();
+		return this.file;
 	}
 
 	public abstract boolean isSubPackage(String internal);

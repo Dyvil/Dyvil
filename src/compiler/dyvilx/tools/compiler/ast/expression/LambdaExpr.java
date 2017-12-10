@@ -19,6 +19,7 @@ import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvilx.tools.compiler.ast.field.*;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
+import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.MapTypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -667,6 +668,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		if (this.captureHelper == null || !this.captureHelper.hasCaptures())
 		{
+			// Check if we can use a direct method reference
 			if (this.value instanceof AbstractCall)
 			{
 				final AbstractCall call = (AbstractCall) this.value;
@@ -675,7 +677,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				if (method != null && this.checkCall(call.getReceiver(), call.getArguments(), method))
 				{
 					this.setHandleType(ClassFormat.insnToHandle(method.getInvokeOpcode()));
-					this.name = method.getName().qualified;
+					this.name = method.getInternalName();
 					this.owner = method.getEnclosingClass().getInternalName();
 					this.descriptor = method.getDescriptor();
 					return this;
@@ -687,13 +689,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				final ConstructorCall call = (ConstructorCall) this.value;
 				final IConstructor constructor = call.getConstructor();
 
-				if (this.checkCall(null, call.getArguments(), constructor))
+				if (constructor != null && this.checkCall(null, call.getArguments(), constructor))
 				{
 					this.setHandleType(ClassFormat.H_NEWINVOKESPECIAL);
-					this.name = "<init>";
+					this.name = constructor.getInternalName();
 					this.owner = constructor.getEnclosingClass().getInternalName();
 					this.descriptor = constructor.getDescriptor();
-
 					return this;
 				}
 			}
@@ -704,6 +705,23 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		classCompilableList.addClassCompilable(this);
 
 		return this;
+	}
+
+	private boolean checkCall(IValue receiver, ArgumentList arguments, IMethod method)
+	{
+		if (method.isTypeParametric())
+		{
+			for (ITypeParameter param : method.getTypeParameters())
+			{
+				if (param.getReifiedKind() != null)
+				{
+					// do not use a direct method reference if the method has a reified type parameter
+					return false;
+				}
+			}
+		}
+
+		return this.checkCall(receiver, arguments, (IParametric) method);
 	}
 
 	private boolean checkCall(IValue receiver, ArgumentList arguments, IParametric parametric)
@@ -749,7 +767,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	private static boolean isFieldAccess(IValue value, IDataMember member)
 	{
-		return value.valueTag() == IValue.FIELD_ACCESS && ((FieldAccess) value).getField() == member;
+		return value instanceof FieldAccess && ((FieldAccess) value).getField() == member;
 	}
 
 	@Override

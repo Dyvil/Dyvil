@@ -10,6 +10,7 @@ import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
 import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.backend.ClassWriter;
@@ -31,6 +32,12 @@ public final class AnnotationMetadata implements IClassMetadata
 	public AnnotationMetadata(IClass iclass)
 	{
 		this.theClass = iclass;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.ANNOTATION;
 	}
 
 	@Override

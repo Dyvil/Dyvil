@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.external;
 
+import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
@@ -59,11 +60,13 @@ public final class ExternalClass extends AbstractClass
 	private static final int GENERICS            = 1 << 2;
 	private static final int BODY_METHOD_CACHE   = 1 << 3;
 	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
+	private static final int ANNOTATIONS         = 1 << 5;
+	private static final int MEMBER_CLASSES      = 1 << 6;
 
 	protected Package thePackage;
 
 	private byte                resolved;
-	private Map<String, String> innerTypes;
+	private Map<String, String> innerTypes; // inner name -> full internal name
 	private Set<String>         classParameters;
 
 	public ExternalClass(Name name)
@@ -172,7 +175,35 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveAnnotations()
 	{
+		if ((this.resolved & ANNOTATIONS) != 0)
+		{
+			return;
+		}
+
+		this.resolved |= ANNOTATIONS;
 		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
+	}
+
+	private void resolveMemberClasses()
+	{
+		if ((this.resolved & MEMBER_CLASSES) != 0)
+		{
+			return;
+		}
+
+		this.resolved |= MEMBER_CLASSES;
+		if (this.innerTypes == null)
+		{
+			return;
+		}
+
+		for (Entry<String, String> entry : this.innerTypes)
+		{
+			final String innerName = entry.getKey();
+			this.resolveClass(Name.fromRaw(innerName)); // adds the class to the body
+		}
+		this.innerTypes.clear(); // we no longer need this
+		this.innerTypes = null;
 	}
 
 	public void setClassParameters(String[] classParameters)
@@ -336,13 +367,13 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		}
 
-		String internal = this.innerTypes.get(name.qualified);
+		final String internal = this.innerTypes.get(name.qualified);
 		if (internal == null)
 		{
 			return null;
 		}
 
-		// Resolve the class name
+		// Resolve the class name and add it to the body
 		final String fileName = internal + DyvilFileType.CLASS_EXTENSION;
 		return Package.loadClass(fileName, name, this.body);
 	}
@@ -375,6 +406,13 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		this.resolveMemberClasses();
+		return super.resolveImplicit(type);
 	}
 
 	@Override

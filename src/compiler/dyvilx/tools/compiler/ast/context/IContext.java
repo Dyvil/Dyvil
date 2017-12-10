@@ -32,7 +32,7 @@ public interface IContext extends IMemberContext, IImportContext
 	byte FALSE = 0;
 	byte TRUE  = 1;
 
-	default boolean hasStaticAccess()
+	default boolean isStaticOnly()
 	{
 		return this.checkStatic() != FALSE;
 	}
@@ -100,6 +100,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IAccessible getAccessibleThis(IClass type);
 
+	@Override
 	IValue resolveImplicit(IType type);
 
 	static IOperator resolveOperator(IContext context, Name name, byte type)

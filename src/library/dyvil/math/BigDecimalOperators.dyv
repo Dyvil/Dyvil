@@ -2,26 +2,39 @@ package dyvil.math
 
 import java.math.{ BigDecimal, BigInteger }
 
-public abstract class BigDecimalOperators
+abstract class BigDecimalOperators
 {
 	private init() {}
 
-	postfix implicit inline func toBigDecimal(i: int)        -> BigDecimal = BigDecimal.valueOf(i as long)
-	postfix implicit inline func toBigDecimal(i: long)       -> BigDecimal = BigDecimal.valueOf(i)
-	postfix implicit inline func toBigDecimal(i: float)      -> BigDecimal = BigDecimal.valueOf(i)
-	postfix implicit inline func toBigDecimal(i: double)     -> BigDecimal = BigDecimal.valueOf(i)
-	postfix implicit inline func toBigDecimal(i: BigInteger) -> BigDecimal = new BigDecimal(i)
+	// Implicit Conversions
 
-	prefix inline func + (rhs: BigDecimal) -> BigDecimal = rhs
-	prefix inline func - (rhs: BigDecimal) -> BigDecimal = rhs.negate()
+	implicit inline postfix func toBigDecimal(i: int)        -> BigDecimal = BigDecimal.valueOf(i as long)
+	implicit inline postfix func toBigDecimal(i: long)       -> BigDecimal = BigDecimal.valueOf(i)
+	implicit inline postfix func toBigDecimal(i: float)      -> BigDecimal = BigDecimal.valueOf(i)
+	implicit inline postfix func toBigDecimal(i: double)     -> BigDecimal = BigDecimal.valueOf(i)
+	implicit inline postfix func toBigDecimal(i: BigInteger) -> BigDecimal = new BigDecimal(i)
 
-	infix  inline func + (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.add(rhs)
-	infix  inline func - (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.subtract(rhs)
-	infix  inline func * (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.multiply(rhs)
-	infix  inline func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs)
-	infix  inline func % (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.remainder(rhs)
+	// Additive Operators
 
-	infix  inline func **(lhs: BigDecimal, rhs: int)        -> BigDecimal = lhs.pow(rhs)
-	infix         func **(lhs: BigDecimal, rhs: double)     -> BigDecimal = PowImpl.pow(lhs, rhs)
-	infix         func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = PowImpl.pow(lhs, rhs)
+	inline prefix func + (rhs: BigDecimal) -> BigDecimal = rhs
+
+	inline infix func + (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.add(rhs)
+
+	inline prefix func - (rhs: BigDecimal) -> BigDecimal = rhs.negate()
+
+	inline infix func - (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.subtract(rhs)
+
+	// Multiplicative Operators
+
+	inline infix func * (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.multiply(rhs)
+
+	inline infix func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs)
+
+	inline infix func % (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.remainder(rhs)
+
+	inline infix func **(lhs: BigDecimal, rhs: int)        -> BigDecimal = lhs.pow(rhs)
+
+	infix func **(lhs: BigDecimal, rhs: double)     -> BigDecimal = PowImpl.pow(lhs, rhs)
+
+	infix func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = PowImpl.pow(lhs, rhs)
 }

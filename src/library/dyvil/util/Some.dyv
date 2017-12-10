@@ -2,7 +2,7 @@ package dyvil.util
 
 @Immutable
 @LiteralConvertible.FromTuple
-public case class Some<T>(let value: T) implements Option<T>
+public case class Some<type +T>(let value: T) implements Option<T>
 {
 	static final func unapply<T>(option: Option<T>!) -> Tupled<T>? = option is Some ? unapply(option as Some<T>) : null
 

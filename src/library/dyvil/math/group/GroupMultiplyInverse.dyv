@@ -1,0 +1,11 @@
+package dyvil.math.group
+
+interface GroupMultiplyInverse<T> extends GroupMultiply<T>
+{
+	abstract func inverse(rhs: T) -> T
+
+	func divide(lhs: T, rhs: T) -> T = this.multiply(lhs, this.inverse(rhs)) // a / b == a * 1/b
+
+	// supports negative exponent
+	override func power(lhs: T, rhs: int) -> T = rhs < 0 ? this.inverse(this.power(lhs, -rhs)) : super<GroupMultiply>.power(lhs, rhs)
+}

@@ -12,21 +12,18 @@ public abstract class References
 	static func & <T>(rhs: T^) -> T* = rhs
 
 	// Primitive Reference Operators
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
 		@Intrinsic([ LOAD_0 ])
 		static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
-
 	}
 
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
-		#if (IS_BOOLEAN) {}
-		#else {
-			#if (IS_SUBRANGE) {#define(CAST){as PRIMITIVE}}
-			#else             {#define(CAST)}
+	// Primitive Increment Operators
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#if (PRIMITIVE != 'boolean') {
+			#let(CAST = Boolean.parseBoolean(spec['IS_SUBRANGE']) ? "as " ++ PRIMITIVE : "")
 
 			// PRIMITIVE
 
@@ -45,7 +42,6 @@ public abstract class References
 			@Intrinsic([], compilerCode: Intrinsic.POST_DECREMENT)
 			@BytecodeName("decPost")
 			postfix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v - 1) CAST; v }
-
 		}
 	}
 }

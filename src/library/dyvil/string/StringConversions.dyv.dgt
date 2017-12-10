@@ -7,9 +7,10 @@ abstract class StringConversions
 	postfix func toBoolean(_ string: String) -> boolean = Boolean.parseBoolean(string)
 
 	// Number Conversions
-	#import("Base.dgs")
-	#for (spec <- NUMBER_SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.NUMBER_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
 
 		postfix func to#(TYPE_NAME)(_ string: String) -> PRIMITIVE? = string.to#(TYPE_NAME)(radix: 10)
 

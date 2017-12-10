@@ -255,14 +255,7 @@ public class NamedArgumentList extends ArgumentList
 		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex < 0)
 		{
-			final IValue missing = resolveMissing(param, genericData, position, markers, context);
-			if (missing != null)
-			{
-				this.add(param.getLabel(), missing);
-				return;
-			}
-
-			markers.add(Markers.semanticError(position, "method.access.argument.missing", param.getName()));
+			this.resolveMissing(param, genericData, position, markers, context);
 			return;
 		}
 

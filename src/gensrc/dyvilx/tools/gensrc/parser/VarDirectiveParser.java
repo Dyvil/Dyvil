@@ -1,31 +1,35 @@
 package dyvilx.tools.gensrc.parser;
 
-import dyvilx.tools.gensrc.ast.directive.DirectiveList;
-import dyvilx.tools.gensrc.ast.var.DefineDirective;
-import dyvilx.tools.gensrc.ast.var.NameDirective;
-import dyvilx.tools.gensrc.ast.var.UndefineDirective;
-import dyvilx.tools.gensrc.ast.var.VarDirective;
+import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
+import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.field.Variable;
+import dyvilx.tools.compiler.ast.statement.StatementList;
+import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.parser.classes.DataMemberParser;
+import dyvilx.tools.gensrc.ast.directive.VarDirective;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class VarDirectiveParser extends Parser
+public class VarDirectiveParser extends Parser implements IDataMemberConsumer<IVariable>
 {
 	private static final int KEYWORD     = 0;
 	private static final int OPEN_PAREN  = 1;
-	private static final int IDENTIFIER  = 2;
 	private static final int CLOSE_PAREN = 3;
 	private static final int BODY        = 4;
 	private static final int BODY_END    = 5;
 
-	private final DirectiveList directives;
+	private final StatementList directives;
 
-	private VarDirective directive;
+	private VarDirective varDirective;
 
-	public VarDirectiveParser(DirectiveList directives)
+	public VarDirectiveParser(StatementList directives)
 	{
 		this.directives = directives;
 	}
@@ -37,26 +41,18 @@ public class VarDirectiveParser extends Parser
 		switch (this.mode)
 		{
 		case KEYWORD:
-			boolean local = false;
+			AttributeList attributes = new AttributeList();
 			switch (type)
 			{
-			case GenSrcSymbols.LOCAL:
-				local = true;
-				// Fallthrough
-			case GenSrcSymbols.DEFINE:
-				this.directive = new DefineDirective(local, token.raw());
+			case GenSrcSymbols.VAR:
 				break;
-			case GenSrcSymbols.DELETE:
-				local = true;
-				// Fallthrough
-			case GenSrcSymbols.UNDEFINE:
-				this.directive = new UndefineDirective(local, token.raw());
-				break;
-			case GenSrcSymbols.NAME:
-				this.directive = new NameDirective(token.raw());
+			case GenSrcSymbols.CONST:
+			case GenSrcSymbols.LET:
+				attributes.addFlag(Modifiers.FINAL);
 				break;
 			default:
-				assert false;
+				pm.report(token, "var.declarator");
+				return;
 			}
 
 			this.mode = OPEN_PAREN;
@@ -64,25 +60,12 @@ public class VarDirectiveParser extends Parser
 		case OPEN_PAREN:
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
-				this.directives.add(this.directive);
+				this.directives.add(this.varDirective);
 				pm.popParser(true);
 				return;
 			}
 
-			this.mode = IDENTIFIER;
-			return;
-		case IDENTIFIER:
-			if (type != Tokens.LETTER_IDENTIFIER)
-			{
-				pm.report(token, "var.identifier");
-				if (type == BaseSymbols.CLOSE_PARENTHESIS)
-				{
-					this.mode = BODY;
-				}
-				return;
-			}
-
-			this.directive.setName(token.nameValue());
+			pm.pushParser(new DataMemberParser<>(this).withFlags(DataMemberParser.PARSE_VALUE));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
@@ -97,20 +80,32 @@ public class VarDirectiveParser extends Parser
 		case BODY:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				this.directives.add(this.directive);
+				this.directives.add(this.varDirective);
 				pm.popParser(true);
 				return;
 			}
 
-			final DirectiveList body = new DirectiveList();
+			final StatementList body = new StatementList();
 			pm.pushParser(new BlockParser(body));
-			this.directive.setBody(body);
+			this.varDirective.setBlock(body);
 			this.mode = BODY_END;
 			return;
 		case BODY_END:
 			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
-			this.directives.add(this.directive);
+			this.directives.add(this.varDirective);
 			pm.popParser();
 		}
+	}
+
+	@Override
+	public void addDataMember(IVariable variable)
+	{
+		this.varDirective = new VarDirective(variable);
+	}
+
+	@Override
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
+	{
+		return new Variable(position, name, type, attributes);
 	}
 }

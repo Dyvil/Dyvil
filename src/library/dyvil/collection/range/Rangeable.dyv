@@ -14,7 +14,7 @@ interface Rangeable<type SELF: Rangeable<SELF>> extends Comparable<SELF>
 
 	override func hashCode() -> int
 
-	infix inline func .. <T: Rangeable>(from: T, to: T) -> Range<T> = Range(from, to: to)
+	infix inline func .. <T: Rangeable<T>>(from: T, to: T) -> Range<T> = Range(from, to: to)
 
-	infix inline func ..< <T: Rangeable>(from: T, to: T) -> Range<T> = Range(from, toExclusive: to)
+	infix inline func ..< <T: Rangeable<T>>(from: T, to: T) -> Range<T> = Range(from, toExclusive: to)
 }

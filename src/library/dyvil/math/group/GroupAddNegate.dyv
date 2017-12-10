@@ -1,0 +1,8 @@
+package dyvil.math.group
+
+interface GroupAddNegate<T> extends GroupAdd<T>
+{
+	abstract func negate(rhs: T) -> T
+
+	func subtract(lhs: T, rhs: T) -> T = this.add(lhs, this.negate(rhs)) // a - b == a + -b
+}

@@ -25,10 +25,10 @@ abstract class Output
 
 	// print functions
 
-	#for (spec <- [ "Base-Boolean.dgs", "Base-Char.dgs", "Base-Int.dgs", "Base-Long.dgs", "Base-Float.dgs", "Base-Double.dgs" ]) {
-		#import(spec)
-		static inline func print(value: PRIMITIVE) -> void = out.println(value)
+	#for (spec <- LibraryGenConstants.BASIC_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
+		static inline func print(value: PRIMITIVE) -> void = out.println(value)
 	}
 
 	static inline func print(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
@@ -43,19 +43,18 @@ abstract class Output
 		out.print(terminator)
 	}
 
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
-		static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
+		static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
 	}
 
 	static inline func print(array: [Object!]) -> void = out.println(array.toString)
 
 	// print(All) functions
 
-	#define(DEFAULT_SEPARATOR) {' '}
-	#define(DEFAULT_TERMINATOR) {ENDL}
+	#let(DEFAULT_SEPARATOR = "' '")
+	#let(DEFAULT_TERMINATOR = 'ENDL')
 
 	@BytecodeName("printAll")
 	static inline func print(values: Object! ...) -> void

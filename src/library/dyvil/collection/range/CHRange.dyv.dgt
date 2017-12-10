@@ -1,17 +1,17 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(IS_HALF_OPEN = Boolean.parseBoolean(spec['IS_HALF_OPEN']))
+#let(LESS_OP = IS_HALF_OPEN ? "<" : "<=")
+#let(RANGE_OP = IS_HALF_OPEN ? "..<" : "..")
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 #if (IS_HALF_OPEN) {
 	package dyvil.collection.range.halfopen
-
-	#define (LESS_OP) {<}
-	#define (RANGE_OP) {..<}
 }
 #else {
 	package dyvil.collection.range.closed
-
-	#define (LESS_OP) {<=}
-	#define (RANGE_OP) {..}
 }
 
 import java.util.Iterator
@@ -47,12 +47,8 @@ class #(TYPE_NAME)Range(
 		override func last() -> PRIMITIVE = this.end
 	}
 
-	#if (IS_HALF_OPEN) {
-		override func size() -> int = (this.end - this.start) as int
-	}
-	#else {
-		override func size() -> int = (this.end - this.start + 1) as int
-	}
+	override func size() -> int = (this.end - this.start#if (IS_HALF_OPEN) { + 1})#if(TYPE_NAME != 'Int'){ as int}
+
 
 	override func iterator() -> Iterator<PRIMITIVE> = new Iterator<PRIMITIVE>() {
 		var value = this<#(TYPE_NAME)Range>.start

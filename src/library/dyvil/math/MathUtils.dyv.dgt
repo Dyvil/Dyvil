@@ -3,23 +3,23 @@
 
 package dyvil.math
 
-using java.lang.Math._
+using dyvil.Math
 
 abstract class MathUtils
 {
 	private init() {} // no instances
 
-	#define(SPECS){Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs}
-
 	// min
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
+		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
 		static func min(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
 
 		static func min(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
-			var min = #if (IS_FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
+			var min = #if (FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
 			for (v <- values) if (v < min) min = v
 			return min
@@ -27,14 +27,16 @@ abstract class MathUtils
 	}
 
 	// max
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(WRAPPER = spec['WRAPPER'])
+		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
 		static func max(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
 
 		static func max(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
-			var max = #if (IS_FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
+			var max = #if (FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
 			for (v <- values) if (v > max) max = v
 			return max
@@ -42,8 +44,8 @@ abstract class MathUtils
 	}
 
 	// sum
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		static func sum(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
@@ -53,16 +55,25 @@ abstract class MathUtils
 		}
 	}
 
-	static func sum(this: Math, k start: long, to end: long, _ f: long -> double) -> double
+	static func sum<T>(_ values: T..., implicit t: GroupAdd<T>) -> T = sum(values as Iterable<T>, t)
+
+	static func sum<T>(_ values: Iterable<T>, implicit t: GroupAdd<T>) -> T
 	{
-		var sum = 0.0D
-		for (k <- start .. end) sum += f(k)
+		var sum = t._0
+		for (k <- values) sum += k
+		return sum
+	}
+
+	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupAdd<T>) -> T
+	{
+		var sum = t._0
+		for (k <- values) sum += f(k)
 		return sum
 	}
 
 	// product
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		static func product(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
@@ -72,23 +83,32 @@ abstract class MathUtils
 		}
 	}
 
-	static func product(this: Math, k start: long, to end: long, _ f: long -> double) -> double
+	static func product<T>(_ values: T..., implicit t: GroupMultiply<T>) -> T = product(values as Iterable<T>, t)
+
+	static func product<T>(_ values: Iterable<T>, implicit t: GroupMultiply<T>) -> T
 	{
-		var product = 1.0D
-		for (k <- start .. end) product *= f(k)
+		var product = t._1
+		for (k <- values) product *= k
+		return product
+	}
+
+	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupMultiply<T>) -> T
+	{
+		var product = t._1
+		for (k <- values) product *= f(k)
 		return product
 	}
 
 	// average
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		static func average(this: Math, _ values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
 	}
 
 	// clamp
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		infix func clamp(this: Math, _ v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
 		{
@@ -99,14 +119,15 @@ abstract class MathUtils
 	}
 
 	// interpolate
-	#for (spec <- SPECS) {
-		#import(spec)
+	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		infix func interpolate(this: Math, _ v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
 		{
 			if (v <= 0) return min
 			if (v >= 1) return max
-			return (min + (max - min) * v) as PRIMITIVE
+			return (min + (max - min) * v)#if (PRIMITIVE != 'double') { as PRIMITIVE}
+
 		}
 	}
 

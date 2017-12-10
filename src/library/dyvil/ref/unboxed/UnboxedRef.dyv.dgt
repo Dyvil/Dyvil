@@ -1,3 +1,7 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(WRAPPER = spec['WRAPPER'])
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
@@ -6,9 +10,7 @@ package dyvil.ref.unboxed
 import dyvil.ref.#(TYPE_NAME)Ref
 import dyvil.ref.ObjectRef
 
-class Unboxed#(TYPE_NAME)Ref(
-	protected let ref: ObjectRef<WRAPPER>
-) implements #(TYPE_NAME)Ref
+class Unboxed#(TYPE_NAME)Ref(protected let ref: ObjectRef<WRAPPER>) implements #(TYPE_NAME)Ref
 {
 	override func get() -> PRIMITIVE = this.ref.get
 

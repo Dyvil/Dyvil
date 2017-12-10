@@ -70,8 +70,7 @@ abstract class Tuple
 	}
 
 	// --- Auto-generated classes ---
-	#import("Base.dgs")
-	#for (ARITY <- 4 .. MAX_ARITY) {
+	#for (ARITY <- 4 .. LibraryGenConstants.MAX_ARITY) {
 
 		@Immutable
 		static case class Of#(ARITY)

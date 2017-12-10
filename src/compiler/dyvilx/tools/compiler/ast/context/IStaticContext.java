@@ -21,7 +21,7 @@ import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 public interface IStaticContext extends IContext
 {
 	@Override
-	default boolean hasStaticAccess()
+	default boolean isStaticOnly()
 	{
 		return true;
 	}

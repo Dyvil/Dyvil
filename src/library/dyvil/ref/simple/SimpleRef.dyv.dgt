@@ -1,3 +1,7 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(FROM_LITERAL = spec['FROM_LITERAL'])
+
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
@@ -6,7 +10,7 @@ package dyvil.ref.simple
 import dyvil.lang.LiteralConvertible
 import dyvil.ref.#(TYPE_NAME)Ref
 
-#if (IS_OBJECT) {
+#if (TYPE_NAME == 'Object') {
 	class SimpleObjectRef<type T>(public var value: T) implements ObjectRef<T>
 }
 #else {

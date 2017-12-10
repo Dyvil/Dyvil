@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -57,6 +58,12 @@ public class ClassMetadata implements IClassMetadata
 	public ClassMetadata(IClass iclass)
 	{
 		this.theClass = iclass;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.CLASS;
 	}
 
 	@Override

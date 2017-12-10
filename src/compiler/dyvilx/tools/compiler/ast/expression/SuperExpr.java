@@ -77,7 +77,7 @@ public final class SuperExpr implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (context.hasStaticAccess())
+		if (context.isStaticOnly())
 		{
 			markers.add(Markers.semantic(this.position, "super.access.static"));
 			return;
@@ -179,7 +179,7 @@ public final class SuperExpr implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		this.type.checkType(markers, context, TypePosition.SUPER_TYPE);
 	}
 
 	@Override

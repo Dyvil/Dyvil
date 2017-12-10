@@ -1,0 +1,57 @@
+#using(gensrc.TestConstants._)
+
+#let(COUNT:        int     = Int.parseInt(spec['COUNT']))
+#let(SUBSTITUTION: String  = spec['SUBSTITUTION'])
+#let(ENABLED:      boolean = Boolean.parseBoolean(spec['ENABLED']))
+#let(NESTED:       boolean = Boolean.parseBoolean(spec['NESTED']))
+#let(SENTENCE){this is not included in the output}
+
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+// tests for substitutions
+
+line without substitution
+
+line with COUNT #(SUBSTITUTION)s
+line ending with SUBSTITUTION
+SUBSTITUTION at the beginning
+
+// tests for the escaped ##
+
+## at start of the line
+line ending with a ##
+line with ## in the middle
+
+// tests for the preprocessor directives
+
+#let(_ENABLED = 'ENABLED')
+#let(_NESTED = 'NESTED')
+
+#if (ENABLED) {
+	_ENABLED set to true #if (NESTED) {and _NESTED set to true} #else {but _NESTED set to false}
+}
+#else {
+	_ENABLED set to ENABLED #if (NESTED) {but _NESTED set to true} #else {and _NESTED set to false}
+}
+
+#func (myFunction(spec SPEC_NAME: String, count COUNT: int) -> String) {
+	the value of #('COUNT') in SPEC_NAME is COUNT
+}
+
+#for (spec <- [ this.spec('GenSrcTest.txt-Test.dgs'), this.spec('GenSrcTest.txt-Base.dgs') ]) {
+	#myFunction(spec['SPEC_NAME'], count: Integer.parseInt(spec['COUNT']))
+}
+
+Counting:#for (INDEX <- 0 .. COUNT_MAX) { INDEX}
+
+CONSTANT
+
+More Counting:
+#for (INDEX <- 1 .. COUNT_MAX) {
+	INDEX
+}
+
+------ GenSrcTest-Base.dgs ------
+#include('gensrc/GenSrcTest.txt-Base.dgs')
+---------------------------------

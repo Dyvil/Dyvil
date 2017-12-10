@@ -1,0 +1,82 @@
+package dyvil.math.group
+
+abstract class GroupImplicits
+{
+	private init() {} // no instances
+
+	implicit object IntGroup implements GroupAddNegate<int>, GroupMultiply<int>
+	{
+		override func _0() -> int = 0
+
+		override func _1() -> int = 1
+
+		override func add(lhs: int, rhs: int) -> int = lhs + rhs
+
+		override func subtract(lhs: int, rhs: int) -> int = lhs - rhs
+
+		override func negate(rhs: int) -> int = -rhs
+
+		override func multiply(lhs: int, rhs: int) -> int = lhs * rhs
+
+		override func power(lhs: int, rhs: int) -> int = lhs ** rhs
+	}
+
+	implicit object LongGroup implements GroupAddNegate<long>, GroupMultiply<long>
+	{
+		override func _0() -> long = 0
+
+		override func _1() -> long = 1
+
+		override func add(lhs: long, rhs: long) -> long = lhs + rhs
+
+		override func subtract(lhs: long, rhs: long) -> long = lhs - rhs
+
+		override func negate(rhs: long) -> long = -rhs
+
+		override func multiply(lhs: long, rhs: long) -> long = lhs * rhs
+
+		override func power(lhs: long, rhs: int) -> long = lhs ** rhs
+	}
+
+	implicit object DoubleRing implements Ring<double>
+	{
+		override func _0() -> double = 0
+
+		override func _1() -> double = 1
+
+		override func add(lhs: double, rhs: double) -> double = lhs + rhs
+
+		override func negate(rhs: double) -> double = -rhs
+
+		override func subtract(lhs: double, rhs: double) -> double = lhs - rhs
+
+		override func multiply(lhs: double, rhs: double) -> double = lhs * rhs
+
+		override func inverse(rhs: double) -> double = 1 / rhs
+
+		override func divide(lhs: double, rhs: double) -> double = lhs / rhs
+
+		override func power(lhs: double, rhs: int) -> double = lhs ** rhs
+	}
+
+	implicit object FloatRing implements Ring<float>
+	{
+		override func _0() -> float = 0
+
+		override func _1() -> float = 1
+
+		override func add(lhs: float, rhs: float) -> float = lhs + rhs
+
+		override func negate(rhs: float) -> float = -rhs
+
+		override func subtract(lhs: float, rhs: float) -> float = lhs - rhs
+
+		override func multiply(lhs: float, rhs: float) -> float = lhs * rhs
+
+		override func inverse(rhs: float) -> float = 1 / rhs
+
+		override func divide(lhs: float, rhs: float) -> float = lhs / rhs
+
+		override func power(lhs: float, rhs: int) -> float = lhs ** rhs
+	}
+}

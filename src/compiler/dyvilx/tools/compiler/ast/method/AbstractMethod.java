@@ -16,11 +16,13 @@ import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.GenericData;
@@ -296,9 +298,35 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
+	public IContext getTypeParameterContext()
+	{
+		return this.enclosingClass == null || this.isStatic() ?
+			       this :
+			       new CombiningContext(this, this.enclosingClass.getTypeParameterContext());
+	}
+
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.parameters.get(name);
+	}
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		if (type == null)
+		{
+			return null;
+		}
+
+		for (IParameter param : this.parameters)
+		{
+			if (param.isImplicit() && Types.isSuperType(type, param.getType()))
+			{
+				return new FieldAccess(param);
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -660,7 +688,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// no receiver, non-static method
 
-			if (context.hasStaticAccess())
+			if (context.isStaticOnly())
 			{
 				// called from static context -> error
 
@@ -676,7 +704,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					genericData.setFallbackTypeContext(receiverType);
 				}
 
-				if (!this.enclosingClass.isAnonymous())
+				if (!this.isNested() && !this.enclosingClass.isAnonymous())
 				{
 					markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
 				}

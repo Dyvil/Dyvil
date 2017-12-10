@@ -1,10 +1,12 @@
 package dyvilx.tools.gensrc.parser;
 
-import dyvilx.tools.gensrc.ast.directive.DirectiveList;
-import dyvilx.tools.gensrc.ast.directive.ForDirective;
-import dyvilx.tools.gensrc.ast.expression.RangeOperator;
+import dyvilx.tools.compiler.ast.field.Variable;
+import dyvilx.tools.compiler.ast.statement.StatementList;
+import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.parser.type.TypeParser;
+import dyvilx.tools.gensrc.ast.directive.ForEachDirective;
 import dyvilx.tools.gensrc.lexer.GenSrcSymbols;
-import dyvilx.tools.gensrc.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -13,19 +15,20 @@ import dyvilx.tools.parsing.token.IToken;
 
 public class ForDirectiveParser extends Parser
 {
-	public static final int FOR         = 0;
-	public static final int OPEN_PAREN  = 1;
-	public static final int VAR_NAME    = 2;
-	public static final int ARROW       = 3;
-	public static final int CLOSE_PAREN = 4;
-	public static final int BODY        = 5;
-	public static final int BODY_END    = 6;
+	protected static final int FOR             = 0;
+	protected static final int OPEN_PAREN      = 1;
+	protected static final int VAR_NAME        = 2;
+	protected static final int TYPE_ASCRIPTION = 3;
+	protected static final int ARROW           = 4;
+	protected static final int CLOSE_PAREN     = 5;
+	protected static final int BODY            = 6;
+	protected static final int BODY_END        = 7;
 
-	private final DirectiveList list;
+	private final StatementList list;
 
-	private ForDirective directive;
+	private ForEachDirective directive;
 
-	public ForDirectiveParser(DirectiveList list)
+	public ForDirectiveParser(StatementList list)
 	{
 		this.list = list;
 	}
@@ -41,7 +44,7 @@ public class ForDirectiveParser extends Parser
 		case FOR:
 			assert type == GenSrcSymbols.FOR;
 			this.mode = OPEN_PAREN;
-			this.directive = new ForDirective(token.raw());
+			this.directive = new ForEachDirective(token.raw(), null);
 			return;
 		case OPEN_PAREN:
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
@@ -57,17 +60,25 @@ public class ForDirectiveParser extends Parser
 		case VAR_NAME:
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				this.directive.setVarName(token.nameValue());
-				this.mode = ARROW;
+				this.directive.setVariable(new Variable(token.raw(), token.nameValue(), Types.UNKNOWN));
+				this.mode = TYPE_ASCRIPTION;
 				return;
 			}
 
 			pm.report(token, "for.identifier");
-			if (type == GenSrcSymbols.ARROW_LEFT || type == BaseSymbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				this.mode = ARROW;
+				this.mode = BODY;
 			}
 			return;
+		case TYPE_ASCRIPTION:
+			if (type == BaseSymbols.COLON)
+			{
+				pm.pushParser(new TypeParser(this.directive.getVariable()));
+				this.mode = ARROW;
+				return;
+			}
+			// Fallthrough
 		case ARROW:
 			if (type != GenSrcSymbols.ARROW_LEFT)
 			{
@@ -75,19 +86,10 @@ public class ForDirectiveParser extends Parser
 				pm.report(token, "for.arrow_left");
 			}
 
-			pm.pushParser(new ExpressionParser(this.directive::setIterable));
+			pm.pushParser(new ExpressionParser(this.directive.getVariable()));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
-			if (type == Tokens.SYMBOL_IDENTIFIER && token.nameValue().unqualified.equals(".."))
-			{
-				final RangeOperator rangeOp = new RangeOperator(token.raw());
-				rangeOp.setStart(this.directive.getIterable());
-				pm.pushParser(new ExpressionParser(rangeOp::setEnd));
-				this.directive.setIterable(rangeOp);
-				return;
-			}
-
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "for.close_paren");
@@ -105,9 +107,9 @@ public class ForDirectiveParser extends Parser
 				return;
 			}
 
-			final DirectiveList body = new DirectiveList();
+			final StatementList body = new StatementList();
 			pm.pushParser(new BlockParser(body));
-			this.directive.setBody(body);
+			this.directive.setAction(body);
 			this.mode = BODY_END;
 			return;
 		case BODY_END:

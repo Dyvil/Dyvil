@@ -64,10 +64,10 @@ public final class ReferenceFactory
 		= new PropertyReferenceMetafactory(caller, invokedType, getter, setter).buildCallSite()
 
 	// Reference Factory Methods
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
-	#import("Base.dgs")
-	#for (spec <- PRIMITIVE_SPECS) {
-		#import(spec)
 		// TYPE_NAME
 
 		static func new#(TYPE_NAME)Ref(base: Object, offset: long) -> #(TYPE_NAME)Ref
@@ -81,6 +81,5 @@ public final class ReferenceFactory
 
 		static func new#(TYPE_NAME)ArrayRef(array: [PRIMITIVE], index: int) -> #(TYPE_NAME)Ref
 			= new #(TYPE_NAME)ArrayRef(array, index)
-
 	}
 }

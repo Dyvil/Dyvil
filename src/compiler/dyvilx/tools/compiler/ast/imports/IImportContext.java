@@ -29,6 +29,8 @@ public interface IImportContext extends IImplicitContext
 
 	IDataMember resolveField(Name name);
 
+	IValue resolveImplicit(IType type);
+
 	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	@Override

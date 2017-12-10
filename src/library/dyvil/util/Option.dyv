@@ -4,7 +4,7 @@ import java.io.Serializable
 
 @LiteralConvertible.FromTuple
 @Immutable
-interface Option<T> extends Serializable
+interface Option<type +T> extends Serializable
 {
 	static func of<T>(value: T?) -> Option<T> = value == null ? None : new Some<T>(value)
 

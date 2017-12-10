@@ -1,0 +1,3 @@
+package dyvil.math.group
+
+interface Ring<T> extends GroupAddNegate<T>, GroupMultiplyInverse<T>
