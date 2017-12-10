@@ -17,8 +17,6 @@
 #let(APPLY_T         = IS_GENERIC ? "ObjectArray<T>" : "new [" ++ PRIMITIVE ++ "]")
 #let(APPLY_WITH_SIZE = IS_GENERIC ? "ObjectArray(size, of: array.elementType)" : "new [" ++ PRIMITIVE ++ "](size)")
 
-#print(spec, spec['PRIMITIVE'])
-
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
