@@ -1,16 +1,18 @@
-package dyvilx.tools.compiler.ast.field;
+package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.field.IField;
+import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -80,9 +82,8 @@ public final class CaptureField extends CaptureDataMember implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		writer
-			.visitField(Modifiers.MANDATED | Modifiers.SYNTHETIC, this.internalName, this.getDescriptor(), this.getSignature(),
-			            null).visitEnd();
+		writer.visitField(Modifiers.MANDATED | Modifiers.SYNTHETIC, this.internalName, this.getDescriptor(),
+		                  this.getSignature(), null).visitEnd();
 	}
 
 	@Override

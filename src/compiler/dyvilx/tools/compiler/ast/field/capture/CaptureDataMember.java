@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.field;
+package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
@@ -9,6 +9,8 @@ import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -132,7 +134,7 @@ public abstract class CaptureDataMember implements IDataMember
 
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
-		                         IValue newValue)
+		IValue newValue)
 	{
 		this.variable.setReferenceType();
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);

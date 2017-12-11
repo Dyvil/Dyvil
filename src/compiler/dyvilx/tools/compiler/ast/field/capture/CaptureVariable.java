@@ -1,7 +1,8 @@
-package dyvilx.tools.compiler.ast.field;
+package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
@@ -15,7 +16,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	public CaptureVariable()
 	{
 	}
-	
+
 	public CaptureVariable(IVariable variable)
 	{
 		this.variable = variable;
@@ -38,7 +39,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	{
 		return this.variable.isReferenceType();
 	}
-	
+
 	@Override
 	public void setReferenceType()
 	{

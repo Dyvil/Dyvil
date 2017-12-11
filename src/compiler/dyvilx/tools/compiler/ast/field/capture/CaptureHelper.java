@@ -1,10 +1,8 @@
-package dyvilx.tools.compiler.transform;
+package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.field.CaptureDataMember;
-import dyvilx.tools.compiler.ast.field.CaptureField;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.backend.ClassWriter;
