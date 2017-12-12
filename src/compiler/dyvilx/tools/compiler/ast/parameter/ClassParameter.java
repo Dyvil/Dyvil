@@ -121,12 +121,6 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public void setVarargs()
-	{
-		this.attributes.addFlag(Modifiers.VARARGS);
-	}
-
-	@Override
 	public int getIndex()
 	{
 		return this.index;

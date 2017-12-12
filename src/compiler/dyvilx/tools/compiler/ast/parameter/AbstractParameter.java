@@ -156,12 +156,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void setVarargs()
-	{
-		this.attributes.addFlag(Modifiers.VARARGS);
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.method != null && this.method.hasModifier(Modifiers.GENERATED))

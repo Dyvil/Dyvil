@@ -68,7 +68,10 @@ public interface IParameter extends IVariable, IClassMember
 	@Override
 	boolean isLocal();
 
-	void setVarargs();
+	default void setVarargs()
+	{
+		this.getAttributes().addFlag(Modifiers.VARARGS);
+	}
 
 	@Override
 	default void writeInit(MethodWriter writer) throws BytecodeException
