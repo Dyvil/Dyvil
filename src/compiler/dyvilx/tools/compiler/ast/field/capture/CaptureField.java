@@ -25,7 +25,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	public IClass enclosingClass;
 	public String internalName;
 
-	public static Function<? super IVariable, ? extends CaptureDataMember> factory(IClass theClass)
+	public static Function<? super IVariable, ? extends CaptureField> factory(IClass theClass)
 	{
 		return variable -> new CaptureField(theClass, variable);
 	}

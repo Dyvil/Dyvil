@@ -90,7 +90,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	protected IMethod method;
 
-	protected CaptureHelper captureHelper;
+	protected CaptureHelper<CaptureVariable> captureHelper;
 
 	/**
 	 * The enclosing class internal name
@@ -283,13 +283,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 	}
 
-	private CaptureHelper getCaptureHelper()
+	private CaptureHelper<CaptureVariable> getCaptureHelper()
 	{
 		if (this.captureHelper != null)
 		{
 			return this.captureHelper;
 		}
-		return this.captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
+		return this.captureHelper = new CaptureHelper<>(CaptureVariable.FACTORY);
 	}
 
 	@Override

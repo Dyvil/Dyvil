@@ -23,7 +23,7 @@ import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
 
 public class AnonymousClass extends CodeClass
 {
-	protected CaptureHelper captureHelper = new CaptureHelper(CaptureField.factory(this));
+	protected CaptureHelper<CaptureField> captureHelper = new CaptureHelper<>(CaptureField.factory(this));
 
 	protected FieldThis    thisField;
 	protected IConstructor constructor;
@@ -166,7 +166,7 @@ class AnonymousClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final CaptureHelper captureHelper = this.theClass.captureHelper;
+		final CaptureHelper<CaptureField> captureHelper = this.theClass.captureHelper;
 		final FieldThis thisField = this.theClass.thisField;
 		final IConstructor constructor = this.theClass.constructor;
 

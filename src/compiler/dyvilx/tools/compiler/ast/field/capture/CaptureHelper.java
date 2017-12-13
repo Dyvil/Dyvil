@@ -1,33 +1,35 @@
 package dyvilx.tools.compiler.ast.field.capture;
 
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.Iterator;
 import java.util.function.Function;
 
-public class CaptureHelper
+public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 {
-	private CaptureDataMember[] capturedFields;
-	private int                 capturedFieldCount;
+	private final Function<? super IVariable, ? extends T> captureSupplier;
 
-	private       IClass                                                   thisClass;
-	private final Function<? super IVariable, ? extends CaptureDataMember> captureSupplier;
+	private T[]    capturedFields;
+	private int    capturedFieldCount;
+	private IClass thisClass;
 
-	public CaptureHelper(Function<? super IVariable, ? extends CaptureDataMember> captureSupplier)
+	public CaptureHelper(Function<? super IVariable, ? extends T> captureSupplier)
 	{
 		this.captureSupplier = captureSupplier;
 	}
 
-	public void setThisClass(IClass thisClass)
+	@Override
+	public Iterator<T> iterator()
 	{
-		this.thisClass = thisClass;
+		return new ArrayIterator<>(this.capturedFields, this.capturedFieldCount);
 	}
 
 	public IClass getThisClass()
@@ -35,11 +37,16 @@ public class CaptureHelper
 		return this.thisClass;
 	}
 
-	public IDataMember capture(IVariable variable)
+	public void setThisClass(IClass thisClass)
+	{
+		this.thisClass = thisClass;
+	}
+
+	public T capture(IVariable variable)
 	{
 		if (this.capturedFields == null)
 		{
-			this.capturedFields = new CaptureDataMember[2];
+			this.capturedFields = (T[]) new CaptureDataMember[2];
 			this.capturedFieldCount = 1;
 			return this.capturedFields[0] = this.captureSupplier.apply(variable);
 		}
@@ -47,7 +54,7 @@ public class CaptureHelper
 		// Check if the variable is already in the array
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			final CaptureDataMember capture = this.capturedFields[i];
+			final T capture = this.capturedFields[i];
 			if (capture.getVariable() == variable)
 			{
 				// If yes, return the match and skip adding the variable
@@ -56,10 +63,10 @@ public class CaptureHelper
 			}
 		}
 
-		int index = this.capturedFieldCount++;
+		final int index = this.capturedFieldCount++;
 		if (this.capturedFieldCount > this.capturedFields.length)
 		{
-			CaptureDataMember[] temp = new CaptureDataMember[this.capturedFieldCount];
+			final T[] temp = (T[]) new CaptureDataMember[index + 1];
 			System.arraycopy(this.capturedFields, 0, temp, 0, index);
 			this.capturedFields = temp;
 		}
@@ -115,7 +122,7 @@ public class CaptureHelper
 		}
 	}
 
-	public int writeCaptureParameters(MethodWriter writer, int index)
+	public void writeCaptureParameters(MethodWriter writer, int index)
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
@@ -123,8 +130,6 @@ public class CaptureHelper
 			capture.setLocalIndex(index);
 			index = writer.visitParameter(index, capture.getInternalName(), capture.getVariable().getInternalType(), 0);
 		}
-
-		return index;
 	}
 
 	public void writeCaptureFields(ClassWriter writer) throws BytecodeException
