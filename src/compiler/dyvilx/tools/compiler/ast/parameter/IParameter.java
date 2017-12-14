@@ -11,6 +11,8 @@ import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
@@ -71,6 +73,15 @@ public interface IParameter extends IVariable, IClassMember
 	default void setVarargs()
 	{
 		this.getAttributes().addFlag(Modifiers.VARARGS);
+	}
+
+	default IValue getDefaultValue(IContext context)
+	{
+		if (!this.isDefault())
+		{
+			return null;
+		}
+		return new DummyValue(this.getCovariantType(), (writer, type) -> this.writeGetDefaultValue(writer));
 	}
 
 	@Override
