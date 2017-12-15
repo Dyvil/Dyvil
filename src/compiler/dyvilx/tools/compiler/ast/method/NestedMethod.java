@@ -36,7 +36,7 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (context.isStaticOnly())
+		if (!context.isThisAvailable())
 		{
 			this.attributes.addFlag(Modifiers.STATIC);
 		}

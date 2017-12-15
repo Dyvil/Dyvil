@@ -37,15 +37,9 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public byte checkStatic()
+	public boolean isThisAvailable()
 	{
-		final byte innerResult = this.inner.checkStatic();
-		if (innerResult != PASS)
-		{
-			return innerResult;
-		}
-
-		return this.outer.checkStatic();
+		return this.inner.isThisAvailable() || this.outer.isThisAvailable();
 	}
 
 	@Override

@@ -32,12 +32,7 @@ public interface IContext extends IMemberContext, IImportContext
 	byte FALSE = 0;
 	byte TRUE  = 1;
 
-	default boolean isStaticOnly()
-	{
-		return this.checkStatic() != FALSE;
-	}
-
-	byte checkStatic();
+	boolean isThisAvailable();
 
 	default IContext push(IContext context)
 	{

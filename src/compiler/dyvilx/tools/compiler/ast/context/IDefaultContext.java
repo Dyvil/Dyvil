@@ -19,9 +19,9 @@ public interface IDefaultContext extends IStaticContext
 	IDefaultContext DEFAULT = new IDefaultContext() {};
 
 	@Override
-	default byte checkStatic()
+	default boolean isThisAvailable()
 	{
-		return PASS;
+		return false;
 	}
 
 	@Override

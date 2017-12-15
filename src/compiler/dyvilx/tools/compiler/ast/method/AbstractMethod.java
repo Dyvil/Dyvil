@@ -222,9 +222,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public byte checkStatic()
+	public boolean isThisAvailable()
 	{
-		return this.isStatic() ? TRUE : PASS;
+		return !this.isStatic();
 	}
 
 	@Override
@@ -688,7 +688,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// no receiver, non-static method
 
-			if (context.isStaticOnly())
+			if (!context.isThisAvailable())
 			{
 				// called from static context -> error
 

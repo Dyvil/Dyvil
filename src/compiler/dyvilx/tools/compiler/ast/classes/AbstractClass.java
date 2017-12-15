@@ -562,9 +562,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public byte checkStatic()
+	public boolean isThisAvailable()
 	{
-		return FALSE;
+		// not by default; only in non-static members
+		return false;
 	}
 
 	@Override

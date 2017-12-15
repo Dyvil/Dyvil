@@ -117,6 +117,12 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
+	public boolean isThisAvailable()
+	{
+		return true;
+	}
+
+	@Override
 	public IHeaderUnit getHeader()
 	{
 		return this.enclosingClass.getHeader();

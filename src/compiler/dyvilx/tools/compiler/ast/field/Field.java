@@ -13,7 +13,9 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
@@ -39,7 +41,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Field extends Member implements IField
+public class Field extends Member implements IField, IDefaultContext
 {
 	protected IValue value;
 
@@ -127,6 +129,12 @@ public class Field extends Member implements IField
 	}
 
 	@Override
+	public boolean isThisAvailable()
+	{
+		return !this.isStatic();
+	}
+
+	@Override
 	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
@@ -159,7 +167,7 @@ public class Field extends Member implements IField
 		{
 			if (!this.isStatic())
 			{
-				if (context.isStaticOnly())
+				if (!context.isThisAvailable())
 				{
 					markers.add(Markers.semanticError(position, "field.access.instance", this.name));
 				}
@@ -215,7 +223,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.value.resolveTypes(markers, new CombiningContext(this, context));
 		}
 
 		if (this.property == null)
@@ -256,7 +264,9 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value = this.value.resolve(markers, context);
+			final IContext context1 = new CombiningContext(this, context);
+
+			this.value = this.value.resolve(markers, context1);
 
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
@@ -268,7 +278,7 @@ public class Field extends Member implements IField
 			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("field.type.incompatible",
 			                                                                             "field.type", "value.type",
 			                                                                             this.name);
-			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context1, markerSupplier);
 
 			if (inferType)
 			{
@@ -340,7 +350,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.value.checkTypes(markers, new CombiningContext(this, context));
 		}
 
 		if (this.property != null)
@@ -356,7 +366,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.check(markers, context);
+			this.value.check(markers, new CombiningContext(this, context));
 		}
 		else if (!this.hasDefaultInit())
 		{

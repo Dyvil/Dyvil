@@ -3,7 +3,9 @@ package dyvilx.tools.compiler.ast.constructor;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -19,7 +21,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Initializer extends Member implements IInitializer
+public class Initializer extends Member implements IInitializer, IDefaultContext
 {
 	protected IValue value;
 
@@ -62,13 +64,19 @@ public class Initializer extends Member implements IInitializer
 	}
 
 	@Override
+	public boolean isThisAvailable()
+	{
+		return true;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
 
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.value.resolveTypes(markers, new CombiningContext(this, context));
 		}
 	}
 
@@ -79,8 +87,10 @@ public class Initializer extends Member implements IInitializer
 
 		if (this.value != null)
 		{
-			final IValue resolved = this.value.resolve(markers, context);
-			this.value = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context,
+			final IContext context1 = new CombiningContext(this, context);
+
+			final IValue resolved = this.value.resolve(markers, context1);
+			this.value = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context1,
 			                                      TypeChecker.markerSupplier("initializer.type"));
 		}
 	}
@@ -92,7 +102,7 @@ public class Initializer extends Member implements IInitializer
 
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.value.checkTypes(markers, new CombiningContext(this, context));
 		}
 	}
 
@@ -103,7 +113,7 @@ public class Initializer extends Member implements IInitializer
 
 		if (this.value != null)
 		{
-			this.value.check(markers, context);
+			this.value.check(markers, new CombiningContext(this, context));
 		}
 	}
 
