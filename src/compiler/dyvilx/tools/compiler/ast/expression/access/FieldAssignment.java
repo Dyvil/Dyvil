@@ -157,7 +157,7 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 			return null;
 		}
 
-		this.field = field;
+		this.field = field.capture(context);
 		this.receiver = receiver;
 		return this;
 	}
@@ -187,7 +187,6 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 
 		if (this.field != null)
 		{
-			this.field = this.field.capture(context);
 			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 			this.value = this.field.checkAssign(markers, context, this.position, this.receiver, this.value);
 		}

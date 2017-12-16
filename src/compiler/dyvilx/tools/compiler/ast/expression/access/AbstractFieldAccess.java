@@ -137,6 +137,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		if (this.field != null)
 		{
+			this.field = this.field.capture(context);
 			return OptionalChainAware.transform(this);
 		}
 
@@ -238,7 +239,6 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		if (this.field != null)
 		{
-			this.field = this.field.capture(context);
 			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		}
 	}

@@ -207,7 +207,7 @@ public class FieldAccess extends AbstractFieldAccess
 			return new EnumValue(this.position, field);
 		}
 
-		this.field = field;
+		this.field = field.capture(context);
 		this.receiver = receiver;
 		return this;
 	}
