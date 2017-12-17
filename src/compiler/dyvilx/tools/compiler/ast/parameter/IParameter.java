@@ -81,7 +81,7 @@ public interface IParameter extends IVariable, IClassMember
 		{
 			return null;
 		}
-		return new DummyValue(this.getCovariantType(), (writer, type) -> this.writeGetDefaultValue(writer));
+		return new DummyValue(this::getType, (writer, type) -> this.writeGetDefaultValue(writer));
 	}
 
 	@Override
