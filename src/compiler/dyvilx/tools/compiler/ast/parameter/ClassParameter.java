@@ -254,10 +254,4 @@ public class ClassParameter extends Field implements IParameter
 	{
 		IParameter.super.writeParameter(writer);
 	}
-
-	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
-	{
-		IParameter.super.writeInit(writer);
-	}
 }

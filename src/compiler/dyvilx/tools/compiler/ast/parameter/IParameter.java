@@ -85,7 +85,7 @@ public interface IParameter extends IVariable, IClassMember
 	}
 
 	@Override
-	default void writeInit(MethodWriter writer) throws BytecodeException
+	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
 		if (!this.isReferenceType())
 		{
@@ -95,12 +95,6 @@ public interface IParameter extends IVariable, IClassMember
 		writer.visitVarInsn(this.getType().getLoadOpcode(), this.getLocalIndex());
 
 		Variable.writeRefInit(this, writer, null);
-	}
-
-	@Override
-	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
 	}
 
 	default void writeParameter(MethodWriter writer)

@@ -192,12 +192,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer)
-	{
-		IParameter.super.writeInit(writer);
-	}
-
-	@Override
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		if (this.name != null)
