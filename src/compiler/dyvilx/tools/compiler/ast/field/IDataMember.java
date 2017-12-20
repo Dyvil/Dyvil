@@ -151,6 +151,11 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		return this;
 	}
 
+	default IDataMember captureReference(IContext context)
+	{
+		return this;
+	}
+
 	static void toString(String prefix, StringBuilder buffer, IMember field, String key)
 	{
 		final IType type = field.getType();

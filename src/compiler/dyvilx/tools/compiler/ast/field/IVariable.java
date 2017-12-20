@@ -52,6 +52,13 @@ public interface IVariable extends IDataMember
 	}
 
 	@Override
+	default IDataMember captureReference(IContext context)
+	{
+		this.setReferenceType();
+		return this.capture(context);
+	}
+
+	@Override
 	default String getDescriptor()
 	{
 		return this.getInternalType().getExtendedName();
