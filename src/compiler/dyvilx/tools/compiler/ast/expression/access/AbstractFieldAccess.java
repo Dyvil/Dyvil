@@ -137,7 +137,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		if (this.field != null)
 		{
-			this.field = this.field.capture(context);
+			this.setField(this.field, context); // to deal with capture correctly
 			return OptionalChainAware.transform(this);
 		}
 
@@ -156,6 +156,8 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		return OptionalChainAware.transform(this);
 	}
+
+	protected abstract void setField(IDataMember field, IContext context);
 
 	protected abstract void reportResolve(MarkerList markers);
 

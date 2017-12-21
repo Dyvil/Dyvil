@@ -121,6 +121,7 @@ public class FieldAccess extends AbstractFieldAccess
 		if (this.field instanceof IVariable)
 		{
 			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
+
 			return new VariableReference(this);
 		}
 		return null;
@@ -182,6 +183,12 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
+	protected void setField(IDataMember field, IContext context)
+	{
+		this.field = field.capture(context);
+	}
+
+	@Override
 	protected void reportResolve(MarkerList markers)
 	{
 		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
@@ -207,8 +214,8 @@ public class FieldAccess extends AbstractFieldAccess
 			return new EnumValue(this.position, field);
 		}
 
-		this.field = field.capture(context);
 		this.receiver = receiver;
+		this.setField(field, context);
 		return this;
 	}
 

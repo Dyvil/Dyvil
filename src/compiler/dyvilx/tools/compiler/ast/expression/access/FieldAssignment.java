@@ -137,18 +137,6 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	}
 
 	@Override
-	protected void reportResolve(MarkerList markers)
-	{
-		final Marker marker = Markers.semanticError(this.position, "resolve.field", this.name.unqualified);
-		if (this.receiver != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
-		}
-
-		markers.add(marker);
-	}
-
-	@Override
 	protected IValue resolveAsField(IValue receiver, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
@@ -157,8 +145,8 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 			return null;
 		}
 
-		this.field = field.capture(context);
 		this.receiver = receiver;
+		this.setField(field, context);
 		return this;
 	}
 
@@ -169,6 +157,24 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 		final ArgumentList argument = new ArgumentList(this.value);
 		final MethodAssignment assignment = new MethodAssignment(this.position, receiver, name, argument);
 		return assignment.resolveCall(markers, context, false);
+	}
+
+	@Override
+	protected void setField(IDataMember field, IContext context)
+	{
+		this.field = field.captureReference(context);
+	}
+
+	@Override
+	protected void reportResolve(MarkerList markers)
+	{
+		final Marker marker = Markers.semanticError(this.position, "resolve.field", this.name.unqualified);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
 	}
 
 	@Override

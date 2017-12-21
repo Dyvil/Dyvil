@@ -136,7 +136,11 @@ public abstract class CaptureDataMember implements IDataMember
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		IValue newValue)
 	{
-		this.variable.setReferenceType();
+		if (this.accessPosition == null)
+		{
+			this.accessPosition = position;
+		}
+
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);
 	}
 
