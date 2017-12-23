@@ -1,46 +1,42 @@
 package dyvilx.tools.compiler.ast.reference;
 
-import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
-import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.header.IClassCompilableList;
-import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class VariableReference implements IReference
 {
-	private final FieldAccess fieldAccess;
+	private IDataMember variable;
 
-	public VariableReference(FieldAccess fieldAccess)
+	public VariableReference(IDataMember variable)
 	{
-		this.fieldAccess = fieldAccess;
+		this.variable = variable;
 	}
 
-	private IVariable getVariable()
+	public IDataMember getVariable()
 	{
-		return (IVariable) this.fieldAccess.getField();
+		return this.variable;
+	}
+
+	@Override
+	public void resolve(SourcePosition position, MarkerList markers, IContext context)
+	{
+		this.variable = this.variable.captureReference(context);
 	}
 
 	@Override
 	public void check(SourcePosition position, MarkerList markers, IContext context)
 	{
-		InstanceFieldReference.checkFinalAccess(this.fieldAccess.getField(), position, markers);
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		this.getVariable().setReferenceType();
+		InstanceFieldReference.checkFinalAccess(this.variable, position, markers);
 	}
 
 	@Override
 	public void writeReference(MethodWriter writer) throws BytecodeException
 	{
 		// Assumes that the variable was properly converted to a Reference Variable
-		writer.visitVarInsn(Opcodes.ALOAD, this.getVariable().getLocalIndex());
+		this.variable.writeGet_Get(writer, -1);
 	}
 }

@@ -100,31 +100,26 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	public IReference toReference()
+	public IReference toReference(IContext context)
 	{
 		if (this.field == null)
 		{
 			return null;
 		}
 
-		if (!this.field.isLocal())
+		if (this.field.isLocal())
 		{
-			if (this.field.hasModifier(Modifiers.STATIC))
-			{
-				return new StaticFieldReference((IField) this.field);
-			}
-			else
-			{
-				return new InstanceFieldReference(this.receiver, (IField) this.field);
-			}
+			return new VariableReference(this.field.captureReference(context));
 		}
-		if (this.field instanceof IVariable)
-		{
-			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
 
-			return new VariableReference(this);
+		if (this.field.isStatic())
+		{
+			return new StaticFieldReference((IField) this.field);
 		}
-		return null;
+		else
+		{
+			return new InstanceFieldReference(this.receiver, (IField) this.field);
+		}
 	}
 
 	@Override

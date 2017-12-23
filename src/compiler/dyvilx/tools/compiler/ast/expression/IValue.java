@@ -176,7 +176,7 @@ public interface IValue extends ASTNode, ITyped
 
 	boolean isResolved();
 
-	default IReference toReference()
+	default IReference toReference(IContext context)
 	{
 		return null;
 	}

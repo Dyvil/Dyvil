@@ -70,7 +70,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return referenceValue;
 		}
 
-		final IReference ref = value.toReference();
+		final IReference ref = value.toReference(context);
 		if (ref != null)
 		{
 			return new ReferenceOperator(value, ref);

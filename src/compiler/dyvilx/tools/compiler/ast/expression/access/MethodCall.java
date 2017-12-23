@@ -94,7 +94,7 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public IReference toReference()
+	public IReference toReference(IContext context)
 	{
 		if (!this.arguments.isEmpty())
 		{
