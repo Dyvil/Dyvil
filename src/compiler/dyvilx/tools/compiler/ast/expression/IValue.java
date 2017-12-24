@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -14,7 +15,6 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.reference.IReference;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.ITyped;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -25,7 +25,6 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public interface IValue extends ASTNode, ITyped
 {
@@ -175,11 +174,6 @@ public interface IValue extends ASTNode, ITyped
 	}
 
 	boolean isResolved();
-
-	default IReference toReference(IContext context)
-	{
-		return null;
-	}
 
 	default IValue toReferenceValue(MarkerList markers, IContext context)
 	{

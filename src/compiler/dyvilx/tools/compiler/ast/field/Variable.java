@@ -135,12 +135,13 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public void setReferenceType()
+	public boolean setReferenceType()
 	{
 		if (this.refType == null)
 		{
 			this.refType = this.type.getSimpleRefType();
 		}
+		return true;
 	}
 
 	@Override

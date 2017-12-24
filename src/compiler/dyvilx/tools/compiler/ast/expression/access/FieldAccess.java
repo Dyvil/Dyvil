@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -13,10 +14,7 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.reference.IReference;
-import dyvilx.tools.compiler.ast.reference.InstanceFieldReference;
-import dyvilx.tools.compiler.ast.reference.StaticFieldReference;
-import dyvilx.tools.compiler.ast.reference.VariableReference;
+import dyvilx.tools.compiler.ast.reference.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
@@ -24,7 +22,7 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
+import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -88,7 +86,7 @@ public class FieldAccess extends AbstractFieldAccess
 
 	@Override
 	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
-		                                  SideEffectHelper helper)
+		SideEffectHelper helper)
 	{
 		// x (op)= z
 		// -> x = x (op) z
@@ -100,26 +98,36 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	public IReference toReference(IContext context)
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
 		if (this.field == null)
 		{
-			return null;
+			return this; // avoid extra error
 		}
 
+		final IReference ref;
 		if (this.field.isLocal())
 		{
-			return new VariableReference(this.field.captureReference(context));
-		}
+			if (!((IVariable) this.field).setReferenceType())
+			{
+				final Marker marker = Markers.semanticError(this.position, "reference.variable.invalid",
+				                                            Util.memberNamed(this.field));
+				markers.add(marker);
+				return this;
+			}
 
-		if (this.field.isStatic())
+			ref = new VariableReference(this.field.capture(context));
+		}
+		else if (this.field.isStatic())
 		{
-			return new StaticFieldReference((IField) this.field);
+			ref = new StaticFieldReference((IField) this.field);
 		}
 		else
 		{
-			return new InstanceFieldReference(this.receiver, (IField) this.field);
+			ref = new InstanceFieldReference(this.receiver, (IField) this.field);
 		}
+
+		return new ReferenceOperator(this, ref);
 	}
 
 	@Override

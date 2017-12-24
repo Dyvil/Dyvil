@@ -38,8 +38,9 @@ public interface IVariable extends IDataMember
 		return null;
 	}
 
-	default void setReferenceType()
+	default boolean setReferenceType()
 	{
+		return false;
 	}
 
 	IType getInternalType();

@@ -1,19 +1,19 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.member.INamed;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.reference.IReference;
 import dyvilx.tools.compiler.ast.reference.PropertyReference;
+import dyvilx.tools.compiler.ast.reference.ReferenceOperator;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvilx.tools.compiler.transform.ConstantFolder;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class MethodCall extends AbstractCall implements INamed
 {
@@ -94,14 +94,14 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public IReference toReference(IContext context)
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
 		if (!this.arguments.isEmpty())
 		{
 			return null;
 		}
 
-		return new PropertyReference(this.receiver, this.method);
+		return new ReferenceOperator(this, new PropertyReference(this.receiver, this.method));
 	}
 
 	@Override
@@ -168,8 +168,7 @@ public class MethodCall extends AbstractCall implements INamed
 			return new ClassAccess(this.position, type);
 		}
 
-		final IValue access = new FieldAccess(this.position, this.receiver, this.name)
-			                      .resolveAccess(markers, context);
+		final IValue access = new FieldAccess(this.position, this.receiver, this.name).resolveAccess(markers, context);
 		if (access == null)
 		{
 			return null;

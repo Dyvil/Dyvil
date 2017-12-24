@@ -58,31 +58,24 @@ public class ImplicitReferenceType extends ReferenceType
 	@Override
 	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IValue typedValue = value.withType(this.type, typeContext, markers, context);
+		final IValue typedValue = value.withType(this.type, typeContext, markers, context);
 		if (typedValue == null || !this.isConvertibleFrom(typedValue.getType()))
 		{
 			return null;
 		}
 
-		final IValue referenceValue = value.toReferenceValue(markers, context);
-		if (referenceValue != null)
+		final IValue reference = typedValue.toReferenceValue(markers, context);
+		if (reference != null)
 		{
-			return referenceValue;
+			return reference;
 		}
 
-		final IReference ref = value.toReference(context);
-		if (ref != null)
-		{
-			return new ReferenceOperator(value, ref);
-		}
-
-		markers.add(Markers.semanticError(value.getPosition(), "reference.expression.invalid"));
+		markers.add(Markers.semanticError(this.getPosition(), "reference.expression.invalid"));
 		return typedValue;
 	}
 
 	@Override
-	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers,
-		                            IContext context)
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (!this.isConvertibleTo(type))
 		{

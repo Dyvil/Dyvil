@@ -42,9 +42,9 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	}
 
 	@Override
-	public void setReferenceType()
+	public boolean setReferenceType()
 	{
-		this.variable.setReferenceType();
+		return this.variable.setReferenceType();
 	}
 
 	@Override
