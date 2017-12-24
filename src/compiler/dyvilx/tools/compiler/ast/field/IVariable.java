@@ -33,9 +33,9 @@ public interface IVariable extends IDataMember
 
 	void setLocalIndex(int index);
 
-	default boolean isReferenceType()
+	default IType getReferenceType()
 	{
-		return false;
+		return null;
 	}
 
 	default void setReferenceType()

@@ -87,7 +87,7 @@ public interface IParameter extends IVariable, IClassMember
 	@Override
 	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
-		if (!this.isReferenceType())
+		if (this.getReferenceType() == null)
 		{
 			return;
 		}

@@ -129,9 +129,9 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public boolean isReferenceType()
+	public IType getReferenceType()
 	{
-		return this.refType != null;
+		return this.refType;
 	}
 
 	@Override
@@ -266,7 +266,7 @@ public class Variable extends Member implements IVariable
 	public static void writeRefInit(IVariable variable, MethodWriter writer, IValue value)
 	{
 		final IType type = variable.getType();
-		final IType refType = variable.getInternalType();
+		final IType refType = variable.getReferenceType();
 
 		final IConstructor constructor = refType.getTheClass().getBody().getConstructor(0);
 		writer.visitTypeInsn(Opcodes.NEW, refType.getInternalName());

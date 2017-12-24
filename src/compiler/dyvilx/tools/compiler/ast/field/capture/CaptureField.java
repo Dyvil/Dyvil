@@ -98,7 +98,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (!this.variable.isReferenceType())
+		if (this.variable.getReferenceType() == null)
 		{
 			String owner = this.enclosingClass.getInternalName();
 			String name = this.internalName;

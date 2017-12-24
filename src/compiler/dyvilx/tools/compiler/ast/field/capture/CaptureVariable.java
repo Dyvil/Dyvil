@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.field.capture;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
@@ -35,9 +36,9 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	}
 
 	@Override
-	public boolean isReferenceType()
+	public IType getReferenceType()
 	{
-		return this.variable.isReferenceType();
+		return this.variable.getReferenceType();
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (!this.variable.isReferenceType())
+		if (this.variable.getReferenceType() == null)
 		{
 			writer.visitVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
 		}

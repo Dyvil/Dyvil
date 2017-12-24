@@ -210,7 +210,7 @@ public abstract class CaptureDataMember implements IDataMember
 	@Override
 	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.variable.isReferenceType())
+		if (this.variable.getReferenceType() != null)
 		{
 			this.writeGet_Get(writer, lineNumber);
 			return true;

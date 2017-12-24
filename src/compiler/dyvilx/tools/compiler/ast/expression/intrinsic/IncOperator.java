@@ -282,7 +282,7 @@ public class IncOperator extends AbstractValue
 		{
 			return false;
 		}
-		if (((IVariable) this.field).isReferenceType())
+		if (((IVariable) this.field).getReferenceType() != null)
 		{
 			return false;
 		}
