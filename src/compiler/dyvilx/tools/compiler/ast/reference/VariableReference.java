@@ -22,12 +22,6 @@ public class VariableReference implements IReference
 	}
 
 	@Override
-	public void resolve(SourcePosition position, MarkerList markers, IContext context)
-	{
-		this.variable = this.variable.captureReference(context);
-	}
-
-	@Override
 	public void check(SourcePosition position, MarkerList markers, IContext context)
 	{
 		InstanceFieldReference.checkFinalAccess(this.variable, position, markers);
