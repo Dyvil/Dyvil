@@ -115,6 +115,13 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
+	public boolean setAssigned()
+	{
+		this.assigned = true;
+		return true;
+	}
+
+	@Override
 	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
@@ -124,7 +131,7 @@ public class Variable extends Member implements IVariable
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		                         IValue newValue)
 	{
-		this.assigned = true;
+		this.setAssigned();
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
 	}
 

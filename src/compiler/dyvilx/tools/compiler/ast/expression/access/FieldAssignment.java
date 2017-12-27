@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
@@ -19,7 +20,6 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -137,7 +137,7 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	}
 
 	@Override
-	protected IValue resolveAsField(IValue receiver, IContext context)
+	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field == null)
@@ -146,7 +146,8 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 		}
 
 		this.receiver = receiver;
-		this.setField(field, context);
+		this.field = field;
+		this.capture(markers, context);
 		return this;
 	}
 
@@ -160,9 +161,17 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	}
 
 	@Override
-	protected void setField(IDataMember field, IContext context)
+	protected void capture(MarkerList markers, IContext context)
 	{
-		this.field = field.captureReference(context);
+		this.field = this.field.capture(context);
+
+		// in case the field was captured, this ensures reference capture takes place
+		if (!this.field.setAssigned())
+		{
+			final Marker marker = Markers.semanticError(this.position, "reference.variable.assignment",
+			                                            Util.memberNamed(this.field));
+			markers.add(marker);
+		}
 	}
 
 	@Override

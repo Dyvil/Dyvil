@@ -186,25 +186,7 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	protected void setField(IDataMember field, IContext context)
-	{
-		this.field = field.capture(context);
-	}
-
-	@Override
-	protected void reportResolve(MarkerList markers)
-	{
-		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
-		if (this.receiver != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
-		}
-
-		markers.add(marker);
-	}
-
-	@Override
-	protected IValue resolveAsField(IValue receiver, IContext context)
+	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field == null)
@@ -218,7 +200,8 @@ public class FieldAccess extends AbstractFieldAccess
 		}
 
 		this.receiver = receiver;
-		this.setField(field, context);
+		this.field = field;
+		this.capture(markers, context);
 		return this;
 	}
 
@@ -249,6 +232,24 @@ public class FieldAccess extends AbstractFieldAccess
 
 		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
 		return type != null ? new ClassAccess(this.position, type) : null;
+	}
+
+	@Override
+	protected void reportResolve(MarkerList markers)
+	{
+		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
+	}
+
+	@Override
+	protected void capture(MarkerList markers, IContext context)
+	{
+		this.field = this.field.capture(context);
 	}
 
 	@Override

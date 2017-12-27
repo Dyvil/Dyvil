@@ -22,8 +22,6 @@ public interface IVariable extends IDataMember
 		return true;
 	}
 
-	boolean isAssigned();
-
 	default int getLocalSlots()
 	{
 		return this.getInternalType().getLocalSlots();
@@ -50,13 +48,6 @@ public interface IVariable extends IDataMember
 	{
 		IDataMember capture = context.capture(this);
 		return capture == null ? this : capture;
-	}
-
-	@Override
-	default IDataMember captureReference(IContext context)
-	{
-		this.setReferenceType();
-		return this.capture(context);
 	}
 
 	@Override

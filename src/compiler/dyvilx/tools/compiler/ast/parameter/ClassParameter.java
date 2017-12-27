@@ -80,12 +80,6 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public boolean isAssigned()
-	{
-		return true;
-	}
-
-	@Override
 	public ICallableMember getMethod()
 	{
 		return this.constructor;

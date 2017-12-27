@@ -26,6 +26,16 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	@Override
 	void setValue(IValue value);
 
+	default boolean isAssigned()
+	{
+		return true;
+	}
+
+	default boolean setAssigned()
+	{
+		return true;
+	}
+
 	default IProperty getProperty()
 	{
 		return null;
@@ -147,11 +157,6 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	}
 
 	default IDataMember capture(IContext context)
-	{
-		return this;
-	}
-
-	default IDataMember captureReference(IContext context)
 	{
 		return this;
 	}

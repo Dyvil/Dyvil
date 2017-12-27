@@ -137,7 +137,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 
 		if (this.field != null)
 		{
-			this.setField(this.field, context); // to deal with capture correctly
+			this.capture(markers, context); // to deal with capture correctly
 			return OptionalChainAware.transform(this);
 		}
 
@@ -157,7 +157,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 		return OptionalChainAware.transform(this);
 	}
 
-	protected abstract void setField(IDataMember field, IContext context);
+	protected abstract void capture(MarkerList markers, IContext context);
 
 	protected abstract void reportResolve(MarkerList markers);
 
@@ -189,14 +189,14 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 					return value;
 				}
 
-				value = this.resolveAsField(implicit, context);
+				value = this.resolveAsField(implicit, markers, context);
 				if (value != null)
 				{
 					return value;
 				}
 			}
 
-			value = this.resolveAsField(this.receiver, context);
+			value = this.resolveAsField(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -216,7 +216,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 				return value;
 			}
 
-			value = this.resolveAsField(this.receiver, context);
+			value = this.resolveAsField(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -225,7 +225,7 @@ public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAc
 		return null;
 	}
 
-	protected abstract IValue resolveAsField(IValue receiver, IContext context);
+	protected abstract IValue resolveAsField(IValue receiver, MarkerList markers, IContext context);
 
 	protected abstract IValue resolveAsMethod(IValue receiver, MarkerList markers, IContext context);
 
