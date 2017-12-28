@@ -9,7 +9,7 @@ class CaptureTest
 		anonClassCapture()
 	}
 
-	static func ref(i: int) -> int* = &i
+	static func supplier(i: int) -> (-> int) = => i
 
 	static func classOf<@Reified(.ANY_CLASS) type T>() -> () -> Class<T> = => class T
 
@@ -23,14 +23,15 @@ class CaptureTest
 		res =?= (1, 2, 3, -1)
 
 		test "Method Parameter Capture" {
-			ref(10).get =?= 10
-			ref(10) =!= ref(10)
+			let supplier = supplier(10)
+			supplier() =?= 10
 		}
 
 		// Lambda Parameter capture by reference
 		test "Lambda Parameter Capture" {
-			let refl = (i: int) => &i
-			refl(10).get =?= 10
+			let supplierLambda = (i: int) => => i
+			let supplier = supplierLambda(10)
+			supplier() =?= 10
 		}
 
 		test "Type Parameter Capture" {
