@@ -271,7 +271,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.parameters[i].getCovariantType().appendExtendedName(builder);
+			this.parameters[i].getInternalType().appendExtendedName(builder);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 			final IParameter parameter = this.parameters[i];
 			if (!parameter.hasModifier(Modifiers.SYNTHETIC))
 			{
-				parameter.getType().appendSignature(builder, false);
+				parameter.getInternalType().appendSignature(builder, false);
 			}
 		}
 	}
