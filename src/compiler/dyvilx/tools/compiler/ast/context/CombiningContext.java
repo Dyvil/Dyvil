@@ -200,7 +200,7 @@ public class CombiningContext implements IContext
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.inner.isMember(variable);
+		return this.inner.isMember(variable) || this.outer.isMember(variable);
 	}
 
 	@Override
@@ -210,10 +210,16 @@ public class CombiningContext implements IContext
 		{
 			return variable;
 		}
-		if (this.outer.isMember(variable))
-		{
-			return this.inner.capture(variable);
-		}
+
+		// first capture in the outer context
+		// then capture the capture from the outer context in the inner context
+		// example:
+		//   var i = 0
+		//   => => print i
+		// first step: capture i in i0
+		//   [ i0 = i ] => => i0
+		// second step: capture i in i1
+		//   [ i0 = i ] => [ i1 = i0 ] => i1
 
 		IDataMember dm = this.outer.capture(variable);
 		return dm.capture(this.inner);

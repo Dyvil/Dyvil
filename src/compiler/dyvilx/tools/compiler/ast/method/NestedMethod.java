@@ -32,6 +32,12 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return super.isMember(variable) || this.captureHelper.isMember(variable);
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (!context.isThisAvailable())

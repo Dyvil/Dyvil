@@ -69,6 +69,12 @@ public class AnonymousClass extends CodeClass
 	}
 
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return super.isMember(variable) || this.captureHelper.isMember(variable);
+	}
+
+	@Override
 	public IDataMember capture(IVariable variable)
 	{
 		if (this.isMember(variable))

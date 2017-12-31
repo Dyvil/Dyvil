@@ -73,6 +73,22 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 		return this.capturedFields[index] = this.captureSupplier.apply(variable);
 	}
 
+	public boolean isMember(IVariable variable)
+	{
+		if (this.capturedFields == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			if (this.capturedFields[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void checkCaptures(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
