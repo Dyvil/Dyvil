@@ -4,6 +4,8 @@ using dyvil.math.MathUtils._
 using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
 
+import java.util.regex.{ Pattern, Matcher }
+
 abstract class Strings
 {
 	private const STRING_VALUE_OFFSET: long = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
@@ -127,6 +129,21 @@ abstract class Strings
 			System.arraycopy(array2, 0, array1, 0, arraySize)
 		}
 		return array2[size2]
+	}
+
+	infix func replaceAll(string: String, target: String, by replacer: String -> String)
+	{
+		let p: Pattern = Pattern.compile(target)
+		let m: Matcher = p.matcher(string)
+		let buffer = new StringBuffer
+
+		while (m.find())
+		{
+			m.appendReplacement(buffer, replacer(m.group()))
+		}
+
+		m.appendTail(buffer)
+		return buffer.toString!!
 	}
 
 	extension func toString(o: any, builder: StringBuilder) -> void = builder.append o
