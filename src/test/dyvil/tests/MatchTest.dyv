@@ -225,12 +225,13 @@ class MatchTest
 		}
 
 		test "Optimized" {
-			let tree: Tree<String> = Node("a", Leaf("b"), Leaf("c"))
+			let tree: Tree<String> = Node("a", Leaf("b"), EmptyLeaf)
 
 			match (tree)
 			{
+				case EmptyLeaf => fail
 				case Leaf(var s) => fail
-				case Node("a", Leaf("b"), Leaf("c")) => pass
+				case Node("a", Leaf("b"), EmptyLeaf) => pass
 				case _ => fail
 			}
 		}

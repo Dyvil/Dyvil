@@ -9,10 +9,13 @@ class CaseClassTest
 	// Tree / Leaf / Node
 
 	@SwitchOptimized
-	static interface Tree<T>
+	static interface Tree<+T>
 
 	@SwitchOptimized
 	static case class Leaf<T>(value: T) implements Tree<T>
+
+	@SwitchOptimized
+	static object EmptyLeaf implements Tree<none>
 
 	@SwitchOptimized
 	static case class Node<T>(value: T, left: Tree<T>, right: Tree<T>) implements Tree<T>

@@ -154,15 +154,21 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 			}
 		}
 
-		if (Types.isSuperClass(matchedType, this.type) // matched type is super-type of enclosing type
-		    && this.type.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null // and both types are @SwitchOptimized
+		this.switchValue = getSwitchValue(matchedType, this.type);
+
+		return true;
+	}
+
+	public static Integer getSwitchValue(IType matchedType, IType type)
+	{
+		if (Types.isSuperClass(matchedType, type) // matched type is super-type of enclosing type
+		    && type.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null // and both types are @SwitchOptimized
 		    && matchedType.getAnnotation(Types.SWITCHOPTIMIZED_CLASS) != null)
 		{
 			// Compute the switch value from the hash code of the class name
-			this.switchValue = ClassFormat.internalToPackage(this.type.getInternalName()).hashCode();
+			return ClassFormat.internalToPackage(type.getInternalName()).hashCode();
 		}
-
-		return true;
+		return null;
 	}
 
 	@Override

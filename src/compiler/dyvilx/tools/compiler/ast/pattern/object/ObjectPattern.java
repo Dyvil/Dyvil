@@ -8,8 +8,8 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -23,6 +23,8 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 
 	// Metadata
 	private IDataMember instanceField;
+
+	private Integer switchValue;
 
 	public ObjectPattern(SourcePosition position, IType type)
 	{
@@ -47,6 +49,7 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 	{
 		if (this.isType(type))
 		{
+			this.switchValue = UnapplyPattern.getSwitchValue(type, this.type);
 			return this;
 		}
 		// Type Check Patterns are not required
@@ -105,6 +108,33 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 
 		this.instanceField = theClass.getMetadata().getInstanceField();
 		return this;
+	}
+
+	@Override
+	public boolean isSwitchable()
+	{
+		return this.switchValue != null;
+	}
+
+	@Override
+	public boolean switchCheck()
+	{
+		return true;
+	}
+
+	@Override
+	public int switchValue()
+	{
+		return this.switchValue;
+	}
+
+	@Override
+	public void writeJumpOnMatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
+	{
+		Pattern.loadVar(writer, varIndex);
+		// No need to cast - Reference Equality Comparison (ACMP) handles it
+		this.instanceField.writeGet(writer, null, this.lineNumber());
+		writer.visitJumpInsn(Opcodes.IF_ACMPEQ, target);
 	}
 
 	@Override
