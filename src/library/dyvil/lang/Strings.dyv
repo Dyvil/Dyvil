@@ -67,7 +67,9 @@ abstract class Strings
 
 	// Misc. additional extensions
 
-	inline infix func size(string: CharSequence) -> int = string.length
+	inline postfix func size(string: CharSequence) -> int = string.length
+
+	inline static func |_|(string: CharSequence) -> int = string.length
 
 	inline infix func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
 

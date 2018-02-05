@@ -107,6 +107,9 @@ public abstract class #(TYPE_NAME)Array
 	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
 	postfix func size GENERIC(array: [T]) -> int = array.size
 
+	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
+	static func |_| GENERIC(array: [T]) -> int = array.size
+
 	@Intrinsic([ LOAD_0, ARRAYLENGTH, EQ0 ])
 	postfix func isEmpty GENERIC(array: [T]) -> boolean = array.isEmpty
 

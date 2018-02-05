@@ -96,7 +96,11 @@ public abstract class Ints
 
 	// Range Operators
 
-	infix func ..(lhs: int, rhs: int) -> IntRange = IntRange(lhs, to: rhs)
+	inline infix func ..(lhs: int, rhs: int) -> IntRange = IntRange(lhs, to: rhs)
 
-	infix func ..<(lhs: int, rhs: int) -> IntRange = IntRange(lhs, toExclusive: rhs)
+	inline infix func ..<(lhs: int, rhs: int) -> IntRange = IntRange(lhs, toExclusive: rhs)
+
+	// Other Operators
+
+	inline static func |_|(lhs: int) -> int = Math.abs(lhs)
 }

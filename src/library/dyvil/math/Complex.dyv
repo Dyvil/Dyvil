@@ -41,6 +41,8 @@ public case class Complex(let real: double, let imag: double) implements ScalarM
 
 	override postfix func inverse(lhs: Complex) -> Complex = 1 / lhs
 
+	static func |_|(c: Complex) -> double = c.length
+
 	// Additive Operators
 
 	override infix func +(lhs: Complex, rhs: Complex) -> Complex = Complex(lhs.real + rhs.real, lhs.imag + rhs.imag)

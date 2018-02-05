@@ -7,13 +7,15 @@ public abstract class Floats
 {
 	private init() {}
 
-	// Float Operators
+	// Unary Operators
 
 	@Intrinsic([ LOAD_0 ])
 	prefix func +(rhs: float) -> float = rhs
 
 	@Intrinsic([ LOAD_0, FNEG ])
 	prefix func -(rhs: float) -> float = -rhs
+
+	// Relational Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
 	infix func ==(lhs: float, rhs: float) -> boolean = lhs == rhs
@@ -33,11 +35,15 @@ public abstract class Floats
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPGE ])
 	infix func >=(lhs: float, rhs: float) -> boolean = lhs >= rhs
 
+	// Additive Operators
+
 	@Intrinsic([ LOAD_0, LOAD_1, FADD ])
 	infix func +(lhs: float, rhs: float) -> float = lhs + rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FSUB ])
 	infix func -(lhs: float, rhs: float) -> float = lhs - rhs
+
+	// Multiplicative Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
 	infix func *(lhs: float, rhs: float) -> float = lhs * rhs
@@ -51,7 +57,13 @@ public abstract class Floats
 	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
 	infix func %(lhs: float, rhs: float) -> float = lhs % rhs
 
-	infix func ..(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, to: rhs)
+	// Range Operators
 
-	infix func ..<(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, toExclusive: rhs)
+	inline infix func ..(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, toExclusive: rhs)
+
+	// Other Operators
+
+	inline static func |_|(lhs: float) -> float = Math.abs(lhs)
 }
