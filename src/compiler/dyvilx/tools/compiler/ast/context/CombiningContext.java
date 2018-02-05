@@ -1,23 +1,23 @@
 package dyvilx.tools.compiler.ast.context;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.field.IAccessible;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
+import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvil.lang.Name;
 
 public class CombiningContext implements IContext
 {
@@ -115,7 +115,7 @@ public class CombiningContext implements IContext
 		if (inner == null || inner.getType() != type)
 		{
 			final IOperator outer = this.outer.resolveOperator(name, type);
-			if (outer != null && outer.getType() == type)
+			if (outer != null && outer.getType() == type || inner == null)
 			{
 				return outer;
 			}

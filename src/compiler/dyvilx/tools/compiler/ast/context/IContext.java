@@ -103,7 +103,11 @@ public interface IContext extends IMemberContext, IImportContext
 		final IOperator operator = context.resolveOperator(name, type);
 		if (operator == null || operator.getType() != type)
 		{
-			return Types.BASE_CONTEXT.resolveOperator(name, type);
+			final IOperator base = Types.BASE_CONTEXT.resolveOperator(name, type);
+			if (base != null && base.getType() == type || operator == null)
+			{
+				return base;
+			}
 		}
 		return operator;
 	}
@@ -116,13 +120,13 @@ public interface IContext extends IMemberContext, IImportContext
 	}
 
 	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type,
-		                                      ArgumentList arguments)
+		ArgumentList arguments)
 	{
 		return resolveConstructors(implicitContext, type, arguments).getBestMember();
 	}
 
 	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type,
-		                                                  ArgumentList arguments)
+		ArgumentList arguments)
 	{
 		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);

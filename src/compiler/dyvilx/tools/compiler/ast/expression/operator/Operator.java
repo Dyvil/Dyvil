@@ -17,9 +17,10 @@ public final class Operator implements IOperator
 	protected static final int ID_INFIX_RIGHT = 3;
 	protected static final int ID_POSTFIX     = 4;
 	protected static final int ID_TERNARY     = 5;
+	protected static final int ID_CIRCUMFIX   = 6;
 
 	protected Name name;
-	protected Name ternaryName;
+	protected Name name2;
 	protected int  precedence;
 	protected byte id;
 
@@ -69,15 +70,15 @@ public final class Operator implements IOperator
 	}
 
 	@Override
-	public Name getTernaryName()
+	public Name getName2()
 	{
-		return this.ternaryName;
+		return this.name2;
 	}
 
 	@Override
-	public void setTernaryName(Name name)
+	public void setName2(Name name)
 	{
-		this.ternaryName = name;
+		this.name2 = name;
 	}
 
 	@Override
@@ -91,6 +92,8 @@ public final class Operator implements IOperator
 			return POSTFIX;
 		case ID_TERNARY:
 			return TERNARY;
+		case ID_CIRCUMFIX:
+			return CIRCUMFIX;
 		}
 		return INFIX;
 	}
@@ -111,6 +114,10 @@ public final class Operator implements IOperator
 			return;
 		case TERNARY:
 			this.id = ID_TERNARY;
+			return;
+		case CIRCUMFIX:
+			this.id = ID_CIRCUMFIX;
+			return;
 		}
 	}
 
@@ -118,7 +125,9 @@ public final class Operator implements IOperator
 	public boolean isType(byte type)
 	{
 		final byte thisType = this.getType();
-		return thisType == type || thisType == TERNARY && type == INFIX;
+		return thisType == type //
+		       || thisType == TERNARY && type == INFIX //
+		       || thisType == CIRCUMFIX && (type == PREFIX || type == POSTFIX);
 	}
 
 	@Override
@@ -171,15 +180,15 @@ public final class Operator implements IOperator
 	@Override
 	public void writeData(DataOutput out) throws IOException
 	{
-		out.writeUTF(this.name.unqualified);
+		Name.write(this.name, out);
 		out.writeByte(this.id);
-		if (this.id != ID_PREFIX && this.id != ID_POSTFIX)
+		if (this.id != ID_PREFIX && this.id != ID_POSTFIX && this.id != ID_CIRCUMFIX)
 		{
 			out.writeInt(this.precedence);
 		}
-		if (this.id == ID_TERNARY)
+		if (this.id == ID_TERNARY || this.id == ID_CIRCUMFIX)
 		{
-			out.writeUTF(this.ternaryName.unqualified);
+			Name.write(this.name2, out);
 		}
 	}
 
@@ -189,13 +198,13 @@ public final class Operator implements IOperator
 		this.name = Name.read(in);
 
 		this.id = in.readByte();
-		if (this.id != ID_PREFIX && this.id != ID_POSTFIX)
+		if (this.id != ID_PREFIX && this.id != ID_POSTFIX && this.id != ID_CIRCUMFIX)
 		{
 			this.precedence = in.readInt();
 		}
-		if (this.id == ID_TERNARY)
+		if (this.id == ID_TERNARY || this.id == ID_CIRCUMFIX)
 		{
-			this.ternaryName = Name.read(in);
+			this.name2 = Name.read(in);
 		}
 	}
 
@@ -238,8 +247,11 @@ public final class Operator implements IOperator
 			       .append(this.precedence).append(" }");
 			return;
 		case ID_TERNARY:
-			builder.append("infix operator ").append(this.name).append(' ').append(this.ternaryName)
-			       .append(" { precedence ").append(this.precedence).append(" }");
+			builder.append("infix operator ").append(this.name).append(' ').append(this.name2).append(" { precedence ")
+			       .append(this.precedence).append(" }");
+			return;
+		case ID_CIRCUMFIX:
+			builder.append("prefix postfix operator ").append(this.name).append(' ').append(this.name2);
 		}
 	}
 }

@@ -104,7 +104,9 @@ public class SourceFileParser extends AbstractMemberParser
 			case DyvilKeywords.PREFIX:
 			case DyvilKeywords.POSTFIX:
 			case DyvilKeywords.INFIX:
-				if (token.next().type() == DyvilKeywords.OPERATOR)
+				if (token.next().type() == DyvilKeywords.OPERATOR //
+				    || token.next().type() == DyvilKeywords.POSTFIX
+				       && token.next().next().type() == DyvilKeywords.OPERATOR)
 				{
 					pm.pushParser(new OperatorParser(this.unit), true);
 					this.mode = SEPARATOR;

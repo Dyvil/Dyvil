@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.operator;
 
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -9,7 +10,6 @@ import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class PrefixCall extends MethodCall
@@ -37,6 +37,26 @@ public class PrefixCall extends MethodCall
 		if (operator == null)
 		{
 			markers.add(Markers.semantic(this.position, "operator.unresolved", this.name));
+		}
+		else if (operator.getType() == IOperator.CIRCUMFIX)
+		{
+			final IValue argument = this.arguments.getFirst();
+			final Name name2 = operator.getName2();
+			if (argument instanceof PostfixCall && ((PostfixCall) argument).getName() == name2)
+			{
+				this.arguments.setFirst(((PostfixCall) argument).getReceiver());
+				this.name = Name.from(this.name.unqualified + "_" + name2.unqualified,
+				                      this.name.qualified + "_" + name2.qualified);
+
+				if (this.position != null)
+				{
+					this.position = this.position.to(argument.getPosition());
+				}
+			}
+			else
+			{
+				OperatorElement.checkPosition(markers, this.position, operator, IOperator.PREFIX);
+			}
 		}
 		else
 		{

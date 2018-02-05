@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.parser.header;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.expression.operator.IOperatorMap;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
@@ -7,7 +9,6 @@ import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -59,6 +60,13 @@ public final class OperatorParser extends Parser
 			switch (type)
 			{
 			case DyvilKeywords.PREFIX:
+				if (token.next().type() == DyvilKeywords.POSTFIX)
+				{
+					pm.skip();
+					this.type = IOperator.CIRCUMFIX;
+					return;
+				}
+
 				this.type = IOperator.PREFIX;
 				return;
 			case DyvilKeywords.POSTFIX:
@@ -90,14 +98,27 @@ public final class OperatorParser extends Parser
 			this.operator = new Operator(name, this.type);
 
 			// TODO Add 'ternary' keyword?
-			if (this.type == IOperator.INFIX || this.type == IOperator.TERNARY)
+			if (this.type == IOperator.INFIX)
 			{
 				name = getOperatorName(pm, token.next());
 				if (name != null)
 				{
 					this.operator.setType(IOperator.TERNARY);
-					this.operator.setTernaryName(name);
+					this.operator.setName2(name);
 					pm.skip();
+				}
+			}
+			else if (this.type == IOperator.CIRCUMFIX || this.type == IOperator.TERNARY)
+			{
+				name = getOperatorName(pm, token.next());
+				if (name != null)
+				{
+					this.operator.setName2(name);
+					pm.skip();
+				}
+				else
+				{
+					pm.report(SourcePosition.between(token, token.next()), "operator.identifier2");
 				}
 			}
 			this.mode = SEPARATOR;
