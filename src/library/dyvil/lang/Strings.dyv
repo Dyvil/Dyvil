@@ -74,15 +74,13 @@ abstract class Strings
 	infix func count(string: String, character: char) -> int
 	{
 		var count = 0
-		for (c <- string) if (c == character) count++
+		for (c <- string) if (c == character) count += 1
 		return count
 	}
 
 	infix func split(string: String, by delimiter: char) -> [String]
 	{
-		var count = 0
-
-		for (c <- string) if (c == delimiter) count++
+		let count = string.count(delimiter)
 		if (count == 0) return [string]
 
 		let array = new [String](count + 1)
@@ -93,7 +91,8 @@ abstract class Strings
 		{
 			if (string[i] == delimiter)
 			{
-				array[arrayIndex++] = string.substring(start, i)
+				array[arrayIndex] = string.substring(start, i)
+				arrayIndex += 1
 				start = i + 1
 			}
 		}

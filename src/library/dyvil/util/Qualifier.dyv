@@ -156,7 +156,7 @@ class Qualifier
 			match string.charAt(start)
 			{
 				case '$' | '_' => return start
-				case _ => start++
+				case _ => start += 1
 			}
 		}
 		return end

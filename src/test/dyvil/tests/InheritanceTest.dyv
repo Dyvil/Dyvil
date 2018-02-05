@@ -40,7 +40,7 @@ class InheritanceTest
 
 		func fooInitAvailable() -> boolean = this.fooInit
 
-		override func onFooInit() -> void = this.foo2Init++
+		override func onFooInit() -> void = this.foo2Init += 1
 	}
 
 	// Trait Constructor Test

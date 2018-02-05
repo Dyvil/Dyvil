@@ -10,6 +10,12 @@ public class OperatorTest
 		ternary()
 	}
 
+	@BytecodeName('preinc')
+	prefix func ++(i: int) -> int = i
+
+	@BytecodeName('postinc')
+	postfix func ++(i: int) -> int = i
+
 	static func unary() -> Test = test "Unary" {
 		infix func apply(i: int, j: int) -> (int, int) = (i, j)
 

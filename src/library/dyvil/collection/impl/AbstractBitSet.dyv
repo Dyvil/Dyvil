@@ -90,7 +90,7 @@ abstract class AbstractBitSet implements Set<int>
 		{
 			this.ensureWordCapacity(wordIndex + 1)
 			this.words[wordIndex] = value // no need to OR here, the word is definitely all-0
-			this.size++
+			this.size += 1
 			return
 		}
 
@@ -100,7 +100,7 @@ abstract class AbstractBitSet implements Set<int>
 		if (newWord != word)
 		{
 			this.words[wordIndex] = newWord
-			this.size++
+			this.size += 1
 		}
 	}
 

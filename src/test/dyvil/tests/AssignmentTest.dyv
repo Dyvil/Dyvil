@@ -73,9 +73,9 @@ class AssignmentTest
 		let counter = new Counter
 		var modCount = 0
 
-		counter(modCount++) += modCount++ // apply/apply_=
+		counter(modCount += 1) += (modCount += 1) // apply/apply_=
 		// counter.applyArray[0] = 1
-		counter[modCount++] += modCount++ // subscript/subscript_=
+		counter[modCount += 1] += (modCount += 1) // subscript/subscript_=
 		// counter.subscriptArray[2] = 3
 
 		test "Mod Count"       { modCount =?= 4 }

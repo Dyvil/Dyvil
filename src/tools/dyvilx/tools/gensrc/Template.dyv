@@ -114,7 +114,7 @@ abstract class Template(let name: String)
 		{
 			try
 			{
-				if (this.generate(spec)) count++
+				if (this.generate(spec)) count += 1
 			}
 			catch (ex: IOException)
 			{
