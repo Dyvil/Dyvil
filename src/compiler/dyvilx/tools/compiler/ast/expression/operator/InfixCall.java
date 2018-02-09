@@ -83,19 +83,22 @@ public class InfixCall extends MethodCall
 
 	private static IncOperator getIncOperator(Name name, IValue lhs, IValue rhs)
 	{
-		// Operator has to be either + or -
-		if (name != Names.plus && name != Names.minus)
-		{
-			return null;
-		}
-
 		// Right-hand operand must be of type int
 		if (rhs.valueTag() != INT)
 		{
 			return null;
 		}
 
-		return IncOperator.apply(lhs, rhs.intValue(), true);
+		if (name == Names.plus)
+		{
+			return IncOperator.apply(lhs, rhs.intValue(), true);
+		}
+		if (name == Names.minus)
+		{
+			return IncOperator.apply(lhs, -rhs.intValue(), true);
+		}
+
+		return null;
 	}
 
 	@Override
