@@ -32,11 +32,11 @@ public class SortTest
 		}
 	}
 
-	static func quicksort<type T: Comparable>(list: ImmutableList<T>) -> ImmutableList<T>
+	static func quicksort<type T: Comparable<-T>>(list: ImmutableList<T>) -> ImmutableList<T>
 	{
 		if (list.isEmpty) return list
 
-		let pivot = list[list.size >> 1]
+		let pivot = list[list.size >>> 1]
 		let less = quicksort(list.filtered(_ < pivot))
 		let equal = list.filtered(_ == pivot)
 		let greater = quicksort(list.filtered(_ > pivot))
@@ -51,13 +51,13 @@ public class SortTest
 		*right = temp
 	}
 
-	static func quicksort<type T: Comparable>(list: MutableList<T>) -> void = quicksortRange(list, 0, list.size - 1)
+	static func quicksort<type T: Comparable<-T>>(list: MutableList<T>) -> void = quicksortRange(list, 0, list.size - 1)
 
-	private static func quicksortRange<type T: Comparable>(list: MutableList<T>, left: int, right: int) -> void
+	private static func quicksortRange<type T: Comparable<-T>>(list: MutableList<T>, left: int, right: int) -> void
 	{
 		var i = left
 		var j = right
-		let pivot = list[left + (right - left) _/ 2]
+		let pivot = list[left + ((right - left) >>> 1)]
 
 		while i <= j
 		{

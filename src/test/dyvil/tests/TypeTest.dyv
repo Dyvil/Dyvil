@@ -34,7 +34,7 @@ public class TypeTest
 		func next() -> SELF
 	}
 
-	func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
+	static func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
 
 	static case class IntRecur(let value: int) implements Recur<IntRecur>
 	{
@@ -69,6 +69,10 @@ public class TypeTest
 		}
 
 		List(1, 2, 3) <<< 1
+
+		let n: IntRecur = nextRecur(IntRecur 10)
+
+		n =?= IntRecur 11
 
 		let w: RecurWrapper<IntRecur> = new RecurWrapper(IntRecur 10)
 	}

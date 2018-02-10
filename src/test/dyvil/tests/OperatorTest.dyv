@@ -2,12 +2,16 @@ package dyvil.tests
 
 using dyvil.Test
 
+prefix operator +++
+postfix operator +++
+
 public class OperatorTest
 {
 	static func apply() -> Test = test "Operators" {
 		unary()
 		binary()
 		ternary()
+		circumfix()
 	}
 
 	@BytecodeName('preinc')
@@ -53,4 +57,35 @@ public class OperatorTest
 
 		// don't care about values, type check pass is sufficient
 	}
+
+	static func circumfix() -> Test = test "Circumfix" {
+		let d = -1.0
+		let i = -2
+		let c = dyvil.math.Complex(1.0, 1.0)
+
+		let absd = |d|
+		let absi = |i|
+		let absc = |c|
+
+		absd =?= 1.0
+		absi =?= 2
+		absc =?= Math.sqrt(2)
+
+		let s = "a"
+		let s1 = +++s+++
+		let s2 = +++(s+++)
+		let s3 = (+++s)+++
+
+		s1 =?= "+++((a)+++)" // postfix is applied first
+		s2 =?= "+++((a)+++)"
+		s3 =?= "(+++(a))+++"
+	}
+
+	@BytecodeName("plusPre")
+	prefix func +++(s: String) -> String = "+++(\(s))"
+
+	@BytecodeName("plusPost")
+	postfix func +++(s: String) -> String = "(\(s))+++"
+
+	static func +++_+++(s: String) -> String = "+++(\(s))+++"
 }

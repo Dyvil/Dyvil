@@ -42,8 +42,8 @@ class AssignmentTest
 	static class Counter
 	{
 		var value: int = 0
-		var applyArray: [int] = [ 0, 0, 0 ]
-		var subscriptArray: [int] = [ 0, 0, 0 ]
+		var applyArray: [int] = new [int](4)
+		var subscriptArray: [int] = new [int](4)
 
 		func apply(i: int) -> int = this.applyArray[i]
 		func apply_=(i: int, value: int) -> void = this.applyArray[i] = value
@@ -74,12 +74,10 @@ class AssignmentTest
 		var modCount = 0
 
 		counter(modCount += 1) += (modCount += 1) // apply/apply_=
-		// counter.applyArray[0] = 1
 		counter[modCount += 1] += (modCount += 1) // subscript/subscript_=
-		// counter.subscriptArray[2] = 3
 
 		test "Mod Count"       { modCount =?= 4 }
-		test "Apply Array"     { counter.applyArray     =?= [ 1, 0, 0 ]}
-		test "Subscript Array" { counter.subscriptArray =?= [ 0, 0, 3 ]}
+		test "Apply Array"     { counter.applyArray     =?= [ 0, 2, 0, 0 ] }
+		test "Subscript Array" { counter.subscriptArray =?= [ 0, 0, 0, 4 ] }
 	}
 }
