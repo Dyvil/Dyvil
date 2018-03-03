@@ -115,7 +115,7 @@ abstract class AbstractBitSet implements Set<int>
 		if (newWord != word)
 		{
 			this.words[wordIndex] = newWord
-			this.size--
+			this.size -= 1
 		}
 	}
 
@@ -167,7 +167,8 @@ abstract class AbstractBitSet implements Set<int>
 			{
 				if (bitSet(word, bit))
 				{
-					store[index++] = wordIndex * 64 + bit
+					store[index] = wordIndex * 64 + bit
+					index += 1
 				}
 			}
 		}
@@ -191,7 +192,8 @@ abstract class AbstractBitSet implements Set<int>
 			{
 				if (bitSet(word, bit))
 				{
-					store[index++] = wordIndex * 64 + bit
+					store[index] = wordIndex * 64 + bit
+					index += 1
 				}
 			}
 		}

@@ -23,14 +23,14 @@ public class OperatorTest
 	static func unary() -> Test = test "Unary" {
 		infix func apply(i: int, j: int) -> (int, int) = (i, j)
 
-		var i = 1                       // Canonical Representation:
-		let j = [ i -i, i++ i, i++ -i ] // i.apply(-i), (i++).apply(i), (i++).apply(-i)
-		let k = [ i - i, i-i ]          // i - i
-		let l = [ i - -i, i - - i ]     // i - (-i)
-		let m = [ i++ , i++, i ++ ]     // i++
-		let n = i++ + i                 // (i++) + i
-		let o = i++ + ++ i              // (i++) + (++i)
-		let p = i++ + + ++ i            // (i++) + (+ (++i))
+		var i = 1                         // Canonical Representation:
+		let j = [ i -i, i+++ i, i+++ -i ] // i.apply(-i), (i+++).apply(i), (i+++).apply(-i)
+		let k = [ i - i, i-i ]            // i - i
+		let l = [ i - -i, i - - i ]       // i - (-i)
+		let m = [ i+++ , i+++, i +++ ]    // i++
+		let n = i+++ + i                  // (i+++) + i
+		let o = i+++ + +++ i              // (i+++) + (+++i)
+		let p = i+++ + + +++ i            // (i+++) + (+ (+++i))
 
 		// don't care about values, resolution pass is sufficient
 
@@ -80,6 +80,12 @@ public class OperatorTest
 		s2 =?= "+++((a)+++)"
 		s3 =?= "(+++(a))+++"
 	}
+
+	@BytecodeName("plusPre")
+	prefix func +++(i: int) -> int = i - 1
+
+	@BytecodeName("plusPost")
+	postfix func +++(i: int) -> int = i + 1
 
 	@BytecodeName("plusPre")
 	prefix func +++(s: String) -> String = "+++(\(s))"

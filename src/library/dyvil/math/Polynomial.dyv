@@ -11,7 +11,7 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 
 	static func apply(coefficients: double...) -> Polynomial
 	{
-		for (var i = coefficients.size - 1; i >= 0; i--)
+		for (var i = coefficients.size - 1; i >= 0; i -= 1)
 		{
 			if (coefficients[i] != 0)
 			{

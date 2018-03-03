@@ -202,7 +202,7 @@ public abstract class #(TYPE_NAME)Array
 		var size = array.size
 
 		// Calculate number of elements in new array
-		for (element <- array) if (element == value) size--
+		for (element <- array) if (element == value) size -= 1
 
 		let result = APPLY_WITH_SIZE
 		var index = 0
@@ -367,7 +367,7 @@ public abstract class #(TYPE_NAME)Array
 		while (startIndex >= 0)
 		{
 			if (array[startIndex] == value) return startIndex
-			startIndex--
+			startIndex -= 1
 		}
 		return -1
 	}
