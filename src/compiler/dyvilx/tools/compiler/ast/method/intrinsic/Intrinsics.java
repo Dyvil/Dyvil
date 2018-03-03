@@ -61,15 +61,6 @@ public class Intrinsics
 		// Strings
 		case Intrinsic.STRING_CONCAT:
 			return StringInterpolationExpr.apply(lhs, arguments.getFirst());
-		// Increment / Decrement
-		case Intrinsic.PRE_INCREMENT:
-			return IncOperator.apply(arguments.getFirst(), 1, true);
-		case Intrinsic.POST_INCREMENT:
-			return IncOperator.apply(lhs, 1, false);
-		case Intrinsic.PRE_DECREMENT:
-			return IncOperator.apply(arguments.getFirst(), -1, true);
-		case Intrinsic.POST_DECREMENT:
-			return IncOperator.apply(lhs, -1, false);
 		}
 		return null;
 	}

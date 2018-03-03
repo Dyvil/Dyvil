@@ -72,8 +72,6 @@ type Type<T>      = dyvil.reflect.types.Type<T>
 postfix operator ?   // optional chain operator
 postfix operator !   // unwrap operator
 postfix operator !!  // unsafe unwrap operator
-postfix operator ++
-postfix operator --
 postfix operator ... // varargs expansion operator
 
 // Prefix Operators
@@ -83,8 +81,6 @@ prefix  operator ~
 prefix  operator !
 prefix  operator &   // reference operator
 prefix  operator *   // de-reference operator
-prefix  operator ++
-prefix  operator --
 
 prefix postfix operator  | |
 

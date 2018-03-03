@@ -18,30 +18,4 @@ public abstract class References
 		@Intrinsic([ LOAD_0 ])
 		static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
 	}
-
-	// Primitive Increment Operators
-	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
-		#if (PRIMITIVE != 'boolean') {
-			#let(CAST = Boolean.parseBoolean(spec['IS_SUBRANGE']) ? "as " ++ PRIMITIVE : "")
-
-			// PRIMITIVE
-
-			@Intrinsic([], compilerCode: Intrinsic.PRE_INCREMENT)
-			@BytecodeName("incPre")
-			prefix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs + 1) CAST; *rhs = v; v }
-
-			@Intrinsic([], compilerCode: Intrinsic.POST_INCREMENT)
-			@BytecodeName("incPost")
-			postfix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v + 1) CAST; v }
-
-			@Intrinsic([], compilerCode: Intrinsic.PRE_DECREMENT)
-			@BytecodeName("decPre")
-			prefix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs - 1) CAST; *rhs = v; v }
-
-			@Intrinsic([], compilerCode: Intrinsic.POST_DECREMENT)
-			@BytecodeName("decPost")
-			postfix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v - 1) CAST; v }
-		}
-	}
 }
