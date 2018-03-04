@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.reference;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -13,19 +15,17 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class PropertyReference implements IReference
 {
 	private static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/ref/ReferenceFactory",
 	                                                   "propertyRefMetafactory",
 	                                                   "(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;"
-		                                                   + "Ljava/lang/invoke/MethodType;"
-		                                                   + "Ljava/lang/invoke/MethodHandle;"
-		                                                   + "Ljava/lang/invoke/MethodHandle;)"
-		                                                   + "Ljava/lang/invoke/CallSite;");
+	                                                   + "Ljava/lang/invoke/MethodType;"
+	                                                   + "Ljava/lang/invoke/MethodHandle;"
+	                                                   + "Ljava/lang/invoke/MethodHandle;)"
+	                                                   + "Ljava/lang/invoke/CallSite;");
 
 	private final IValue  receiver;
 	private final IMethod getterMethod;
@@ -52,7 +52,7 @@ public class PropertyReference implements IReference
 	}
 
 	@Override
-	public void writeReference(MethodWriter writer) throws BytecodeException
+	public void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder().append('(');
 
@@ -70,6 +70,8 @@ public class PropertyReference implements IReference
 
 		final Handle getterHandle = this.getterMethod.toHandle();
 		final Handle setterHandle = this.setterMethod.toHandle();
+
+		writer.visitLineNumber(lineNumber);
 		writer.visitInvokeDynamicInsn(getterName, desc.toString(), BOOTSTRAP, getterHandle, setterHandle);
 	}
 }

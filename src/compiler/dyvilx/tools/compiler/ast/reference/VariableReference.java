@@ -28,9 +28,9 @@ public class VariableReference implements IReference
 	}
 
 	@Override
-	public void writeReference(MethodWriter writer) throws BytecodeException
+	public void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		// Assumes that the variable was properly converted to a Reference Variable
-		this.variable.writeGet_Get(writer, -1);
+		this.variable.writeGetRaw(writer, lineNumber);
 	}
 }

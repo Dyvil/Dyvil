@@ -120,9 +120,9 @@ public class ConstructorCall implements ICall
 		return this.arguments;
 	}
 
-	public ClassConstructor toClassConstructor()
+	public ClassConstructorCall toClassConstructor()
 	{
-		ClassConstructor cc = new ClassConstructor(this.position, this.type, this.arguments);
+		ClassConstructorCall cc = new ClassConstructorCall(this.position, this.type, this.arguments);
 		cc.constructor = this.constructor;
 		return cc;
 	}

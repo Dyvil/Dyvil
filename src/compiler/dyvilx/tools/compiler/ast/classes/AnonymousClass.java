@@ -133,7 +133,7 @@ public class AnonymousClass extends CodeClass
 		return this.constructorDesc = buf.append(")V").toString();
 	}
 
-	public void writeConstructorCall(MethodWriter writer, ArgumentList arguments) throws BytecodeException
+	public void writeConstructorCall(MethodWriter writer, ArgumentList arguments, int lineNumber) throws BytecodeException
 	{
 		String owner = this.getInternalName();
 		String name = "<init>";
@@ -148,7 +148,7 @@ public class AnonymousClass extends CodeClass
 			thisField.getTargetAccess().writeGet(writer);
 		}
 
-		this.captureHelper.writeCaptures(writer);
+		this.captureHelper.writeCaptures(writer, lineNumber);
 
 		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, this.getConstructorDesc(), false);
 	}

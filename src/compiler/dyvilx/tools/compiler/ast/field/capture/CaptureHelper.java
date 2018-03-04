@@ -124,7 +124,7 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 		}
 	}
 
-	public void writeCaptures(MethodWriter writer) throws BytecodeException
+	public void writeCaptures(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.thisClass != null)
 		{

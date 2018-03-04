@@ -788,7 +788,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				{
 					handleType = ClassFormat.H_INVOKESPECIAL;
 				}
-				this.captureHelper.writeCaptures(writer);
+				this.captureHelper.writeCaptures(writer, this.lineNumber());
 			}
 		}
 

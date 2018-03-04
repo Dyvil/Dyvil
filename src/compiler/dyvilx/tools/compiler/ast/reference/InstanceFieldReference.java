@@ -1,18 +1,17 @@
 package dyvilx.tools.compiler.ast.reference;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class InstanceFieldReference implements IReference
 {
@@ -44,16 +43,16 @@ public class InstanceFieldReference implements IReference
 	}
 
 	@Override
-	public void writeReference(MethodWriter writer) throws BytecodeException
+	public void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		// Write the receiver
 		this.receiver.writeExpression(writer, null);
 
 		final String internalClassName = this.field.getEnclosingClass().getInternalName();
-		final IType fieldType = this.field.getType();
+		final String refClassName = ReferenceType.LazyFields.getInternalRef(this.field.getType(), "unsafe/Unsafe");
+		final String desc = "(L" + internalClassName + ";)L" + refClassName + ';';
 
-		final String desc =
-			"(L" + internalClassName + ";)L" + ReferenceType.LazyFields.getInternalRef(fieldType, "unsafe/Unsafe") + ';';
+		writer.visitLineNumber(lineNumber);
 		writer.visitInvokeDynamicInsn(this.field.getInternalName(), desc, BOOTSTRAP);
 	}
 }

@@ -22,5 +22,5 @@ public interface IReference
 	{
 	}
 
-	void writeReference(MethodWriter writer) throws BytecodeException;
+	void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException;
 }
