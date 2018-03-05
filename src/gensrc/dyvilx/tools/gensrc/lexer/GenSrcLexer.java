@@ -6,7 +6,6 @@ import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
-import dyvilx.tools.parsing.lexer.Lexer;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.token.IdentifierToken;
 import dyvilx.tools.parsing.token.StringToken;
@@ -278,16 +277,6 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 	{
 		final GenSrcLexer sublexer = new GenSrcLexer(this.markers, this.blockLevel + 1);
 		this.useSubLexer(sublexer);
-	}
-
-	private void useSubLexer(Lexer sublexer)
-	{
-		final TokenList tokens = sublexer.tokenize(this.code, this.cursor, this.line, this.column);
-		this.tokens.addAll(tokens);
-
-		this.cursor = sublexer.getCursor();
-		this.line = sublexer.getLine();
-		this.column = sublexer.getColumn();
 	}
 
 	// Utility Methods

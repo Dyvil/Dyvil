@@ -85,6 +85,16 @@ public abstract class Lexer
 
 	protected abstract void parseCharacter(int c);
 
+	protected void useSubLexer(Lexer sublexer)
+	{
+		final TokenList tokens = sublexer.tokenize(this.code, this.cursor, this.line, this.column);
+		this.tokens.addAll(tokens);
+
+		this.cursor = sublexer.getCursor();
+		this.line = sublexer.getLine();
+		this.column = sublexer.getColumn();
+	}
+
 	// Utility Methods
 
 	protected int codePoint()
@@ -97,10 +107,10 @@ public abstract class Lexer
 		return this.cursor + 1 >= this.length ? 0 : this.code.codePointAt(this.cursor + 1);
 	}
 
-	protected int advance()
+	protected void advance()
 	{
 		this.cursor++;
-		return this.column++;
+		this.column++;
 	}
 
 	protected void advance2()

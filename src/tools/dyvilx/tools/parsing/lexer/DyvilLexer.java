@@ -101,7 +101,8 @@ public final class DyvilLexer extends Lexer
 			{
 				this.stringParens++;
 			}
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.line, this.column));
+			this.advance();
 			return;
 		case ')':
 			if (this.stringParens > 0 && --this.stringParens == 0)
@@ -110,19 +111,24 @@ public final class DyvilLexer extends Lexer
 				return;
 			}
 
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.line, this.column));
+			this.advance();
 			return;
 		case '[':
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_SQUARE_BRACKET, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_SQUARE_BRACKET, this.line, this.column));
+			this.advance();
 			return;
 		case ']':
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_SQUARE_BRACKET, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_SQUARE_BRACKET, this.line, this.column));
+			this.advance();
 			return;
 		case '{':
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_CURLY_BRACKET, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_CURLY_BRACKET, this.line, this.column));
+			this.advance();
 			return;
 		case '}':
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.column));
+			this.advance();
 			return;
 		case '.':
 		{
@@ -132,14 +138,17 @@ public final class DyvilLexer extends Lexer
 				this.parseIdentifier('.', MOD_DOT);
 				return;
 			}
-			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.line, this.column));
+			this.advance();
 			return;
 		}
 		case ';':
-			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.line, this.column));
+			this.advance();
 			return;
 		case ',':
-			this.tokens.append(new SymbolToken(INSTANCE, COMMA, this.line, this.advance()));
+			this.tokens.append(new SymbolToken(INSTANCE, COMMA, this.line, this.column));
+			this.advance();
 			return;
 		case '_':
 		case '$':
@@ -183,8 +192,9 @@ public final class DyvilLexer extends Lexer
 	{
 		// assert this.codePoint() == '`';
 
-		final int startIndex = this.advance();
-		final int startLine = this.line;
+		final int startColumn = this.column;
+
+		this.advance();
 
 		this.clearBuffer();
 
@@ -210,9 +220,10 @@ public final class DyvilLexer extends Lexer
 					this.buffer.append('_');
 				}
 
+				this.advance();
 				this.tokens.append(
-					new IdentifierToken(Name.from(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine, startIndex,
-					                    this.advance() + 1));
+					new IdentifierToken(Name.from(this.buffer.toString()), SPECIAL_IDENTIFIER, this.line, startColumn,
+					                    this.column));
 				return;
 			}
 
@@ -225,7 +236,9 @@ public final class DyvilLexer extends Lexer
 	{
 		// assert this.codePoint() == '\'';
 
-		final int startColumn = this.advance();
+		final int startColumn = this.column;
+
+		this.advance();
 
 		this.clearBuffer();
 
@@ -249,9 +262,10 @@ public final class DyvilLexer extends Lexer
 				this.error("string.single.unclosed");
 				// Fallthrough
 			case '\'':
+				this.advance();
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, this.line, this.line, startColumn,
-					                this.advance() + 1));
+					                this.column));
 				return;
 			}
 
@@ -264,8 +278,10 @@ public final class DyvilLexer extends Lexer
 	{
 		// assert this.codePoint() == (stringPart ? ')' : '"');
 
-		final int startColumn = this.advance();
+		final int startColumn = this.column;
 		final int startLine = this.line;
+
+		this.advance();
 
 		this.clearBuffer();
 
@@ -279,18 +295,18 @@ public final class DyvilLexer extends Lexer
 				final int nextChar = this.nextCodePoint();
 				if (nextChar == '(')
 				{
-					this.advance();
 					if (this.stringParens > 0)
 					{
 						this.error("string.double.interpolation.nested");
 						continue; // parse the rest of the string as normal
 					}
 
+					this.advance2();
 					this.tokens.append(
 						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
-						                this.line, startColumn, this.advance() + 1));
 					this.stringParens = 1;
 					return;
+						                this.line, startColumn, this.column));
 				}
 
 				this.parseEscape(nextChar);
@@ -299,9 +315,10 @@ public final class DyvilLexer extends Lexer
 				this.error("string.double.unclosed");
 				// Fallthrough
 			case '"':
+				this.advance();
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, this.line,
-					                startColumn, this.advance() + 1));
+					                startColumn, this.column));
 				return;
 			case '\n':
 				this.newLine();
@@ -338,9 +355,10 @@ public final class DyvilLexer extends Lexer
 				this.error("string.verbatim.unclosed");
 				// Fallthrough
 			case '"':
+				this.advance();
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, this.line, startColumn,
-					                this.advance() + 1));
+					                this.column));
 				return;
 			case '\n':
 				this.newLine();
@@ -394,15 +412,17 @@ public final class DyvilLexer extends Lexer
 			this.advance(currentChar);
 		}
 
-		this.tokens.append(new StringToken(this.buffer.toString(), VERBATIM_CHAR, startLine, this.line, startColumn,
-		                                   this.advance() + 1));
+		this.advance();
+		this.tokens.append(
+			new StringToken(this.buffer.toString(), VERBATIM_CHAR, startLine, this.line, startColumn, this.column));
 	}
 
 	private void parseNumberLiteral(int currentChar)
 	{
 		final int radix;
 
-		final int startColumn = this.advance();
+		final int startColumn = this.column;
+		this.advance();
 
 		this.clearBuffer();
 		if (currentChar == '0')
