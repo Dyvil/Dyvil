@@ -3,7 +3,6 @@ package dyvilx.tools.parsing.lexer;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvilx.tools.parsing.token.StringToken;
 import dyvilx.tools.parsing.token.*;
 
 import static dyvilx.tools.parsing.lexer.BaseSymbols.*;
@@ -11,7 +10,7 @@ import static dyvilx.tools.parsing.lexer.Tokens.*;
 
 public final class DyvilLexer extends Lexer
 {
-	private int     stringParens;
+	private int     parens;
 	private boolean interpolationEnd;
 
 	public DyvilLexer(MarkerList markers, Symbols symbols)
@@ -24,7 +23,6 @@ public final class DyvilLexer extends Lexer
 	 */
 	public void setInterpolationEnd()
 	{
-		this.stringParens = 1;
 		this.interpolationEnd = true;
 	}
 
@@ -41,8 +39,11 @@ public final class DyvilLexer extends Lexer
 			{
 			case 0:
 				break loop;
+			case '(':
+				this.parens++;
+				break;
 			case ')':
-				if (this.stringParens == 1 && this.interpolationEnd)
+				if (--this.parens < 0 && this.interpolationEnd)
 				{
 					break loop;
 				}
@@ -66,7 +67,7 @@ public final class DyvilLexer extends Lexer
 			this.parseBacktickIdentifier();
 			return;
 		case '"':
-			this.parseDoubleString(false);
+			this.parseDoubleString();
 			return;
 		case '\'':
 			this.parseSingleString();
@@ -97,20 +98,10 @@ public final class DyvilLexer extends Lexer
 			this.parseIdentifier('/', MOD_SYMBOL);
 			return;
 		case '(':
-			if (this.stringParens > 0)
-			{
-				this.stringParens++;
-			}
 			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.line, this.column));
 			this.advance();
 			return;
 		case ')':
-			if (this.stringParens > 0 && --this.stringParens == 0)
-			{
-				this.parseDoubleString(true);
-				return;
-			}
-
 			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.line, this.column));
 			this.advance();
 			return;
@@ -274,12 +265,13 @@ public final class DyvilLexer extends Lexer
 		}
 	}
 
-	private void parseDoubleString(boolean stringPart)
+	private void parseDoubleString()
 	{
 		// assert this.codePoint() == (stringPart ? ')' : '"');
 
-		final int startColumn = this.column;
-		final int startLine = this.line;
+		int startColumn = this.column;
+		int startLine = this.line;
+		boolean stringPart = false;
 
 		this.advance();
 
@@ -295,18 +287,21 @@ public final class DyvilLexer extends Lexer
 				final int nextChar = this.nextCodePoint();
 				if (nextChar == '(')
 				{
-					if (this.stringParens > 0)
-					{
-						this.error("string.double.interpolation.nested");
-						continue; // parse the rest of the string as normal
-					}
-
 					this.advance2();
 					this.tokens.append(
 						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
-					this.stringParens = 1;
-					return;
 						                this.line, startColumn, this.column));
+
+					this.parseInterpolationValue();
+
+					assert this.codePoint() == ')';
+					startColumn = this.column;
+					startLine = this.line;
+					stringPart = true;
+
+					this.advance();
+					this.clearBuffer();
+					continue;
 				}
 
 				this.parseEscape(nextChar);
@@ -331,6 +326,13 @@ public final class DyvilLexer extends Lexer
 			this.buffer.appendCodePoint(currentChar);
 			this.advance(currentChar);
 		}
+	}
+
+	private void parseInterpolationValue()
+	{
+		final DyvilLexer lexer = new DyvilLexer(this.markers, this.symbols);
+		lexer.setInterpolationEnd();
+		this.useSubLexer(lexer);
 	}
 
 	private void parseVerbatimString()
