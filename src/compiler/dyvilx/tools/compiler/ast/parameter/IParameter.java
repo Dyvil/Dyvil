@@ -15,7 +15,6 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -87,20 +86,12 @@ public interface IParameter extends IVariable, IClassMember
 	@Override
 	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
-		if (this.getReferenceType() == null)
-		{
-			return;
-		}
-
-		writer.visitVarInsn(this.getType().getLoadOpcode(), this.getLocalIndex());
-
-		Variable.writeRefInit(this, writer, null);
 	}
 
 	default void writeParameter(MethodWriter writer)
 	{
 		final AttributeList annotations = this.getAttributes();
-		final IType type = this.getType();
+		final IType type = this.getInternalType();
 		final long flags = ModifierUtil.getFlags(this);
 
 		final int index = this.getIndex();

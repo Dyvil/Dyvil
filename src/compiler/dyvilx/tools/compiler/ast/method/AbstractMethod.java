@@ -1132,12 +1132,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		arguments.writeValues(writer, this.parameters, 0);
 	}
 
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, ArgumentList arguments,
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments,
 		                                    ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		this.writeReceiver(writer, instance);
-		this.writeArguments(writer, instance, arguments);
-		this.writeInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeReceiver(writer, receiver);
+		this.writeArguments(writer, receiver, arguments);
+		this.writeInvoke(writer, receiver, arguments, typeContext, lineNumber);
 	}
 
 	@Override
