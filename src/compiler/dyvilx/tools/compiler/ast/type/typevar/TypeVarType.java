@@ -2,11 +2,14 @@ package dyvilx.tools.compiler.ast.type.typevar;
 
 import dyvil.annotation.Reified;
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -17,9 +20,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.IRawType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,7 +29,7 @@ import java.io.IOException;
 public class TypeVarType implements IRawType
 {
 	protected ITypeParameter typeParameter;
-	protected IDataMember    reifyVariable;
+	protected IValue         reifyVariableAccess;
 
 	public TypeVarType()
 	{
@@ -37,7 +38,6 @@ public class TypeVarType implements IRawType
 	public TypeVarType(ITypeParameter typeParameter)
 	{
 		this.typeParameter = typeParameter;
-		this.reifyVariable = typeParameter.getReifyParameter();
 	}
 
 	public ITypeParameter getTypeVariable()
@@ -137,8 +137,7 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers,
-		                            IContext context)
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return this.typeParameter.getUpperBound().convertTo(value, type, typeContext, markers, context);
 	}
@@ -193,7 +192,9 @@ public class TypeVarType implements IRawType
 		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
 		if (reifiedKind != null)
 		{
-			this.reifyVariable = context.capture(this.typeParameter.getReifyParameter());
+			this.reifyVariableAccess = new FieldAccess(this.typeParameter.getReifyParameter())
+				                           .resolve(markers, context);
+			this.reifyVariableAccess.checkTypes(markers, context); // ensure proper capture
 		}
 	}
 
@@ -253,7 +254,7 @@ public class TypeVarType implements IRawType
 			throw new Error("Non-reified Type Parameter");
 		}
 
-		this.reifyVariable.writeGet(writer, null, -1);
+		this.reifyVariableAccess.writeExpression(writer, null);
 
 		// The generic Type is reified -> extract erasure class
 		if (reifiedKind == Reified.Type.TYPE)
@@ -278,7 +279,7 @@ public class TypeVarType implements IRawType
 			throw new Error("Non-reified Type Parameter");
 		}
 
-		this.reifyVariable.writeGet(writer, null, -1);
+		this.reifyVariableAccess.writeExpression(writer, null);
 
 		if (reifiedKind == Reified.Type.TYPE)
 		{

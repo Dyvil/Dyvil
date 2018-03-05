@@ -100,7 +100,7 @@ public class CaptureParameter extends CaptureVariable implements IParameter
 	@Override
 	public IValue getDefaultValue(IContext context)
 	{
-		return new FieldAccess(this.variable)
+		final IValue access = new FieldAccess(this.variable)
 		{
 			@Override
 			public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
@@ -108,6 +108,8 @@ public class CaptureParameter extends CaptureVariable implements IParameter
 				this.field.writeGetRaw(writer, this.receiver, this.lineNumber());
 			}
 		}.resolve(MarkerList.BLACKHOLE, context);
+		access.checkTypes(MarkerList.BLACKHOLE, context); // ensures proper capture
+		return access;
 	}
 
 	@Override
