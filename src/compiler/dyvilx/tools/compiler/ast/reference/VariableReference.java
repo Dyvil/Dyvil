@@ -31,6 +31,6 @@ public class VariableReference implements IReference
 	public void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		// Assumes that the variable was properly converted to a Reference Variable
-		this.variable.writeGetRaw(writer, lineNumber);
+		this.variable.writeGetRaw(writer, null, lineNumber);
 	}
 }

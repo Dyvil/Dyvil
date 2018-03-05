@@ -2,15 +2,16 @@ package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -99,9 +100,14 @@ public class CaptureParameter extends CaptureVariable implements IParameter
 	@Override
 	public IValue getDefaultValue(IContext context)
 	{
-		// has to be captured here
-		final IDataMember capture = this.variable.capture(context);
-		return new DummyValue(this::getType, (writer, type) -> capture.writeGet_Get(writer, this.lineNumber()));
+		return new FieldAccess(this.variable)
+		{
+			@Override
+			public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+			{
+				this.field.writeGetRaw(writer, this.receiver, this.lineNumber());
+			}
+		}.resolve(MarkerList.BLACKHOLE, context);
 	}
 
 	@Override

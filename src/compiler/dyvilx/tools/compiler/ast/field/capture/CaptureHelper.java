@@ -134,7 +134,8 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			final CaptureDataMember capture = this.capturedFields[i];
-			capture.getVariable().writeGet_Get(writer, 0);
+			// variables typically don't have receivers
+			capture.getVariable().writeGetRaw(writer, null, lineNumber);
 		}
 	}
 

@@ -1,11 +1,15 @@
 package dyvilx.tools.compiler.ast.field.capture;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.transform.Names;
 
 import java.lang.annotation.ElementType;
 import java.util.function.Function;
@@ -53,19 +57,49 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 		return this.variable.setReferenceType();
 	}
 
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
+	private WriteableExpression asWriteableExpression()
 	{
-		writer.visitVarInsn(this.variable.getInternalType().getLoadOpcode(), this.localIndex);
+		return (writer, type) -> writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 	}
 
 	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeGetRaw(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
 	{
-		if (this.variable.getReferenceType() == null)
+		writer.visitVarInsn(Opcodes.AUTO_LOAD, this.localIndex);
+	}
+
+	@Override
+	public void writeGet(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
+		throws BytecodeException
+	{
+		final IType referenceType = this.variable.getReferenceType();
+		if (referenceType != null)
 		{
-			writer.visitVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
+			referenceType.resolveField(Names.value).writeGet(writer, this.asWriteableExpression(), lineNumber);
+			return;
 		}
+
+		writer.visitVarInsn(Opcodes.AUTO_LOAD, this.localIndex);
+	}
+
+	@Override
+	public void writeSet(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException
+	{
+		final IType referenceType = this.variable.getReferenceType();
+		assert referenceType != null;
+
+		referenceType.resolveField(Names.value).writeSet(writer, this.asWriteableExpression(), value, lineNumber);
+	}
+
+	@Override
+	public void writeSetCopy(@NonNull MethodWriter writer, WriteableExpression receiver,
+		@NonNull WriteableExpression value, int lineNumber) throws BytecodeException
+	{
+		final IType referenceType = this.variable.getReferenceType();
+		assert referenceType != null;
+
+		referenceType.resolveField(Names.value).writeSetCopy(writer, this.asWriteableExpression(), value, lineNumber);
 	}
 
 	@Override

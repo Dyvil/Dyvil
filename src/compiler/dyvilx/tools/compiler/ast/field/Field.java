@@ -18,6 +18,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
@@ -606,15 +607,27 @@ public class Field extends Member implements IField, IDefaultContext
 		}
 	}
 
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
+	private void writeReceiver(MethodWriter writer, WriteableExpression receiver)
 	{
-		String owner = this.enclosingClass.getInternalName();
-		String name = this.getInternalName();
-		String desc = this.getDescriptor();
+		if (receiver != null && !this.isStatic())
+		{
+			receiver.writeNullCheckedExpression(writer, this.getEnclosingClass().getReceiverType());
+		}
+	}
+
+	@Override
+	public void writeGet(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
+		throws BytecodeException
+	{
+		this.writeReceiver(writer, receiver);
+
+		final IClass enclosingClass = this.getEnclosingClass();
+		final String owner = enclosingClass.getInternalName();
+		final String name = this.getInternalName();
+		final String desc = this.getDescriptor();
 
 		writer.visitLineNumber(lineNumber);
-		switch (this.attributes.flags() & (Modifiers.STATIC | Modifiers.LAZY))
+		switch (this.getAttributes().flags() & (Modifiers.STATIC | Modifiers.LAZY))
 		{
 		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
@@ -628,16 +641,34 @@ public class Field extends Member implements IField, IDefaultContext
 			return;
 		case Modifiers.STATIC | Modifiers.LAZY: // both static and lazy
 			writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name + "$lazy", "()" + desc,
-			                       this.enclosingClass.isInterface());
+			                       enclosingClass.isInterface());
 		}
 	}
 
 	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeSet(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException
 	{
-		String owner = this.enclosingClass.getInternalName();
-		String name = this.getInternalName();
-		String desc = this.getDescriptor();
+		this.writeReceiver(writer, receiver);
+		value.writeExpression(writer, this.getType());
+		this.writePutInsn(writer, lineNumber);
+	}
+
+	@Override
+	public void writeSetCopy(@NonNull MethodWriter writer, WriteableExpression receiver,
+		@NonNull WriteableExpression value, int lineNumber) throws BytecodeException
+	{
+		this.writeReceiver(writer, receiver);
+		value.writeExpression(writer, this.getType());
+		writer.visitInsn(this.isStatic() ? Opcodes.AUTO_DUP : Opcodes.AUTO_DUP_X1);
+		this.writePutInsn(writer, lineNumber);
+	}
+
+	private void writePutInsn(MethodWriter writer, int lineNumber)
+	{
+		final String owner = this.getEnclosingClass().getInternalName();
+		final String name = this.getInternalName();
+		final String desc = this.getDescriptor();
 
 		if (this.isStatic())
 		{

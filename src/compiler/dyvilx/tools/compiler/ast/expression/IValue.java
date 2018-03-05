@@ -4,7 +4,6 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
@@ -26,7 +25,7 @@ import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IValue extends ASTNode, ITyped
+public interface IValue extends ASTNode, ITyped, WriteableExpression
 {
 	// --- Expression IDs ---
 
@@ -447,12 +446,8 @@ public interface IValue extends ASTNode, ITyped
 
 	// Compilation
 
+	@Override
 	void writeExpression(MethodWriter writer, IType type) throws BytecodeException;
-
-	default void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		this.writeExpression(writer, type);
-	}
 
 	default int writeStore(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -473,29 +468,6 @@ public interface IValue extends ASTNode, ITyped
 		final int localIndex = this.writeStore(writer, type);
 		writer.visitVarInsn(Opcodes.AUTO_LOAD, localIndex);
 		return localIndex;
-	}
-
-	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.writeExpression(writer, Types.BOOLEAN);
-		writer.visitJumpInsn(Opcodes.IFNE, dest);
-	}
-
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter} {@code writer} as a jump expression to the given
-	 * {@link Label} {@code dest}. By default, this calls {@link #writeExpression(MethodWriter, IType)} and then writes
-	 * an {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That means the JVM would jump to {@code dest}
-	 * if the current value on the stack equals {@code 0}.
-	 *
-	 * @param writer
-	 * @param dest
-	 *
-	 * @throws BytecodeException
-	 */
-	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.writeExpression(writer, Types.BOOLEAN);
-		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 
 	default void writeAnnotationValue(AnnotationVisitor visitor, String key)

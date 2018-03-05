@@ -2,7 +2,6 @@ package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
-import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -251,47 +250,13 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		final int lineNumber = this.lineNumber();
-		if (Types.isVoid(type))
+		if (type == null || Types.isVoid(type))
 		{
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
 			return;
 		}
 
-		final IType fieldType = this.getType();
-		if (type == null)
-		{
-			type = fieldType;
-		}
-
-		if (this.receiver != null)
-		{
-			this.receiver.writeExpression(writer, null);
-		}
-
-		this.field.writeSet_PreValue(writer, lineNumber);
-
-		if (this.receiver == null)
-		{
-			final boolean tempVar = this.field.writeSet_PreValue(writer, lineNumber);
-
-			this.value.writeExpression(writer, fieldType);
-
-			writer.visitInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
-		}
-		else
-		{
-			this.field.writeSet_PreValue(writer, lineNumber);
-
-			this.value.writeExpression(writer, fieldType);
-
-			writer.visitInsn(Opcodes.AUTO_DUP_X1);
-		}
-
-		this.field.writeSet_Wrap(writer, lineNumber);
-		this.field.writeSet_Set(writer, lineNumber);
-
-		// Return value left on stack
-		fieldType.writeCast(writer, type, lineNumber);
+		this.field.writeSetCopy(writer, this.receiver, this.value, lineNumber);
 	}
 
 	@Override
