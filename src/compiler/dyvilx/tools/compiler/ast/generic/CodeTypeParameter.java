@@ -37,7 +37,7 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance,
-		                        AttributeList annotations)
+		AttributeList annotations)
 	{
 		super(generic, name, variance);
 		this.attributes = annotations;
@@ -117,17 +117,9 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	protected void computeReifiedKind()
 	{
-		this.attributes.checkTypes(markers, context);
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
-		}
-		if (this.upperBound != null)
-		{
-			this.upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
-		}
+		super.computeReifiedKind();
 
 		final IType type;
 		final Reified.Type reifiedKind = this.getReifiedKind();
@@ -150,6 +142,20 @@ public class CodeTypeParameter extends TypeParameter
 				                                 .of(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
 			final Name name = Name.apply("reify_" + this.name.qualified);
 			this.reifyParameter = new CodeParameter(null, this.position, name, type, attributes);
+		}
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.attributes.checkTypes(markers, context);
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
+		}
+		if (this.upperBound != null)
+		{
+			this.upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 	}
 
