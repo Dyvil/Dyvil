@@ -39,7 +39,7 @@ line with ## in the middle
 	the value of #('COUNT') in SPEC_NAME is COUNT
 }
 
-#decorate(line => '- ' ++ line ++ '.') {
+#decorate(line => "- \(line).") {
 	Item 1
 	Item 2
 	Item 3
