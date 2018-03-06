@@ -713,6 +713,7 @@ public class CodeMethod extends AbstractMethod
 
 		// Delegate to the TypeVarType implementation
 		final TypeVarType typeVarType = new TypeVarType(overrideParameter);
+		typeVarType.checkType(MarkerList.BLACKHOLE, this, TypePosition.REIFY_FLAG);
 
 		if (reifiedType == Reified.Type.TYPE)
 		{

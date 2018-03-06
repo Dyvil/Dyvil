@@ -170,7 +170,7 @@ public final class ClassOperator implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		this.type.checkType(markers, context, TypePosition.CLASS | TypePosition.REIFY_FLAG);
 	}
 
 	@Override

@@ -189,12 +189,15 @@ public class TypeVarType implements IRawType
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
-		if (reifiedKind != null)
+		if ((position & TypePosition.REIFY_FLAG) != 0)
 		{
-			this.reifyVariableAccess = new FieldAccess(this.typeParameter.getReifyParameter())
-				                           .resolve(markers, context);
-			this.reifyVariableAccess.checkTypes(markers, context); // ensure proper capture
+			final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+			if (reifiedKind != null)
+			{
+				this.reifyVariableAccess = new FieldAccess(this.typeParameter.getReifyParameter())
+					                           .resolve(markers, context);
+				this.reifyVariableAccess.checkTypes(markers, context); // ensure proper capture
+			}
 		}
 	}
 
@@ -249,7 +252,7 @@ public class TypeVarType implements IRawType
 	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
 		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
-		if (reifiedKind == null)
+		if (reifiedKind == null || this.reifyVariableAccess == null)
 		{
 			throw new Error("Non-reified Type Parameter");
 		}
@@ -274,7 +277,7 @@ public class TypeVarType implements IRawType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
-		if (reifiedKind == null)
+		if (reifiedKind == null || this.reifyVariableAccess == null)
 		{
 			throw new Error("Non-reified Type Parameter");
 		}

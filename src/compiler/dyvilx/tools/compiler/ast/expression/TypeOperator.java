@@ -137,7 +137,7 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.TYPE);
+		this.type.checkType(markers, context, TypePosition.TYPE | TypePosition.REIFY_FLAG);
 	}
 
 	@Override

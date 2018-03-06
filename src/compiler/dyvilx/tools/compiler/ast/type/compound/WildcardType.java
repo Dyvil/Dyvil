@@ -177,7 +177,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 			markers.add(Markers.semanticError(this.position, "type.wildcard.invalid"));
 		}
 
-		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		this.type.checkType(markers, context, TypePosition.copyReify(position, TypePosition.SUPER_TYPE_ARGUMENT));
 	}
 
 	// Compilation

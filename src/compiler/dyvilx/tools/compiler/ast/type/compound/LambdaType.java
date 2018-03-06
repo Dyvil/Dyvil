@@ -160,7 +160,7 @@ public final class LambdaType extends ResolvedGenericType
 			markers.add(Markers.semanticError(this.position, "type.lambda.class"));
 		}
 
-		this.arguments.checkTypes(markers, context, TypePosition.GENERIC_ARGUMENT);
+		this.arguments.checkTypes(markers, context, TypePosition.genericArgument(position));
 	}
 
 	@Override
