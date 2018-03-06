@@ -14,7 +14,6 @@ import dyvilx.tools.compiler.ast.expression.TypeOperator;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -28,7 +27,6 @@ import java.lang.annotation.ElementType;
 public class CodeTypeParameter extends TypeParameter
 {
 	protected SourcePosition position;
-	protected CodeParameter  reifyParameter;
 
 	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
@@ -42,12 +40,6 @@ public class CodeTypeParameter extends TypeParameter
 		super(generic, name, variance);
 		this.attributes = annotations;
 		this.position = position;
-	}
-
-	@Override
-	public IParameter getReifyParameter()
-	{
-		return this.reifyParameter;
 	}
 
 	@Override
@@ -140,8 +132,9 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			final AttributeList attributes = AttributeList
 				                                 .of(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
-			final Name name = Name.apply("reify_" + this.name.qualified);
-			this.reifyParameter = new CodeParameter(null, this.position, name, type, attributes);
+			final Name name = Name.apply("reify_" + this.getName().qualified);
+			final CodeParameter parameter = new CodeParameter(null, this.getPosition(), name, type, attributes);
+			this.setReifyParameter(parameter);
 		}
 	}
 

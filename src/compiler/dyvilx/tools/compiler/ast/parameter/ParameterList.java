@@ -131,16 +131,13 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 		}
 	}
 
-	public void remove(int count)
+	public IParameter removeLast()
 	{
-		final int end = this.size;
-		this.size -= count;
-
-		// Set excessive array elements to null to let the GC do its job
-		for (int i = this.size; i < end; i++)
-		{
-			this.parameters[i] = null;
-		}
+		final int index = this.size - 1;
+		final IParameter result = this.parameters[index];
+		this.parameters[index] = null;
+		this.size = index;
+		return result;
 	}
 
 	// Resolution

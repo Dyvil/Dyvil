@@ -44,6 +44,8 @@ public interface ITypeParameter extends ASTNode, IResolvable, INamed, Attributab
 
 	IParameter getReifyParameter();
 
+	void setReifyParameter(IParameter parameter);
+
 	default boolean isAny()
 	{
 		return this.getGeneric() instanceof ITypeAlias;

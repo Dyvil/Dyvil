@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.IRawType;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -189,16 +190,25 @@ public class TypeVarType implements IRawType
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		if ((position & TypePosition.REIFY_FLAG) != 0)
+		if ((position & TypePosition.REIFY_FLAG) == 0)
 		{
-			final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
-			if (reifiedKind != null)
-			{
-				this.reifyVariableAccess = new FieldAccess(this.typeParameter.getReifyParameter())
-					                           .resolve(markers, context);
-				this.reifyVariableAccess.checkTypes(markers, context); // ensure proper capture
-			}
+			return;
 		}
+
+		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+		if (reifiedKind == null)
+		{
+			return;
+		}
+
+		final IParameter reifyParameter = this.typeParameter.getReifyParameter();
+		if (reifyParameter == null)
+		{
+			return;
+		}
+
+		this.reifyVariableAccess = new FieldAccess(reifyParameter).resolve(markers, context);
+		this.reifyVariableAccess.checkTypes(markers, context); // ensure proper capture
 	}
 
 	@Override

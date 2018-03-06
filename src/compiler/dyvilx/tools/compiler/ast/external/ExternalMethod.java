@@ -73,15 +73,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		if (this.typeParameters != null)
 		{
-			int reifiedParameters = 0;
-			for (int i = 0; i < this.typeParameters.size(); i++)
+			for (int i = this.typeParameters.size() - 1; i >= 0; i--)
 			{
-				if (this.typeParameters.get(i).getReifiedKind() != null)
+				final ITypeParameter typeParameter = this.typeParameters.get(i);
+				if (typeParameter.getReifiedKind() != null)
 				{
-					reifiedParameters++;
+					typeParameter.setReifyParameter(this.parameters.removeLast());
 				}
 			}
-			this.parameters.remove(reifiedParameters);
 		}
 	}
 

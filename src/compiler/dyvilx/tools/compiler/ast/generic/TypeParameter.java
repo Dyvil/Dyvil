@@ -52,6 +52,7 @@ public abstract class TypeParameter implements ITypeParameter
 
 	protected ITypeParametric generic;
 	protected Reified.Type    reifiedKind; // defaults to null (not reified)
+	protected IParameter      reifyParameter;
 
 	private final IType covariantType = new CovariantTypeVarType(this);
 
@@ -110,15 +111,27 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void setName(Name name)
+	public IParameter getReifyParameter()
 	{
-		this.name = name;
+		return this.reifyParameter;
+	}
+
+	@Override
+	public void setReifyParameter(IParameter parameter)
+	{
+		this.reifyParameter = parameter;
 	}
 
 	@Override
 	public Name getName()
 	{
 		return this.name;
+	}
+
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
 	}
 
 	@Override
