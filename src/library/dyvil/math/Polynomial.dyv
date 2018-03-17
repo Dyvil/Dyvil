@@ -1,10 +1,12 @@
 package dyvil.math
 
+import dyvil.math.group.RingCompatible
+
 @LiteralConvertible.FromInt
 @LiteralConvertible.FromLong
 @LiteralConvertible.FromFloat
 @LiteralConvertible.FromDouble
-class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomial>, Formattable, (double -> double)
+class Polynomial private (coefficients: [double]) implements RingCompatible<Polynomial>, Formattable, (double -> double)
 {
 	@BytecodeName("apply0")
 	static func apply(coefficient: double) -> Polynomial = Polynomial(coefficient, degree: 0)
@@ -187,7 +189,7 @@ class Polynomial private (coefficients: [double]) implements ScalarMath<Polynomi
 		return Polynomial(rCoeff / dCoeff, degree: rDeg - dDeg)
 	}
 
-	infix func **(lhs: Polynomial, rhs: int) -> Polynomial
+	override infix func **(lhs: Polynomial, rhs: int) -> Polynomial
 	{
 		if (rhs < 0) throw new UnsupportedOperationException('polynomial to the negative power')
 		if (rhs == 0) return _1

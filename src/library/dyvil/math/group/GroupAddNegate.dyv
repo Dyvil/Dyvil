@@ -5,4 +5,15 @@ interface GroupAddNegate<T> extends GroupAdd<T>
 	abstract func negate(rhs: T) -> T
 
 	func subtract(lhs: T, rhs: T) -> T = this.add(lhs, this.negate(rhs)) // a - b == a + -b
+
+	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupAddNegate<R> = new GroupAddNegate<R>()
+	{
+		override func _0() -> R = R._0
+
+		override func add(lhs: R, rhs: R) -> R = R.`+`(lhs, rhs)
+
+		override func negate(rhs: R) -> R = R.`-`(rhs)
+
+		override func subtract(lhs: R, rhs: R) -> R = R.`-`(lhs, rhs)
+	}
 }

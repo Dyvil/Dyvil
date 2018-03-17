@@ -1,9 +1,11 @@
 package dyvil.math
 
+import dyvil.math.group.RingCompatible
+
 @LiteralConvertible.FromInt
 @LiteralConvertible.FromLong
 class Rational private (let numerator: long { public get }, let denominator: long { public get })
-	implements ScalarMath<Rational>, Formattable, Comparable<Rational>
+	implements RingCompatible<Rational>, Formattable, Comparable<Rational>
 {
 	static func gcd(a: long, b: long) -> long
 	{
@@ -108,6 +110,8 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 		let denom = lhs.denominator * rhs.numerator
 		return Rational(num, denom)
 	}
+
+	override infix func **(lhs: Rational, rhs: int) -> Rational = Rational(lhs.numerator ** rhs, lhs.denominator ** rhs)
 
 	// Equals and Hash Code
 

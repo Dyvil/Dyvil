@@ -7,5 +7,28 @@ interface GroupMultiplyInverse<T> extends GroupMultiply<T>
 	func divide(lhs: T, rhs: T) -> T = this.multiply(lhs, this.inverse(rhs)) // a / b == a * 1/b
 
 	// supports negative exponent
-	override func power(lhs: T, rhs: int) -> T = rhs < 0 ? this.inverse(this.power(lhs, -rhs)) : super<GroupMultiply>.power(lhs, rhs)
+	override func power(lhs: T, rhs: int) -> T
+	{
+		if (rhs < 0)
+		{
+			return this.inverse(super<GroupMultiply>.power(lhs, -rhs))
+		}
+		else
+		{
+			return super<GroupMultiply>.power(lhs, rhs)
+		}
+	}
+
+	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiplyInverse<R> = new GroupMultiplyInverse<R>()
+	{
+		override func _1() -> R = R._1
+
+		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
+
+		override func inverse(rhs: R) -> R = R.inverse(rhs)
+
+		override func divide(lhs: R, rhs: R) -> R = R.`/`(lhs, rhs)
+
+		override func power(lhs: R, rhs: int) -> R = R.`**`(lhs, rhs)
+	}
 }
