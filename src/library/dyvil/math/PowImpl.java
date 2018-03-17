@@ -112,6 +112,18 @@ public final class PowImpl
 		return ((exponent & 1) == 0 ? 1 : base) * powRec(base * base, exponent >> 1);
 	}
 
+	public static BigDecimal pow(@NonNull BigDecimal base, int exponent)
+	{
+		if (exponent < 0)
+		{
+			return BigDecimal.ONE.divide(base.pow(-exponent), RoundingMode.HALF_EVEN);
+		}
+		else
+		{
+			return base.pow(exponent);
+		}
+	}
+
 	// Implementation note:
 	// Both BigDecimal pow algorithms calculate base^(A+B) as base^A * base^B,
 	// where A is the integer part of the exponent, and B is the decimal part.
