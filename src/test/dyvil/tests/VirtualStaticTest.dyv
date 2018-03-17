@@ -4,28 +4,29 @@ using dyvil.Test
 
 class VirtualStaticTest
 {
-	// Static Virtual Method Test
-
-	interface Interface
+	interface Interface<T>
 	{
-		static func foo() -> String
-		static func bar(s: String) -> String
+		static func foo() -> T
+		static func bar(v: T) -> T
 	}
 
-	static class Base implements Interface
+	static class Base implements Interface<String>
 	{
-		static override func foo() -> String = "Base"
-		static override func bar(s: String) -> String = s ++ "_Base"
+		override static func foo() -> String = "Base"
+		override static func bar(v: String) -> String = v ++ "_Base"
 	}
 
 	static class Derived extends Base
 	{
-		static override func foo() -> String = "Derived"
-		static override func bar(s: String) -> String = s ++ "_Derived"
+		override static func foo() -> String = "Derived"
+		override static func bar(v: String) -> String = v ++ "_Derived"
 	}
 
-	static func getFoo<@Reified(Reified.Type.ANY_CLASS) T: Interface>() -> String = T.foo
-	static func getBar<@Reified(Reified.Type.OBJECT_CLASS) T: Interface>(s: String) -> String = T.bar(s)
+	static func getFoo<type T, @Reified(.ANY_CLASS) type ITF: Interface<T>>() -> T = ITF.foo()
+
+	static func getBar<type T, @Reified(.ANY_CLASS) type ITF: Interface<T>>(v: T) -> T = ITF.bar(v)
+
+	// Apply Methods
 
 	interface IntConstructible
 	{
@@ -37,13 +38,16 @@ class VirtualStaticTest
 
 	static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(i: int) -> T = T(i) as T
 
-	static func apply() -> Test = test "Virtual Static Methods" {
-		expect(class AbstractMethodError, from: => getFoo<Interface>()) // see #379
+	// Test
 
-		getFoo<Base>() =?= "Base"
-		getFoo<Derived>() =?= "Derived"
-		getBar<Base>("") =?= "_Base"
-		getBar<Derived>("") =?= "_Derived"
+	static func apply() -> Test = test "Virtual Static Methods" {
+		expect(class AbstractMethodError, from: => getFoo<Object, Interface<Object>>()) // see #379
+		expect(class AbstractMethodError, from: => getBar<Object, Interface<Object>>(""))
+
+		getFoo<String, Base>() =?= "Base"
+		getFoo<String, Derived>() =?= "Derived"
+		getBar<String, Base>("") =?= "_Base"
+		getBar<String, Derived>("") =?= "_Derived"
 
 		expect(class AbstractMethodError, from: => create<IntConstructible>(10))
 

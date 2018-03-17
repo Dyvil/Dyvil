@@ -32,6 +32,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
@@ -565,7 +566,7 @@ public class CodeMethod extends AbstractMethod
 			                                                                      mangledName, descriptor, signature,
 			                                                                      exceptionTypes));
 
-		if (!this.hasModifier(Modifiers.STATIC))
+		if (!this.isStatic())
 		{
 			methodWriter.setThisType(ownerClassName);
 		}
@@ -592,21 +593,18 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitCode();
 			methodWriter.visitTypeInsn(Opcodes.NEW, "java/lang/AbstractMethodError");
 			methodWriter.visitInsn(Opcodes.DUP);
-			methodWriter.visitLdcInsn(ownerClassName.replace('/', '.') + '.' + mangledName + descriptor);
+			methodWriter.visitLdcInsn(ClassFormat.internalToPackage(ownerClassName) + '.' + mangledName + descriptor);
 			methodWriter.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/AbstractMethodError", "<init>",
 			                             "(Ljava/lang/String;)V", false);
 			methodWriter.visitInsn(Opcodes.ATHROW);
 			methodWriter.visitEnd(this.type);
 		}
 
-		this.parameters.writeLocals(methodWriter, start, end);
-
-		if (this.hasModifier(Modifiers.STATIC))
+		if (!this.isStatic())
 		{
-			return;
+			methodWriter.visitLocalVariable("this", 'L' + ownerClassName + ';', null, start, end, 0);
 		}
-
-		methodWriter.visitLocalVariable("this", 'L' + ownerClassName + ';', null, start, end, 0);
+		this.parameters.writeLocals(methodWriter, start, end);
 
 		if (this.overrideMethods == null)
 		{
@@ -614,7 +612,9 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final int lineNumber = this.lineNumber();
-		final int opcode = interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
+		final int opcode = this.getInvokeOpcode();
+		final int bridgeModifiers =
+			Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE | (this.isStatic() ? Modifiers.STATIC : 0);
 
 		/*
 		 * Contains entries in the format 'mangledName(paramTypes)returnType'
@@ -638,56 +638,68 @@ public class CodeMethod extends AbstractMethod
 			descriptors.add(overrideEntry);
 
 			// Generate a bridge method
-			methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-				Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, overrideMangledName, overrideDescriptor,
-				null, exceptionTypes));
+			methodWriter = new MethodWriterImpl(writer, writer.visitMethod(bridgeModifiers, overrideMangledName,
+			                                                               overrideDescriptor, null, exceptionTypes));
 
 			methodWriter.visitCode();
-			methodWriter.setThisType(ownerClassName);
 
-			methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
-
-			final ParameterList overrideParameterList = overrideMethod.getParameters();
+			if (!this.isStatic())
+			{
+				methodWriter.setThisType(ownerClassName);
+				methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
+			}
 
 			// Generate Parameters and load arguments
-			for (int p = 0, count = this.parameters.size(); p < count; p++)
-			{
-				final IParameter overrideParameter = overrideParameterList.get(p);
-				final IType parameterType = this.parameters.get(p).getCovariantType();
-				final IType overrideParameterType = overrideParameter.getCovariantType();
-
-				overrideParameter.writeParameter(methodWriter);
-				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
-				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
-			}
+			this.writeBridgeParameters(methodWriter, overrideMethod);
 			// Generate Type Parameters and load reified type arguments
-			if (this.typeParameters != null)
-			{
-				final TypeParameterList overrideTypeParams = overrideMethod.getTypeParameters();
+			this.writeBridgeTypeParameters(methodWriter, overrideMethod);
 
-				for (int i = 0, count = this.typeParameters.size(); i < count; i++)
-				{
-					final ITypeParameter thisParameter = this.typeParameters.get(i);
-					final Reified.Type reifiedType = thisParameter.getReifiedKind();
-					if (reifiedType == null)
-					{
-						continue;
-					}
-
-					final ITypeParameter overrideParameter = overrideTypeParams.get(i);
-					this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
-
-					// Extra type parameters from the overridden method are ignored
-				}
-			}
-
-			IType overrideReturnType = overrideMethod.getType();
+			final IType overrideReturnType = overrideMethod.getType();
 
 			methodWriter.visitLineNumber(lineNumber);
 			methodWriter.visitMethodInsn(opcode, ownerClassName, mangledName, descriptor, interfaceClass);
 			this.type.writeCast(methodWriter, overrideReturnType, lineNumber);
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
+		}
+	}
+
+	private void writeBridgeParameters(MethodWriter methodWriter, IMethod overrideMethod)
+	{
+		final int lineNumber = this.lineNumber();
+		final ParameterList overrideParameterList = overrideMethod.getParameters();
+		for (int p = 0, count = overrideParameterList.size(); p < count; p++)
+		{
+			final IParameter overrideParameter = overrideParameterList.get(p);
+			final IType parameterType = this.parameters.get(p).getCovariantType();
+			final IType overrideParameterType = overrideParameter.getCovariantType();
+
+			overrideParameter.writeParameter(methodWriter);
+			methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
+			overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
+		}
+	}
+
+	private void writeBridgeTypeParameters(MethodWriter methodWriter, IMethod overrideMethod)
+	{
+		if (this.typeParameters != null)
+		{
+			final TypeParameterList overrideTypeParams = overrideMethod.getTypeParameters();
+
+			for (int i = 0, count = this.typeParameters.size(); i < count; i++)
+			{
+				final ITypeParameter thisParameter = this.typeParameters.get(i);
+				final Reified.Type reifiedType = thisParameter.getReifiedKind();
+				if (reifiedType == null)
+				{
+					continue;
+				}
+
+				final ITypeParameter overrideParameter = overrideTypeParams.get(i);
+				this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
+
+				// Extra type parameters from the overridden method are ignored
+			}
 		}
 	}
 
@@ -702,7 +714,7 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	private void writeReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType,
-		                               ITypeParameter overrideParameter)
+		ITypeParameter overrideParameter)
 	{
 		overrideParameter.writeParameter(writer);
 		if (overrideParameter.getReifiedKind() == null)
