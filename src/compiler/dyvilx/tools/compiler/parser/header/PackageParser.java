@@ -1,9 +1,9 @@
 package dyvilx.tools.compiler.parser.header;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -17,13 +17,13 @@ public class PackageParser extends Parser
 
 	protected PackageDeclaration packageDeclaration;
 	private StringBuilder buffer = new StringBuilder();
-	
+
 	public PackageParser(PackageDeclaration pack)
 	{
 		this.packageDeclaration = pack;
 		this.mode = NAME;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -49,21 +49,24 @@ public class PackageParser extends Parser
 			pm.report(token, "package.identifier");
 			return;
 		case DOT:
-			if (type == BaseSymbols.SEMICOLON)
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+				pm.reparse();
+				// Fallthrough
+			case Tokens.EOF:
 				this.packageDeclaration.setPackage(this.buffer.toString());
-				pm.popParser(true);
+				pm.popParser();
 				return;
-			}
-			this.mode = NAME;
-			if (type == BaseSymbols.DOT)
-			{
+			case BaseSymbols.DOT:
+				this.mode = NAME;
 				this.buffer.append('.');
-			}
-			else
-			{
+				return;
+			default:
+				this.mode = NAME;
 				pm.report(token, "package.dot");
 				pm.reparse();
+				return;
 			}
 		}
 	}
