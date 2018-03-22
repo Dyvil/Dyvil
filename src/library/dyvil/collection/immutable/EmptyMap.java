@@ -53,7 +53,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		return EmptyIterator.instance;
+		return EmptyIterator.apply();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,7 +61,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return EmptyIterator.instance;
+		return EmptyIterator.apply();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,7 +69,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return EmptyIterator.instance;
+		return EmptyIterator.apply();
 	}
 
 	@Override

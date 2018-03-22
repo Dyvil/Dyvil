@@ -145,7 +145,7 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new ArrayIterator(this.cells, this.rows * this.columns);
+		return new ArrayIterator(this.cells, 0, this.rows * this.columns);
 	}
 
 	@Override

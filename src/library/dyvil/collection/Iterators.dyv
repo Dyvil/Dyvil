@@ -1,0 +1,47 @@
+package dyvil.collection
+
+import java.util.Iterator
+import dyvil.collection.iterator._
+
+class Iterators
+{
+	static func apply<type E>(this: Iterator) -> Iterator<E>
+	{
+		return EmptyIterator<E>()
+	}
+
+	static func apply<type E>(this: Iterator, element: E) -> Iterator<E>
+	{
+		return SingletonIterator(element)
+	}
+
+	static func apply<type E>(this: Iterator, elements: E...) -> Iterator<E>
+	{
+		return ArrayIterator(elements)
+	}
+
+	infix func map<type E, type R>(_ base: Iterator<+E>, by mapper: E -> R) -> Iterator<+R>
+	{
+		return MappingIterator(base, mapper)
+	}
+
+	infix func filter<type E>(_ base: Iterator<+E>, by filter: E -> boolean) -> Iterator<E>
+	{
+		return FilterIterator(base, filter)
+	}
+
+	infix func ++ <type E>(lhs: Iterator<+E>, rhs: Iterator<+E>) -> Iterator<E>
+	{
+		return ConcatIterator(lhs, rhs)
+	}
+
+	infix func + <type E>(lhs: E, rhs: Iterator<+E>) -> Iterator<E>
+	{
+		return PrependIterator(lhs, rhs)
+	}
+
+	infix func + <type E>(lhs: Iterator<+E>, rhs: E) -> Iterator<E>
+	{
+		return AppendIterator(lhs, rhs)
+	}
+}

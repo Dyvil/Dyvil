@@ -19,7 +19,7 @@ public object EmptyRange implements Range<none>
 
 	override func size() -> int = 0
 
-	override func iterator() -> Iterator<none> = EmptyIterator<none>()
+	override func iterator() -> Iterator<none> = EmptyIterator
 
 	override func forEach(action: none -> void) -> void = {}
 

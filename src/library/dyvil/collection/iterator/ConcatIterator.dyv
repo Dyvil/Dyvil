@@ -2,9 +2,13 @@ package dyvil.collection.iterator
 
 import java.util.{ Iterator, NoSuchElementException }
 
-class ConcatIterator<type E>(let parts: Iterator<E>...) implements Iterator<E>
+class ConcatIterator<type E>(let parts: Iterator<+E>...) implements Iterator<E>
 {
-	static func apply<type E>(parts: Iterator<E>...) -> ConcatIterator<E> = new ConcatIterator<E>(parts...)
+	// Apply Method
+
+	static func apply<type E>(parts: Iterator<+E>...) -> ConcatIterator<E> = new ConcatIterator<E>(parts...)
+
+	// Implementation
 
 	var index: int
 

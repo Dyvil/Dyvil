@@ -1,0 +1,26 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+class SingletonIterator<type E>(let element: E) implements Iterator<E>
+{
+	// Apply Method
+
+	static func apply<type E>(element: E) -> SingletonIterator<E>
+	{
+		return new SingletonIterator<E>(element)
+	}
+
+	// Implementation
+
+	var returned: boolean
+
+	override func hasNext() -> boolean = !this.returned
+
+	override func next() -> E
+	{
+		if (this.returned) throw new NoSuchElementException
+		this.returned = true
+		return this.element
+	}
+}

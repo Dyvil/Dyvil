@@ -1,0 +1,46 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+class FilterIterator<type E>(let base: Iterator<E>, let filter: E -> boolean) implements Iterator<E>
+{
+	// Apply Method
+
+	static func apply<type E>(base: Iterator<E>, filter: E -> boolean) -> FilterIterator<E>
+	{
+		return new FilterIterator<E>(base, filter)
+	}
+
+	// Implementation
+
+	var hasNext: boolean
+	var next: E!
+
+	override func hasNext() -> boolean
+	{
+		if (this.hasNext) return true
+
+		while (this.base.hasNext())
+		{
+			let next = this.base.next()
+			if (this.filter.apply(next))
+			{
+				this.hasNext = true
+				this.next = next
+				return true
+			}
+		}
+		return false
+	}
+
+	override func next() -> E
+	{
+		if (!this.hasNext()) throw new NoSuchElementException
+		let next = this.next
+		this.next = null
+		this.hasNext = false
+		return next
+	}
+
+	override func toString() -> String = "FilterIterator(\(this.base), filter: \(this.filter))"
+}
