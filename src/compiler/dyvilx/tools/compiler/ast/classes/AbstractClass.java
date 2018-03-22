@@ -277,15 +277,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Body
 
 	@Override
-	public void setBody(ClassBody body)
-	{
-		this.body = body;
-	}
-
-	@Override
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+
+	@Override
+	public ClassBody createBody()
+	{
+		if (this.body != null)
+		{
+			return this.body;
+		}
+		return this.body = new ClassBody(this);
+	}
+
+	@Override
+	public void setBody(ClassBody body)
+	{
+		this.body = body;
 	}
 
 	@Override

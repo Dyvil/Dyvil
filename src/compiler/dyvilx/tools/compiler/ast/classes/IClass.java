@@ -113,6 +113,8 @@ public interface IClass
 
 	// Body
 
+	ClassBody createBody();
+
 	ClassBody getBody();
 
 	void setBody(ClassBody body);
