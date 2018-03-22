@@ -80,7 +80,7 @@ public class ArgumentList implements IResolvable, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator<>(this.values, this.size);
+		return new ArrayIterator<>(this.values, 0, this.size);
 	}
 
 	@Override

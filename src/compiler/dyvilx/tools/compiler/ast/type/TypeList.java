@@ -96,7 +96,7 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 	@Override
 	public Iterator<IType> iterator()
 	{
-		return new ArrayIterator<>(this.types, this.size);
+		return new ArrayIterator<>(this.types, 0, this.size);
 	}
 
 	public void resolveTypes(MarkerList markers, IContext context)

@@ -100,7 +100,7 @@ public class TypeParameterList implements IResolvable, Iterable<ITypeParameter>
 	@Override
 	public Iterator<ITypeParameter> iterator()
 	{
-		return new ArrayIterator<>(this.typeParams, this.size);
+		return new ArrayIterator<>(this.typeParams, 0, this.size);
 	}
 
 	// Resolution

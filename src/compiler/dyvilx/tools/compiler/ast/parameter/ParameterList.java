@@ -73,7 +73,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	@Override
 	public Iterator<IParameter> iterator()
 	{
-		return new ArrayIterator<>(this.parameters, this.size);
+		return new ArrayIterator<>(this.parameters, 0, this.size);
 	}
 
 	public IParameter get(int index)

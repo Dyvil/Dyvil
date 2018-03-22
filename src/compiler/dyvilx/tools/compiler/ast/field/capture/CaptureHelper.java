@@ -29,7 +29,7 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 	@Override
 	public Iterator<T> iterator()
 	{
-		return new ArrayIterator<>(this.capturedFields, this.capturedFieldCount);
+		return new ArrayIterator<>(this.capturedFields, 0, this.capturedFieldCount);
 	}
 
 	public IClass getThisClass()

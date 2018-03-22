@@ -173,7 +173,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator<>(this.values, this.valueCount);
+		return new ArrayIterator<>(this.values, 0, this.valueCount);
 	}
 
 	@Override
