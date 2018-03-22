@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
-import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -9,10 +8,10 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.field.Field;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -74,17 +73,16 @@ public final class ObjectClassMetadata extends ClassMetadata
 			                                  this.theClass.getName()));
 		}
 
+		if ((this.members & CONSTRUCTOR) == 0)
+		{
+			this.constructor.setAttributes(AttributeList.of(PRIVATE));
+		}
+
 		if ((this.members & INSTANCE_FIELD) == 0)
 		{
-			final int flags = PUBLIC | CONST | (this.theClass.isImplicit() ? IMPLICIT : 0);
-
-			final Field field = new Field(this.theClass, Names.instance, this.theClass.getClassType(),
-			                              AttributeList.of(flags));
+			final Field field = this.createInstanceField();
 			this.instanceField = field;
-
-			this.constructor.setAttributes(AttributeList.of(PRIVATE));
-			final ConstructorCall call = new ConstructorCall(null, this.constructor, ArgumentList.EMPTY);
-			field.setValue(call);
+			this.theClass.createBody().addDataMember(field);
 		}
 		else
 		{
@@ -93,33 +91,20 @@ public final class ObjectClassMetadata extends ClassMetadata
 		}
 	}
 
-	@Override
-	public IDataMember resolveField(Name name)
+	private Field createInstanceField()
 	{
-		if (this.instanceField != null && name == Names.instance)
-		{
-			return this.instanceField;
-		}
-		return null;
-	}
+		final int flags = PUBLIC | CONST | (this.theClass.isImplicit() ? IMPLICIT : 0);
 
-	@Override
-	public void writeStaticInit(MethodWriter mw) throws BytecodeException
-	{
-		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
-		{
-			this.instanceField.writeStaticInit(mw);
-		}
+		final IType classType = this.theClass.getClassType();
+		final Field field = new Field(this.theClass, Names.instance, classType, AttributeList.of(flags));
+		final ConstructorCall call = new ConstructorCall(null, classType, ArgumentList.EMPTY);
+		field.setValue(call);
+		return field;
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
-		{
-			this.instanceField.write(writer);
-		}
-
 		super.write(writer);
 
 		String internalName = this.theClass.getInternalName();
@@ -172,23 +157,29 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "readResolve",
 			                                                                      "()Ljava/lang/Object;", null, null));
-			writeResolveMethod(mw, internalName);
+			mw.setThisType(internalName);
+			writeGetInstance(mw, internalName);
 		}
 
 		if ((this.members & WRITE_REPLACE) == 0)
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "writeReplace",
 			                                                                      "()Ljava/lang/Object;", null, null));
-			writeResolveMethod(mw, internalName);
+			mw.setThisType(internalName);
+			writeGetInstance(mw, internalName);
 		}
 	}
 
-	private static void writeResolveMethod(MethodWriter mw, String internal) throws BytecodeException
+	private static void writeGetInstance(MethodWriter mw, String internal) throws BytecodeException
 	{
-		mw.setThisType(internal);
 		mw.visitCode();
 		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
 		mw.visitInsn(Opcodes.ARETURN);
 		mw.visitEnd();
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter mw) throws BytecodeException
+	{
 	}
 }
