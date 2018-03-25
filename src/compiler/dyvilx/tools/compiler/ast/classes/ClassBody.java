@@ -1,7 +1,10 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.List;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.iterator.FilterIterator;
 import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
@@ -13,6 +16,7 @@ import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.field.EnumConstant;
 import dyvilx.tools.compiler.ast.field.Field;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
@@ -78,8 +82,8 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 	private int            initializerCount;
 
 	// Caches
-	protected MethodLink[] namedMethodCache;
-	protected IMethod[]    implicitCache;
+	protected MethodLink[]  namedMethodCache;
+	protected List<IMethod> implicitCache;
 
 	public ClassBody(IClass iclass)
 	{
@@ -163,30 +167,19 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		return this.getEnclosingClass().hasModifier(Modifiers.ENUM);
 	}
 
+	public Iterable<IField> fields()
+	{
+		return () -> new ArrayIterator<>(this.fields, 0, this.fieldCount);
+	}
+
+	public Iterable<IField> enumConstants()
+	{
+		return () -> new FilterIterator<>(new ArrayIterator<>(this.fields, 0, this.fieldCount), IField::isEnumConstant);
+	}
+
 	public int fieldCount()
 	{
 		return this.fieldCount;
-	}
-
-	@Override
-	public void addDataMember(IField field)
-	{
-		field.setEnclosingClass(this.enclosingClass);
-
-		final int index = this.fieldCount++;
-		if (index >= this.fields.length)
-		{
-			IField[] temp = new IField[index * 2];
-			System.arraycopy(this.fields, 0, temp, 0, index);
-			this.fields = temp;
-		}
-		this.fields[index] = field;
-	}
-
-	@Override
-	public IField createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
-	{
-		return new Field(this.enclosingClass, position, name, type, attributes);
 	}
 
 	public IField getField(int index)
@@ -205,6 +198,58 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			}
 		}
 		return null;
+	}
+
+	public void addField(IField field)
+	{
+		field.setEnclosingClass(this.enclosingClass);
+
+		final int index = this.fieldCount++;
+		if (index >= this.fields.length)
+		{
+			IField[] temp = new IField[index * 2];
+			System.arraycopy(this.fields, 0, temp, 0, index);
+			this.fields = temp;
+		}
+		this.fields[index] = field;
+
+		final IProperty property = field.getProperty();
+		if (property != null)
+		{
+			this.addToCache(property);
+		}
+
+		if (!(field instanceof EnumConstant))
+		{
+			return;
+		}
+
+		final EnumConstant enumConst = (EnumConstant) field;
+
+		// set enum constant index
+		for (int i = index - 1; i >= 0; i--)
+		{
+			final IField fieldI = this.fields[i];
+			if (fieldI instanceof EnumConstant)
+			{
+				enumConst.setIndex(((EnumConstant) fieldI).getIndex() + 1);
+				return;
+			}
+		}
+
+		enumConst.setIndex(0);
+	}
+
+	@Override
+	public void addDataMember(IField field)
+	{
+		this.addField(field);
+	}
+
+	@Override
+	public IField createDataMember(SourcePosition position, Name name, IType type, AttributeList attributes)
+	{
+		return new Field(this.enclosingClass, position, name, type, attributes);
 	}
 
 	public IValue resolveImplicit(IType type)
@@ -253,9 +298,47 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 
 	// region Properties
 
+	public Iterable<IProperty> properties()
+	{
+		return () -> new ArrayIterator<>(this.properties, 0, this.propertyCount);
+	}
+
+	public Iterable<IProperty> allProperties()
+	{
+		final ArrayList.Builder<IProperty> builder = new ArrayList.Builder<>(this.propertyCount + this.fieldCount);
+		builder.addAll(this.properties());
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty property = this.fields[i].getProperty();
+			if (property != null)
+			{
+				builder.add(property);
+			}
+		}
+		return builder.build();
+	}
+
 	public int propertyCount()
 	{
 		return this.propertyCount;
+	}
+
+	public IProperty getProperty(int index)
+	{
+		return this.properties[index];
+	}
+
+	public IProperty getProperty(Name name)
+	{
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			IProperty p = this.properties[i];
+			if (p.getName() == name)
+			{
+				return p;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -277,57 +360,24 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			this.properties = temp;
 		}
 		this.properties[index] = property;
-	}
 
-	public IProperty getProperty(int index)
-	{
-		return this.properties[index];
-	}
-
-	public IProperty getProperty(Name name)
-	{
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			IProperty p = this.properties[i];
-			if (p.getName() == name)
-			{
-				return p;
-			}
-		}
-		return null;
+		this.addToCache(property);
 	}
 
 	// endregion
 
 	// region Methods
 
-	public int methodCount()
+	public Iterable<IMethod> methods()
 	{
-		return this.methodCount;
-	}
-
-	public IMethod getMethod(int index)
-	{
-		return this.methods[index];
-	}
-
-	public IMethod getMethod(Name name)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			final IMethod method = this.methods[i];
-			if (method.getName() == name)
-			{
-				return method;
-			}
-		}
-		return null;
+		return () -> new ArrayIterator<>(this.methods, 0, this.methodCount);
 	}
 
 	public Iterable<IMethod> allMethods()
 	{
-		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(this.methodCount + this.propertyCount * 2
-		                                                                   + this.fieldCount);
+		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(
+			this.methodCount + this.propertyCount * 2 + this.fieldCount);
+
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			builder.add(this.methods[i]);
@@ -362,6 +412,29 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		}
 	}
 
+	public int methodCount()
+	{
+		return this.methodCount;
+	}
+
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
+	}
+
+	public IMethod getMethod(Name name)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			final IMethod method = this.methods[i];
+			if (method.getName() == name)
+			{
+				return method;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void addMethod(IMethod method)
 	{
@@ -375,57 +448,49 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 			this.methods = temp;
 		}
 		this.methods[index] = method;
+
+		this.addToCache(method);
 	}
 
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		final int cacheSize = this.namedMethodCache.length;
-		if (cacheSize == 0)
+		if (name == null)
 		{
-			return;
-		}
-
-		if (name != null)
-		{
-			final int hash = hash(name);
-			final int index = hash & (cacheSize - 1);
-			for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
+			for (IMethod method : this.methods())
 			{
-				if (link.hash == hash)
-				{
-					link.method.checkMatch(list, receiver, name, arguments);
-				}
+				method.checkMatch(list, receiver, null, arguments);
 			}
-
-			return;
-		}
-
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			this.methods[i].checkMatch(list, receiver, null, arguments);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			this.properties[i].checkMatch(list, receiver, null, arguments);
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			final IProperty property = this.fields[i].getProperty();
-			if (property != null)
+			for (IProperty property : this.allProperties())
 			{
 				property.checkMatch(list, receiver, null, arguments);
 			}
+
+			return;
 		}
+
+		final MethodLink[] cache = this.getNamedMethodCache();
+		if (cache.length == 0)
+		{
+			// no methods
+			return;
+		}
+
+		final int hash = hash(name);
+		final int index = hash & (cache.length - 1);
+		for (MethodLink link = cache[index]; link != null; link = link.next)
+		{
+			if (link.hash == hash)
+			{
+				link.method.checkMatch(list, receiver, name, arguments);
+			}
+		}
+
+		return;
 	}
 
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if (this.implicitCache == null)
-		{
-			return;
-		}
-
-		for (IMethod method : this.implicitCache)
+		for (IMethod method : this.getImplicitMethodCache())
 		{
 			method.checkImplicitMatch(list, value, targetType);
 		}
@@ -433,17 +498,19 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		final int cacheSize = this.namedMethodCache.length;
-		if (cacheSize == 0)
+		boolean result = false;
+
+		final MethodLink[] cache = this.getNamedMethodCache();
+		if (cache.length == 0)
 		{
+			// no methods
 			return false;
 		}
 
 		final int hash = hash(candidate.getName());
-		final int index = hash & (cacheSize - 1);
-		boolean result = false;
+		final int index = hash & (cache.length - 1);
 
-		for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
+		for (MethodLink link = cache[index]; link != null; link = link.next)
 		{
 			if (link.hash == hash && checkMethodImplements(link.method, candidate, typeContext))
 			{
@@ -519,7 +586,7 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 	}
 
 	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass,
-		                                ITypeContext typeContext)
+		ITypeContext typeContext)
 	{
 		final IMethod getter = property.getGetter();
 		if (getter != null)
@@ -534,9 +601,99 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		}
 	}
 
+	// Cache
+
+	public MethodLink[] getNamedMethodCache()
+	{
+		if (this.namedMethodCache != null)
+		{
+			return this.namedMethodCache;
+		}
+
+		/*
+		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add
+		 * twice the amount of properties with the same assumption and half the amount of fields, assuming there are
+		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
+		 * is larger than our sum, and use it as the cache size.
+		 */
+		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
+		final int mask = cacheSize - 1;
+		this.namedMethodCache = new MethodLink[cacheSize];
+
+		for (IMethod method : this.allMethods())
+		{
+			addToCache(this.namedMethodCache, method, mask);
+		}
+
+		return this.namedMethodCache;
+	}
+
+	public List<IMethod> getImplicitMethodCache()
+	{
+		if (this.implicitCache != null)
+		{
+			return this.implicitCache;
+		}
+
+		this.implicitCache = ((List<IMethod>) this.allMethods()).filtered(IMethod::isImplicitConversion);
+
+		return this.implicitCache;
+	}
+
+	private void addToCache(IProperty property)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			this.addToCache(getter);
+		}
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			this.addToCache(setter);
+		}
+	}
+
+	private void addToCache(IMethod method)
+	{
+		if (this.namedMethodCache != null)
+		{
+			final int cacheSize = this.namedMethodCache.length;
+			if (cacheSize > 0)
+			{
+				addToCache(this.namedMethodCache, method, cacheSize - 1);
+			}
+			else
+			{
+				this.namedMethodCache = null; // force cache rebuild later
+			}
+		}
+		if (this.implicitCache != null && method.isImplicitConversion())
+		{
+			this.implicitCache.add(method);
+		}
+	}
+
+	private static void addToCache(MethodLink[] cache, IMethod method, int mask)
+	{
+		final int hash = hash(method.getName());
+		final int index = hash & mask;
+		cache[index] = new MethodLink(method, hash, cache[index]);
+	}
+
+	private static int hash(Name name)
+	{
+		return name.unqualified.hashCode();
+	}
+
 	// endregion
 
 	// region Constructors
+
+	public Iterable<IConstructor> constructors()
+	{
+		return () -> new ArrayIterator<>(this.constructors, 0, this.constructorCount);
+	}
 
 	public int constructorCount()
 	{
@@ -591,9 +748,19 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 
 	// region Initializers
 
+	public Iterable<IInitializer> initializers()
+	{
+		return () -> new ArrayIterator<>(this.initializers, 0, this.initializerCount);
+	}
+
 	public int initializerCount()
 	{
 		return this.initializerCount;
+	}
+
+	public IInitializer getInitializer(int index)
+	{
+		return this.initializers[index];
 	}
 
 	@Override
@@ -617,69 +784,14 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		this.initializers[index] = initializer;
 	}
 
-	public IInitializer getInitializer(int index)
-	{
-		return this.initializers[index];
-	}
-
 	// endregion
 
 	// region Phases
-
-	public void initExternalMethodCache()
-	{
-		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount);
-		final int mask = cacheSize - 1;
-		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
-
-		// External Classes do not have any properties or fields with properties
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			addMethod(cache, this.methods[i], mask);
-		}
-	}
-
-	public void initExternalImplicitCache()
-	{
-		IMethod[] implicitCache = null;
-		int implicitCount = 0;
-
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			final IMethod method = this.methods[i];
-
-			// Add method to implicit cache
-			if (method.isImplicitConversion())
-			{
-				if (implicitCache == null)
-				{
-					implicitCache = new IMethod[this.methodCount];
-				}
-
-				implicitCache[implicitCount++] = method;
-			}
-		}
-
-		if (implicitCount > 0)
-		{
-			this.initImplicitCache(implicitCount, implicitCache);
-		}
-	}
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		final IHeaderUnit header = this.enclosingClass.getHeader();
-
-		/*
-		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add
-		 * twice the amount of properties with the same assumption and half the amount of fields, assuming there are
-		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
-		 * is larger than our sum, and use it as the cache size.
-		 */
-		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
-		final int mask = cacheSize - 1;
-		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -690,46 +802,16 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 
 		for (int i = 0; i < this.fieldCount; i++)
 		{
-			final IField field = this.fields[i];
-			field.resolveTypes(markers, context);
-
-			final IProperty property = field.getProperty();
-			if (property != null)
-			{
-				addProperty(cache, property, mask);
-			}
+			this.fields[i].resolveTypes(markers, context);
 		}
-
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			final IProperty property = this.properties[i];
-			property.resolveTypes(markers, context);
-			addProperty(cache, property, mask);
+			this.properties[i].resolveTypes(markers, context);
 		}
-
-		int implicitCount = 0;
-		IMethod[] implicitCache = null;
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			final IMethod method = this.methods[i];
-			method.resolveTypes(markers, context);
-			addMethod(cache, method, mask);
-
-			// Add method to implicit cache
-			if (method.isImplicitConversion())
-			{
-				if (implicitCache == null)
-				{
-					implicitCache = new IMethod[this.methodCount];
-				}
-				implicitCache[implicitCount++] = method;
-			}
+			this.methods[i].resolveTypes(markers, context);
 		}
-		if (implicitCount > 0)
-		{
-			this.initImplicitCache(implicitCount, implicitCache);
-		}
-
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].resolveTypes(markers, context);
@@ -738,39 +820,6 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		{
 			this.initializers[i].resolveTypes(markers, context);
 		}
-	}
-
-	private void initImplicitCache(int implicitCount, IMethod[] implicitCache)
-	{
-		this.implicitCache = new IMethod[implicitCount];
-		System.arraycopy(implicitCache, 0, this.implicitCache, 0, implicitCount);
-	}
-
-	private static void addProperty(MethodLink[] cache, IProperty property, int mask)
-	{
-		final IMethod getter = property.getGetter();
-		if (getter != null)
-		{
-			addMethod(cache, getter, mask);
-		}
-
-		final IMethod setter = property.getSetter();
-		if (setter != null)
-		{
-			addMethod(cache, setter, mask);
-		}
-	}
-
-	private static void addMethod(MethodLink[] cache, IMethod method, int mask)
-	{
-		final int hash = hash(method.getName());
-		final int index = hash & mask;
-		cache[index] = new MethodLink(method, hash, cache[index]);
-	}
-
-	private static int hash(Name name)
-	{
-		return name.unqualified.hashCode();
 	}
 
 	@Override
