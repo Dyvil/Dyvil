@@ -4,9 +4,9 @@ import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.classes.metadata.ObjectClassMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -169,18 +169,7 @@ public final class ClassAccess implements IValue
 			return;
 		}
 
-		IClass iclass = this.type.getTheClass();
-		if (iclass != null)
-		{
-			IDataMember field = iclass.getMetadata().getInstanceField();
-			if (field != null)
-			{
-				field.writeGet(writer, null, this.lineNumber());
-				return;
-			}
-		}
-
-		throw new BytecodeException("Object access was not compiled correctly");
+		ObjectClassMetadata.writeGetInstance(writer, this.type.getInternalName());
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.classes.metadata.ObjectClassMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
@@ -20,9 +21,6 @@ import dyvilx.tools.parsing.marker.MarkerList;
 public class ObjectPattern extends AbstractPattern implements Pattern
 {
 	protected IType type;
-
-	// Metadata
-	private IDataMember instanceField;
 
 	private Integer switchValue;
 
@@ -95,18 +93,11 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 		this.type = this.type.resolveType(markers, context);
 
 		final IClass theClass = this.type.getTheClass();
-		if (theClass == null)
-		{
-			return this;
-		}
-
-		if (!theClass.hasModifier(Modifiers.OBJECT_CLASS))
+		if (theClass != null && !theClass.hasModifier(Modifiers.OBJECT_CLASS))
 		{
 			markers.add(Markers.semanticError(this.position, "pattern.object", theClass.getName()));
-			return this;
 		}
 
-		this.instanceField = theClass.getMetadata().getInstanceField();
 		return this;
 	}
 
@@ -132,8 +123,7 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 	public void writeJumpOnMatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		Pattern.loadVar(writer, varIndex);
-		// No need to cast - Reference Equality Comparison (ACMP) handles it
-		this.instanceField.writeGet(writer, null, this.lineNumber());
+		ObjectClassMetadata.writeGetInstance(writer, this.type.getInternalName());
 		writer.visitJumpInsn(Opcodes.IF_ACMPEQ, target);
 	}
 
@@ -141,8 +131,7 @@ public class ObjectPattern extends AbstractPattern implements Pattern
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
 	{
 		Pattern.loadVar(writer, varIndex);
-		// No need to cast - Reference Equality Comparison (ACMP) handles it
-		this.instanceField.writeGet(writer, null, this.lineNumber());
+		ObjectClassMetadata.writeGetInstance(writer, this.type.getInternalName());
 		writer.visitJumpInsn(Opcodes.IF_ACMPNE, target);
 	}
 

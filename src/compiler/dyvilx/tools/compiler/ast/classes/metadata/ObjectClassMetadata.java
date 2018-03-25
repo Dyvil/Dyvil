@@ -155,27 +155,36 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & READ_RESOLVE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "readResolve",
-			                                                                      "()Ljava/lang/Object;", null, null));
-			mw.setThisType(internalName);
-			writeGetInstance(mw, internalName);
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(
+				Modifiers.PRIVATE | Modifiers.SYNTHETIC, "readResolve",
+				"()Ljava/lang/Object;", null, null));
+
+			writeResolveBody(mw, internalName);
 		}
 
 		if ((this.members & WRITE_REPLACE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "writeReplace",
-			                                                                      "()Ljava/lang/Object;", null, null));
-			mw.setThisType(internalName);
-			writeGetInstance(mw, internalName);
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(
+				Modifiers.PRIVATE | Modifiers.SYNTHETIC, "writeReplace",
+				"()Ljava/lang/Object;", null, null));
+
+			writeResolveBody(mw, internalName);
+
 		}
 	}
 
-	private static void writeGetInstance(MethodWriter mw, String internal) throws BytecodeException
+	private static void writeResolveBody(MethodWriter mw, String internal) throws BytecodeException
 	{
+		mw.setThisType(internal);
 		mw.visitCode();
-		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+		writeGetInstance(mw, internal);
 		mw.visitInsn(Opcodes.ARETURN);
 		mw.visitEnd();
+	}
+
+	public static void writeGetInstance(MethodWriter mw, String internal)
+	{
+		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
 	}
 
 	@Override
