@@ -408,11 +408,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 
-		if (this.metadata.checkImplements(candidate, typeContext))
-		{
-			return true;
-		}
-
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
 			return true;
@@ -668,12 +663,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 
-		field = this.metadata.resolveField(name);
-		if (field != null)
-		{
-			return field;
-		}
-
 		// Inherited Fields
 		if (this.superType != null)
 		{
@@ -696,10 +685,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 
 		// for implicit objects
-		if (this.isImplicit() && this.isObject() && Types.isSuperType(type, this.getClassType()))
-		{
-			return new FieldAccess(this.metadata.getInstanceField());
-		}
 
 		IParameter candidate = null;
 		for (IParameter param : this.parameters)
@@ -738,8 +723,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			this.body.getMethodMatches(list, receiver, name, arguments);
 		}
-
-		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
 		if (list.hasCandidate())
 		{
@@ -780,8 +763,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			this.body.getConstructorMatches(list, arguments);
 		}
-
-		this.metadata.getConstructorMatches(list, arguments);
 	}
 
 	@Override

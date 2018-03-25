@@ -2,22 +2,16 @@ package dyvilx.tools.compiler.ast.classes.metadata;
 
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.phase.IResolvable;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
@@ -125,24 +119,6 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 
 	@Override
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-	}
-
-	default boolean checkImplements(IMethod candidate, ITypeContext typeContext)
-	{
-		return false;
-	}
-
-	default IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-
-	default void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
-	{
-	}
-
-	default void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 	}
 

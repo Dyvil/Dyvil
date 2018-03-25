@@ -30,7 +30,7 @@ class VirtualStaticTest
 
 	interface IntConstructible
 	{
-		static func apply(i: int) -> IntConstructible
+		static func apply(value: int) -> IntConstructible
 	}
 
 	static case class CustomInt(public let value: int) implements IntConstructible
