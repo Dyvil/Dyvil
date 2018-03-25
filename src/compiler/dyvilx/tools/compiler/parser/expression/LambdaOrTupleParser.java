@@ -4,7 +4,7 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LambdaExpr;
-import dyvilx.tools.compiler.ast.expression.TupleExpr;
+import dyvilx.tools.compiler.ast.expression.TupleLikeExpr;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.BracketMatcher;
@@ -87,7 +87,7 @@ public class LambdaOrTupleParser extends Parser
 			// Fallthrough
 		case TUPLE:
 			// ( ... )
-			final TupleExpr tupleExpr = new TupleExpr(token);
+			final TupleLikeExpr tupleExpr = new TupleLikeExpr(token);
 			pm.pushParser(new ArgumentListParser(tupleExpr));
 			this.value = tupleExpr;
 			this.mode = TUPLE_END;
