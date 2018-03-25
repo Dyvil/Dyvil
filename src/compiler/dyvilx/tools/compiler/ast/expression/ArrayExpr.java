@@ -143,7 +143,7 @@ public final class ArrayExpr implements IValue
 	public void setElementType(IType elementType)
 	{
 		this.elementType = elementType;
-		this.arrayType = new ArrayType(elementType);
+		this.arrayType = new ArrayType(elementType, Mutability.IMMUTABLE);
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public final class ArrayExpr implements IValue
 
 			// Compute element type from scratch
 			elementType = this.getElementType();
-			mutability = Mutability.UNDEFINED;
+			mutability = Mutability.IMMUTABLE;
 		}
 		else
 		{
