@@ -34,6 +34,8 @@ public interface IContext extends IMemberContext, IImportContext
 
 	boolean isThisAvailable();
 
+	boolean isConstructor();
+
 	default IContext push(IContext context)
 	{
 		return new CombiningContext(context, this);

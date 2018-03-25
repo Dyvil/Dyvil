@@ -43,6 +43,12 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
+	public boolean isConstructor()
+	{
+		return this.inner.isConstructor() || this.outer.isConstructor();
+	}
+
+	@Override
 	public DyvilCompiler getCompilationContext()
 	{
 		return this.outer.getCompilationContext();

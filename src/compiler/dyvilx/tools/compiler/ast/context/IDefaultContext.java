@@ -25,6 +25,12 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
+	default boolean isConstructor()
+	{
+		return false;
+	}
+
+	@Override
 	default DyvilCompiler getCompilationContext()
 	{
 		return null;

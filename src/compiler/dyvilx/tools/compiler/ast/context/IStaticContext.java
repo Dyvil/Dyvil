@@ -27,6 +27,12 @@ public interface IStaticContext extends IContext
 	}
 
 	@Override
+	default boolean isConstructor()
+	{
+		return false;
+	}
+
+	@Override
 	IHeaderUnit getHeader();
 
 	@Override

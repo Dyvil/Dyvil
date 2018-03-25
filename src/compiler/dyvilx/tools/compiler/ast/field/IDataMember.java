@@ -57,7 +57,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	default IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		IValue newValue)
 	{
-		if (this.hasModifier(Modifiers.FINAL))
+		if (this.hasModifier(Modifiers.FINAL) && !context.isConstructor())
 		{
 			markers.add(Markers.semanticError(position, this.getKind().getName() + ".assign.final", this.getName()));
 		}
