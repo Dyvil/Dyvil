@@ -21,8 +21,7 @@ class ImmutableIterator<type E>(let base: Iterator<+E>) implements Iterator<E>
 
 	override func remove() -> void = throw new ImmutableException('remove() on immutable Iterator')
 
-	// FIXME
-	// override func forEachRemaining(action: Consumer<-E>) -> void = this.base.forEachRemaining(action)
+	override func forEachRemaining(action: Consumer<-E>!) -> void = this.base.forEachRemaining(action)
 
 	override func toString() -> String = this.base.toString
 }
