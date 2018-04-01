@@ -6,18 +6,19 @@ apply plugin: 'idea'
 apply plugin: 'application'
 
 import org.apache.tools.ant.filters.ReplaceTokens
+
 import static Constants.*
 
 // ---------------------------------------- Main Settings ----------------------------------------
 
 class Constants
 {
-	public static String version = '0.38.0'
-	public static String libraryVersion = '0.38.0'
-	public static String compilerVersion = '0.38.0'
-	public static String replVersion = '0.24.0'
-	public static String dpfVersion = '0.15.2'
-	public static String genSrcVersion = '0.9.0'
+	public static String version = '0.39.0'
+	public static String libraryVersion = '0.39.0'
+	public static String compilerVersion = '0.39.0'
+	public static String replVersion = '0.24.1'
+	public static String dpfVersion = '0.15.3'
+	public static String genSrcVersion = '0.9.1'
 
 	public static final String devStage = 'delta'
 

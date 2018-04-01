@@ -1,3 +1,115 @@
+Dyvil v0.39.0
+=============
+
+- Added Circumfix Operators. #389
+
+## Dyvil Library v0.39.0
+
+- Added `dyvil.math` package import to the `dyvil.Math` header.
+- Added group implicits for `BigDecimal`s, `BigInteger`s and `String`s to the `GroupImplicits` class.
+- Added the `Complex.**` and `Rational.**` methods.
+- Added the `FilterIterator` class.
+- Added the `Lexer.useSubLexer` method from GenSrc.
+- Added the `PowImpl.pow(BigDecimal, int)` method.
+- Added the `of` methods to the `Group*` and `Ring` classes.
+- Added the abs operator (`|x|`) for all numeric types.
+- Added the length operator (`|x|`) for Strings, Arrays and SizedIterables.
+- Changed the return type of the `Lexer.advance` method to `void`.
+- Cleaned up the `MathUtils` template/class.
+- Converted all classes in the `dyvil.collection.iterator` package to Dyvil.
+- Fixed a sign issue in the Rational.apply(long, long) implementation.
+- Improved the `DynamicLinked.invokeClassMethod` and other method implementations.
+- Removed more uses of the Increment and Decrement Operators. #390
+- Removed the `WebUtils` class.
+- Removed usages of the ++ and -- increment/decrement operators from Dyvil files. #390
+- Renamed the `ScalarMath` class to `RingCompatible`.
+- The Dyvil Lexer now supports nested String Interpolations. #387
+- Updated the GenSrc `Builtins` class to add the `decorate`, `replace` and `replaceAll` methods.
+- Updated the `Array.dyv.dgt` template.
+- Updated the `BigDecimalOperators` and `BigIntegerOperators` classes with `apply` methods.
+- Updated the `MappingIterator` class.
+- Updated the `PowImpl` class to fix some edge cases and clean up API.
+- Updated the `Strings` class to add the `replaceAll` (with function) method.
+
+## Dyvil Compiler v0.39.0
+
+- Added a lineNumber parameter to the `CaptureHelper.writeCaptures` method.
+- Added a lineNumber parameter to the `IReference.writeReference` method.
+- Added an `IContext` parameter to the `IValue.toReference` method.
+- Added new error diagnostics for variables that cannot be reference or assignment captured.
+- Added new methods to the `ClassBody` API.
+- Added support for `@SwitchOptimized` annotations on `object` classes.
+- Added support for circumfix operators. #389
+- Added the `IClass.createBody` method.
+- Added the `IContext.isConstructor` method.
+- Added the `IDataMember.captureReference` method and the `IVariable` implementation.
+- Added the `IDataMember.isAssigned` and `.setAssigned` methods.
+- Added the `IParameter.getDefaultValue(IContext)` method.
+- Added the `TypePosition.REIFY_FLAG` constant.
+- Assigning `final` fields is now allowed in constructor bodies.
+- Attempting to reference capture a parameter now results in an error diagnostic. #386
+- Changed the return type of `IVariable.setReferenceType` to `boolean`.
+- Dropped support for Increment/Decrement Operators. #390
+- FIxed an issue that caused capture to work incorrectly from within nested contexts. #267
+- Final Methods can now use covariant types in parameters.
+- Fixed a NPE in the `StringInterpolationExpr` constructor.
+- Fixed an issue that caused Type Parameter types to resolved Reify accessors unnecessary.
+- Fixed an issue that caused `-=` operators to be compiled incorrectly.
+- Fixed an issue that caused capture parameters to be compiled incorrectly.
+- Fixed an issue that caused incorrect mutabilities for `ArrayExpr` types.
+- Fixed an issue that would cause (type) parameter capture to work incorrectly in anonymous class contexts. #381
+- Fixed generated methods not generating bridge methods. #391
+- Fixed reified type parameters creating parameter objects too late, causing resolution issues.
+- Fixed some bugs related to captures.
+- Fixed the `getInternalType` not resolving types for `ExternalParameter`s.
+- Fixed the type parameter reification parameter being removed for external classes.
+- Improved operator resolution.
+- Improved the `ClassBody` cache implementation.
+- Made the `CaptureHelper` class generic and extend `Iterable`.
+- Made the `IParameter.setVarargs` method a default method.
+- Moved capture-related classes to the `d.t.c.ast.field.capture` package.
+- Moved the functionality for treating `TupleExpr`s as parenthesized expressions to the `TupleLikeExpr` class.
+- Parameter Descriptors and Signatures are now derived from the internal type.
+- Properly implemented static checking for initializers, properties and fields.
+- Properly implemented the `isMember(IVariable)` method for anonymous classes, lambda expressions and nested methods.
+- Refactored the `ObjectClassMetadata` class to use the class body for resolution etc..
+- Refactored the capture system for nested methods. #267
+- Refactored the way generated members are added by class metadata objects.
+- Removed overrides of `IVariable.writeInit(MethodWriter)` from `IParameter` classes in favor of the extended signature.
+- Removed the `IContext.checkStatic` method.
+- Removed the `IDataMember.captureReference` method.
+- Removed the `IReference.resolve` method.
+- Removed the `IValue.toReference` method and updated implementations to use `toReferenceValue`.
+- Renamed the `AbstractFieldAccess.setField` method to `capture` and added a `MarkerList` parameter.
+- Replaced the `IContext.isStaticOnly` method with `isThisAvailable`.
+- Replaced the `IVariable.isReferenceType` method with the `getReferenceType` method.
+- Reworked the APIs for field assignment compilation.
+- Static methods that override other methods now generate bridge methods. #391
+- The `DummyValue` class now uses a `Supplier<IType>`.
+- Updated Reference Capture for References to variables.
+- Updated class and type operators, class access expressions and method call generic argument lists to use the `REIFY_FLAG` in `checkTypes`.
+- Updated some `IType.checkType` implementations.
+- Updated the Package Declaration Parser to support EOF.
+- Updated the `ArgumentList.resolveDefault` method.
+- Updated the `ClassAccess` compilation implementation.
+- Updated usages of the `ArrayIterator` constructor.
+- Variable Capture is now done in the Resolve Phase instead of CheckTypes.
+- Variable Reference Capture is now done in the Resolve Phase.
+
+## Dyvil REPL v0.24.1
+
+- Updated the `REPLVariable` class to adapt to compiler API changes.
+
+## Dyvil Property Format v0.15.3
+
+- Removed more uses of the Increment and Decrement Operators. #390
+- Removed usages of the ++ and -- increment/decrement operators from Dyvil files. #390
+
+## Dyvil GenSrc v0.9.1
+
+- Added support for Call Directives with Blocks. #388
+- Moved the `GenSrcLexer.useSubLexer` method to the `Lexer` class.
+
 Dyvil v0.38.0
 =============
 

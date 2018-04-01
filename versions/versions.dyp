@@ -61,5 +61,6 @@ versionFiles = {
 		"v0.36.0" : "\(baseLink)/delta/v0.36.0.dyp"
 		"v0.37.0" : "\(baseLink)/delta/v0.37.0.dyp"
 		"v0.38.0" : "\(baseLink)/delta/v0.38.0.dyp"
+		"v0.39.0" : "\(baseLink)/delta/v0.39.0.dyp"
 	}
 }
