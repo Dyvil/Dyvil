@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.ast.field;
+package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
@@ -9,11 +9,11 @@ import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public abstract class CaptureDataMember implements IDataMember
@@ -132,9 +132,13 @@ public abstract class CaptureDataMember implements IDataMember
 
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
-		                         IValue newValue)
+		IValue newValue)
 	{
-		this.variable.setReferenceType();
+		if (this.accessPosition == null)
+		{
+			this.accessPosition = position;
+		}
+
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);
 	}
 
@@ -191,35 +195,6 @@ public abstract class CaptureDataMember implements IDataMember
 	{
 		return this.variable.getSignature();
 	}
-
-	@Override
-	public abstract void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException;
-
-	@Override
-	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		this.variable.writeGet_Unwrap(writer, lineNumber);
-	}
-
-	@Override
-	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.variable.isReferenceType())
-		{
-			this.writeGet_Get(writer, lineNumber);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		this.variable.writeSet_Wrap(writer, lineNumber);
-	}
-
-	@Override
-	public abstract void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException;
 
 	@Override
 	public String toString()

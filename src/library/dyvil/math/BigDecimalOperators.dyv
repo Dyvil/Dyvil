@@ -6,13 +6,14 @@ abstract class BigDecimalOperators
 {
 	private init() {}
 
-	// Implicit Conversions
+	inline static func apply(this: BigDecimal, _ i: long) -> BigDecimal = BigDecimal.valueOf(i)
+	inline static func apply(this: BigDecimal, _ d: double) -> BigDecimal = BigDecimal.valueOf(d)
+	inline static func apply(this: BigDecimal, _ b: BigInteger) -> BigDecimal = new BigDecimal(b)
+	inline static func apply(this: BigDecimal, _ s: String) -> BigDecimal = new BigDecimal(s)
 
-	implicit inline postfix func toBigDecimal(i: int)        -> BigDecimal = BigDecimal.valueOf(i as long)
-	implicit inline postfix func toBigDecimal(i: long)       -> BigDecimal = BigDecimal.valueOf(i)
-	implicit inline postfix func toBigDecimal(i: float)      -> BigDecimal = BigDecimal.valueOf(i)
-	implicit inline postfix func toBigDecimal(i: double)     -> BigDecimal = BigDecimal.valueOf(i)
-	implicit inline postfix func toBigDecimal(i: BigInteger) -> BigDecimal = new BigDecimal(i)
+	implicit inline postfix func toBigDecimal(_ l: long) -> BigDecimal = BigDecimal.valueOf(l)
+	implicit inline postfix func toBigDecimal(_ d: double) -> BigDecimal = BigDecimal.valueOf(d)
+	implicit inline postfix func toBigDecimal(_ b: BigInteger) -> BigDecimal = new BigDecimal(b)
 
 	// Additive Operators
 
@@ -28,13 +29,13 @@ abstract class BigDecimalOperators
 
 	inline infix func * (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.multiply(rhs)
 
-	inline infix func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs)
+	inline infix func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs, .HALF_EVEN)
 
 	inline infix func % (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.remainder(rhs)
 
-	inline infix func **(lhs: BigDecimal, rhs: int)        -> BigDecimal = lhs.pow(rhs)
+	inline infix func **(lhs: BigDecimal, rhs: int) -> BigDecimal = PowImpl.pow(lhs, rhs)
 
-	infix func **(lhs: BigDecimal, rhs: double)     -> BigDecimal = PowImpl.pow(lhs, rhs)
+	infix func **(lhs: BigDecimal, rhs: double) -> BigDecimal = PowImpl.pow(lhs, rhs)
 
 	infix func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = PowImpl.pow(lhs, rhs)
 }

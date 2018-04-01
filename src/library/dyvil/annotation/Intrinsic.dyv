@@ -31,9 +31,4 @@ import java.lang.annotation._
 	const FORCE_UNWRAP    = 33
 	const OPTIONAL_CHAIN  = 34
 	const NULL_COALESCING = 35
-
-	const PRE_INCREMENT  = 64
-	const PRE_DECREMENT  = 65
-	const POST_INCREMENT = 66
-	const POST_DECREMENT = 67
 }

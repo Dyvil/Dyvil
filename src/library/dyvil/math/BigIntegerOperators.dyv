@@ -6,8 +6,10 @@ abstract class BigIntegerOperators
 {
 	private init() {}
 
-	implicit inline postfix func toBigInteger(i: int) -> BigInteger = BigInteger.valueOf(i)
-	implicit inline postfix func toBigInteger(i: long) -> BigInteger = BigInteger.valueOf(i)
+	inline static func apply(this: BigInteger, _ l: long) -> BigInteger = BigInteger.valueOf(l)
+	inline static func apply(this: BigInteger, _ s: String) -> BigInteger = new BigInteger(s)
+
+	implicit inline postfix func toBigInteger(_ l: long) -> BigInteger = BigInteger.valueOf(l)
 
 	// Additive Operators
 

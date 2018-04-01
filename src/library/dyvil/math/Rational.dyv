@@ -1,9 +1,11 @@
 package dyvil.math
 
+import dyvil.math.group.RingCompatible
+
 @LiteralConvertible.FromInt
 @LiteralConvertible.FromLong
 class Rational private (let numerator: long { public get }, let denominator: long { public get })
-	implements ScalarMath<Rational>, Formattable, Comparable<Rational>
+	implements RingCompatible<Rational>, Formattable, Comparable<Rational>
 {
 	static func gcd(a: long, b: long) -> long
 	{
@@ -22,6 +24,10 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 	{
 		if (numerator == 0) return _0
 
+		let gcd = gcd(numerator, denominator)
+		numerator _/= gcd
+		denominator _/= gcd
+
 		if (denominator < 0)
 		{
 			// make sure the denominator is always positive
@@ -29,8 +35,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 			denominator = -denominator
 		}
 
-		let gcd = gcd(numerator, denominator)
-		return new Rational(numerator _/ gcd, denominator _/ gcd)
+		return new Rational(numerator, denominator)
 	}
 
 	@Experimental
@@ -69,6 +74,8 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	override postfix func inverse(lhs: Rational) -> Rational = Rational(lhs.denominator, lhs.numerator)
 
+	static func |_|(r: Rational) -> Rational = r.numerator < 0 ? -r : r
+
 	func toFloat() -> float = this.toDouble() as float
 
 	func toDouble() -> double = this.numerator / this.denominator
@@ -103,6 +110,8 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 		let denom = lhs.denominator * rhs.numerator
 		return Rational(num, denom)
 	}
+
+	override infix func **(lhs: Rational, rhs: int) -> Rational = Rational(lhs.numerator ** rhs, lhs.denominator ** rhs)
 
 	// Equals and Hash Code
 

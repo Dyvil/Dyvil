@@ -7,13 +7,15 @@ public abstract class Doubles
 {
 	private init() {}
 
-	// Double Operators
+	// Unary Operators
 
 	@Intrinsic([ LOAD_0 ])
 	prefix func +(rhs: double) -> double = rhs
 
 	@Intrinsic([ LOAD_0, DNEG ])
 	prefix func -(rhs: double) -> double = -rhs
+
+	// Relational Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
 	infix func ==(lhs: double, rhs: double) -> boolean = lhs == rhs
@@ -33,11 +35,15 @@ public abstract class Doubles
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPGE ])
 	infix func >=(lhs: double, rhs: double) -> boolean = lhs >= rhs
 
+	// Additive Operators
+
 	@Intrinsic([ LOAD_0, LOAD_1, DADD ])
 	infix func +(lhs: double, rhs: double) -> double = lhs + rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, DSUB ])
 	infix func -(lhs: double, rhs: double) -> double = lhs - rhs
+
+	// Multiplicative Operators
 
 	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
 	infix func *(lhs: double, rhs: double) -> double = lhs * rhs
@@ -51,7 +57,13 @@ public abstract class Doubles
 	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
 	infix func %(lhs: double, rhs: double) -> double = lhs % rhs
 
-	infix func ..(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, to: rhs)
+	// Range Operators
 
-	infix func ..<(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, toExclusive: rhs)
+	inline infix func ..(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, toExclusive: rhs)
+
+	// Other Operators
+
+	inline static func |_|(lhs: double) -> double = Math.abs(lhs)
 }

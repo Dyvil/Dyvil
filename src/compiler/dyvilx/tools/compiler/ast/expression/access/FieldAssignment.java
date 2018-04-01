@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.reflect.Opcodes;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -19,7 +19,6 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -137,19 +136,7 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	}
 
 	@Override
-	protected void reportResolve(MarkerList markers)
-	{
-		final Marker marker = Markers.semanticError(this.position, "resolve.field", this.name.unqualified);
-		if (this.receiver != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
-		}
-
-		markers.add(marker);
-	}
-
-	@Override
-	protected IValue resolveAsField(IValue receiver, IContext context)
+	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field == null)
@@ -157,8 +144,9 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 			return null;
 		}
 
-		this.field = field;
 		this.receiver = receiver;
+		this.field = field;
+		this.capture(markers, context);
 		return this;
 	}
 
@@ -169,6 +157,32 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 		final ArgumentList argument = new ArgumentList(this.value);
 		final MethodAssignment assignment = new MethodAssignment(this.position, receiver, name, argument);
 		return assignment.resolveCall(markers, context, false);
+	}
+
+	@Override
+	protected void capture(MarkerList markers, IContext context)
+	{
+		this.field = this.field.capture(context);
+
+		// in case the field was captured, this ensures reference capture takes place
+		if (!this.field.setAssigned())
+		{
+			final Marker marker = Markers.semanticError(this.position, "reference.variable.assignment",
+			                                            Util.memberNamed(this.field));
+			markers.add(marker);
+		}
+	}
+
+	@Override
+	protected void reportResolve(MarkerList markers)
+	{
+		final Marker marker = Markers.semanticError(this.position, "resolve.field", this.name.unqualified);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
 	}
 
 	@Override
@@ -187,7 +201,6 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 
 		if (this.field != null)
 		{
-			this.field = this.field.capture(context);
 			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 			this.value = this.field.checkAssign(markers, context, this.position, this.receiver, this.value);
 		}
@@ -237,47 +250,13 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		final int lineNumber = this.lineNumber();
-		if (Types.isVoid(type))
+		if (type == null || Types.isVoid(type))
 		{
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
 			return;
 		}
 
-		final IType fieldType = this.getType();
-		if (type == null)
-		{
-			type = fieldType;
-		}
-
-		if (this.receiver != null)
-		{
-			this.receiver.writeExpression(writer, null);
-		}
-
-		this.field.writeSet_PreValue(writer, lineNumber);
-
-		if (this.receiver == null)
-		{
-			final boolean tempVar = this.field.writeSet_PreValue(writer, lineNumber);
-
-			this.value.writeExpression(writer, fieldType);
-
-			writer.visitInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
-		}
-		else
-		{
-			this.field.writeSet_PreValue(writer, lineNumber);
-
-			this.value.writeExpression(writer, fieldType);
-
-			writer.visitInsn(Opcodes.AUTO_DUP_X1);
-		}
-
-		this.field.writeSet_Wrap(writer, lineNumber);
-		this.field.writeSet_Set(writer, lineNumber);
-
-		// Return value left on stack
-		fieldType.writeCast(writer, type, lineNumber);
+		this.field.writeSetCopy(writer, this.receiver, this.value, lineNumber);
 	}
 
 	@Override

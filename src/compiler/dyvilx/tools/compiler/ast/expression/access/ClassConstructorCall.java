@@ -19,11 +19,11 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvil.source.position.SourcePosition;
 
-public class ClassConstructor extends ConstructorCall
+public class ClassConstructorCall extends ConstructorCall
 {
 	private @NonNull AnonymousClass nestedClass;
 
-	public ClassConstructor(SourcePosition position, IType type, ArgumentList arguments)
+	public ClassConstructorCall(SourcePosition position, IType type, ArgumentList arguments)
 	{
 		super(position, type, arguments);
 		this.nestedClass = new AnonymousClass(position);
@@ -147,7 +147,7 @@ public class ClassConstructor extends ConstructorCall
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.nestedClass.writeConstructorCall(writer, this.arguments);
+		this.nestedClass.writeConstructorCall(writer, this.arguments, this.lineNumber());
 	}
 
 	@Override

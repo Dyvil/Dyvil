@@ -1,0 +1,31 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+class AppendIterator<type E>(let head: Iterator<+E>, let tail: E) implements Iterator<E>
+{
+	// Apply Method
+
+	static func apply<type E>(head: Iterator<+E>, tail: E) -> AppendIterator<E>
+	{
+		return new AppendIterator<E>(head, tail)
+	}
+
+	// Implementation
+
+	var returned: boolean
+
+	override func hasNext() -> boolean = this.head.hasNext() || !this.returned
+
+	override func next() -> E
+	{
+		if (this.head.hasNext()) return this.head.next()
+
+		if (this.returned) throw new NoSuchElementException
+
+		this.returned = true
+		return this.tail
+	}
+
+	override func toString() -> String = "AppendIterator(\(this.head), \(this.tail))"
+}

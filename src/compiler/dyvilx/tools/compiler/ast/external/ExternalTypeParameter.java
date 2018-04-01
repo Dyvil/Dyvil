@@ -71,12 +71,6 @@ public class ExternalTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public IParameter getReifyParameter()
-	{
-		return null;
-	}
-
-	@Override
 	public IType getUpperBound()
 	{
 		if (this.upperBound != null)

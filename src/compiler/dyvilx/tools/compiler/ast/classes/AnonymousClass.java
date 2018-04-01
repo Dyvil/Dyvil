@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.field.*;
+import dyvilx.tools.compiler.ast.field.capture.CaptureField;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
@@ -18,11 +19,11 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.transform.CaptureHelper;
+import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
 
 public class AnonymousClass extends CodeClass
 {
-	protected CaptureHelper captureHelper = new CaptureHelper(CaptureField.factory(this));
+	protected CaptureHelper<CaptureField> captureHelper = new CaptureHelper<>(CaptureField.factory(this));
 
 	protected FieldThis    thisField;
 	protected IConstructor constructor;
@@ -65,6 +66,12 @@ public class AnonymousClass extends CodeClass
 		compilableList.addCompilable(this);
 
 		super.cleanup(compilableList, classCompilableList);
+	}
+
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return super.isMember(variable) || this.captureHelper.isMember(variable);
 	}
 
 	@Override
@@ -126,7 +133,7 @@ public class AnonymousClass extends CodeClass
 		return this.constructorDesc = buf.append(")V").toString();
 	}
 
-	public void writeConstructorCall(MethodWriter writer, ArgumentList arguments) throws BytecodeException
+	public void writeConstructorCall(MethodWriter writer, ArgumentList arguments, int lineNumber) throws BytecodeException
 	{
 		String owner = this.getInternalName();
 		String name = "<init>";
@@ -141,7 +148,7 @@ public class AnonymousClass extends CodeClass
 			thisField.getTargetAccess().writeGet(writer);
 		}
 
-		this.captureHelper.writeCaptures(writer);
+		this.captureHelper.writeCaptures(writer, lineNumber);
 
 		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, this.getConstructorDesc(), false);
 	}
@@ -165,7 +172,7 @@ class AnonymousClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final CaptureHelper captureHelper = this.theClass.captureHelper;
+		final CaptureHelper<CaptureField> captureHelper = this.theClass.captureHelper;
 		final FieldThis thisField = this.theClass.thisField;
 		final IConstructor constructor = this.theClass.constructor;
 

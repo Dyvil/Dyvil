@@ -35,11 +35,16 @@ case class TextSource(protected let text: String { public override get }) implem
 			{
 				if (i + 1 < length && this.text.charAt(i + 1) == '\n')
 				{
-					i++
+					i += 1
 				}
-				lineStarts = add(lineStarts, lineCount++, i + 1)
+				lineStarts = add(lineStarts, lineCount, i + 1)
+				lineCount += 1
 			}
-			case '\n' => lineStarts = add(lineStarts, lineCount++, i + 1)
+			case '\n'
+			{
+				lineStarts = add(lineStarts, lineCount, i + 1)
+				lineCount += 1
+			}
 			case _ {}
 		}
 

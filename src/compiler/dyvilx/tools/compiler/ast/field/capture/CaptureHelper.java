@@ -1,35 +1,35 @@
-package dyvilx.tools.compiler.transform;
+package dyvilx.tools.compiler.ast.field.capture;
 
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.field.CaptureDataMember;
-import dyvilx.tools.compiler.ast.field.CaptureField;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.Iterator;
 import java.util.function.Function;
 
-public class CaptureHelper
+public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 {
-	private CaptureDataMember[] capturedFields;
-	private int                 capturedFieldCount;
+	private final Function<? super IVariable, ? extends T> captureSupplier;
 
-	private       IClass                                                   thisClass;
-	private final Function<? super IVariable, ? extends CaptureDataMember> captureSupplier;
+	private T[]    capturedFields;
+	private int    capturedFieldCount;
+	private IClass thisClass;
 
-	public CaptureHelper(Function<? super IVariable, ? extends CaptureDataMember> captureSupplier)
+	public CaptureHelper(Function<? super IVariable, ? extends T> captureSupplier)
 	{
 		this.captureSupplier = captureSupplier;
 	}
 
-	public void setThisClass(IClass thisClass)
+	@Override
+	public Iterator<T> iterator()
 	{
-		this.thisClass = thisClass;
+		return new ArrayIterator<>(this.capturedFields, 0, this.capturedFieldCount);
 	}
 
 	public IClass getThisClass()
@@ -37,11 +37,16 @@ public class CaptureHelper
 		return this.thisClass;
 	}
 
-	public IDataMember capture(IVariable variable)
+	public void setThisClass(IClass thisClass)
+	{
+		this.thisClass = thisClass;
+	}
+
+	public T capture(IVariable variable)
 	{
 		if (this.capturedFields == null)
 		{
-			this.capturedFields = new CaptureDataMember[2];
+			this.capturedFields = (T[]) new CaptureDataMember[2];
 			this.capturedFieldCount = 1;
 			return this.capturedFields[0] = this.captureSupplier.apply(variable);
 		}
@@ -49,7 +54,7 @@ public class CaptureHelper
 		// Check if the variable is already in the array
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			final CaptureDataMember capture = this.capturedFields[i];
+			final T capture = this.capturedFields[i];
 			if (capture.getVariable() == variable)
 			{
 				// If yes, return the match and skip adding the variable
@@ -58,14 +63,30 @@ public class CaptureHelper
 			}
 		}
 
-		int index = this.capturedFieldCount++;
+		final int index = this.capturedFieldCount++;
 		if (this.capturedFieldCount > this.capturedFields.length)
 		{
-			CaptureDataMember[] temp = new CaptureDataMember[this.capturedFieldCount];
+			final T[] temp = (T[]) new CaptureDataMember[index + 1];
 			System.arraycopy(this.capturedFields, 0, temp, 0, index);
 			this.capturedFields = temp;
 		}
 		return this.capturedFields[index] = this.captureSupplier.apply(variable);
+	}
+
+	public boolean isMember(IVariable variable)
+	{
+		if (this.capturedFields == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			if (this.capturedFields[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void checkCaptures(MarkerList markers, IContext context)
@@ -103,7 +124,7 @@ public class CaptureHelper
 		}
 	}
 
-	public void writeCaptures(MethodWriter writer) throws BytecodeException
+	public void writeCaptures(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.thisClass != null)
 		{
@@ -113,11 +134,12 @@ public class CaptureHelper
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			final CaptureDataMember capture = this.capturedFields[i];
-			capture.getVariable().writeGet_Get(writer, 0);
+			// variables typically don't have receivers
+			capture.getVariable().writeGetRaw(writer, null, lineNumber);
 		}
 	}
 
-	public int writeCaptureParameters(MethodWriter writer, int index)
+	public void writeCaptureParameters(MethodWriter writer, int index)
 	{
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
@@ -125,8 +147,6 @@ public class CaptureHelper
 			capture.setLocalIndex(index);
 			index = writer.visitParameter(index, capture.getInternalName(), capture.getVariable().getInternalType(), 0);
 		}
-
-		return index;
 	}
 
 	public void writeCaptureFields(ClassWriter writer) throws BytecodeException

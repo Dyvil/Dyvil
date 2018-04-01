@@ -11,13 +11,11 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
-import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
@@ -28,7 +26,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class TupleExpr implements IValue, IArgumentsConsumer
+public class TupleExpr implements IValue, IArgumentsConsumer
 {
 	public static final class LazyFields
 	{
@@ -99,24 +97,6 @@ public final class TupleExpr implements IValue, IArgumentsConsumer
 	public boolean isResolved()
 	{
 		return this.values.isResolved();
-	}
-
-	@Override
-	public boolean isPartialWildcard()
-	{
-		return this.values.size() == 1 && this.values.getFirst().isPartialWildcard();
-	}
-
-	@Override
-	public IValue withLambdaParameter(IParameter parameter)
-	{
-		return this.values.size() != 1 ? null : this.values.getFirst().withLambdaParameter(parameter);
-	}
-
-	@Override
-	public IValue toAssignment(IValue rhs, SourcePosition position)
-	{
-		return this.values.size() != 1 ? null : this.values.getFirst().toAssignment(rhs, position);
 	}
 
 	@Override
@@ -191,10 +171,6 @@ public final class TupleExpr implements IValue, IArgumentsConsumer
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		final int arity = this.values.size();
-		if (arity == 1)
-		{
-			return this.values.getFirst().getTypeMatch(type, implicitContext);
-		}
 
 		final IClass tupleClass = TupleType.getTupleClass(arity);
 		if (!Types.isSuperClass(type, tupleClass.getClassType()))
@@ -237,16 +213,7 @@ public final class TupleExpr implements IValue, IArgumentsConsumer
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		switch (this.values.size())
-		{
-		case 0:
-			return new VoidValue(this.position);
-		case 1:
-			return this.values.getFirst().resolve(markers, context);
-		}
-
 		this.values.resolve(markers, context);
-
 		return this;
 	}
 

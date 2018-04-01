@@ -1,6 +1,6 @@
-package dyvil.math
+package dyvil.math.group
 
-interface ScalarMath<T>
+interface RingCompatible<type T: RingCompatible<T>>
 {
 	// Constants
 
@@ -27,4 +27,6 @@ interface ScalarMath<T>
 	infix func *(lhs: T, rhs: T) -> T
 
 	infix func /(lhs: T, rhs: T) -> T // = lhs * rhs.inverse
+
+	infix func **(lhs: T, rhs: int) -> T
 }

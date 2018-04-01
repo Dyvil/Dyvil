@@ -1,0 +1,28 @@
+package dyvil.collection.iterator
+
+import java.util.Iterator
+
+class PrependIterator<type E>(let head: E, let tail: Iterator<+E>) implements Iterator<E>
+{
+	// Apply Method
+
+	static func apply<type E>(head: E, tail: Iterator<+E>) -> PrependIterator<E>
+	{
+		return new PrependIterator<E>(head, tail)
+	}
+
+	// Implementation
+
+	var returned: boolean
+
+	override func hasNext() -> boolean = !this.returned || this.tail.hasNext()
+
+	override func next() -> E
+	{
+		if (this.returned) return this.tail.next()
+		this.returned = true
+		return this.head
+	}
+
+	override func toString() -> String = "PrependIterator(\(this.head), \(this.tail))"
+}

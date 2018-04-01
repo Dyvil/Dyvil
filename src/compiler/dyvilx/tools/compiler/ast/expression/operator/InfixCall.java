@@ -1,18 +1,16 @@
 package dyvilx.tools.compiler.ast.expression.operator;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.MethodCall;
-import dyvilx.tools.compiler.ast.expression.intrinsic.IncOperator;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class InfixCall extends MethodCall
 {
@@ -59,13 +57,7 @@ public class InfixCall extends MethodCall
 	protected static IValue resolveCompound(MarkerList markers, IContext context, SourcePosition position, IValue lhs,
 		                                       Name name, ArgumentList arguments)
 	{
-		IValue op = getIncOperator(name, lhs, arguments.getLast());
-		if (op != null)
-		{
-			return op;
-		}
-
-		op = new InfixCall(position, lhs, name, arguments).resolveCall(markers, context, false);
+		final IValue op = new InfixCall(position, lhs, name, arguments).resolveCall(markers, context, false);
 		if (op == null)
 		{
 			return null;
@@ -79,23 +71,6 @@ public class InfixCall extends MethodCall
 		}
 
 		return null;
-	}
-
-	private static IncOperator getIncOperator(Name name, IValue lhs, IValue rhs)
-	{
-		// Operator has to be either + or -
-		if (name != Names.plus && name != Names.minus)
-		{
-			return null;
-		}
-
-		// Right-hand operand must be of type int
-		if (rhs.valueTag() != INT)
-		{
-			return null;
-		}
-
-		return IncOperator.apply(lhs, rhs.intValue(), true);
 	}
 
 	@Override

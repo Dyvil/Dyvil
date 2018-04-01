@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.MethodCall;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.gensrc.ast.GenSrcValue;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -40,9 +41,9 @@ public class CallDirective extends MethodCall
 		return GenSrcValue.CALL_DIRECTIVE;
 	}
 
-	public void setBlock(IValue block)
+	public void setBlock(StatementList block)
 	{
-		// TODO
+		this.arguments.add(FuncDirective.convertBlock(block));
 	}
 
 	@Override

@@ -1,11 +1,13 @@
 package dyvilx.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
@@ -26,6 +28,16 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	@Override
 	void setValue(IValue value);
 
+	default boolean isAssigned()
+	{
+		return true;
+	}
+
+	default boolean setAssigned()
+	{
+		return true;
+	}
+
 	default IProperty getProperty()
 	{
 		return null;
@@ -42,9 +54,10 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 	IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context);
 
-	default IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
+	default IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
+		IValue newValue)
 	{
-		if (this.hasModifier(Modifiers.FINAL))
+		if (this.hasModifier(Modifiers.FINAL) && !context.isConstructor())
 		{
 			markers.add(Markers.semanticError(position, this.getKind().getName() + ".assign.final", this.getName()));
 		}
@@ -83,58 +96,18 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeGet(writer, null, 0);
 	}
 
-	void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException;
+	void writeGet(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber) throws BytecodeException;
 
-	default void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	default void writeGetRaw(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber) throws BytecodeException
 	{
-
+		this.writeGet(writer, receiver, lineNumber);
 	}
 
-	default boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		return false;
-	}
+	void writeSet(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException;
 
-	default void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-	}
-
-	void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException;
-
-	default void writeReceiver(MethodWriter writer, IValue receiver)
-	{
-		if (receiver != null)
-		{
-			final IType receiverType = this.getEnclosingClass().getReceiverType();
-			if (this.hasModifier(Modifiers.STATIC))
-			{
-				receiver.writeNullCheckedExpression(writer, receiverType);
-			}
-			else
-			{
-				receiver.writeExpression(writer, receiverType);
-			}
-		}
-	}
-
-	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
-	{
-		this.writeReceiver(writer, receiver);
-
-		this.writeGet_Get(writer, lineNumber);
-		this.writeGet_Unwrap(writer, lineNumber);
-	}
-
-	default void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
-	{
-		this.writeReceiver(writer, receiver);
-
-		this.writeSet_PreValue(writer, lineNumber);
-		value.writeExpression(writer, this.getType());
-
-		this.writeSet_Wrap(writer, lineNumber);
-		this.writeSet_Set(writer, lineNumber);
-	}
+	void writeSetCopy(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException;
 
 	default String getDescriptor()
 	{

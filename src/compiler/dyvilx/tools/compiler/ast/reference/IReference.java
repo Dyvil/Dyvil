@@ -10,10 +10,6 @@ import dyvil.source.position.SourcePosition;
 
 public interface IReference
 {
-	default void resolve(SourcePosition position, MarkerList markers, IContext context)
-	{
-	}
-
 	default void checkTypes(SourcePosition position, MarkerList markers, IContext context)
 	{
 	}
@@ -21,10 +17,10 @@ public interface IReference
 	default void check(SourcePosition position, MarkerList markers, IContext context)
 	{
 	}
-	
+
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
-	
-	void writeReference(MethodWriter writer) throws BytecodeException;
+
+	void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException;
 }

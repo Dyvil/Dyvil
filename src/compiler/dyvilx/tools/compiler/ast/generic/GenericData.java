@@ -5,6 +5,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.phase.IResolvable;
@@ -157,7 +158,7 @@ public final class GenericData implements IResolvable, ITypeContext
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.generics.checkTypes(markers, context, IType.TypePosition.GENERIC_ARGUMENT);
+		this.generics.checkTypes(markers, context, TypePosition.GENERIC_ARGUMENT | TypePosition.REIFY_FLAG);
 	}
 
 	@Override

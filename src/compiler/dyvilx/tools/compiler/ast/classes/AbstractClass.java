@@ -277,15 +277,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Body
 
 	@Override
-	public void setBody(ClassBody body)
-	{
-		this.body = body;
-	}
-
-	@Override
 	public ClassBody getBody()
 	{
 		return this.body;
+	}
+
+	@Override
+	public ClassBody createBody()
+	{
+		if (this.body != null)
+		{
+			return this.body;
+		}
+		return this.body = new ClassBody(this);
+	}
+
+	@Override
+	public void setBody(ClassBody body)
+	{
+		this.body = body;
 	}
 
 	@Override
@@ -396,11 +406,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			{
 				return true;
 			}
-		}
-
-		if (this.metadata.checkImplements(candidate, typeContext))
-		{
-			return true;
 		}
 
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
@@ -562,9 +567,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public byte checkStatic()
+	public boolean isThisAvailable()
 	{
-		return FALSE;
+		// not by default; only in non-static members
+		return false;
 	}
 
 	@Override
@@ -657,12 +663,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 
-		field = this.metadata.resolveField(name);
-		if (field != null)
-		{
-			return field;
-		}
-
 		// Inherited Fields
 		if (this.superType != null)
 		{
@@ -685,10 +685,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 
 		// for implicit objects
-		if (this.isImplicit() && this.isObject() && Types.isSuperType(type, this.getClassType()))
-		{
-			return new FieldAccess(this.metadata.getInstanceField());
-		}
 
 		IParameter candidate = null;
 		for (IParameter param : this.parameters)
@@ -727,8 +723,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			this.body.getMethodMatches(list, receiver, name, arguments);
 		}
-
-		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
 		if (list.hasCandidate())
 		{
@@ -769,8 +763,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			this.body.getConstructorMatches(list, arguments);
 		}
-
-		this.metadata.getConstructorMatches(list, arguments);
 	}
 
 	@Override

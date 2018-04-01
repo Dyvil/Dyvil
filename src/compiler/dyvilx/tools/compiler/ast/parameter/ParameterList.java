@@ -73,7 +73,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	@Override
 	public Iterator<IParameter> iterator()
 	{
-		return new ArrayIterator<>(this.parameters, this.size);
+		return new ArrayIterator<>(this.parameters, 0, this.size);
 	}
 
 	public IParameter get(int index)
@@ -131,16 +131,13 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 		}
 	}
 
-	public void remove(int count)
+	public IParameter removeLast()
 	{
-		final int end = this.size;
-		this.size -= count;
-
-		// Set excessive array elements to null to let the GC do its job
-		for (int i = this.size; i < end; i++)
-		{
-			this.parameters[i] = null;
-		}
+		final int index = this.size - 1;
+		final IParameter result = this.parameters[index];
+		this.parameters[index] = null;
+		this.size = index;
+		return result;
 	}
 
 	// Resolution
@@ -271,7 +268,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.parameters[i].getCovariantType().appendExtendedName(builder);
+			this.parameters[i].getInternalType().appendExtendedName(builder);
 		}
 	}
 
@@ -301,7 +298,7 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 			final IParameter parameter = this.parameters[i];
 			if (!parameter.hasModifier(Modifiers.SYNTHETIC))
 			{
-				parameter.getType().appendSignature(builder, false);
+				parameter.getInternalType().appendSignature(builder, false);
 			}
 		}
 	}

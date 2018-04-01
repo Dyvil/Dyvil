@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.Member;
@@ -115,6 +116,13 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
+	public boolean setAssigned()
+	{
+		this.assigned = true;
+		return true;
+	}
+
+	@Override
 	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
@@ -122,25 +130,26 @@ public class Variable extends Member implements IVariable
 
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
-		                         IValue newValue)
+		IValue newValue)
 	{
-		this.assigned = true;
+		this.setAssigned();
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
 	}
 
 	@Override
-	public boolean isReferenceType()
+	public IType getReferenceType()
 	{
-		return this.refType != null;
+		return this.refType;
 	}
 
 	@Override
-	public void setReferenceType()
+	public boolean setReferenceType()
 	{
 		if (this.refType == null)
 		{
 			this.refType = this.type.getSimpleRefType();
 		}
+		return true;
 	}
 
 	@Override
@@ -266,7 +275,7 @@ public class Variable extends Member implements IVariable
 	public static void writeRefInit(IVariable variable, MethodWriter writer, IValue value)
 	{
 		final IType type = variable.getType();
-		final IType refType = variable.getInternalType();
+		final IType refType = variable.getReferenceType();
 
 		final IConstructor constructor = refType.getTheClass().getBody().getConstructor(0);
 		writer.visitTypeInsn(Opcodes.NEW, refType.getInternalName());
@@ -297,61 +306,72 @@ public class Variable extends Member implements IVariable
 		writer.visitVarInsn(Opcodes.ASTORE, localIndex);
 	}
 
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
+	private WriteableExpression asWriteableExpression()
 	{
-		if (this.refType != null)
+		return (writer, type) -> writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
+	}
+
+	@Override
+	public void writeGetRaw(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
+	{
+		writer.visitVarInsn(this.getInternalType().getLoadOpcode(), this.localIndex);
+	}
+
+	@Override
+	public void writeGet(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
+		throws BytecodeException
+	{
+		assert receiver == null;
+
+		final IType refType = this.getReferenceType();
+		if (refType == null)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(this.getType().getLoadOpcode(), this.localIndex);
 			return;
 		}
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
-	}
 
-	@Override
-	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.refType != null)
+		final IClass refClass = refType.getTheClass();
+		refClass.resolveField(Names.value).writeGet(writer, this.asWriteableExpression(), lineNumber);
+
+		if (refClass == ReferenceType.LazyFields.OBJECT_SIMPLE_REF_CLASS)
 		{
-			final IClass refClass = this.refType.getTheClass();
-			final IDataMember refField = refClass.resolveField(Names.value);
-			refField.writeGet_Get(writer, lineNumber);
-
-			if (refClass == ReferenceType.LazyFields.OBJECT_SIMPLE_REF_CLASS)
-			{
-				Types.OBJECT.writeCast(writer, this.type, lineNumber);
-			}
+			Types.OBJECT.writeCast(writer, this.getType(), lineNumber);
 		}
 	}
 
 	@Override
-	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeSet(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException
 	{
-		if (this.refType != null)
+		assert receiver == null;
+
+		final IType refType = this.getReferenceType();
+		if (refType == null)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
-			return true;
+			final IType type = this.getType();
+			value.writeExpression(writer, type);
+			writer.visitVarInsn(type.getStoreOpcode(), this.localIndex);
+			return;
 		}
-		return false;
+
+		refType.resolveField(Names.value).writeSet(writer, this.asWriteableExpression(), value, lineNumber);
 	}
 
 	@Override
-	public void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeSetCopy(@NonNull MethodWriter writer, WriteableExpression receiver,
+		@NonNull WriteableExpression value, int lineNumber) throws BytecodeException
 	{
-		if (this.refType != null)
+		final IType refType = this.getReferenceType();
+		if (refType == null)
 		{
-			final IDataMember refField = this.refType.getTheClass().resolveField(Names.value);
-			refField.writeSet_Set(writer, lineNumber);
+			final IType type = this.getType();
+			value.writeExpression(writer, type);
+			writer.visitInsn(Opcodes.AUTO_DUP);
+			writer.visitVarInsn(type.getStoreOpcode(), this.localIndex);
+			return;
 		}
-	}
 
-	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.refType == null)
-		{
-			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
-		}
+		refType.resolveField(Names.value).writeSetCopy(writer, this.asWriteableExpression(), value, lineNumber);
 	}
 
 	@Override

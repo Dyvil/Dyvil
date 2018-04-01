@@ -4,7 +4,6 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.array.ObjectArray;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -137,20 +136,6 @@ public class REPLVariable extends Field
 		{
 			this.value.writeExpression(writer, Types.VOID);
 		}
-	}
-
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
-		                      this.getDescriptor());
-	}
-
-	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
-		                      this.getDescriptor());
 	}
 
 	@Override

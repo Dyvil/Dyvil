@@ -5,7 +5,9 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -32,7 +34,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class Property extends Member implements IProperty
+public class Property extends Member implements IProperty, IDefaultContext
 {
 	protected IMethod getter;
 
@@ -156,6 +158,12 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
+	public boolean isThisAvailable()
+	{
+		return true;
+	}
+
+	@Override
 	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (this.getter != null)
@@ -199,7 +207,7 @@ public class Property extends Member implements IProperty
 		}
 		if (this.initializer != null)
 		{
-			this.initializer.resolveTypes(markers, context);
+			this.initializer.resolveTypes(markers, new CombiningContext(this, context));
 		}
 	}
 
@@ -235,9 +243,11 @@ public class Property extends Member implements IProperty
 		}
 		if (this.initializer != null)
 		{
-			final IValue resolved = this.initializer.resolve(markers, context);
+			final IContext context1 = new CombiningContext(this, context);
 
-			this.initializer = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context,
+			final IValue resolved = this.initializer.resolve(markers, context1);
+
+			this.initializer = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context1,
 			                                            TypeChecker.markerSupplier("property.initializer.type"));
 		}
 	}
@@ -257,7 +267,7 @@ public class Property extends Member implements IProperty
 		}
 		if (this.initializer != null)
 		{
-			this.initializer.checkTypes(markers, context);
+			this.initializer.checkTypes(markers, new CombiningContext(this, context));
 		}
 	}
 
@@ -289,7 +299,7 @@ public class Property extends Member implements IProperty
 
 		if (this.initializer != null)
 		{
-			this.initializer.check(markers, context);
+			this.initializer.check(markers, new CombiningContext(this, context));
 		}
 	}
 

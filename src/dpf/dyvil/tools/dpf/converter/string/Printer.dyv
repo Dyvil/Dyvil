@@ -24,7 +24,7 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	{
 		this.printIndent()
 		System.out.println(text)
-		this.indent++
+		this.indent += 1
 	}
 
 	override func visitNode(name: Name) -> NodeVisitor
@@ -32,19 +32,19 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 		this.section("Node \(name)")
 		return this
 	}
-	
+
 	override func visitProperty(name: Name) -> ValueVisitor
 	{
 		this.holder("Property \(name):")
 		return this
 	}
-	
+
 	override func visitNodeAccess(name: Name) -> NodeVisitor
 	{
 		this.section("Access \(name)")
 		return this
 	}
-	
+
 	override func visitInt(value: int) -> void = this.value("Int \(value)")
 
 	override func visitLong(value: long) -> void = this.value("Long \(value)")
@@ -119,5 +119,5 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 
 	override func visitStringPart(string: String) -> void = this.value("String Part '\(string)'")
 
-	override func visitEnd() -> void = this.indent--
+	override func visitEnd() -> void = this.indent -= 1
 }

@@ -2,25 +2,35 @@ package dyvil.tests
 
 using dyvil.Test
 
+prefix operator +++
+postfix operator +++
+
 public class OperatorTest
 {
 	static func apply() -> Test = test "Operators" {
 		unary()
 		binary()
 		ternary()
+		circumfix()
 	}
+
+	@BytecodeName('preinc')
+	prefix func ++(i: int) -> int = i
+
+	@BytecodeName('postinc')
+	postfix func ++(i: int) -> int = i
 
 	static func unary() -> Test = test "Unary" {
 		infix func apply(i: int, j: int) -> (int, int) = (i, j)
 
-		var i = 1                       // Canonical Representation:
-		let j = [ i -i, i++ i, i++ -i ] // i.apply(-i), (i++).apply(i), (i++).apply(-i)
-		let k = [ i - i, i-i ]          // i - i
-		let l = [ i - -i, i - - i ]     // i - (-i)
-		let m = [ i++ , i++, i ++ ]     // i++
-		let n = i++ + i                 // (i++) + i
-		let o = i++ + ++ i              // (i++) + (++i)
-		let p = i++ + + ++ i            // (i++) + (+ (++i))
+		var i = 1                         // Canonical Representation:
+		let j = [ i -i, i+++ i, i+++ -i ] // i.apply(-i), (i+++).apply(i), (i+++).apply(-i)
+		let k = [ i - i, i-i ]            // i - i
+		let l = [ i - -i, i - - i ]       // i - (-i)
+		let m = [ i+++ , i+++, i +++ ]    // i++
+		let n = i+++ + i                  // (i+++) + i
+		let o = i+++ + +++ i              // (i+++) + (+++i)
+		let p = i+++ + + +++ i            // (i+++) + (+ (+++i))
 
 		// don't care about values, resolution pass is sufficient
 
@@ -47,4 +57,41 @@ public class OperatorTest
 
 		// don't care about values, type check pass is sufficient
 	}
+
+	static func circumfix() -> Test = test "Circumfix" {
+		let d = -1.0
+		let i = -2
+		let c = dyvil.math.Complex(1.0, 1.0)
+
+		let absd = |d|
+		let absi = |i|
+		let absc = |c|
+
+		absd =?= 1.0
+		absi =?= 2
+		absc =?= Math.sqrt(2)
+
+		let s = "a"
+		let s1 = +++s+++
+		let s2 = +++(s+++)
+		let s3 = (+++s)+++
+
+		s1 =?= "+++((a)+++)" // postfix is applied first
+		s2 =?= "+++((a)+++)"
+		s3 =?= "(+++(a))+++"
+	}
+
+	@BytecodeName("plusPre")
+	prefix func +++(i: int) -> int = i - 1
+
+	@BytecodeName("plusPost")
+	postfix func +++(i: int) -> int = i + 1
+
+	@BytecodeName("plusPre")
+	prefix func +++(s: String) -> String = "+++(\(s))"
+
+	@BytecodeName("plusPost")
+	postfix func +++(s: String) -> String = "(\(s))+++"
+
+	static func +++_+++(s: String) -> String = "+++(\(s))+++"
 }

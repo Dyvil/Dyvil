@@ -1,3 +1,25 @@
 package dyvil.math.group
 
 interface Ring<T> extends GroupAddNegate<T>, GroupMultiplyInverse<T>
+{
+	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> Ring<R> = new Ring<R>()
+	{
+		override func _0() -> R = R._0
+
+		override func _1() -> R = R._1
+
+		override func add(lhs: R, rhs: R) -> R = R.`+`(lhs, rhs)
+
+		override func negate(rhs: R) -> R = R.`-`(rhs)
+
+		override func subtract(lhs: R, rhs: R) -> R = R.`-`(lhs, rhs)
+
+		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
+
+		override func inverse(rhs: R) -> R = R.inverse(rhs)
+
+		override func divide(lhs: R, rhs: R) -> R = R.`/`(lhs, rhs)
+
+		override func power(lhs: R, rhs: int) -> R = R.`**`(lhs, rhs)
+	}
+}

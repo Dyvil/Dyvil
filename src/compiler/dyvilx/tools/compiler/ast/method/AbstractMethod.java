@@ -222,9 +222,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public byte checkStatic()
+	public boolean isThisAvailable()
 	{
-		return this.isStatic() ? TRUE : PASS;
+		return !this.isStatic();
 	}
 
 	@Override
@@ -605,7 +605,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver,
-		                            ArgumentList arguments, GenericData genericData)
+		ArgumentList arguments, GenericData genericData)
 	{
 		final ParameterList parameters = this.getParameters();
 
@@ -688,7 +688,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// no receiver, non-static method
 
-			if (context.isStaticOnly())
+			if (!context.isThisAvailable())
 			{
 				// called from static context -> error
 
@@ -767,7 +767,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
-		                     ArgumentList arguments, ITypeContext typeContext)
+		ArgumentList arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
@@ -1038,7 +1038,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public void writeCall(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
-		                     IType targetType, int lineNumber) throws BytecodeException
+		IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
 		{
@@ -1057,7 +1057,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
-		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
+		ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
 		{
@@ -1072,7 +1072,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
-		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
+		ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
 		{
@@ -1092,21 +1092,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		if (this.hasModifier(Modifiers.INFIX) && !this.parameters.isEmpty())
-		{
-			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
-			return;
-		}
-
-		final IType receiverType = this.enclosingClass.getReceiverType();
-
 		if (!this.isStatic())
 		{
-			receiver.writeNullCheckedExpression(writer, receiverType);
-		}
-		else
-		{
-			receiver.writeExpression(writer, receiverType);
+			receiver.writeNullCheckedExpression(writer, this.enclosingClass.getReceiverType());
+			return;
 		}
 
 		if (receiver.isIgnoredClassAccess())
@@ -1117,7 +1106,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// Static virtual call
 				type.writeClassExpression(writer, true);
 			}
+			return;
 		}
+		if (this.hasModifier(Modifiers.INFIX) && !this.parameters.isEmpty())
+		{
+			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
+			return;
+		}
+
+		// static
+		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
+		writer.visitInsn(Opcodes.AUTO_POP);
 	}
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, ArgumentList arguments) throws BytecodeException
@@ -1132,17 +1131,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		arguments.writeValues(writer, this.parameters, 0);
 	}
 
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, ArgumentList arguments,
-		                                    ITypeContext typeContext, int lineNumber) throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments,
+		ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		this.writeReceiver(writer, instance);
-		this.writeArguments(writer, instance, arguments);
-		this.writeInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeReceiver(writer, receiver);
+		this.writeArguments(writer, receiver, arguments);
+		this.writeInvoke(writer, receiver, arguments, typeContext, lineNumber);
 	}
 
 	@Override
 	public void writeInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
-		                       int lineNumber) throws BytecodeException
+		int lineNumber) throws BytecodeException
 	{
 		if (this.typeParameters != null)
 		{

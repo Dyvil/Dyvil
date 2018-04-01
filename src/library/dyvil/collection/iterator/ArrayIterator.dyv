@@ -1,0 +1,37 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+class ArrayIterator<type E>(let array: [E], var index: int, let size: int) implements Iterator<E>
+{
+	// Apply Methods
+
+	static func apply<type E>(array: [E]) -> ArrayIterator<E>
+	{
+		return new ArrayIterator<E>(array, 0, array.size)
+	}
+
+	static func apply<type E>(array: [E], size: int) -> ArrayIterator<E>
+	{
+		return new ArrayIterator<E>(array, 0, size)
+	}
+
+	static func apply<type E>(array: [E], index: int, size: int) -> ArrayIterator<E>
+	{
+		return new ArrayIterator<E>(array, index, size)
+	}
+
+	// Implementation
+
+	override func hasNext() -> boolean = this.index < this.size
+
+	override func next() -> E
+	{
+		if (!this.hasNext()) throw new NoSuchElementException
+		let element = this.array[this.index]
+		this.index += 1
+		return element
+	}
+
+	override func toString() -> String = "ArrayIterator(\(this.array), \(this.index), \(this.size))"
+}

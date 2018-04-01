@@ -1,5 +1,7 @@
 package dyvil
 
+import  dyvil.math._
+
 // Rings
 
 import  dyvil.math.group._

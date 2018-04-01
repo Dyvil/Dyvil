@@ -39,6 +39,24 @@ line with ## in the middle
 	the value of #('COUNT') in SPEC_NAME is COUNT
 }
 
+#decorate(line => "- \(line).") {
+	Item 1
+	Item 2
+	Item 3
+}
+
+#replace('target', 'replacement') {
+	target
+
+	#('target')
+
+	#('tar' ++ 'get')
+}
+
+#replaceAll('.', c => '%2h '.format(c)) {
+	THIS WILL BE ASCII-ENCODED
+}
+
 #for (spec <- [ this.spec('GenSrcTest.txt-Test.dgs'), this.spec('GenSrcTest.txt-Base.dgs') ]) {
 	#myFunction(spec['SPEC_NAME'], count: Integer.parseInt(spec['COUNT']))
 }

@@ -80,4 +80,31 @@ abstract class Builtins
 	static func include(name: String) -> String throws IOException = include(file(name))
 
 	static func include(file: File) -> String throws IOException = dyvil.io.FileUtils.read(file)
+
+	// Other Functions
+
+	static func decorate(with process: String -> String, _ body: String) -> String
+	{
+		let result = new StringBuilder
+		for (line <- body.split('\n'))
+		{
+			result.append(process(line)).append('\n')
+		}
+		return result.toString
+	}
+
+	static func replace(target: String, with replacement: String, in body: String) -> String
+	{
+		return body.replace(target, replacement)
+	}
+
+	static func replaceAll(target: String, with replacement: String, in body: String) -> String
+	{
+		return body.replaceAll(target, replacement)
+	}
+
+	static func replaceAll(target: String, with replacer: String -> String, in body: String) -> String
+	{
+		return body.replaceAll(target, replacer)
+	}
 }

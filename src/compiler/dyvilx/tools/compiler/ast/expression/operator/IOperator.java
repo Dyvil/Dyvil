@@ -8,23 +8,24 @@ import java.io.IOException;
 
 public interface IOperator
 {
-	byte ANY = -1;
-	byte PREFIX = 0;
-	byte INFIX = 1;
-	byte POSTFIX = 2;
-	byte TERNARY = 3;
+	byte ANY       = -1;
+	byte PREFIX    = 0;
+	byte INFIX     = 1;
+	byte POSTFIX   = 2;
+	byte TERNARY   = 3;
+	byte CIRCUMFIX = 4;
 
-	byte LEFT = 0;
+	byte LEFT  = 0;
 	byte RIGHT = 1;
-	byte NONE = 2;
+	byte NONE  = 2;
 
 	Name getName();
 
 	void setName(Name name);
 
-	Name getTernaryName();
+	Name getName2();
 
-	void setTernaryName(Name name);
+	void setName2(Name name);
 
 	byte getType();
 

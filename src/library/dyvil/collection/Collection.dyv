@@ -365,7 +365,14 @@ interface Collection<type E> extends Queryable<E>
 	 * 	the index in the array at which the first element of this collection should be placed
 	 * @param store
 	 */
-	func toArray(index: int, store: [Object!]) -> void = for (e <- this) store[index++] = e
+	func toArray(index: int, store: [Object!]) -> void
+	{
+		for (e <- this)
+		{
+			store[index] = e
+			index += 1
+		}
+	}
 
 	/**
 	 * Creates a copy of this collection. The general contract of this method is that the type of the returned

@@ -23,4 +23,13 @@ interface GroupMultiply<T>
 			return this.multiply(lhs, this.power(this.multiply(lhs, lhs), rhs >> 1))
 		}
 	}
+
+	implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiply<R> = new GroupMultiply<R>()
+	{
+		override func _1() -> R = R._1
+
+		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
+
+		override func power(lhs: R, rhs: int) -> R = R.`**`(lhs, rhs)
+	}
 }

@@ -23,4 +23,6 @@ interface SizedIterable<type E> extends Iterable<E>
 
 	@OverloadPriority
 	func forEach(action: E -> void) -> void = for (e <- this) action(e)
+
+	inline static func |_|(it: SizedIterable<_>) -> int = it.size
 }

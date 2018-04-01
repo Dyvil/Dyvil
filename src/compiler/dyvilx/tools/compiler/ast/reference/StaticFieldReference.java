@@ -1,22 +1,21 @@
 package dyvilx.tools.compiler.ast.reference;
 
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.asm.Type;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class StaticFieldReference implements IReference
 {
 	private static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/ref/ReferenceFactory",
 	                                                   "staticRefMetafactory",
 	                                                   ClassFormat.BSM_HEAD + "Ljava/lang/Class;"
-		                                                   + ClassFormat.BSM_TAIL);
+	                                                   + ClassFormat.BSM_TAIL);
 
 	private IField field;
 
@@ -32,12 +31,13 @@ public class StaticFieldReference implements IReference
 	}
 
 	@Override
-	public void writeReference(MethodWriter writer) throws BytecodeException
+	public void writeReference(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		final String internalClassName = this.field.getEnclosingClass().getInternalName();
-		final IType fieldType = this.field.getType();
 
-		final String desc = "()L" + ReferenceType.LazyFields.getInternalRef(fieldType, "unsafe/Unsafe") + ';';
+		final String refClassName = ReferenceType.LazyFields.getInternalRef(this.field.getType(), "unsafe/Unsafe");
+		final String desc = "()L" + refClassName + ';';
+
 		writer.visitInvokeDynamicInsn(this.field.getInternalName(), desc, BOOTSTRAP,
 		                              Type.getObjectType(internalClassName));
 	}

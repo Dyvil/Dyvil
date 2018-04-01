@@ -43,7 +43,7 @@ public class CodeParameter extends AbstractParameter
 	}
 
 	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
-		                    AttributeList attributes)
+		AttributeList attributes)
 	{
 		super(callable, position, name, type, attributes);
 	}
@@ -80,8 +80,12 @@ public class CodeParameter extends AbstractParameter
 	{
 		if (this.type != null)
 		{
-			final boolean constructorParam = this.method != null && this.method.getKind() == MemberKind.CONSTRUCTOR;
-			final int position = constructorParam ?
+			// for final methods and constructors, covariant types in parameter types are ok,
+			// because the method or constructor cannot be overridden
+			final boolean allowCovariant =
+				this.method != null && (this.method.getKind() == MemberKind.CONSTRUCTOR || this.method.hasModifier(
+					Modifiers.FINAL));
+			final int position = allowCovariant ?
 				                     IType.TypePosition.SUPER_TYPE_ARGUMENT :
 				                     IType.TypePosition.PARAMETER_TYPE;
 			this.type.checkType(markers, context, position);

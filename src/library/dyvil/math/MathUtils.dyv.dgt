@@ -11,106 +11,112 @@ abstract class MathUtils
 
 	// min
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static func min(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
+		static func min(this: Math, _ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
 
-		static func min(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
+		static func min(this: Math, _ values: T...) -> T
 		{
 			var min = #if (FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
 			for (v <- values) if (v < min) min = v
 			return min
 		}
+
+		@BytecodeName("min$_array")
+		inline static func min(this: Math, _ array: [T]) -> T = min(array...)
 	}
 
 	// max
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static func max(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
+		static func max(this: Math, _ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
 
-		static func max(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
+		static func max(this: Math, _ values: T...) -> T
 		{
 			var max = #if (FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
 			for (v <- values) if (v > max) max = v
 			return max
 		}
+
+		@BytecodeName("max$_array")
+		inline static func max(this: Math, _ array: [T]) -> T = max(array...)
 	}
 
 	// sum
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 
-		static func sum(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
+		static func sum(this: Math, _ values: [T]) -> T
 		{
-			var sum: PRIMITIVE = 0
+			var sum: T = 0
 			for (v <- values) sum += v
 			return sum
 		}
 	}
 
-	static func sum<T>(_ values: T..., implicit t: GroupAdd<T>) -> T = sum(values as Iterable<T>, t)
+	static func sum<T>(_ values: [T], implicit group: GroupAdd<T>) -> T = sum(values.asIterable(), group)
 
-	static func sum<T>(_ values: Iterable<T>, implicit t: GroupAdd<T>) -> T
+	static func sum<T>(_ values: Iterable<T>, implicit group: GroupAdd<T>) -> T
 	{
-		var sum = t._0
+		var sum = group._0
 		for (k <- values) sum += k
 		return sum
 	}
 
-	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupAdd<T>) -> T
+	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupAdd<T>) -> T
 	{
-		var sum = t._0
+		var sum = group._0
 		for (k <- values) sum += f(k)
 		return sum
 	}
 
 	// product
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 
-		static func product(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
+		static func product(this: Math, _ values: [T]) -> T
 		{
-			var product: PRIMITIVE = 1
+			var product: T = 1
 			for (v <- values) product *= v
 			return product
 		}
 	}
 
-	static func product<T>(_ values: T..., implicit t: GroupMultiply<T>) -> T = product(values as Iterable<T>, t)
+	static func product<T>(_ values: [T], implicit group: GroupMultiply<T>) -> T = product(values as Iterable<T>, group)
 
-	static func product<T>(_ values: Iterable<T>, implicit t: GroupMultiply<T>) -> T
+	static func product<T>(_ values: Iterable<T>, implicit group: GroupMultiply<T>) -> T
 	{
-		var product = t._1
+		var product = group._1
 		for (k <- values) product *= k
 		return product
 	}
 
-	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit t: GroupMultiply<T>) -> T
+	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupMultiply<T>) -> T
 	{
-		var product = t._1
+		var product = group._1
 		for (k <- values) product *= f(k)
 		return product
 	}
 
 	// average
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 
-		static func average(this: Math, _ values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
+		static func average(this: Math, _ values: [T]) -> double = sum(values) / (values.size as double)
 	}
 
 	// clamp
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 
-		infix func clamp(this: Math, _ v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		infix func clamp(this: Math, _ v: T, min: T, max: T) -> T
 		{
 			if (v < min) return min
 			if (v > max) return max
@@ -120,13 +126,13 @@ abstract class MathUtils
 
 	// interpolate
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(T = spec['PRIMITIVE'])
 
-		infix func interpolate(this: Math, _ v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		infix func interpolate(this: Math, _ v: double, min: T, max: T) -> T
 		{
 			if (v <= 0) return min
 			if (v >= 1) return max
-			return (min + (max - min) * v)#if (PRIMITIVE != 'double') { as PRIMITIVE}
+			return (min + (max - min) * v)#if (T != 'double') { as T}
 
 		}
 	}

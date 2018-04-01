@@ -22,8 +22,6 @@ public interface IVariable extends IDataMember
 		return true;
 	}
 
-	boolean isAssigned();
-
 	default int getLocalSlots()
 	{
 		return this.getInternalType().getLocalSlots();
@@ -33,13 +31,14 @@ public interface IVariable extends IDataMember
 
 	void setLocalIndex(int index);
 
-	default boolean isReferenceType()
+	default IType getReferenceType()
 	{
-		return false;
+		return null;
 	}
 
-	default void setReferenceType()
+	default boolean setReferenceType()
 	{
+		return false;
 	}
 
 	IType getInternalType();

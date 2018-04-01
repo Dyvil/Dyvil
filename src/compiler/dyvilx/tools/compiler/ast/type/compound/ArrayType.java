@@ -225,10 +225,10 @@ public class ArrayType implements IObjectType
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(Markers.semantic(this.getPosition(), "type.array.super"));
+			markers.add(Markers.semanticError(this.getPosition(), "type.array.super"));
 		}
 
-		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		this.type.checkType(markers, context, TypePosition.copyReify(position, TypePosition.SUPER_TYPE_ARGUMENT));
 	}
 
 	@Override

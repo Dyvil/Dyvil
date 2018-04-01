@@ -58,8 +58,6 @@ public final class ExternalClass extends AbstractClass
 	private static final int METADATA            = 1;
 	private static final int SUPER_TYPES         = 1 << 1;
 	private static final int GENERICS            = 1 << 2;
-	private static final int BODY_METHOD_CACHE   = 1 << 3;
-	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
 	private static final int ANNOTATIONS         = 1 << 5;
 	private static final int MEMBER_CLASSES      = 1 << 6;
 
@@ -128,28 +126,6 @@ public final class ExternalClass extends AbstractClass
 			final ITypeParameter typeParameter = this.typeParameters.get(i);
 			typeParameter.resolveTypes(null, context);
 		}
-	}
-
-	private void resolveMethodCache()
-	{
-		if ((this.resolved & BODY_METHOD_CACHE) != 0)
-		{
-			return;
-		}
-
-		this.body.initExternalMethodCache();
-		this.resolved |= BODY_METHOD_CACHE;
-	}
-
-	private void resolveImplicitCache()
-	{
-		if ((this.resolved & BODY_IMPLICIT_CACHE) != 0)
-		{
-			return;
-		}
-
-		this.body.initExternalImplicitCache();
-		this.resolved |= BODY_IMPLICIT_CACHE;
 	}
 
 	private void resolveSuperTypes()
@@ -325,7 +301,6 @@ public final class ExternalClass extends AbstractClass
 		this.resolveMetadata();
 		this.resolveGenerics();
 		this.resolveSuperTypes();
-		this.resolveMethodCache();
 		return super.checkImplements(candidate, typeContext);
 	}
 
@@ -419,7 +394,6 @@ public final class ExternalClass extends AbstractClass
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		this.resolveGenerics();
-		this.resolveMethodCache();
 
 		/*
 		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
@@ -455,8 +429,6 @@ public final class ExternalClass extends AbstractClass
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		this.resolveGenerics();
-		this.resolveImplicitCache();
-
 		this.body.getImplicitMatches(list, value, targetType);
 	}
 

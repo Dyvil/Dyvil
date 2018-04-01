@@ -8,7 +8,6 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
-import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.IValueList;
 import dyvilx.tools.compiler.ast.generic.GenericData;
@@ -81,7 +80,7 @@ public class ArgumentList implements IResolvable, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator<>(this.values, this.size);
+		return new ArrayIterator<>(this.values, 0, this.size);
 	}
 
 	@Override
@@ -431,7 +430,7 @@ public class ArgumentList implements IResolvable, IValueList
 		{
 			// not implicit, possible default
 
-			if (this.resolveDefault(param))
+			if (this.resolveDefault(param, context))
 			{
 				return;
 			}
@@ -465,7 +464,7 @@ public class ArgumentList implements IResolvable, IValueList
 		}
 
 		// default resolution only if implicit resolution fails
-		if (this.resolveDefault(param))
+		if (this.resolveDefault(param, context))
 		{
 			return;
 		}
@@ -474,13 +473,11 @@ public class ArgumentList implements IResolvable, IValueList
 		return;
 	}
 
-	private boolean resolveDefault(IParameter param)
+	private boolean resolveDefault(IParameter param, IContext context)
 	{
 		if (param.isDefault())
 		{
-			final DummyValue value = new DummyValue(param.getCovariantType(),
-			                                        (writer, type) -> param.writeGetDefaultValue(writer));
-			this.add(param.getLabel(), value);
+			this.add(param.getLabel(), param.getDefaultValue(context));
 			return true;
 		}
 		return false;

@@ -13,9 +13,12 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
+import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
@@ -39,7 +42,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Field extends Member implements IField
+public class Field extends Member implements IField, IDefaultContext
 {
 	protected IValue value;
 
@@ -127,6 +130,12 @@ public class Field extends Member implements IField
 	}
 
 	@Override
+	public boolean isThisAvailable()
+	{
+		return !this.isStatic();
+	}
+
+	@Override
 	public boolean skipAnnotation(String type, Annotation annotation)
 	{
 		switch (type)
@@ -159,7 +168,7 @@ public class Field extends Member implements IField
 		{
 			if (!this.isStatic())
 			{
-				if (context.isStaticOnly())
+				if (!context.isThisAvailable())
 				{
 					markers.add(Markers.semanticError(position, "field.access.instance", this.name));
 				}
@@ -215,7 +224,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.value.resolveTypes(markers, new CombiningContext(this, context));
 		}
 
 		if (this.property == null)
@@ -256,7 +265,9 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value = this.value.resolve(markers, context);
+			final IContext context1 = new CombiningContext(this, context);
+
+			this.value = this.value.resolve(markers, context1);
 
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
@@ -268,7 +279,7 @@ public class Field extends Member implements IField
 			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("field.type.incompatible",
 			                                                                             "field.type", "value.type",
 			                                                                             this.name);
-			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context1, markerSupplier);
 
 			if (inferType)
 			{
@@ -340,7 +351,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.value.checkTypes(markers, new CombiningContext(this, context));
 		}
 
 		if (this.property != null)
@@ -356,7 +367,7 @@ public class Field extends Member implements IField
 
 		if (this.value != null)
 		{
-			this.value.check(markers, context);
+			this.value.check(markers, new CombiningContext(this, context));
 		}
 		else if (!this.hasDefaultInit())
 		{
@@ -596,15 +607,27 @@ public class Field extends Member implements IField
 		}
 	}
 
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
+	private void writeReceiver(MethodWriter writer, WriteableExpression receiver)
 	{
-		String owner = this.enclosingClass.getInternalName();
-		String name = this.getInternalName();
-		String desc = this.getDescriptor();
+		if (receiver != null && !this.isStatic())
+		{
+			receiver.writeNullCheckedExpression(writer, this.getEnclosingClass().getReceiverType());
+		}
+	}
+
+	@Override
+	public void writeGet(@NonNull MethodWriter writer, WriteableExpression receiver, int lineNumber)
+		throws BytecodeException
+	{
+		this.writeReceiver(writer, receiver);
+
+		final IClass enclosingClass = this.getEnclosingClass();
+		final String owner = enclosingClass.getInternalName();
+		final String name = this.getInternalName();
+		final String desc = this.getDescriptor();
 
 		writer.visitLineNumber(lineNumber);
-		switch (this.attributes.flags() & (Modifiers.STATIC | Modifiers.LAZY))
+		switch (this.getAttributes().flags() & (Modifiers.STATIC | Modifiers.LAZY))
 		{
 		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
@@ -618,16 +641,34 @@ public class Field extends Member implements IField
 			return;
 		case Modifiers.STATIC | Modifiers.LAZY: // both static and lazy
 			writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name + "$lazy", "()" + desc,
-			                       this.enclosingClass.isInterface());
+			                       enclosingClass.isInterface());
 		}
 	}
 
 	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeSet(@NonNull MethodWriter writer, WriteableExpression receiver, @NonNull WriteableExpression value,
+		int lineNumber) throws BytecodeException
 	{
-		String owner = this.enclosingClass.getInternalName();
-		String name = this.getInternalName();
-		String desc = this.getDescriptor();
+		this.writeReceiver(writer, receiver);
+		value.writeExpression(writer, this.getType());
+		this.writePutInsn(writer, lineNumber);
+	}
+
+	@Override
+	public void writeSetCopy(@NonNull MethodWriter writer, WriteableExpression receiver,
+		@NonNull WriteableExpression value, int lineNumber) throws BytecodeException
+	{
+		this.writeReceiver(writer, receiver);
+		value.writeExpression(writer, this.getType());
+		writer.visitInsn(this.isStatic() ? Opcodes.AUTO_DUP : Opcodes.AUTO_DUP_X1);
+		this.writePutInsn(writer, lineNumber);
+	}
+
+	private void writePutInsn(MethodWriter writer, int lineNumber)
+	{
+		final String owner = this.getEnclosingClass().getInternalName();
+		final String name = this.getInternalName();
+		final String desc = this.getDescriptor();
 
 		if (this.isStatic())
 		{

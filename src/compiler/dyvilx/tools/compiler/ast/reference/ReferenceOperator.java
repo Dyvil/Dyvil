@@ -129,7 +129,7 @@ public class ReferenceOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.reference.writeReference(writer);
+		this.reference.writeReference(writer, this.lineNumber());
 	}
 
 	@Override

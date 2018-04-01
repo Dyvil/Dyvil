@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -13,10 +14,7 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.reference.IReference;
-import dyvilx.tools.compiler.ast.reference.InstanceFieldReference;
-import dyvilx.tools.compiler.ast.reference.StaticFieldReference;
-import dyvilx.tools.compiler.ast.reference.VariableReference;
+import dyvilx.tools.compiler.ast.reference.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
@@ -24,7 +22,7 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
+import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -88,7 +86,7 @@ public class FieldAccess extends AbstractFieldAccess
 
 	@Override
 	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
-		                                  SideEffectHelper helper)
+		SideEffectHelper helper)
 	{
 		// x (op)= z
 		// -> x = x (op) z
@@ -100,30 +98,36 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	public IReference toReference()
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
 		if (this.field == null)
 		{
-			return null;
+			return this; // avoid extra error
 		}
 
-		if (!this.field.isLocal())
+		final IReference ref;
+		if (this.field.isLocal())
 		{
-			if (this.field.hasModifier(Modifiers.STATIC))
+			if (!((IVariable) this.field).setReferenceType())
 			{
-				return new StaticFieldReference((IField) this.field);
+				final Marker marker = Markers.semanticError(this.position, "reference.variable.invalid",
+				                                            Util.memberNamed(this.field));
+				markers.add(marker);
+				return this;
 			}
-			else
-			{
-				return new InstanceFieldReference(this.receiver, (IField) this.field);
-			}
+
+			ref = new VariableReference(this.field.capture(context));
 		}
-		if (this.field instanceof IVariable)
+		else if (this.field.isStatic())
 		{
-			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
-			return new VariableReference(this);
+			ref = new StaticFieldReference((IField) this.field);
 		}
-		return null;
+		else
+		{
+			ref = new InstanceFieldReference(this.receiver, (IField) this.field);
+		}
+
+		return new ReferenceOperator(this, ref);
 	}
 
 	@Override
@@ -182,19 +186,7 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	protected void reportResolve(MarkerList markers)
-	{
-		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
-		if (this.receiver != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
-		}
-
-		markers.add(marker);
-	}
-
-	@Override
-	protected IValue resolveAsField(IValue receiver, IContext context)
+	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
 	{
 		final IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field == null)
@@ -207,8 +199,9 @@ public class FieldAccess extends AbstractFieldAccess
 			return new EnumValue(this.position, field);
 		}
 
-		this.field = field;
 		this.receiver = receiver;
+		this.field = field;
+		this.capture(markers, context);
 		return this;
 	}
 
@@ -239,6 +232,24 @@ public class FieldAccess extends AbstractFieldAccess
 
 		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
 		return type != null ? new ClassAccess(this.position, type) : null;
+	}
+
+	@Override
+	protected void reportResolve(MarkerList markers)
+	{
+		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
+	}
+
+	@Override
+	protected void capture(MarkerList markers, IContext context)
+	{
+		this.field = this.field.capture(context);
 	}
 
 	@Override

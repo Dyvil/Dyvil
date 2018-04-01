@@ -9,8 +9,16 @@ public class NestedMethodTest
 
 		func testI(text: String, expected: int) -> Test = test text { i =?= expected }
 
+		func setI(newValue: int) = i = newValue
+
+		func setI2(newValue: int) = setI(newValue)
+
 		testI("Before Assignment", 0)
-		i = 2
-		testI("After Assignment", 2)
+		i = 1
+		testI("After Assignment", 1)
+		setI(2)
+		testI("After Set", 2)
+		setI2(3)
+		testI("After Set 2", 3)
 	}
 }

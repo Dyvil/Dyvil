@@ -44,13 +44,14 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 {
 	class TypePosition
 	{
-		public static final int CLASS_FLAG            = 0b0000001;
-		public static final int GENERIC_FLAG          = 0b0000010;
-		public static final int TYPE_VAR_FLAG         = 0b0000100;
-		public static final int NO_CONTRAVARIANT_FLAG = 0b0001000;
-		public static final int NO_COVARIANT_FLAG     = 0b0010000;
-		public static final int WILDCARD_FLAG         = 0b0100000;
-		public static final int SUPERTYPE_FLAG        = 0b1000000;
+		public static final int CLASS_FLAG            = 0b00000001;
+		public static final int GENERIC_FLAG          = 0b00000010;
+		public static final int TYPE_VAR_FLAG         = 0b00000100;
+		public static final int NO_CONTRAVARIANT_FLAG = 0b00001000;
+		public static final int NO_COVARIANT_FLAG     = 0b00010000;
+		public static final int WILDCARD_FLAG         = 0b00100000;
+		public static final int SUPERTYPE_FLAG        = 0b01000000;
+		public static final int REIFY_FLAG            = 0b10000000;
 
 		/**
 		 * The parameter type of a {@code class<T>} expression. Allows class types as well as reified type variable
@@ -94,7 +95,12 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 		public static int genericArgument(int position)
 		{
-			return (position & SUPERTYPE_FLAG) != 0 ? SUPER_TYPE_ARGUMENT : GENERIC_ARGUMENT;
+			return copyReify(position, (position & SUPERTYPE_FLAG) != 0 ? SUPER_TYPE_ARGUMENT : GENERIC_ARGUMENT);
+		}
+
+		public static int copyReify(int from, int to)
+		{
+			return to | from & REIFY_FLAG;
 		}
 	}
 

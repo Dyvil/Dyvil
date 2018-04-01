@@ -63,7 +63,7 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 			final OperatorElement element2 = this.operators[1];
 			final T rhs = (T) this.operands[2];
 
-			if (element1.operator.getType() == IOperator.TERNARY && element2.name == element1.operator.getTernaryName())
+			if (element1.operator.getType() == IOperator.TERNARY && element2.name == element1.operator.getName2())
 			{
 				return this.ternaryOp(lhs, element1, center, element2, rhs);
 			}
@@ -121,7 +121,7 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 
 		final OperatorElement peek = operatorStack.peek();
 		if (peek != null && peek.operator.getType() == IOperator.TERNARY // ternary operator
-			    && operatorElement.name == peek.operator.getTernaryName()) // right-hand part
+			    && operatorElement.name == peek.operator.getName2()) // right-hand part
 		{
 			final T cond = operandStack.pop();
 			operatorStack.pop(); // == peek
@@ -145,12 +145,12 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 			{
 				return false;
 			}
-			if (element2.name == element1.operator.getTernaryName())
+			if (element2.name == element1.operator.getName2())
 			{
 				return false;
 			}
 		}
-		if (ternaryOperator != null && element1.name == ternaryOperator.operator.getTernaryName())
+		if (ternaryOperator != null && element1.name == ternaryOperator.operator.getName2())
 		{
 			if (element2.name == element1.name)
 			{

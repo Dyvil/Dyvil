@@ -57,7 +57,7 @@ public class AttributeList implements Iterable<Attribute>
 	@Override
 	public Iterator<Attribute> iterator()
 	{
-		return new ArrayIterator<>(this.data, this.size);
+		return new ArrayIterator<>(this.data, 0, this.size);
 	}
 
 	// Flags

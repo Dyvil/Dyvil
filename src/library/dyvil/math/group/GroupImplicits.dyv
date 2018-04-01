@@ -1,5 +1,8 @@
 package dyvil.math.group
 
+import java.math.{ BigDecimal, BigInteger }
+import dyvil.math.PowImpl
+
 abstract class GroupImplicits
 {
 	private init() {} // no instances
@@ -12,9 +15,9 @@ abstract class GroupImplicits
 
 		override func add(lhs: int, rhs: int) -> int = lhs + rhs
 
-		override func subtract(lhs: int, rhs: int) -> int = lhs - rhs
-
 		override func negate(rhs: int) -> int = -rhs
+
+		override func subtract(lhs: int, rhs: int) -> int = lhs - rhs
 
 		override func multiply(lhs: int, rhs: int) -> int = lhs * rhs
 
@@ -29,13 +32,30 @@ abstract class GroupImplicits
 
 		override func add(lhs: long, rhs: long) -> long = lhs + rhs
 
-		override func subtract(lhs: long, rhs: long) -> long = lhs - rhs
-
 		override func negate(rhs: long) -> long = -rhs
+
+		override func subtract(lhs: long, rhs: long) -> long = lhs - rhs
 
 		override func multiply(lhs: long, rhs: long) -> long = lhs * rhs
 
 		override func power(lhs: long, rhs: int) -> long = lhs ** rhs
+	}
+
+	implicit object BigIntegerGroup implements GroupAddNegate<BigInteger>, GroupMultiply<BigInteger>
+	{
+		override func _0() -> BigInteger = BigInteger.valueOf(0)
+
+		override func _1() -> BigInteger = BigInteger.valueOf(1)
+
+		override func add(lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.add(rhs)
+
+		override func negate(rhs: BigInteger) -> BigInteger = rhs.negate()
+
+		override func subtract(lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.subtract(rhs)
+
+		override func multiply(lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.multiply(rhs)
+
+		override func power(lhs: BigInteger, rhs: int) -> BigInteger = lhs.pow(rhs)
 	}
 
 	implicit object DoubleRing implements Ring<double>
@@ -78,5 +98,33 @@ abstract class GroupImplicits
 		override func divide(lhs: float, rhs: float) -> float = lhs / rhs
 
 		override func power(lhs: float, rhs: int) -> float = lhs ** rhs
+	}
+
+	implicit object BigDecimalRing implements Ring<BigDecimal>
+	{
+		override func _0() -> BigDecimal = BigDecimal.ZERO
+
+		override func _1() -> BigDecimal = BigDecimal.ONE
+
+		override func add(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.add(rhs)
+
+		override func negate(rhs: BigDecimal) -> BigDecimal = rhs.negate()
+
+		override func subtract(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.subtract(rhs)
+
+		override func multiply(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.multiply(rhs)
+
+		override func inverse(rhs: BigDecimal) -> BigDecimal = BigDecimal.ONE.divide(rhs, .HALF_EVEN)
+
+		override func divide(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs, .HALF_EVEN)
+
+		override func power(lhs: BigDecimal, rhs: int) -> BigDecimal = PowImpl.pow(lhs, rhs)
+	}
+
+	implicit object StringGroup implements GroupAdd<String>
+	{
+		override func _0() -> String = ""
+
+		override func add(lhs: String, rhs: String) -> String = lhs ++ rhs
 	}
 }

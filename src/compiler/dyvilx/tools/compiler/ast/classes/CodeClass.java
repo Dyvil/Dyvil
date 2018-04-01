@@ -42,7 +42,7 @@ import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
-	protected ArgumentList superConstructorArguments = ArgumentList.EMPTY;
+	protected ArgumentList  superConstructorArguments;
 	protected AttributeList constructorAttributes;
 
 	// Metadata

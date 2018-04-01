@@ -96,7 +96,11 @@ public abstract class Longs
 
 	// Range Operators
 
-	infix func ..(lhs: long, rhs: long) -> LongRange = LongRange(lhs, to: rhs)
+	inline infix func ..(lhs: long, rhs: long) -> LongRange = LongRange(lhs, to: rhs)
 
-	infix func ..<(lhs: long, rhs: long) -> LongRange = LongRange(lhs, toExclusive: rhs)
+	inline infix func ..<(lhs: long, rhs: long) -> LongRange = LongRange(lhs, toExclusive: rhs)
+
+	// Other Operators
+
+	inline static func |_|(lhs: long) -> long = Math.abs(lhs)
 }

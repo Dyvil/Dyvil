@@ -1,21 +1,21 @@
-#let(TYPE_NAME        = spec['TYPE_NAME'])
-#let(PRIMITIVE        = spec['PRIMITIVE'])
-#let(WRAPPER          = spec['WRAPPER'])
-#let(HAS_RANGE_CLASS  = Boolean.parseBoolean(spec['HAS_RANGE_CLASS']))
-#let(IS_RANGEABLE     = Boolean.parseBoolean(spec['IS_RANGEABLE']))
-#let(RANGE_CAST       = Boolean.parseBoolean(spec['RANGE_CAST']))
-#let(IS_GENERIC       = Boolean.parseBoolean(spec['IS_GENERIC']))
-#let(ARRAY_LOAD_INSN  = spec['ARRAY_LOAD_INSN'])
-#let(ARRAY_STORE_INSN = spec['ARRAY_STORE_INSN'])
+#let(TYPE_NAME          = spec['TYPE_NAME'])
+#let(PRIMITIVE          = spec['PRIMITIVE'])
+#let(WRAPPER            = spec['WRAPPER'])
+#let(HAS_RANGE_CLASS    = Boolean.parseBoolean(spec['HAS_RANGE_CLASS']))
+#let(IS_RANGEABLE       = Boolean.parseBoolean(spec['IS_RANGEABLE']))
+#let(RANGE_CAST         = Boolean.parseBoolean(spec['RANGE_CAST']))
+#let(IS_GENERIC         = Boolean.parseBoolean(spec['IS_GENERIC']))
+#let(ARRAY_LOAD_INSN    = spec['ARRAY_LOAD_INSN'])
+#let(ARRAY_STORE_INSN   = spec['ARRAY_STORE_INSN'])
+#let(ERASURE            = spec['ERASURE'] ?? PRIMITIVE)
 
-#let(ERASURE         = spec['ERASURE'] ?? PRIMITIVE)
-#let(REIFIED         = "@Reified(.OBJECT_CLASS)")
-#let(GENERIC         = IS_GENERIC ? "<T>" : "")
-#let(GENERIC_2       = IS_GENERIC ? "<T, " ++ REIFIED ++ " U>" : "<" ++ REIFIED ++ " U>")
-#let(GENERIC_REIFIED = IS_GENERIC ? "<" ++ REIFIED ++ "T>" : "")
-#let(T               = IS_GENERIC ? "T" : PRIMITIVE)
-#let(APPLY_T         = IS_GENERIC ? "ObjectArray<T>" : "new [" ++ PRIMITIVE ++ "]")
-#let(APPLY_WITH_SIZE = IS_GENERIC ? "ObjectArray(size, of: array.elementType)" : "new [" ++ PRIMITIVE ++ "](size)")
+#let(REIFIED)           {@Reified(.OBJECT_CLASS)}
+#let(GENERIC)           {#if (IS_GENERIC) {<T>}}
+#let(GENERIC_2)         {#if (IS_GENERIC) {<T, REIFIED U>} #else {<REIFIED U>}}
+#let(GENERIC_REIFIED)   {#if (IS_GENERIC) {<REIFIED T>}}
+#let(T)                 {#if (IS_GENERIC) {#("T")} #else {PRIMITIVE}}
+#let(APPLY_T)           {#if (IS_GENERIC) {ObjectArray<T>} #else {new [PRIMITIVE]}}
+#let(APPLY_WITH_SIZE)   {#if (IS_GENERIC) {ObjectArray(size, of: array.elementType)} #else {new [PRIMITIVE](size)}}
 
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
@@ -88,16 +88,16 @@ public abstract class #(TYPE_NAME)Array
 		{
 			let array = APPLY_T((to - from + 1)#if (RANGE_CAST) { as int})
 			var index = 0
-			for (i <- from .. to) array[index++] = i
+			for (i <- from .. to) { array[index] = i; index += 1 }
 			return array
 		}
 
 		@BytecodeName('rangeOpen')
-		static func range GENERIC(from: T, explicit toExclusive: T) -> [T]
+		static func apply GENERIC(from: T, explicit toExclusive: T) -> [T]
 		{
 			let array = APPLY_T((toExclusive - from)#if (RANGE_CAST) { as int})
 			var index = 0
-			for (i <- from ..< toExclusive) array[index++] = from
+			for (i <- from ..< toExclusive) { array[index] = i; index += 1 }
 			return array
 		}
 	}
@@ -106,6 +106,9 @@ public abstract class #(TYPE_NAME)Array
 
 	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
 	postfix func size GENERIC(array: [T]) -> int = array.size
+
+	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
+	static func |_| GENERIC(array: [T]) -> int = array.size
 
 	@Intrinsic([ LOAD_0, ARRAYLENGTH, EQ0 ])
 	postfix func isEmpty GENERIC(array: [T]) -> boolean = array.isEmpty
@@ -199,12 +202,19 @@ public abstract class #(TYPE_NAME)Array
 		var size = array.size
 
 		// Calculate number of elements in new array
-		for (element <- array) if (element == value) size--
+		for (element <- array) if (element == value) size -= 1
 
 		let result = APPLY_WITH_SIZE
 		var index = 0
 
-		for (element <- array) if (element != value) result[index++] = element
+		for (element <- array)
+		{
+			if (element != value)
+			{
+				result[index] = element
+				index += 1
+			}
+		}
 		return result
 	}
 
@@ -214,7 +224,14 @@ public abstract class #(TYPE_NAME)Array
 		let result = APPLY_WITH_SIZE
 		var index = 0
 
-		for (v <- array) if (!from.contains(v)) result[index++] = v
+		for (v <- array)
+		{
+			if (!from.contains(v))
+			{
+				result[index] = v
+				index += 1
+			}
+		}
 		return result.trim(index)
 	}
 
@@ -224,7 +241,14 @@ public abstract class #(TYPE_NAME)Array
 		let result = APPLY_WITH_SIZE
 		var index = 0
 
-		for (v <- array) if (with.contains(v)) result[index++] = v
+		for (v <- array)
+		{
+			if (with.contains(v))
+			{
+				result[index] = v
+				index += 1
+			}
+		}
 		return result.trim(index)
 	}
 
@@ -287,7 +311,14 @@ public abstract class #(TYPE_NAME)Array
 		let result = APPLY_WITH_SIZE
 		var index = 0
 
-		for (v <- array) if (condition(v)) result[index++] = v
+		for (v <- array)
+		{
+			if (condition(v))
+			{
+				result[index] = v
+				index += 1
+			}
+		}
 		return result.trim(index)
 	}
 
@@ -300,7 +331,7 @@ public abstract class #(TYPE_NAME)Array
 			// Count the number of 'false' entries in the array
 			var falseEntries = 0
 
-			for (value <- array) if (!value) falseEntries++
+			for (value <- array) if (!value) falseEntries += 1
 
 			// Make the remaining elements of the result true
 			for (i <- falseEntries ..< size) result[i] = true
@@ -324,7 +355,7 @@ public abstract class #(TYPE_NAME)Array
 		while (startIndex < array.size)
 		{
 			if (array[startIndex] == value) return startIndex
-			startIndex++
+			startIndex += 1
 		}
 		return -1
 	}
@@ -336,7 +367,7 @@ public abstract class #(TYPE_NAME)Array
 		while (startIndex >= 0)
 		{
 			if (array[startIndex] == value) return startIndex
-			startIndex--
+			startIndex -= 1
 		}
 		return -1
 	}

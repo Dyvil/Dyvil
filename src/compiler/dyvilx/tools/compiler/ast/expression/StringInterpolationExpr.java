@@ -50,12 +50,26 @@ public final class StringInterpolationExpr implements IValue
 		this.position = position;
 	}
 
+	public StringInterpolationExpr(IValue value)
+	{
+		this.values = new ArgumentList(value);
+		this.position = value.getPosition();
+	}
+
 	public StringInterpolationExpr(IValue... values)
 	{
-		final int size = values.length;
-		this.position = size == 0 ? null : SourcePosition.$dot$dot(values[0].getPosition(), values[size - 1].getPosition());
-
 		this.values = new ArgumentList(values);
+
+		final int size = values.length;
+		if (size > 0)
+		{
+			final SourcePosition start = values[0].getPosition();
+			final SourcePosition end = values[size - 1].getPosition();
+			if (start != null && end != null)
+			{
+				this.position = SourcePosition.$dot$dot(start, end);
+			}
+		}
 	}
 
 	public static StringInterpolationExpr apply(IValue lhs, IValue rhs)

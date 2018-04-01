@@ -4,6 +4,8 @@ using dyvil.math.MathUtils._
 using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
 
+import java.util.regex.{ Pattern, Matcher }
+
 abstract class Strings
 {
 	private const STRING_VALUE_OFFSET: long = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
@@ -65,22 +67,22 @@ abstract class Strings
 
 	// Misc. additional extensions
 
-	inline infix func size(string: CharSequence) -> int = string.length
+	inline postfix func size(string: CharSequence) -> int = string.length
+
+	inline static func |_|(string: CharSequence) -> int = string.length
 
 	inline infix func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
 
 	infix func count(string: String, character: char) -> int
 	{
 		var count = 0
-		for (c <- string) if (c == character) count++
+		for (c <- string) if (c == character) count += 1
 		return count
 	}
 
 	infix func split(string: String, by delimiter: char) -> [String]
 	{
-		var count = 0
-
-		for (c <- string) if (c == delimiter) count++
+		let count = string.count(delimiter)
 		if (count == 0) return [string]
 
 		let array = new [String](count + 1)
@@ -91,7 +93,8 @@ abstract class Strings
 		{
 			if (string[i] == delimiter)
 			{
-				array[arrayIndex++] = string.substring(start, i)
+				array[arrayIndex] = string.substring(start, i)
+				arrayIndex += 1
 				start = i + 1
 			}
 		}
@@ -127,6 +130,21 @@ abstract class Strings
 			System.arraycopy(array2, 0, array1, 0, arraySize)
 		}
 		return array2[size2]
+	}
+
+	infix func replaceAll(string: String, target: String, by replacer: String -> String)
+	{
+		let p: Pattern = Pattern.compile(target)
+		let m: Matcher = p.matcher(string)
+		let buffer = new StringBuffer
+
+		while (m.find())
+		{
+			m.appendReplacement(buffer, replacer(m.group()))
+		}
+
+		m.appendTail(buffer)
+		return buffer.toString!!
 	}
 
 	extension func toString(o: any, builder: StringBuilder) -> void = builder.append o

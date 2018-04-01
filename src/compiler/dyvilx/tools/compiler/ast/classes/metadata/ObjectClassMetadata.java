@@ -1,18 +1,19 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
-import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.field.Field;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
@@ -21,8 +22,6 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-
-import static dyvil.reflect.Modifiers.*;
 
 public final class ObjectClassMetadata extends ClassMetadata
 {
@@ -67,24 +66,16 @@ public final class ObjectClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesGenerate(markers, context);
 
-		final ClassBody body = this.theClass.getBody();
-		if (body != null && body.constructorCount() > 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
-			markers.add(Markers.semanticError(this.theClass.getPosition(), "class.object.constructor",
-			                                  this.theClass.getName()));
+			this.constructor.setAttributes(AttributeList.of(Modifiers.PRIVATE | Modifiers.GENERATED));
 		}
 
 		if ((this.members & INSTANCE_FIELD) == 0)
 		{
-			final int flags = PUBLIC | CONST | (this.theClass.isImplicit() ? IMPLICIT : 0);
-
-			final Field field = new Field(this.theClass, Names.instance, this.theClass.getClassType(),
-			                              AttributeList.of(flags));
+			final Field field = this.createInstanceField();
 			this.instanceField = field;
-
-			this.constructor.setAttributes(AttributeList.of(PRIVATE));
-			final ConstructorCall call = new ConstructorCall(null, this.constructor, ArgumentList.EMPTY);
-			field.setValue(call);
+			this.theClass.createBody().addDataMember(field);
 		}
 		else
 		{
@@ -93,33 +84,40 @@ public final class ObjectClassMetadata extends ClassMetadata
 		}
 	}
 
-	@Override
-	public IDataMember resolveField(Name name)
+	private Field createInstanceField()
 	{
-		if (this.instanceField != null && name == Names.instance)
-		{
-			return this.instanceField;
-		}
-		return null;
+		final int flags = Modifiers.PUBLIC | Modifiers.CONST | (this.theClass.isImplicit() ? Modifiers.IMPLICIT : 0);
+
+		final IType classType = this.theClass.getClassType();
+		final Field field = new Field(this.theClass, Names.instance, classType, AttributeList.of(flags));
+		final ConstructorCall call = new ConstructorCall(this.theClass.position(), classType, ArgumentList.EMPTY);
+		field.setValue(call);
+		return field;
 	}
 
 	@Override
-	public void writeStaticInit(MethodWriter mw) throws BytecodeException
+	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
+		final ClassBody body = this.theClass.getBody();
+		if (body == null)
 		{
-			this.instanceField.writeStaticInit(mw);
+			return;
+		}
+
+		for (IConstructor ctor : body.constructors())
+		{
+			if (ctor.hasModifier(Modifiers.GENERATED))
+			{
+				continue;
+			}
+
+			markers.add(Markers.semanticError(ctor.position(), "class.object.constructor", this.theClass.getName()));
 		}
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
-		{
-			this.instanceField.write(writer);
-		}
-
 		super.write(writer);
 
 		String internalName = this.theClass.getInternalName();
@@ -127,7 +125,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			// Generate a toString() method that simply returns the name of this
 			// object type.
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PUBLIC, "toString",
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString",
 			                                                                      "()Ljava/lang/String;", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
@@ -140,7 +138,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			// Generate an equals(Object) method that compares the objects for
 			// identity
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PUBLIC, "equals",
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals",
 			                                                                      "(Ljava/lang/Object;)Z", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
@@ -160,7 +158,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		if ((this.members & HASHCODE) == 0)
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
-			                                           writer.visitMethod(PUBLIC, "hashCode", "()I", null, null));
+			                                           writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null, null));
 			mw.visitCode();
 			mw.setThisType(internalName);
 			mw.visitLdcInsn(internalName.hashCode());
@@ -170,25 +168,40 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & READ_RESOLVE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "readResolve",
-			                                                                      "()Ljava/lang/Object;", null, null));
-			writeResolveMethod(mw, internalName);
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(
+				Modifiers.PRIVATE | Modifiers.SYNTHETIC, "readResolve",
+				"()Ljava/lang/Object;", null, null));
+
+			writeResolveBody(mw, internalName);
 		}
 
 		if ((this.members & WRITE_REPLACE) == 0)
 		{
-			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(PRIVATE | SYNTHETIC, "writeReplace",
-			                                                                      "()Ljava/lang/Object;", null, null));
-			writeResolveMethod(mw, internalName);
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(
+				Modifiers.PRIVATE | Modifiers.SYNTHETIC, "writeReplace",
+				"()Ljava/lang/Object;", null, null));
+
+			writeResolveBody(mw, internalName);
+
 		}
 	}
 
-	private static void writeResolveMethod(MethodWriter mw, String internal) throws BytecodeException
+	private static void writeResolveBody(MethodWriter mw, String internal) throws BytecodeException
 	{
 		mw.setThisType(internal);
 		mw.visitCode();
-		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+		writeGetInstance(mw, internal);
 		mw.visitInsn(Opcodes.ARETURN);
 		mw.visitEnd();
+	}
+
+	public static void writeGetInstance(MethodWriter mw, String internal)
+	{
+		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter mw) throws BytecodeException
+	{
 	}
 }

@@ -34,7 +34,11 @@ interface SourcePosition extends Comparable<SourcePosition>
 	{
 		var startColumn = start.endColumn
 		var endColumn = end.startColumn
-		if (startColumn == endColumn) { startColumn++; endColumn-- }
+		if (startColumn == endColumn)
+		{
+			startColumn += 1
+			endColumn -= 1
+		}
 		return new Base(start.endLine, end.startLine, startColumn, endColumn)
 	}
 

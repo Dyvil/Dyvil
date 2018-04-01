@@ -21,15 +21,15 @@ import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 public interface IStaticContext extends IContext
 {
 	@Override
-	default boolean isStaticOnly()
+	default boolean isThisAvailable()
 	{
-		return true;
+		return false;
 	}
 
 	@Override
-	default byte checkStatic()
+	default boolean isConstructor()
 	{
-		return TRUE;
+		return false;
 	}
 
 	@Override

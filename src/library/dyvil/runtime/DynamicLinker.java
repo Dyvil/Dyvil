@@ -67,7 +67,7 @@ public class DynamicLinker
 
 	@NonNull
 	public static CallSite linkExtension(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type,
-		                                    @NonNull MethodHandle fallback)
+		@NonNull MethodHandle fallback)
 	{
 		return link(lookup, name, type, fallback, INVOKE_DYNAMIC);
 	}
@@ -80,7 +80,7 @@ public class DynamicLinker
 
 	@NonNull
 	private static CallSite link(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type,
-		                            MethodHandle fallback, @NonNull MethodHandle dynamicTarget)
+		MethodHandle fallback, @NonNull MethodHandle dynamicTarget)
 	{
 		final InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type, fallback);
 
@@ -103,19 +103,6 @@ public class DynamicLinker
 		return receiver == clazz;
 	}
 
-	public static Method findMethod(@NonNull Class<?> receiver, @NonNull String name, Class @NonNull [] parameterTypes)
-		throws Throwable
-	{
-		try
-		{
-			return receiver.getMethod(name, parameterTypes);
-		}
-		catch (NoSuchMethodException ignored)
-		{
-			return null;
-		}
-	}
-
 	public static Object invokeDynamic(@NonNull InliningCacheCallSite callSite, Object @NonNull [] args)
 		throws Throwable
 	{
@@ -131,25 +118,27 @@ public class DynamicLinker
 		{
 			throw new NullPointerException();
 		}
+
 		final Class<?> receiverClass = receiver.getClass();
 
-		final Method implementationMethod = findMethod(receiverClass, callSite.name,
-		                                               type.dropParameterTypes(0, 1).parameterArray());
-
-		if (implementationMethod != null)
+		try
 		{
+			final Method implementationMethod = receiverClass.getMethod(callSite.name,
+			                                                            type.dropParameterTypes(0, 1).parameterArray());
 			// Convert the implementation to a MethodHandle with the desired type
 			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(type);
 			return invokeWith(callSite, args, type, receiverClass, target, CHECK_CLASS);
 		}
-
-		final MethodHandle fallbackMethod = callSite.fallback;
-		if (fallbackMethod != null)
+		catch (NoSuchMethodException ex)
 		{
-			return invokeWith(callSite, args, type, receiverClass, fallbackMethod, CHECK_CLASS);
-		}
+			final MethodHandle fallbackMethod = callSite.fallback;
+			if (fallbackMethod != null)
+			{
+				return invokeWith(callSite, args, type, receiverClass, fallbackMethod, CHECK_CLASS);
+			}
 
-		throw new NoSuchMethodError(callSite.name);
+			throw ex;
+		}
 	}
 
 	public static Object invokeClassMethod(@NonNull InliningCacheCallSite callSite, Object @NonNull [] args)
@@ -164,22 +153,14 @@ public class DynamicLinker
 
 		final Class<?> receiver = (Class<?>) args[0];
 		final MethodType targetType = type.dropParameterTypes(0, 1);
-		final Class<?>[] argumentTypes = targetType.parameterArray();
-		final Method implementationMethod = findMethod(receiver, callSite.name, argumentTypes);
+		final MethodHandle target = callSite.lookup.findStatic(receiver, callSite.name, targetType).asType(targetType);
 
-		if (implementationMethod != null)
-		{
-			// Convert the implementation to a MethodHandle with the desired type
-			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(targetType);
-			return invokeWith(callSite, args, type, receiver, MethodHandles.dropArguments(target, 0, Class.class),
-			                  CHECK_ISCLASS);
-		}
-
-		throw new NoSuchMethodError(callSite.name);
+		return invokeWith(callSite, args, type, receiver, MethodHandles.dropArguments(target, 0, Class.class),
+		                  CHECK_ISCLASS);
 	}
 
 	private static Object invokeVirtual(@NonNull InliningCacheCallSite callSite, Object @NonNull [] args,
-		                                   @NonNull MethodType type) throws Throwable
+		@NonNull MethodType type) throws Throwable
 	{
 		final MethodHandle virtualTarget = callSite.lookup.findVirtual(type.parameterType(0), callSite.name,
 		                                                               type.dropParameterTypes(0, 1));
@@ -188,9 +169,8 @@ public class DynamicLinker
 	}
 
 	private static Object invokeWith(@NonNull InliningCacheCallSite callSite, Object @NonNull [] args,
-		                                @NonNull MethodType type, @NonNull Class<?> receiverClass,
-		                                @NonNull MethodHandle target, @NonNull MethodHandle receiverCheck)
-		throws Throwable
+		@NonNull MethodType type, @NonNull Class<?> receiverClass, @NonNull MethodHandle target,
+		@NonNull MethodHandle receiverCheck) throws Throwable
 	{
 		MethodHandle test = receiverCheck.bindTo(receiverClass);
 		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
@@ -198,6 +178,7 @@ public class DynamicLinker
 		// Creates a method that, when called, first tests the type of the first argument (the receiver) to be the
 		// required receiver type. If that succeeds, the target is called. Otherwise, this invokeDynamic method is
 		// called again
+
 		final MethodHandle guard = MethodHandles.guardWithTest(test, target, callSite.getTarget());
 
 		// Set the guard method as the new callsite target to speed up further invocations

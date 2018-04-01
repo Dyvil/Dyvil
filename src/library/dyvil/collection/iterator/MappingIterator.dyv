@@ -2,16 +2,22 @@ package dyvil.collection.iterator
 
 import java.util.Iterator
 
-class MappingIterator<type F, type T>(let base: Iterator<F>, let mapper: F -> T) implements Iterator<T>
+class MappingIterator<type E, type R>(let base: Iterator<+E>, let mapper: E -> R) implements Iterator<R>
 {
-	static func apply<type F, type T>(base: Iterator<F>, mapper: F -> T) -> MappingIterator<F, T>
+	// Apply Method
+
+	static func apply<type E, type R>(base: Iterator<+E>, mapper: E -> R) -> MappingIterator<E, R>
 	{
-		return new MappingIterator<F, T>(base, mapper)
+		return new MappingIterator<E, R>(base, mapper)
 	}
+
+	// Implementation
 
 	override func hasNext() -> boolean = this.base.hasNext()
 
-	override func next() -> T = this.mapper(this.base.next())
+	override func next() -> R = this.mapper(this.base.next())
+
+	override func remove() -> void = this.base.remove()
 
 	override func toString() -> String = "MappingIterator(\(this.base), mapper: \(this.mapper))"
 }

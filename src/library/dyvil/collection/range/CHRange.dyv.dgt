@@ -60,7 +60,7 @@ class #(TYPE_NAME)Range(
 			let value = this.value
 			if (value LESS_OP this<#(TYPE_NAME)Range>.end)
 			{
-				this.value++
+				this.value += 1
 				return value
 			}
 
@@ -77,13 +77,24 @@ class #(TYPE_NAME)Range(
 		let result = new [PRIMITIVE](this.size)
 		var index = 0
 
-		for (i <- this.start RANGE_OP this.end) result[index++] = i
+		for (i <- this.start RANGE_OP this.end)
+		{
+			result[index] = i
+			index += 1
+		}
 		return result
 	}
 
 	override func copy() -> #(TYPE_NAME)Range = new #(TYPE_NAME)Range(this.start, this.end)
 
-	override func copy(to: [Object!], index: int) -> void = for (i <- this.start RANGE_OP this.end) to[index++] = i
+	override func copy(to: [Object!], index: int) -> void
+	{
+		for (i <- this.start RANGE_OP this.end)
+		{
+			to[index] = i
+			index += 1
+		}
+	}
 
 	override func toString() -> String = "\(this.start) RANGE_OP \(this.end)"
 

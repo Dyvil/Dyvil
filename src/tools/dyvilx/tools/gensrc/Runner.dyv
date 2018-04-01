@@ -26,7 +26,7 @@ class Runner
 		var currentTemplate: Template! = null
 		var templates: List<Template> = new mutable.ArrayList<Template>()
 
-		for (var i = 0; i < argc; i++)
+		for (i <- 0 ..< argc)
 		{
 			let arg = args[i]
 			if (arg.startsWith('output_dir='))
@@ -46,7 +46,7 @@ class Runner
 				currentTemplate = Class.forName(tempName).newInstance() as Template
 				currentTemplate.outputDir = outputDir
 				templates.add(currentTemplate)
-				i++ // skip
+				i += 1 // skip
 				continue
 			}
 

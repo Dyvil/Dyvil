@@ -18,21 +18,31 @@ public final class PowImpl
 
 	public static long pow(long base, int exponent)
 	{
+		if (base == 0)
+		{
+			if (exponent <= 0)
+			{
+				throw new ArithmeticException("0 ** " + exponent);
+			}
+			return 0;
+		}
+		if (base == 1)
+		{
+			return 1;
+		}
+		if (base == -1)
+		{
+			return 1 - ((exponent & 1) << 1); // 1 if even, -1 if odd
+		}
+		if (exponent < 0)
+		{
+			return 0; // always rounded down to 0
+		}
+
 		if (exponent > 63)
 		{
-			if (base == 1)
-			{
-				return 1;
-			}
-
-			if (base == -1)
-			{
-				// -1 if exponent is even, 1 if it's odd
-				return 1 - 2 * (exponent & 1);
-			}
-
 			// this will overflow anyway, but we at least want the "correct" overflow value
-			return pow_rec(base, exponent);
+			return powRec(base, exponent);
 		}
 
 		long result = 1;
@@ -89,7 +99,7 @@ public final class PowImpl
 		}
 	}
 
-	public static long pow_rec(long base, int exponent)
+	private static long powRec(long base, int exponent) /* where |base| > 1, exponent >= 0 */
 	{
 		switch (exponent)
 		{
@@ -98,13 +108,20 @@ public final class PowImpl
 		case 1:
 			return base;
 		}
-		if (exponent < 0) // always rounded down to 0, except when base=1
-		{
-			return base == 1 ? 1 : 0;
-		}
-
 		// Use recursive pow definition, with time complexity O(log n)
-		return ((exponent & 1) == 0 ? 1 : base) * pow_rec(base * base, exponent >> 1);
+		return ((exponent & 1) == 0 ? 1 : base) * powRec(base * base, exponent >> 1);
+	}
+
+	public static BigDecimal pow(@NonNull BigDecimal base, int exponent)
+	{
+		if (exponent < 0)
+		{
+			return BigDecimal.ONE.divide(base.pow(-exponent), RoundingMode.HALF_EVEN);
+		}
+		else
+		{
+			return base.pow(exponent);
+		}
 	}
 
 	// Implementation note:

@@ -9,6 +9,7 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
@@ -121,6 +122,12 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
+	public boolean setReferenceType()
+	{
+		return false;
+	}
+
+	@Override
 	public String getInternalName()
 	{
 		return this.name == null ? null : this.name.qualified;
@@ -153,12 +160,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	public void setIndex(int index)
 	{
 		this.index = index;
-	}
-
-	@Override
-	public void setVarargs()
-	{
-		this.attributes.addFlag(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -198,9 +199,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer)
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
-		IParameter.super.writeInit(writer);
+		IParameter.super.writeInit(writer, value);
 	}
 
 	@Override

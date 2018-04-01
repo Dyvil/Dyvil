@@ -17,7 +17,12 @@ import dyvilx.tools.compiler.ast.expression.access.AbstractCall;
 import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.constant.WildcardValue;
-import dyvilx.tools.compiler.ast.field.*;
+import dyvilx.tools.compiler.ast.field.IAccessible;
+import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.field.VariableThis;
+import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
+import dyvilx.tools.compiler.ast.field.capture.CaptureVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.MapTypeContext;
@@ -36,7 +41,6 @@ import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.transform.CaptureHelper;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
@@ -89,7 +93,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	protected IMethod method;
 
-	protected CaptureHelper captureHelper;
+	protected CaptureHelper<CaptureVariable> captureHelper;
 
 	/**
 	 * The enclosing class internal name
@@ -282,13 +286,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 	}
 
-	private CaptureHelper getCaptureHelper()
+	private CaptureHelper<CaptureVariable> getCaptureHelper()
 	{
 		if (this.captureHelper != null)
 		{
 			return this.captureHelper;
 		}
-		return this.captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
+		return this.captureHelper = new CaptureHelper<>(CaptureVariable.FACTORY);
 	}
 
 	@Override
@@ -513,7 +517,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.parameters.isParameter(variable);
+		return this.parameters.isParameter(variable) //
+		       || this.captureHelper != null && this.captureHelper.isMember(variable);
 	}
 
 	@Override
@@ -783,7 +788,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				{
 					handleType = ClassFormat.H_INVOKESPECIAL;
 				}
-				this.captureHelper.writeCaptures(writer);
+				this.captureHelper.writeCaptures(writer, this.lineNumber());
 			}
 		}
 

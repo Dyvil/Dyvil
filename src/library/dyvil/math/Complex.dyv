@@ -1,8 +1,10 @@
 package dyvil.math
 
+import dyvil.math.group.RingCompatible
+
 @LiteralConvertible.FromDouble
 @LiteralConvertible.FromTuple
-public case class Complex(let real: double, let imag: double) implements ScalarMath<Complex>
+public case class Complex(let real: double, let imag: double) implements RingCompatible<Complex>
 {
 	// Constants
 
@@ -40,6 +42,8 @@ public case class Complex(let real: double, let imag: double) implements ScalarM
 	                prefix func ~(rhs: Complex) -> Complex = Complex(+rhs.real, -rhs.imag)
 
 	override postfix func inverse(lhs: Complex) -> Complex = 1 / lhs
+
+	static func |_|(c: Complex) -> double = c.length
 
 	// Additive Operators
 
@@ -86,6 +90,8 @@ public case class Complex(let real: double, let imag: double) implements ScalarM
 	}
 
 	// Exponentiative Operators
+
+	override infix func **(lhs: Complex, rhs: int) -> Complex = lhs ** (rhs as double)
 
 	// (r * exp(arg * i)) ^ b = r ^ b * exp(arg * i * b)
 	infix func **(lhs: Complex, rhs: double) -> Complex = Complex(length: lhs.length ** rhs, argument: lhs.argument * rhs)

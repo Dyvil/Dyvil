@@ -1,0 +1,27 @@
+package dyvil.collection.iterator
+
+import java.util.Iterator
+import java.util.function.Consumer
+import dyvil.util.ImmutableException
+
+class ImmutableIterator<type E>(let base: Iterator<+E>) implements Iterator<E>
+{
+	// Apply Method
+
+	static func apply<type E>(base: Iterator<+E>) -> ImmutableIterator<E>
+	{
+		return new ImmutableIterator<E>(base)
+	}
+
+	// Implementation
+
+	override func hasNext() -> boolean = this.base.hasNext
+
+	override func next() -> E = this.base.next
+
+	override func remove() -> void = throw new ImmutableException('remove() on immutable Iterator')
+
+	override func forEachRemaining(action: Consumer<-E>!) -> void = this.base.forEachRemaining(action)
+
+	override func toString() -> String = this.base.toString
+}

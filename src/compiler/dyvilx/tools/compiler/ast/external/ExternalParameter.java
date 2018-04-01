@@ -31,6 +31,11 @@ public class ExternalParameter extends AbstractParameter
 
 	private void resolveTypes()
 	{
+		if (this.resolved)
+		{
+			return;
+		}
+
 		this.resolved = true;
 
 		this.resolveTypes(null, ((IExternalCallableMember) this.method).getExternalContext());
@@ -44,23 +49,22 @@ public class ExternalParameter extends AbstractParameter
 	@Override
 	public IType getType()
 	{
-		if (!this.resolved)
-		{
-			this.resolveTypes();
-		}
-
+		this.resolveTypes();
 		return super.getType();
 	}
 
 	@Override
 	public IType getCovariantType()
 	{
-		if (!this.resolved)
-		{
-			this.resolveTypes();
-		}
-
+		this.resolveTypes();
 		return super.getCovariantType();
+	}
+
+	@Override
+	public IType getInternalType()
+	{
+		this.resolveTypes();
+		return super.getInternalType();
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.parser.expression;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.access.ClassConstructor;
+import dyvilx.tools.compiler.ast.expression.access.ClassConstructorCall;
 import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
@@ -120,10 +120,10 @@ public class ConstructorCallParser extends Parser
 	 */
 	private void parseBody(IParserManager pm)
 	{
-		final ClassConstructor classConstructor = this.call.toClassConstructor();
-		this.call = classConstructor;
+		final ClassConstructorCall classConstructorCall = this.call.toClassConstructor();
+		this.call = classConstructorCall;
 
-		final IClass nestedClass = classConstructor.getNestedClass();
+		final IClass nestedClass = classConstructorCall.getNestedClass();
 		final ClassBody body = nestedClass.getBody();
 
 		pm.pushParser(new ClassBodyParser(body), true);

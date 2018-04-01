@@ -2,47 +2,34 @@ package dyvilx.tools.compiler.ast.classes.metadata;
 
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.constructor.CodeConstructor;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.ClassOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.*;
-import dyvilx.tools.compiler.ast.field.EnumConstant;
 import dyvilx.tools.compiler.ast.field.Field;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.CodeMethod;
-import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
 import dyvilx.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvilx.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class EnumClassMetadata extends ClassMetadata
 {
-	private Field      valuesField;
-	private CodeMethod valuesMethod;
-	private CodeMethod fromOrdMethod;
-	private CodeMethod fromNameMethod;
 
 	public EnumClassMetadata(IClass forClass)
 	{
@@ -75,39 +62,29 @@ public class EnumClassMetadata extends ClassMetadata
 	@Override
 	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
-		final ClassBody body = this.theClass.getBody();
-		final IType classType = this.theClass.getClassType();
-		final IType arrayType = new ArrayType(classType, Mutability.IMMUTABLE); // [final TYPE]
+		super.resolveTypesGenerate(markers, context);
 
-		// Initialize $VALUES Field
-		this.initValuesField(body, arrayType);
+		final ClassBody body = this.theClass.createBody();
 
-		// Initialize values Method
-		this.initMethods(classType, arrayType);
+		body.addDataMember(this.createValuesField());
 
-		this.updateConstructors(classType);
-	}
+		body.addMethod(this.createValuesMethod());
 
-	protected void updateConstructors(IType classType)
-	{
+		body.addMethod(this.createFromOrdMethod());
+
+		body.addMethod(this.createFromNameMethod());
+
 		// Replace super initializer calls from constructors
-		for (Candidate<IConstructor> candidates : IContext.resolveConstructors(null, classType, null))
+		for (IConstructor ctor : body.constructors())
 		{
-			final IConstructor constructor = candidates.getMember();
-			this.updateConstructor(constructor);
-		}
-
-		if ((this.members & CONSTRUCTOR) == 0)
-		{
-			this.constructor = new CodeConstructor(this.theClass,
-			                                       AttributeList.of(Modifiers.PROTECTED | Modifiers.GENERATED));
-			this.updateConstructor(this.constructor);
-			this.copyClassParameters(this.constructor);
+			this.updateConstructor(ctor);
 		}
 	}
 
 	private void updateConstructor(IConstructor constructor)
 	{
+		constructor.getAttributes().addFlag(Modifiers.PRIVATE_PROTECTED);
+
 		// Prepend parameters and set super initializer
 		final CodeParameter nameParam = new CodeParameter(constructor, null, Names.name,
 		                                                  new ImplicitNullableType(Types.STRING),
@@ -124,7 +101,8 @@ public class EnumClassMetadata extends ClassMetadata
 		if (initializer == null)
 		{
 			final ArgumentList arguments = new ArgumentList(new FieldAccess(nameParam), new FieldAccess(ordParam));
-			final InitializerCall init = new InitializerCall(null, true, arguments, this.theClass.getSuperType(),
+			final SourcePosition position = constructor.position();
+			final InitializerCall init = new InitializerCall(position, true, arguments, this.theClass.getSuperType(),
 			                                                 enumConstructor);
 			constructor.setInitializer(init);
 			return;
@@ -136,115 +114,107 @@ public class EnumClassMetadata extends ClassMetadata
 		arguments.insert(1, new FieldAccess(ordParam));
 	}
 
-	protected void initValuesField(ClassBody body, IType arrayType)
+	private Field createValuesField()
 	{
-		this.valuesField = new Field(this.theClass, Names.$VALUES, arrayType,
-		                             AttributeList.of(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC));
+		final SourcePosition position = this.theClass.position();
+		final ArrayType type = new ArrayType(this.theClass.getClassType(), Mutability.IMMUTABLE);
+		final AttributeList attributes = AttributeList.of(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC);
+		final Field field = new Field(this.theClass, position, Names.$VALUES, type, attributes);
 
-		final ArrayExpr value = new ArrayExpr();
-		value.setType(arrayType);
+		field.setValue(this.createValuesArray());
 
-		this.valuesField.setValue(value);
-
-		if (body == null)
-		{
-			return;
-		}
-
-		final ArgumentList values = value.getValues();
-		for (int i = 0, count = body.fieldCount(); i < count; i++)
-		{
-			final IField field = body.getField(i);
-			if (!field.hasModifier(Modifiers.ENUM_CONST))
-			{
-				continue;
-			}
-
-			if (field instanceof EnumConstant)
-			{
-				((EnumConstant) field).setIndex(i);
-			}
-
-			values.add(new FieldAccess(field)); // static, no receiver
-		}
+		return field;
 	}
 
-	protected void initMethods(IType classType, IType arrayType)
+	private IValue createValuesArray()
+	{
+		final ArrayExpr arrayExpr = new ArrayExpr();
+		arrayExpr.setElementType(this.theClass.getClassType());
+
+		final ClassBody body = this.theClass.getBody();
+		if (body != null)
+		{
+			final ArgumentList values = arrayExpr.getValues();
+			for (IField enumConstant : body.enumConstants())
+			{
+				values.add(new FieldAccess(enumConstant));
+			}
+		}
+
+		return arrayExpr;
+	}
+
+	private CodeMethod createValuesMethod()
 	{
 		// public static func values() -> [final EnumType]
-		this.valuesMethod = new CodeMethod(this.theClass, Names.values, arrayType,
-		                                   AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 
-		final Name from = Name.fromRaw("from");
+		final SourcePosition position = this.theClass.position();
+		final ArrayType type = new ArrayType(this.theClass.getClassType());
+		final AttributeList attributes = AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC);
+		final CodeMethod method = new CodeMethod(this.theClass, Names.values, type, attributes);
 
-		// public static func valueOf(ordinal: int) -> EnumType
-		this.fromOrdMethod = new CodeMethod(this.theClass, from, classType,
-		                                    AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
-		this.fromOrdMethod.setInternalName("valueOf");
-		this.fromOrdMethod.getParameters().add(new CodeParameter(Name.fromRaw("ordinal"), Types.INT));
+		method.setPosition(position);
 
-		// public static func valueOf(name: String) -> EnumType
-		this.fromNameMethod = new CodeMethod(this.theClass, from, classType,
-		                                     AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
-		this.fromNameMethod.setInternalName("valueOf");
-		this.fromNameMethod.getParameters().add(new CodeParameter(Name.fromRaw("name"), Types.STRING));
+		// = $VALUES.copy()
+
+		final FieldAccess valuesField = new FieldAccess(position, null, Names.$VALUES);
+		final MethodCall cloneCall = new MethodCall(position, valuesField, Name.fromRaw("copy"), ArgumentList.EMPTY);
+
+		method.setValue(cloneCall);
+
+		return method;
 	}
 
-	@Override
-	public void resolve(MarkerList markers, IContext context)
+	private CodeMethod createFromOrdMethod()
 	{
-		super.resolve(markers, context);
+		// @BytecodeName("valueOf")
+		// public static func from(ordinal: int) -> EnumType
 
-		// $VALUES.copy()
-		final MethodCall cloneCall = new MethodCall(null, new FieldAccess(this.valuesField), Name.fromRaw("copy"),
-		                                            ArgumentList.EMPTY);
+		final SourcePosition position = this.theClass.position();
+		final IType type = this.theClass.getClassType();
+		final CodeMethod method = new CodeMethod(this.theClass, Name.fromRaw("from"), type,
+		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
 
-		this.valuesMethod.setValue(cloneCall.resolve(markers, context));
+		method.setPosition(position);
+		method.setInternalName("valueOf");
 
-		final IParameter ordParam = this.fromOrdMethod.getParameters().get(0);
-		final IParameter nameParam = this.fromNameMethod.getParameters().get(0);
+		final CodeParameter parameter = new CodeParameter(Name.fromRaw("ordinal"), Types.INT);
+		method.getParameters().add(parameter);
 
-		// $VALUES[ordinal]
-		final SubscriptAccess getCall = new SubscriptAccess(null, new FieldAccess(this.valuesField),
-		                                                    new ArgumentList(new FieldAccess(ordParam)));
-		this.fromOrdMethod.setValue(getCall.resolve(markers, this.fromOrdMethod));
+		// = $VALUES[ordinal]
 
-		// Enum.valueOf(class<EnumType>, name)
-		final MethodCall valueOfCall = new MethodCall(null, new ClassAccess(Types.ENUM), Name.fromRaw("valueOf"),
+		final FieldAccess valuesField = new FieldAccess(position, null, Names.$VALUES);
+		final SubscriptAccess getCall = new SubscriptAccess(position, valuesField,
+		                                                    new ArgumentList(new FieldAccess(parameter)));
+		method.setValue(getCall);
+
+		return method;
+	}
+
+	private CodeMethod createFromNameMethod()
+	{
+		// @BytecodeName("valueOf")
+		// public static func from(name: String) -> EnumType
+
+		final SourcePosition position = this.theClass.position();
+		final IType type = this.theClass.getClassType();
+		final CodeMethod method = new CodeMethod(this.theClass, Name.fromRaw("from"), type,
+		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
+
+		method.setPosition(position);
+		method.setInternalName("valueOf");
+
+		final CodeParameter parameter = new CodeParameter(Name.fromRaw("name"), Types.STRING);
+		method.getParameters().add(parameter);
+
+		// = Enum.valueOf(class<EnumType>, name)
+
+		final MethodCall valueOfCall = new MethodCall(position, new ClassAccess(Types.ENUM), Name.fromRaw("valueOf"),
 		                                              new ArgumentList(new ClassOperator(this.theClass.getClassType()),
-		                                                               new FieldAccess(nameParam)));
-		this.fromNameMethod.setValue(valueOfCall.resolve(markers, this.fromNameMethod));
-	}
+		                                                               new FieldAccess(parameter)));
 
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return name == Names.$VALUES ? this.valuesField : super.resolveField(name);
-	}
+		method.setValue(valueOfCall);
 
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
-	{
-		super.getMethodMatches(list, receiver, name, arguments);
-		this.valuesMethod.checkMatch(list, receiver, name, arguments);
-		this.fromOrdMethod.checkMatch(list, receiver, name, arguments);
-		this.fromNameMethod.checkMatch(list, receiver, name, arguments);
-	}
-
-	@Override
-	public void writeStaticInitPost(MethodWriter writer) throws BytecodeException
-	{
-		super.writeStaticInitPost(writer);
-		this.valuesField.writeStaticInit(writer);
-	}
-
-	@Override
-	public void writePost(ClassWriter writer) throws BytecodeException
-	{
-		super.writePost(writer);
-		this.valuesField.write(writer);
-		this.valuesMethod.write(writer);
-		this.fromOrdMethod.write(writer);
-		this.fromNameMethod.write(writer);
+		return method;
 	}
 }

@@ -1,0 +1,14 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+object EmptyIterator implements Iterator<none>
+{
+	static func apply<type E>() -> Iterator<E> = EmptyIterator as Iterator
+
+	override func hasNext() -> boolean = false
+
+	override func next() -> none = throw new NoSuchElementException
+
+	override func remove() -> void = throw new NoSuchElementException
+}

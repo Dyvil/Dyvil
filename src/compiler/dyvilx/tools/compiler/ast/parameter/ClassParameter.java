@@ -80,12 +80,6 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public boolean isAssigned()
-	{
-		return true;
-	}
-
-	@Override
 	public ICallableMember getMethod()
 	{
 		return this.constructor;
@@ -118,12 +112,6 @@ public class ClassParameter extends Field implements IParameter
 		}
 
 		return this.covariantType = this.type.asParameterType();
-	}
-
-	@Override
-	public void setVarargs()
-	{
-		this.attributes.addFlag(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -259,11 +247,5 @@ public class ClassParameter extends Field implements IParameter
 	public void writeParameter(MethodWriter writer)
 	{
 		IParameter.super.writeParameter(writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
-	{
-		IParameter.super.writeInit(writer);
 	}
 }

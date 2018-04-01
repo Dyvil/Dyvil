@@ -140,7 +140,7 @@ public final class ThisExpr implements IValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE);
-		if (context.isStaticOnly())
+		if (!context.isThisAvailable())
 		{
 			markers.add(Markers.semanticError(this.position, "this.access.static"));
 			return;

@@ -161,7 +161,7 @@ public final class MarkerList implements Iterable<Marker>
 	@Override
 	public Iterator<Marker> iterator()
 	{
-		return new ArrayIterator<>(this.markers, this.markerCount);
+		return new ArrayIterator<>(this.markers, 0, this.markerCount);
 	}
 
 	@Override
