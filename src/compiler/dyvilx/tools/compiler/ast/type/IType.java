@@ -252,18 +252,18 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 	default boolean isSuperClassOf(IType subType)
 	{
-		final IClass superClass = this.getTheClass();
-		if (superClass == null)
+		final IClass thisClass = this.getTheClass();
+		if (thisClass == null)
 		{
 			return false;
 		}
-		if (superClass == Types.OBJECT_CLASS)
+		if (thisClass == Types.OBJECT_CLASS)
 		{
-			return true;
+			return !subType.isPrimitive();
 		}
 
 		final IClass subClass = subType.getTheClass();
-		return subClass != null && (subClass == superClass || subClass.isSubClassOf(this));
+		return subClass != null && (subClass == thisClass || subClass.isSubClassOf(this));
 	}
 
 	boolean isSameType(IType type);

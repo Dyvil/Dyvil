@@ -10,6 +10,7 @@ import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.CastOperator;
 import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.*;
@@ -235,7 +236,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public final IType getObjectType()
 	{
-		return new ClassType(this.wrapperClass);
+		return this.wrapperClass.getClassType();
 	}
 
 	@Override
@@ -338,7 +339,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return this.wrapperClass;
+		return null;
 	}
 
 	@Override
@@ -348,16 +349,51 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType subType)
+	public boolean isSameType(IType type)
 	{
-		return this.wrapperClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(
-			subType.getTypecode(), this.typecode);
+		return this.typecode == type.getTypecode();
 	}
 
 	@Override
-	public boolean isSameType(IType type)
+	public boolean isSameClass(IType type)
 	{
-		return this.wrapperClass == type.getTheClass();
+		return this.isSameType(type);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return this.isSameType(subType);
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return this.isSameType(subType);
+	}
+
+	@Override
+	public boolean isConvertibleTo(IType type)
+	{
+		return Types.isSuperType(type, this.getObjectType()) || isPromotable(this.typecode, type.getTypecode());
+	}
+
+	@Override
+	public boolean isConvertibleFrom(IType type)
+	{
+		return type.getTheClass() == this.wrapperClass || isPromotable(type.getTypecode(), this.typecode);
+	}
+
+	@Override
+	public IValue convertFrom(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.isConvertibleFrom(type) ? new CastOperator(value, this) : null;
+	}
+
+	@Override
+	public IValue convertTo(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.isConvertibleTo(type) ? new CastOperator(value, type) : null;
 	}
 
 	private static long bitMask(int from, int to)
@@ -367,13 +403,7 @@ public final class PrimitiveType implements IType
 
 	private static boolean isPromotable(int from, int to)
 	{
-		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
-	}
-
-	@Override
-	public boolean isSameClass(IType type)
-	{
-		return type == this;
+		return from > 0 && to > 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
 	}
 
 	@Override
