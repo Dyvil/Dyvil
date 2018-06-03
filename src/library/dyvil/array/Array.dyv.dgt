@@ -88,7 +88,7 @@ public abstract class #(TYPE_NAME)Array
 		{
 			let array = APPLY_T((to - from + 1)#if (RANGE_CAST) { as int})
 			var index = 0
-			for (i <- from .. to) { array[index] = i; index += 1 }
+			for (i <- from .. to) { array[index] = #if (IS_SUBRANGE) {i as T} #else {i}; index += 1 }
 			return array
 		}
 
@@ -97,7 +97,7 @@ public abstract class #(TYPE_NAME)Array
 		{
 			let array = APPLY_T((toExclusive - from)#if (RANGE_CAST) { as int})
 			var index = 0
-			for (i <- from ..< toExclusive) { array[index] = i; index += 1 }
+			for (i <- from ..< toExclusive) { array[index] = #if (IS_SUBRANGE) {i as T} #else {i}; index += 1 }
 			return array
 		}
 	}
@@ -396,11 +396,16 @@ public abstract class #(TYPE_NAME)Array
 		}
 	}
 
-	implicit inline infix func asIterable GENERIC(array: [T]) -> Iterable<T> = array.toList
+	implicit inline infix func asIterable GENERIC(array: [T]) -> Iterable<WRAPPER> = array.toList
 
-	implicit inline infix func asList GENERIC(array: [final T]) -> ImmutableList<T> = array.toList
+	#if (TYPE_NAME == 'Object') {
+		implicit inline infix func asList<T>(array: [final T]) -> ImmutableList<WRAPPER> = array.toList
 
-	infix func toList GENERIC(array: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(#if (TYPE_NAME == 'Object') {array} #else {array.boxed, trusted: true})
+		infix func toList<type T>(array: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(array)
+	}
+	#else {
+		infix func toList(array: [T]) -> ImmutableList<WRAPPER> = new immutable.ArrayList<WRAPPER>(array.boxed, trusted: true)
+	}
 
 	// equals, hashCode and toString
 
@@ -467,8 +472,8 @@ public abstract class #(TYPE_NAME)Array
 			builder.append(']')
 		}
 		#else {
-			builder.append('[').append(array[0])
-			for (i <- 1 ..< size) builder.append(', ').append(array[i])
+			builder.append('[').append(array[0] #if (IS_SUBRANGE) {as int})
+			for (i <- 1 ..< size) builder.append(', ').append(array[i] #if (IS_SUBRANGE) {as int})
 			builder.append(']')
 		}
 	}
