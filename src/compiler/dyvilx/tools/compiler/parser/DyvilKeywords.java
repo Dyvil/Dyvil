@@ -14,46 +14,47 @@ public class DyvilKeywords
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
 	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
-	public static final int ENUM         = Tokens.KEYWORD | 0x000B0000;
-	public static final int EXPLICIT     = Tokens.KEYWORD | 0x00330000;
-	public static final int EXTENDS      = Tokens.KEYWORD | 0x000C0000;
-	public static final int EXTENSION    = Tokens.KEYWORD | 0x000D0000;
-	public static final int FALSE        = Tokens.KEYWORD | 0x000E0000;
-	public static final int FINAL        = Tokens.KEYWORD | 0x000F0000;
-	public static final int FINALLY      = Tokens.KEYWORD | 0x00100000;
-	public static final int FOR          = Tokens.KEYWORD | 0x00110000;
-	public static final int FUNC         = Tokens.KEYWORD | 0x00120000;
-	public static final int GOTO         = Tokens.KEYWORD | 0x00130000;
-	public static final int HEADER       = Tokens.KEYWORD | 0x00140000;
-	public static final int IF           = Tokens.KEYWORD | 0x00150000;
-	public static final int IMPLEMENTS   = Tokens.KEYWORD | 0x00160000;
-	public static final int IMPLICIT     = Tokens.KEYWORD | 0x00170000;
-	public static final int IMPORT       = Tokens.KEYWORD | 0x00180000;
-	public static final int INFIX        = Tokens.KEYWORD | 0x001A0000;
-	public static final int INIT         = Tokens.KEYWORD | 0x001B0000;
-	public static final int INLINE       = Tokens.KEYWORD | 0x001C0000;
-	public static final int INTERFACE    = Tokens.KEYWORD | 0x001D0000;
-	public static final int INTERNAL     = Tokens.KEYWORD | 0x001E0000;
-	public static final int IS           = Tokens.KEYWORD | 0x001F0000;
-	public static final int LABEL        = Tokens.KEYWORD | 0x00200000;
-	public static final int LAZY         = Tokens.KEYWORD | 0x00210000;
-	public static final int LET          = Tokens.KEYWORD | 0x00220000;
-	public static final int MACRO        = Tokens.KEYWORD | 0x00230000; // unused
-	public static final int MATCH        = Tokens.KEYWORD | 0x00240000;
-	public static final int NEW          = Tokens.KEYWORD | 0x00250000;
-	public static final int NIL          = Tokens.KEYWORD | 0x00260000; // unused
-	public static final int NULL         = Tokens.KEYWORD | 0x00270000;
-	public static final int OBJECT       = Tokens.KEYWORD | 0x00280000;
-	public static final int OVERRIDE     = Tokens.KEYWORD | 0x00290000;
-	public static final int OPERATOR     = Tokens.KEYWORD | 0x002A0000;
-	public static final int PACKAGE      = Tokens.KEYWORD | 0x002B0000;
-	public static final int POSTFIX      = Tokens.KEYWORD | 0x002C0000;
-	public static final int PREFIX       = Tokens.KEYWORD | 0x002D0000;
-	public static final int PRIVATE      = Tokens.KEYWORD | 0x002E0000;
-	public static final int PROTECTED    = Tokens.KEYWORD | 0x002F0000;
-	public static final int PUBLIC       = Tokens.KEYWORD | 0x00300000;
-	public static final int REPEAT       = Tokens.KEYWORD | 0x00310000;
-	public static final int RETURN       = Tokens.KEYWORD | 0x00320000;
+	public static final int ENUM         = Tokens.KEYWORD | 0x000B0000; // unused
+	public static final int EXPLICIT     = Tokens.KEYWORD | 0x000C0000;
+	public static final int EXTENDS      = Tokens.KEYWORD | 0x000D0000;
+	public static final int EXTENSION    = Tokens.KEYWORD | 0x000E0000;
+	public static final int FALLTHROUGH  = Tokens.KEYWORD | 0x000F0000;
+	public static final int FALSE        = Tokens.KEYWORD | 0x00100000;
+	public static final int FINAL        = Tokens.KEYWORD | 0x00110000;
+	public static final int FINALLY      = Tokens.KEYWORD | 0x00120000;
+	public static final int FOR          = Tokens.KEYWORD | 0x00130000;
+	public static final int FUNC         = Tokens.KEYWORD | 0x00140000;
+	public static final int GOTO         = Tokens.KEYWORD | 0x00150000;
+	public static final int HEADER       = Tokens.KEYWORD | 0x00160000;
+	public static final int IF           = Tokens.KEYWORD | 0x00170000;
+	public static final int IMPLEMENTS   = Tokens.KEYWORD | 0x00180000;
+	public static final int IMPLICIT     = Tokens.KEYWORD | 0x00190000;
+	public static final int IMPORT       = Tokens.KEYWORD | 0x001A0000;
+	public static final int INFIX        = Tokens.KEYWORD | 0x001B0000;
+	public static final int INIT         = Tokens.KEYWORD | 0x001C0000;
+	public static final int INLINE       = Tokens.KEYWORD | 0x001D0000;
+	public static final int INTERFACE    = Tokens.KEYWORD | 0x001E0000;
+	public static final int INTERNAL     = Tokens.KEYWORD | 0x001F0000;
+	public static final int IS           = Tokens.KEYWORD | 0x00200000;
+	public static final int LABEL        = Tokens.KEYWORD | 0x00210000;
+	public static final int LAZY         = Tokens.KEYWORD | 0x00220000;
+	public static final int LET          = Tokens.KEYWORD | 0x00230000;
+	public static final int MACRO        = Tokens.KEYWORD | 0x00240000; // unused
+	public static final int MATCH        = Tokens.KEYWORD | 0x00250000;
+	public static final int NEW          = Tokens.KEYWORD | 0x00260000;
+	public static final int NIL          = Tokens.KEYWORD | 0x00270000; // unused
+	public static final int NULL         = Tokens.KEYWORD | 0x00280000;
+	public static final int OBJECT       = Tokens.KEYWORD | 0x00290000;
+	public static final int OVERRIDE     = Tokens.KEYWORD | 0x002A0000;
+	public static final int OPERATOR     = Tokens.KEYWORD | 0x002B0000;
+	public static final int PACKAGE      = Tokens.KEYWORD | 0x002C0000;
+	public static final int POSTFIX      = Tokens.KEYWORD | 0x002D0000;
+	public static final int PREFIX       = Tokens.KEYWORD | 0x002E0000;
+	public static final int PRIVATE      = Tokens.KEYWORD | 0x002F0000;
+	public static final int PROTECTED    = Tokens.KEYWORD | 0x00300000;
+	public static final int PUBLIC       = Tokens.KEYWORD | 0x00310000;
+	public static final int REPEAT       = Tokens.KEYWORD | 0x00320000;
+	public static final int RETURN       = Tokens.KEYWORD | 0x00330000;
 	public static final int STATIC       = Tokens.KEYWORD | 0x00340000;
 	public static final int STRUCT       = Tokens.KEYWORD | 0x00350000; // unused
 	public static final int SUPER        = Tokens.KEYWORD | 0x00360000;
@@ -90,6 +91,7 @@ public class DyvilKeywords
 		case "explicit": return EXPLICIT;
 		case "extends": return EXTENDS;
 		case "extension": return EXTENSION;
+		case "fallthrough": return FALLTHROUGH;
 		case "false": return FALSE;
 		case "final": return FINAL;
 		case "finally": return FINALLY;
@@ -166,6 +168,7 @@ public class DyvilKeywords
 		case EXPLICIT: return "explicit";
 		case EXTENDS: return "extends";
 		case EXTENSION: return "extension";
+		case FALLTHROUGH: return "fallthrough";
 		case FALSE: return "false";
 		case FINAL: return "final";
 		case FINALLY: return "finally";
