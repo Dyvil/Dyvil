@@ -5,6 +5,7 @@ class LibraryGenConstants
 {
 	public const MAX_ARITY: int = 20
 
+	public const VOID_SPEC:    Specialization = spec 'src/gensrc-base/Base-Void.dgs'
 	public const BOOLEAN_SPEC: Specialization = spec 'src/gensrc-base/Base-Boolean.dgs'
 	public const BYTE_SPEC:    Specialization = spec 'src/gensrc-base/Base-Byte.dgs'
 	public const SHORT_SPEC:   Specialization = spec 'src/gensrc-base/Base-Short.dgs'
@@ -13,6 +14,7 @@ class LibraryGenConstants
 	public const LONG_SPEC:    Specialization = spec 'src/gensrc-base/Base-Long.dgs'
 	public const FLOAT_SPEC:   Specialization = spec 'src/gensrc-base/Base-Float.dgs'
 	public const DOUBLE_SPEC:  Specialization = spec 'src/gensrc-base/Base-Double.dgs'
+	public const OBJECT_SPEC:  Specialization = spec 'src/gensrc-base/Base-Object.dgs'
 
 	public const MAIN_SPECS: [Specialization] = [ INT_SPEC, LONG_SPEC, FLOAT_SPEC, DOUBLE_SPEC ]
 

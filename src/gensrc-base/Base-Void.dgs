@@ -1,0 +1,7 @@
+@base=true
+
+TYPE_NAME=Void
+PRIMITIVE=void
+WRAPPER=Void
+DESC_CHAR=V
+DEFAULT_VALUE=()

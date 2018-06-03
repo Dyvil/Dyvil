@@ -3,6 +3,7 @@
 TYPE_NAME=Object
 PRIMITIVE=T
 ERASURE=Object!
+DESC_CHAR=L
 
 IS_GENERIC=true
 
