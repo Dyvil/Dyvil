@@ -1,5 +1,19 @@
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
+#using(dyvil.array.ArrayOperators._)
+
+#let(OBJ_SPEC = LibraryGenConstants.OBJECT_SPEC)
+#let(PARAM_SPECS = LibraryGenConstants.MAIN_SPECS + OBJ_SPEC)
+#let(RETURN_SPECS = [ LibraryGenConstants.VOID_SPEC, LibraryGenConstants.BOOLEAN_SPEC ] ++ PARAM_SPECS)
+
+#func(desc(spec: dyvilx.tools.gensrc.Specialization) -> String = spec['DESC_CHAR'])
+#func(gnrc(spec: dyvilx.tools.gensrc.Specialization, par: String) -> String = spec == OBJ_SPEC ? "type \(par)," : " " * (6 + par.length))
+#func(prim(spec: dyvilx.tools.gensrc.Specialization, par: String) -> String
+	{
+		let text = spec == OBJ_SPEC ? par : spec['PRIMITIVE'];
+		return text ++ (" " * (7 - text.length))
+	}
+)
 
 package dyvil.function
 
@@ -7,16 +21,24 @@ abstract class Function
 {
 	private init() {} // no instances
 
-	@FunctionalInterface
 	interface Of0<type +R>
 	{
 		func apply() -> R
+
+		// Specializations
+		#for (rspec <- RETURN_SPECS) {
+			#if (rspec != OBJ_SPEC) {
+				#let(R = prim(rspec, 'R'))
+
+				interface _#desc(rspec) <#gnrc(rspec, '+R')> extends Of0<R> { override func apply() -> R }
+			}
+		}
+
 	}
 
-	@FunctionalInterface
 	interface Of1<type -P1, type +R>
 	{
-		func apply(_ par1: P1) -> R
+		func apply(_ : P1) -> R
 
 		infix func compose<A, B, C>(_ f: B -> C, _ g: A -> B) -> (A -> C) = x => f(g(x))
 
@@ -43,24 +65,48 @@ abstract class Function
 		*/
 
 		static func identity<T> -> (T -> T) = x => x
+
+		// Specializations
+		#for (p1spec <- PARAM_SPECS) {
+			#for (rspec <- RETURN_SPECS) {
+				#if (p1spec != OBJ_SPEC || rspec != OBJ_SPEC) {
+					#let(P1 = prim(p1spec, 'P1'))
+					#let(R  = prim(rspec, 'R'))
+
+					interface _#desc(p1spec)#desc(rspec) <#gnrc(p1spec, '-P1') #gnrc(rspec, '+R')> extends Of1<P1, R> { override func apply(_ : P1) -> R }
+				}
+			}
+		}
+
 	}
 
-	@FunctionalInterface
 	interface Of2<type -P1, type -P2, type +R>
 	{
-		func apply(_ par1: P1, _ par2: P2) -> R
+		func apply(_ : P1, _ : P2) -> R
 
 		postfix func curried<A, B, C>(_ f: (A, B) -> C) -> (A -> B -> C) = p1 => p2 => f(p1, p2)
 
 		postfix func tupled<A, B, C>(_ f: (A, B) -> C) -> (((A, B)) -> C) = tuple => f(tuple._1, tuple._2)
+
+		// Specializations
+		#for (p1spec <- PARAM_SPECS) {
+			#for (p2spec <- PARAM_SPECS) {
+				#for (rspec <- RETURN_SPECS) {
+					#if (p1spec != OBJ_SPEC || p2spec != OBJ_SPEC || rspec != OBJ_SPEC) {
+						#let(P1 = prim(p1spec, 'P1'))
+						#let(P2 = prim(p2spec, 'P2'))
+						#let(R  = prim(rspec, 'R'))
+
+						interface _#desc(p1spec)#desc(p2spec)#desc(rspec) <#gnrc(p1spec, '-P1') #gnrc(p2spec, '-P2') #gnrc(rspec, '+R')> extends Of2<P1, P2, R> { override func apply(_ : P1, _ : P2) -> R }
+					}
+				}
+			}
+		}
+
 	}
 
 	#for (ARITY <- 3 .. LibraryGenConstants.MAX_ARITY) {
 
-		@FunctionalInterface
-		interface Of#(ARITY)<#for (INDEX <- 1 .. ARITY) {type -P#(INDEX), }type +R>
-		{
-			func apply(_ par1: P1#for (INDEX <- 2 .. ARITY) {, _ par#(INDEX): P#(INDEX)}) -> R
-		}
+		interface Of#(ARITY)<#for (INDEX <- 1 .. ARITY) {type -P#(INDEX), }type +R> { func apply(_ : P1#for (INDEX <- 2 .. ARITY) {, _ : P#(INDEX)}) -> R }
 	}
 }
