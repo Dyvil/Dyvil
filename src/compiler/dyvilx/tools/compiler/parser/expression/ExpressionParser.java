@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.statement.ReturnStatement;
 import dyvilx.tools.compiler.ast.statement.SyncStatement;
 import dyvilx.tools.compiler.ast.statement.control.BreakStatement;
 import dyvilx.tools.compiler.ast.statement.control.ContinueStatement;
+import dyvilx.tools.compiler.ast.statement.control.FallthroughStatement;
 import dyvilx.tools.compiler.ast.statement.control.GoToStatement;
 import dyvilx.tools.compiler.ast.statement.exception.ThrowStatement;
 import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
@@ -947,6 +948,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.skip();
 			}
 
+			this.mode = END;
+			return true;
+		}
+		case DyvilKeywords.FALLTHROUGH:
+		{
+			this.value = new FallthroughStatement(token.raw());
 			this.mode = END;
 			return true;
 		}

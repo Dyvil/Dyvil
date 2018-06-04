@@ -111,9 +111,10 @@ public interface IValue extends ASTNode, ITyped, WriteableExpression
 	int SYNCHRONIZED = 200;
 
 	// Jump Statements
-	int BREAK    = 214;
-	int CONTINUE = 215;
-	int GOTO     = 216;
+	int BREAK       = 214;
+	int CONTINUE    = 215;
+	int GOTO        = 216;
+	int FALLTHROUGH = 217;
 
 	// Pseudo-Expressions
 	int VARIABLE         = 232;
