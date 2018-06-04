@@ -34,4 +34,11 @@ public class CombiningLabelContext implements ILabelContext
 		final Label inner = this.inner.getContinueLabel();
 		return inner != null ? inner : this.outer.getContinueLabel();
 	}
+
+	@Override
+	public Label getFallthroughLabel()
+	{
+		final Label inner = this.inner.getFallthroughLabel();
+		return inner != null ? inner : this.outer.getFallthroughLabel();
+	}
 }

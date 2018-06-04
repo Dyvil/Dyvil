@@ -10,4 +10,6 @@ public interface ILabelContext
 	Label getBreakLabel();
 
 	Label getContinueLabel();
+
+	Label getFallthroughLabel();
 }
