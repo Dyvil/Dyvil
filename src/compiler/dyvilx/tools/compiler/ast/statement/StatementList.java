@@ -324,18 +324,6 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public Label getContinueLabel()
-	{
-		return null;
-	}
-
-	@Override
-	public Label getBreakLabel()
-	{
-		return null;
-	}
-
-	@Override
 	public boolean isMember(IVariable variable)
 	{
 		return this.variables != null && this.variables.contains(variable);

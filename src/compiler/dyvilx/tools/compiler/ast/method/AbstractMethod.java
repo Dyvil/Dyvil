@@ -336,18 +336,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public dyvilx.tools.compiler.ast.statement.control.Label getBreakLabel()
-	{
-		return null;
-	}
-
-	@Override
-	public dyvilx.tools.compiler.ast.statement.control.Label getContinueLabel()
-	{
-		return null;
-	}
-
-	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		// Handled by enclosing class
