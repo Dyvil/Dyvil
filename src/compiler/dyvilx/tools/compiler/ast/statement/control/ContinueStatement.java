@@ -42,7 +42,7 @@ public class ContinueStatement extends JumpStatement
 
 		if (!(this.label.value instanceof ILoop))
 		{
-			markers.add(Markers.semanticError(this.position, "continue.invalid.type", this.name));
+			markers.add(Markers.semanticError(this.position, "continue.invalid.target", this.name));
 			return;
 		}
 

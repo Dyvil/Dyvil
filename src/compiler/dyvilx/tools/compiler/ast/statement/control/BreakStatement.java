@@ -42,7 +42,7 @@ public class BreakStatement extends JumpStatement
 
 		if (!(this.label.value instanceof ILoop))
 		{
-			markers.add(Markers.semanticError(this.position, "break.invalid.type", this.name));
+			markers.add(Markers.semanticError(this.position, "break.invalid.target", this.name));
 			return;
 		}
 
