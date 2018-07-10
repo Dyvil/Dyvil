@@ -101,6 +101,12 @@ public class ModifierParser
 			return Modifiers.ENUM_CLASS;
 		case DyvilKeywords.OBJECT:
 			return Modifiers.OBJECT_CLASS;
+		case DyvilKeywords.EXTENSION:
+			if (token.next().type() != DyvilKeywords.FUNC)
+			{
+				return Modifiers.EXTENSION_CLASS;
+			}
+			return -1;
 		}
 		return -1;
 	}
