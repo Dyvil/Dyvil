@@ -145,10 +145,6 @@ public class SourceFileParser extends AbstractMemberParser
 			}
 			// Fallthrough
 		case CLASS:
-			if (this.parseAttribute(pm, token))
-			{
-				return;
-			}
 			final int classType;
 			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
@@ -161,6 +157,10 @@ public class SourceFileParser extends AbstractMemberParser
 				pm.pushParser(new ClassDeclarationParser(this.unit, this.attributes));
 				this.attributes = new AttributeList(); // reset
 				this.mode = SEPARATOR;
+				return;
+			}
+			if (this.parseAttribute(pm, token))
+			{
 				return;
 			}
 		}

@@ -1,11 +1,9 @@
 package dyvilx.tools.compiler.parser.classes;
 
-import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.annotation.ModifierParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.parsing.IParserManager;
@@ -105,13 +103,6 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				return;
 			}
 
-			final Modifier modifier;
-			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
-			{
-				this.attributes.add(modifier);
-				return;
-			}
-
 			int classType;
 			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
@@ -122,10 +113,8 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				return;
 			}
 
-			// This is not in the above switch because 'readClassTypeModifier' above has to check for '@ interface' first
-			if (type == DyvilSymbols.AT)
+			if (this.parseAttribute(pm, token))
 			{
-				this.parseAnnotation(pm, token);
 				return;
 			}
 
