@@ -123,6 +123,8 @@ public interface Modifiers
 	 */
 	int MANDATED = 0x00008000;
 
+	int EXTENSION_FLAG = 0x00080000;
+
 	// Type Modifiers
 
 	int OBJECT = 0x00010000;
@@ -157,6 +159,8 @@ public interface Modifiers
 
 	int ANNOTATION_CLASS = ANNOTATION | INTERFACE_CLASS;
 
+	int EXTENSION_CLASS = EXTENSION_FLAG;
+
 	// Method Modifiers
 
 	/**
@@ -172,8 +176,6 @@ public interface Modifiers
 	 * virtually has the receiver as the first parameter. An infix method is always static.
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
-
-	int EXTENSION_FLAG = 0x00080000;
 
 	int EXTENSION = EXTENSION_FLAG | INFIX;
 
