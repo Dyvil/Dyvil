@@ -209,6 +209,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.typeParameters = new TypeParameterList();
 	}
 
+	@Override
+	public void setTypeParameters(TypeParameterList typeParameters)
+	{
+		this.typeParameters = typeParameters;
+	}
+
 	// Class Parameters
 
 	@Override

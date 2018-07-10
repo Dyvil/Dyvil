@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametricMember;
+import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilable;
@@ -108,6 +109,11 @@ public interface IClass
 	TypeList getInterfaces();
 
 	// Generics
+
+	@Override
+	TypeParameterList getTypeParameters();
+
+	void setTypeParameters(TypeParameterList typeParameters);
 
 	IType resolveType(ITypeParameter typeVar, IType concrete);
 
