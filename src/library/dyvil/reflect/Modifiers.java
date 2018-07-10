@@ -142,6 +142,7 @@ public interface Modifiers
 	 */
 	int CASE_CLASS = 0x00020000;
 
+	int EXTENSION_CLASS = 0x00040000;
 
 	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
 
@@ -153,8 +154,6 @@ public interface Modifiers
 	int TRAIT_CLASS = TRAIT | INTERFACE_CLASS;
 
 	int ANNOTATION_CLASS = ANNOTATION | INTERFACE_CLASS;
-
-	int EXTENSION_CLASS = EXTENSION_FLAG;
 
 	// Method Modifiers
 
