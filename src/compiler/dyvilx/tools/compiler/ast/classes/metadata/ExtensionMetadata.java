@@ -1,25 +1,23 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
+import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.generic.ITypeParametric;
-import dyvilx.tools.compiler.ast.generic.TypeParameterList;
+import dyvilx.tools.compiler.ast.header.IClassCompilableList;
+import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ExtensionMetadata implements IClassMetadata, ITypeParametric
+public class ExtensionMetadata implements IClassMetadata
 {
-	private IType extendedType;
+	private final IClass theClass;
 
-	public IType getExtendedType()
+	public ExtensionMetadata(IClass theClass)
 	{
-		return this.extendedType;
-	}
-
-	public void setExtendedType(IType type)
-	{
-		this.extendedType = type;
+		this.theClass = theClass;
 	}
 
 	@Override
@@ -28,24 +26,20 @@ public class ExtensionMetadata implements IClassMetadata, ITypeParametric
 		return MemberKind.CLASS;
 	}
 
-	// Type Parametric
+	// Phases
 
 	@Override
-	public boolean isTypeParametric()
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		return false;
+		this.theClass.setPosition(this.theClass.getSuperType().getPosition());
+		this.theClass.setName(Name.fromQualified("extension_" + this.theClass.getSuperType().getInternalName().replace('/', '_')));
 	}
 
 	@Override
-	public TypeParameterList getTypeParameters()
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		return null;
-	}
-
-	@Override
-	public IContext getTypeParameterContext()
-	{
-		return null;
+		this.theClass.setSuperType(Types.OBJECT);
+		this.theClass.setTypeParameters(null);
 	}
 
 	// Compilation

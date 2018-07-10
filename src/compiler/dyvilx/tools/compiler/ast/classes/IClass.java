@@ -191,6 +191,10 @@ public interface IClass
 		{
 			return new ObjectClassMetadata(forClass);
 		}
+		if ((modifiers & Modifiers.EXTENSION_CLASS) != 0)
+		{
+			return new ExtensionMetadata(forClass);
+		}
 		// All modifiers above are single-bit flags
 		if ((modifiers & Modifiers.CASE_CLASS) != 0)
 		{

@@ -8,7 +8,6 @@ import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.classes.metadata.ExtensionMetadata;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -252,10 +251,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				// extension < ...
 
-				ExtensionMetadata metadata = (ExtensionMetadata) this.theClass.getMetadata();
-
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeParameterListParser(metadata));
+				pm.pushParser(new TypeParameterListParser(this.theClass));
 				this.mode = EXTENSION_GENERICS_END;
 				return;
 			}
@@ -263,8 +260,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case EXTENSION_TYPE:
 			assert this.classAttributes.hasFlag(Modifiers.EXTENSION_CLASS);
 
-			ExtensionMetadata metadata = (ExtensionMetadata) this.theClass.getMetadata();
-			pm.pushParser(new TypeParser(metadata::setExtendedType), true);
+			pm.pushParser(new TypeParser(this.theClass::setSuperType), true);
 			this.mode = BODY;
 			return;
 		case EXTENSION_GENERICS_END:
