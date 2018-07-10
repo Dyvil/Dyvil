@@ -155,9 +155,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		case Deprecation.JAVA_INTERNAL:
 			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
-		case "java/lang/FunctionalInterface":
-			this.attributes.addFlag(Modifiers.FUNCTIONAL);
-			return true;
 		}
 		return false;
 	}

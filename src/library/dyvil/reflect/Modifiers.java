@@ -142,11 +142,6 @@ public interface Modifiers
 	 */
 	int CASE_CLASS = 0x00020000;
 
-	/**
-	 * <i>Dyvil</i> {@code functional} modifier. This modifier is a shortcut for the {@link FunctionalInterface}
-	 * annotation.
-	 */
-	int FUNCTIONAL = 0x00040000;
 
 	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
 

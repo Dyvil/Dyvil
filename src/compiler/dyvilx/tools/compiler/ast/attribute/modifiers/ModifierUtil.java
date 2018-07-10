@@ -35,8 +35,7 @@ public final class ModifierUtil
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-	                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
-	                                               & ~GENERATED; // exclude source-only modifiers
+	                                               & ~DEPRECATED & ~OVERRIDE & ~GENERATED; // exclude source-only modifiers
 
 	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 

@@ -327,7 +327,7 @@ public class CodeClass extends AbstractClass
 
 	public void checkFunctional(MarkerList markers)
 	{
-		final boolean hasAnnotation = this.hasModifier(Modifiers.FUNCTIONAL);
+		final boolean hasAnnotation = this.getAttributes().getAnnotation(Types.FUNCTIONALINTERFACE_CLASS) != null;
 		if (hasAnnotation && !this.isInterface())
 		{
 			// FunctionalInterface annotation on class or object
@@ -718,10 +718,6 @@ public class CodeClass extends AbstractClass
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
-		}
-		if (this.hasModifier(Modifiers.FUNCTIONAL))
-		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true).visitEnd();
 		}
 
 		this.attributes.write(writer);
