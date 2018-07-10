@@ -60,6 +60,11 @@ public final class ModifierUtil
 
 	public static void writeClassType(int mod, StringBuilder sb)
 	{
+		if ((mod & CASE_CLASS) != 0)
+		{
+			sb.append("case ");
+		}
+
 		if (mod == 0)
 		{
 			sb.append("class ");
