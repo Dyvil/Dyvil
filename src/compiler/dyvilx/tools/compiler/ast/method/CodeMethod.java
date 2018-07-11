@@ -261,6 +261,12 @@ public class CodeMethod extends AbstractMethod
 			this.thisType.check(markers, context);
 		}
 
+		if (this.hasModifier(Modifiers.EXTENSION) //
+		    && (this.thisType == null || this.thisType == this.enclosingClass.getThisType()))
+		{
+			markers.add(Markers.semanticError(this.position, "method.extension.this_type.invalid", this.name));
+		}
+
 		this.parameters.check(markers, context);
 
 		if (this.exceptions != null)
