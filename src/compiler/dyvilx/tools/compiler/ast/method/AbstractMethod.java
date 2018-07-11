@@ -23,8 +23,10 @@ import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.field.IAccessible;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.field.VariableThis;
 import dyvilx.tools.compiler.ast.generic.GenericData;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -224,7 +226,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isThisAvailable()
 	{
-		return !this.isStatic();
+		return !this.isStatic() || this.hasModifier(Modifiers.EXTENSION);
 	}
 
 	@Override
@@ -270,6 +272,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return this.thisType;
 		}
 		return this.thisType = this.enclosingClass.getThisType();
+	}
+
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		return type == this.getThisType().getTheClass() ? VariableThis.DEFAULT : null;
 	}
 
 	@Override
@@ -971,6 +979,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 
+		if (this.hasModifier(Modifiers.EXTENSION))
+		{
+			this.getThisType().appendExtendedName(buffer);
+		}
+
 		this.parameters.appendDescriptor(buffer);
 		if (this.typeParameters != null)
 		{
@@ -998,6 +1011,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		buffer.append('(');
+
+		if (this.hasModifier(Modifiers.EXTENSION))
+		{
+			this.getThisType().appendSignature(buffer, false);
+		}
+
 		this.parameters.appendSignature(buffer);
 		if (this.typeParameters != null)
 		{
