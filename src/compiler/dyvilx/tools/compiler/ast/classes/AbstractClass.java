@@ -274,6 +274,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.interfaces = new TypeList();
 	}
 
+	public void setInterfaces(TypeList interfaces)
+	{
+		this.interfaces = interfaces;
+	}
+
 	// Body
 
 	@Override
@@ -501,6 +506,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public String getInternalName()
 	{
 		return this.internalName;
+	}
+
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
 	}
 
 	@Override

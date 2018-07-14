@@ -3,19 +3,11 @@ package dyvilx.tools.compiler.ast.external;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
-import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
-import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.asm.*;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
-import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.AbstractClass;
-import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -32,30 +24,19 @@ import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.ClassParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.TypeList;
-import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
-import dyvilx.tools.compiler.backend.annotation.AnnotationClassVisitor;
-import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
-import dyvilx.tools.compiler.backend.annotation.ClassParameterAnnotationVisitor;
-import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.visitor.*;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import static dyvilx.tools.compiler.backend.ClassFormat.*;
 
 public final class ExternalClass extends AbstractClass
 {
@@ -65,15 +46,24 @@ public final class ExternalClass extends AbstractClass
 	private static final int ANNOTATIONS         = 1 << 5;
 	private static final int MEMBER_CLASSES      = 1 << 6;
 
-	protected Package thePackage;
+	protected Package enclosingPackage;
 
 	private byte                resolved;
 	private Map<String, String> innerTypes; // inner name -> full internal name
-	private Set<String>         classParameters;
 
 	public ExternalClass(Name name)
 	{
 		this.name = name;
+	}
+
+	public Package getEnclosingPackage()
+	{
+		return this.enclosingPackage;
+	}
+
+	public void setEnclosingPackage(Package enclosingPackage)
+	{
+		this.enclosingPackage = enclosingPackage;
 	}
 
 	@Override
@@ -85,6 +75,16 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void setPosition(SourcePosition position)
 	{
+	}
+
+	public Map<String, String> getInnerTypeNames()
+	{
+		if (this.innerTypes == null)
+		{
+			this.innerTypes = new HashMap<>();
+		}
+
+		return this.innerTypes;
 	}
 
 	private IContext getCombiningContext()
@@ -186,11 +186,6 @@ public final class ExternalClass extends AbstractClass
 		this.innerTypes = null;
 	}
 
-	public void setClassParameters(String[] classParameters)
-	{
-		this.classParameters = ArraySet.apply(classParameters);
-	}
-
 	@Override
 	public String getFullName()
 	{
@@ -202,9 +197,9 @@ public final class ExternalClass extends AbstractClass
 		{
 			return this.fullName = this.enclosingClass.getFullName() + '.' + this.getName();
 		}
-		if (this.thePackage != null)
+		if (this.enclosingPackage != null)
 		{
-			return this.fullName = this.thePackage.getFullName() + '.' + this.getName();
+			return this.fullName = this.enclosingPackage.getFullName() + '.' + this.getName();
 		}
 		return this.fullName = this.getName().toString();
 	}
@@ -443,233 +438,6 @@ public final class ExternalClass extends AbstractClass
 		this.resolveGenerics();
 
 		this.body.getConstructorMatches(list, arguments);
-	}
-
-	public void visit(int access, String name, String signature, String superName, String[] interfaces)
-	{
-		this.attributes = readModifiers(access);
-		this.internalName = name;
-
-		this.body = new ClassBody(this);
-		if (interfaces != null)
-		{
-			this.interfaces = new TypeList(interfaces.length);
-		}
-
-		int index = name.lastIndexOf('$');
-		if (index == -1)
-		{
-			index = name.lastIndexOf('/');
-		}
-		if (index == -1)
-		{
-			this.name = Name.fromQualified(name);
-			this.thePackage = Package.rootPackage;
-			this.fullName = name;
-		}
-		else
-		{
-			this.name = Name.fromQualified(name.substring(index + 1));
-			// Do not set 'fullName' here
-			this.thePackage = Package.rootPackage.resolveInternalPackage(name.substring(0, index));
-		}
-
-		if (signature != null)
-		{
-			ClassFormat.readClassSignature(signature, this);
-		}
-		else
-		{
-			this.superType = superName != null ? ClassFormat.internalToType(superName) : null;
-
-			if (interfaces != null)
-			{
-				for (String internal : interfaces)
-				{
-					this.interfaces.add(ClassFormat.internalToType(internal));
-				}
-			}
-		}
-	}
-
-	public AnnotationVisitor visitAnnotation(String type)
-	{
-		switch (type)
-		{
-		case ModifierUtil.DYVIL_MODIFIERS:
-			return new ModifierVisitor(this.attributes);
-		case AnnotationUtil.CLASS_PARAMETERS:
-			return new ClassParameterAnnotationVisitor(this);
-		}
-
-		String internal = ClassFormat.extendedToInternal(type);
-		if (!this.skipAnnotation(internal, null))
-		{
-			Annotation annotation = new ExternalAnnotation(ClassFormat.internalToType(internal));
-			return new AnnotationReader(this, annotation);
-		}
-		return null;
-	}
-
-	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc)
-	{
-		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
-		switch (TypeReference.getSort(typeRef))
-		{
-		case TypeReference.CLASS_EXTENDS:
-		{
-			final int index = TypeReference.getSuperTypeIndex(typeRef);
-			if (index < 0)
-			{
-				this.superType = IType.withAnnotation(this.superType, annotation, typePath);
-			}
-			else
-			{
-				this.interfaces.set(index, IType.withAnnotation(this.interfaces.get(index), annotation, typePath));
-			}
-			break;
-		}
-		case TypeReference.CLASS_TYPE_PARAMETER:
-		{
-			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
-			if (!typeVar.skipAnnotation(annotation.getTypeDescriptor(), annotation))
-			{
-				return null;
-			}
-
-			typeVar.getAttributes().add(annotation);
-			break;
-		}
-		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
-		{
-			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
-			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
-			break;
-		}
-		}
-		return new AnnotationReader(null, annotation);
-	}
-
-	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
-	{
-		IType type = ClassFormat.readFieldType(signature == null ? desc : signature);
-
-		if (this.classParameters != null && this.classParameters.contains(name))
-		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
-			                                                        readModifiers(access));
-			this.parameters.add(param);
-			return new ExternalFieldVisitor(param);
-		}
-
-		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type,
-		                                              readModifiers(access));
-
-		if (value != null)
-		{
-			field.setConstantValue(value);
-		}
-
-		this.body.addDataMember(field);
-
-		return new ExternalFieldVisitor(field);
-	}
-
-	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
-	{
-		if ((access & Modifiers.SYNTHETIC) != 0)
-		{
-			return null;
-		}
-
-		switch (name)
-		{
-		case "<clinit>":
-			return null;
-		case "<init>":
-			if (this.hasModifier(Modifiers.ENUM))
-			{
-				return null;
-			}
-
-			final ExternalConstructor ctor = new ExternalConstructor(this, readModifiers(access));
-
-			if (signature != null)
-			{
-				readConstructorType(signature, ctor);
-			}
-			else
-			{
-				readConstructorType(desc, ctor);
-
-				if (exceptions != null)
-				{
-					readExceptions(exceptions, ctor.getExceptions());
-				}
-			}
-
-			if ((access & Modifiers.ACC_VARARGS) != 0)
-			{
-				final ParameterList parameterList = ctor.getExternalParameterList();
-				parameterList.get(parameterList.size() - 1).setVarargs();
-			}
-
-			this.body.addConstructor(ctor);
-
-			return new ExternalMethodVisitor(ctor);
-		}
-
-		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
-		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
-			                                                        readReturnType(desc), readModifiers(access));
-			this.parameters.add(param);
-			return new AnnotationClassVisitor(param);
-		}
-
-		final ExternalMethod method = new ExternalMethod(this, name, desc, signature, readModifiers(access));
-
-		if (signature != null)
-		{
-			readMethodType(signature, method);
-		}
-		else
-		{
-			readMethodType(desc, method);
-
-			if (exceptions != null)
-			{
-				readExceptions(exceptions, method.getExceptions());
-			}
-		}
-
-		if ((access & Modifiers.ACC_VARARGS) != 0)
-		{
-			final ParameterList parameterList = method.getExternalParameterList();
-			parameterList.get(parameterList.size() - 1).setVarargs();
-		}
-
-		this.body.addMethod(method);
-		return new ExternalMethodVisitor(method);
-	}
-
-	public void visitInnerClass(String name, String outerName, String innerName)
-	{
-		if (innerName == null || !this.internalName.equals(outerName))
-		{
-			return;
-		}
-
-		if (this.innerTypes == null)
-		{
-			this.innerTypes = new HashMap<>();
-		}
-
-		this.innerTypes.put(innerName, name);
-	}
-
-	public void visitEnd()
-	{
 	}
 
 	@Override

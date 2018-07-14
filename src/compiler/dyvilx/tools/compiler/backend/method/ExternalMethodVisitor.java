@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.method;
 
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;

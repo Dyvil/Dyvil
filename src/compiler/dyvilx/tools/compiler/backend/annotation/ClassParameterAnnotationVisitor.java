@@ -1,15 +1,15 @@
 package dyvilx.tools.compiler.backend.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.external.ExternalClass;
+import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 
 public class ClassParameterAnnotationVisitor implements AnnotationVisitor
 {
-	private ExternalClass externalClass;
+	private ExternalClassVisitor classVisitor;
 
-	public ClassParameterAnnotationVisitor(ExternalClass externalClass)
+	public ClassParameterAnnotationVisitor(ExternalClassVisitor classVisitor)
 	{
-		this.externalClass = externalClass;
+		this.classVisitor = classVisitor;
 	}
 
 	@Override
@@ -39,22 +39,12 @@ public class ClassParameterAnnotationVisitor implements AnnotationVisitor
 
 		return new AnnotationVisitor()
 		{
-			private String[] classParameters = new String[4];
-			private int classParameterCount;
-
 			@Override
 			public void visit(String name, Object value)
 			{
 				if (value instanceof String)
 				{
-					int index = this.classParameterCount++;
-					if (index >= this.classParameters.length)
-					{
-						String[] temp = new String[this.classParameters.length << 1];
-						System.arraycopy(this.classParameters, 0, temp, 0, index);
-						this.classParameters = temp;
-					}
-					this.classParameters[index] = (String) value;
+					ClassParameterAnnotationVisitor.this.classVisitor.classParameters.add((String) value);
 				}
 			}
 
@@ -79,10 +69,6 @@ public class ClassParameterAnnotationVisitor implements AnnotationVisitor
 			@Override
 			public void visitEnd()
 			{
-				// Create a trimmed copy
-				final String[] classParameters = new String[this.classParameterCount];
-				System.arraycopy(this.classParameters, 0, classParameters, 0, this.classParameterCount);
-				ClassParameterAnnotationVisitor.this.externalClass.setClassParameters(classParameters);
 			}
 		};
 	}
