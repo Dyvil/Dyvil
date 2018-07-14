@@ -12,7 +12,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
@@ -70,7 +70,7 @@ public final class Deprecation
 	private static final IParameter INF_DESC_PARAM  = INF_PARAMS.get(description);
 	private static final IParameter INF_LEVEL_PARAM = INF_PARAMS.get(level);
 
-	public static void checkAnnotations(IMember member, SourcePosition position, MarkerList markers)
+	public static void checkAnnotations(Member member, SourcePosition position, MarkerList markers)
 	{
 		if (member.hasModifier(Modifiers.DEPRECATED))
 		{
@@ -90,7 +90,7 @@ public final class Deprecation
 		}
 	}
 
-	private static void checkDeprecation(IMember member, SourcePosition position, MarkerList markers)
+	private static void checkDeprecation(Member member, SourcePosition position, MarkerList markers)
 	{
 		Annotation annotation = member.getAnnotation(DEPRECATED_CLASS);
 		if (annotation == null)
@@ -184,7 +184,7 @@ public final class Deprecation
 		return Markers.getSemantic("deprecated.reason." + reason.name());
 	}
 
-	private static String replaceMember(IMember member, String value)
+	private static String replaceMember(Member member, String value)
 	{
 		if (value == null)
 		{
@@ -195,7 +195,7 @@ public final class Deprecation
 		            .replace("{member.name}", member.getName().toString());
 	}
 
-	private static void checkExperimental(IMember member, SourcePosition position, MarkerList markers,
+	private static void checkExperimental(Member member, SourcePosition position, MarkerList markers,
 		                                     Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
@@ -230,7 +230,7 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static void checkUsageInfo(IMember member, SourcePosition position, MarkerList markers,
+	private static void checkUsageInfo(Member member, SourcePosition position, MarkerList markers,
 		                                  Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();

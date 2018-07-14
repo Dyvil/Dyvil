@@ -7,7 +7,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -21,14 +21,14 @@ public final class Util
 {
 	// region Member & AST toString
 
-	public static String memberSignatureToString(IMember member, ITypeContext typeContext)
+	public static String memberSignatureToString(Member member, ITypeContext typeContext)
 	{
 		final StringBuilder stringBuilder = new StringBuilder();
 		memberSignatureToString(member, typeContext, stringBuilder);
 		return stringBuilder.toString();
 	}
 
-	public static void memberSignatureToString(IMember member, ITypeContext typeContext, StringBuilder stringBuilder)
+	public static void memberSignatureToString(Member member, ITypeContext typeContext, StringBuilder stringBuilder)
 	{
 		stringBuilder.append(member.getName()).append(": ");
 
@@ -142,7 +142,7 @@ public final class Util
 		return true;
 	}
 
-	public static String memberNamed(IMember member)
+	public static String memberNamed(Member member)
 	{
 		return Markers.getSemantic("member.named", Markers.getSemantic("member." + member.getKind().getName()),
 		                           member.getName());

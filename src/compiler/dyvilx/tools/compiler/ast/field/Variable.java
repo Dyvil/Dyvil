@@ -12,7 +12,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.reference.ReferenceType;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -26,7 +26,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Variable extends Member implements IVariable
+public class Variable extends AbstractMember implements IVariable
 {
 	protected int    localIndex;
 	protected IValue value;

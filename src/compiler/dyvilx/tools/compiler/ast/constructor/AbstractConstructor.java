@@ -19,7 +19,7 @@ import dyvilx.tools.compiler.ast.generic.GenericData;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -41,7 +41,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public abstract class AbstractConstructor extends Member implements IConstructor, IDefaultContext
+public abstract class AbstractConstructor extends AbstractMember implements IConstructor, IDefaultContext
 {
 	protected @NonNull ParameterList parameters = new ParameterList(3);
 

@@ -29,7 +29,7 @@ import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.ICompilable;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.member.IClassMember;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -65,7 +65,7 @@ public class REPLContext extends AbstractHeader
 	// Cleared for every input
 	protected final MarkerList        markers        = new MarkerList(Markers.INSTANCE);
 	protected final List<ICompilable> innerClassList = new ArrayList<>();
-	protected final List<IMember>     members        = new ArrayList<>();
+	protected final List<Member>      members        = new ArrayList<>();
 
 	public REPLContext(DyvilREPL repl)
 	{
@@ -140,7 +140,7 @@ public class REPLContext extends AbstractHeader
 
 		final Class<?> theClass = this.compileAndLoad();
 
-		for (IMember member : this.members)
+		for (Member member : this.members)
 		{
 			this.processMember(member, theClass);
 		}
@@ -167,7 +167,7 @@ public class REPLContext extends AbstractHeader
 		return classLoader.initialize(this.currentClass);
 	}
 
-	private void processMember(IMember member, Class<?> theClass)
+	private void processMember(Member member, Class<?> theClass)
 	{
 		switch (member.getKind())
 		{

@@ -24,7 +24,7 @@ import dyvilx.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -43,7 +43,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Field extends Member implements IField, IDefaultContext
+public class Field extends AbstractMember implements IField, IDefaultContext
 {
 	protected IValue value;
 

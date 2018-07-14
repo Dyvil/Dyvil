@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -215,9 +215,9 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void printMembers(PrintStream out, Set<? extends IMember> members, ITypeContext typeContext)
+	private static void printMembers(PrintStream out, Set<? extends Member> members, ITypeContext typeContext)
 	{
-		for (IMember member : members)
+		for (Member member : members)
 		{
 			out.print('\t');
 			out.println(Util.memberSignatureToString(member, typeContext));
@@ -328,7 +328,7 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static <T extends IMember> void checkMember(Set<T> set, T member, String start)
+	private static <T extends Member> void checkMember(Set<T> set, T member, String start)
 	{
 		if (member.getName().startsWith(start))
 		{
@@ -336,7 +336,7 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static <T extends IMember> void checkMember(Set<T> set, T member, String start, boolean statics)
+	private static <T extends Member> void checkMember(Set<T> set, T member, String start, boolean statics)
 	{
 		if (!member.getName().startsWith(start))
 		{

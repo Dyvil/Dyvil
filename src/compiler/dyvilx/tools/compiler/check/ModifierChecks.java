@@ -8,7 +8,7 @@ import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.member.IClassMember;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.transform.Deprecation;
@@ -22,7 +22,7 @@ import static dyvil.reflect.Modifiers.NATIVE;
 
 public class ModifierChecks
 {
-	public static void checkModifiers(IMember member, MarkerList markers)
+	public static void checkModifiers(Member member, MarkerList markers)
 	{
 		final AttributeList attributes = member.getAttributes();
 		final MemberKind memberKind = member.getKind();
@@ -65,7 +65,7 @@ public class ModifierChecks
 		}
 	}
 
-	public static void checkVisibility(IMember member, SourcePosition position, MarkerList markers, IContext context)
+	public static void checkVisibility(Member member, SourcePosition position, MarkerList markers, IContext context)
 	{
 		Deprecation.checkAnnotations(member, position, markers);
 

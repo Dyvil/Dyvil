@@ -58,7 +58,7 @@ public enum MemberKind
 		return index >= 0 && (this.allowedModifiers.charAt(index + str.length()) == ',');
 	}
 
-	public int getDefaultAccess(IMember member)
+	public int getDefaultAccess(Member member)
 	{
 		if (this == FIELD && ((IField) member).getEnclosingClass().isInterface())
 		{
