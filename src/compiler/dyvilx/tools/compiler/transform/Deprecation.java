@@ -7,7 +7,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
-import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
@@ -100,17 +99,17 @@ public final class Deprecation
 		}
 
 		final ArgumentList arguments = annotation.getArguments();
-		final MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, DEP_LEVEL_PARAM, MarkerLevel.class);
+		final MarkerLevel markerLevel = EnumValue.eval(arguments.getOrDefault(DEP_LEVEL_PARAM), MarkerLevel.class);
 
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = AnnotationUtil.getStringValue(arguments, DEP_VALUE_PARAM);
-		final String description = AnnotationUtil.getStringValue(arguments, DEP_DESC_PARAM);
-		final String since = AnnotationUtil.getStringValue(arguments, DEP_SINCE_PARAM);
-		final String forRemoval = AnnotationUtil.getStringValue(arguments, DEP_UNTIL_PARAM);
+		String value = arguments.getOrDefault(DEP_VALUE_PARAM).stringValue();
+		final String description = arguments.getOrDefault(DEP_DESC_PARAM).stringValue();
+		final String since = arguments.getOrDefault(DEP_SINCE_PARAM).stringValue();
+		final String forRemoval = arguments.getOrDefault(DEP_UNTIL_PARAM).stringValue();
 
 		value = replaceMember(member, value);
 		if (since != null)
@@ -200,16 +199,16 @@ public final class Deprecation
 		                                     Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
-		final MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, EXP_LEVEL_PARAM, MarkerLevel.class);
+		final MarkerLevel markerLevel = EnumValue.eval(arguments.getOrDefault(EXP_LEVEL_PARAM), MarkerLevel.class);
 
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = AnnotationUtil.getStringValue(arguments, EXP_VALUE_PARAM);
-		final String description = AnnotationUtil.getStringValue(arguments, EXP_DESC_PARAM);
-		final Stage stage = AnnotationUtil.getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
+		String value = arguments.getOrDefault(EXP_VALUE_PARAM).stringValue();
+		final String description = arguments.getOrDefault(EXP_DESC_PARAM).stringValue();
+		final Stage stage = EnumValue.eval(arguments.getOrDefault(EXP_STAGE_PARAM), Stage.class);
 		assert stage != null;
 
 		final String stageName = Markers.getSemantic("experimental.stage." + stage.name());
@@ -235,15 +234,15 @@ public final class Deprecation
 		                                  Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
-		final MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, INF_LEVEL_PARAM, MarkerLevel.class);
+		final MarkerLevel markerLevel = EnumValue.eval(arguments.getOrDefault(INF_LEVEL_PARAM), MarkerLevel.class);
 
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = AnnotationUtil.getStringValue(arguments, INF_VALUE_PARAM);
-		final String description = AnnotationUtil.getStringValue(arguments, INF_DESC_PARAM);
+		String value = arguments.getOrDefault(INF_VALUE_PARAM).stringValue();
+		final String description = arguments.getOrDefault(INF_DESC_PARAM).stringValue();
 
 		value = replaceMember(member, value);
 
@@ -281,11 +280,7 @@ public final class Deprecation
 		final Reason[] reasons = new Reason[size];
 		for (int i = 0; i < size; i++)
 		{
-			final IValue element = values.get(i);
-			assert element.valueTag() == IValue.ENUM_ACCESS;
-
-			final EnumValue enumValue = (EnumValue) element;
-			reasons[i] = Reason.valueOf(enumValue.getInternalName());
+			reasons[i] = EnumValue.eval(values.get(i), Reason.class);
 		}
 
 		return reasons;

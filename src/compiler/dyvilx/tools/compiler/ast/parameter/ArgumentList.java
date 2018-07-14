@@ -221,6 +221,12 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.get(parameter.getIndex(), parameter.getLabel());
 	}
 
+	public IValue getOrDefault(IParameter parameter)
+	{
+		final IValue value = this.get(parameter);
+		return value != null ? value : parameter.getValue();
+	}
+
 	public IValue get(int index, Name key)
 	{
 		return this.get(index);

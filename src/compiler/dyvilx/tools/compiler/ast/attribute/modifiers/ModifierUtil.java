@@ -1,22 +1,10 @@
 package dyvilx.tools.compiler.ast.attribute.modifiers;
 
-import dyvil.reflect.Modifiers;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.attribute.Attribute;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.member.IClassMember;
-import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.transform.Deprecation;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
-import dyvilx.tools.parsing.marker.Marker;
-import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
