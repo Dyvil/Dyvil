@@ -26,7 +26,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public abstract class TypeDelegate implements IType, ITyped
+public abstract class TypeDelegate implements IType, Typed
 {
 	protected IType type;
 

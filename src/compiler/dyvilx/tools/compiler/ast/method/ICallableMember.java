@@ -11,10 +11,10 @@ import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.TypeList;
 
-public interface ICallableMember extends IClassMember, IOverloadable, IValueConsumer, ITyped, IParametric
+public interface ICallableMember extends IClassMember, IOverloadable, IValueConsumer, Typed, IParametric
 {
 	IValue getValue();
 

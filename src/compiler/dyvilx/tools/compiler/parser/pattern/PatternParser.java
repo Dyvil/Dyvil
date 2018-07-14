@@ -216,7 +216,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			{
 				final TypeCheckPattern typeCheck = new TypeCheckPattern(token.raw(), this.pattern);
 				this.pattern = typeCheck;
-				pm.pushParser(new TypeParser(typeCheck));
+				pm.pushParser(new TypeParser(typeCheck::setType));
 				return;
 			}
 

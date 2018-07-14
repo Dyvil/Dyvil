@@ -70,7 +70,7 @@ public class TypeClassParser extends Parser
 			{
 				this.mode = ANGLE_END;
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeParser(this.value, true));
+				pm.pushParser(new TypeParser(this.value::setType, true));
 				return;
 			}
 
@@ -84,7 +84,7 @@ public class TypeClassParser extends Parser
 				pm.reparse();
 			}
 
-			pm.pushParser(new TypeParser(this.value));
+			pm.pushParser(new TypeParser(this.value::setType));
 			return;
 		case PARENTHESES_END:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)

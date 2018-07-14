@@ -11,7 +11,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.TypeDelegate;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.IRawType;
@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class WildcardType extends TypeDelegate implements IRawType, ITyped
+public final class WildcardType extends TypeDelegate implements IRawType, Typed
 {
 	protected SourcePosition position;
 	protected Variance       variance;

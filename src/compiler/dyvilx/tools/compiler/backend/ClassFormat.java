@@ -234,7 +234,7 @@ public final class ClassFormat
 			i = readTyped(desc, i, parameterTypeConsumer(method), true);
 		}
 		i++;
-		i = readTyped(desc, i, method, true);
+		i = readTyped(desc, i, method::setType, true);
 
 		// Throwables
 		int len = desc.length();
@@ -418,14 +418,14 @@ public final class ClassFormat
 		case '+': // covariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.COVARIANT);
-			final int end = readTyped(desc, start + 1, var, nullables);
+			final int end = readTyped(desc, start + 1, var::setType, nullables);
 			consumer.setType(var);
 			return end;
 		}
 		case '-': // contravariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			final int end = readTyped(desc, start + 1, var, nullables);
+			final int end = readTyped(desc, start + 1, var::setType, nullables);
 			consumer.setType(var);
 			return end;
 		}

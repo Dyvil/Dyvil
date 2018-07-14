@@ -36,7 +36,7 @@ public class AnnotationParser extends Parser
 		case NAME:
 			this.annotation.setPosition(token.prev());
 
-			pm.pushParser(new TypeParser(this.annotation), true);
+			pm.pushParser(new TypeParser(this.annotation::setType), true);
 			this.mode = PARAMETERS_START;
 			return;
 		case PARAMETERS_START:

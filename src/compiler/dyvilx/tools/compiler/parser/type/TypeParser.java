@@ -6,7 +6,6 @@ import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
 import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.ITyped;
 import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -302,7 +301,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		case ANNOTATION_END:
 			this.mode = END;
-			pm.pushParser(this.subParser((ITyped) this.type), true);
+			pm.pushParser(this.subParser(((AnnotatedType) this.type)::setType), true);
 			return;
 		case GENERICS_END:
 			this.mode = END;
