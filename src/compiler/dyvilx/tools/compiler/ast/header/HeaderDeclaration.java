@@ -16,7 +16,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class HeaderDeclaration implements ASTNode, Named, Attributable, IObjectCompilable
+public class HeaderDeclaration implements ASTNode, Named, Attributable, ObjectCompilable
 {
 	protected final IHeaderUnit header;
 

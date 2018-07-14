@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.statement;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -12,19 +12,19 @@ import dyvil.source.position.SourcePosition;
 
 public class MemberStatement implements IStatement
 {
-	protected IClassMember member;
+	protected ClassMember member;
 
-	public MemberStatement(IClassMember member)
+	public MemberStatement(ClassMember member)
 	{
 		this.member = member;
 	}
 
-	public IClassMember getMember()
+	public ClassMember getMember()
 	{
 		return this.member;
 	}
 
-	public void setMember(IClassMember member)
+	public void setMember(ClassMember member)
 	{
 		this.member = member;
 	}

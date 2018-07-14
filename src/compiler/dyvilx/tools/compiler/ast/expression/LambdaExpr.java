@@ -26,7 +26,7 @@ import dyvilx.tools.compiler.ast.field.capture.CaptureVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.MapTypeContext;
-import dyvilx.tools.compiler.ast.header.IClassCompilable;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -46,7 +46,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer, IParametric
+public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IValueConsumer, IParametric
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",

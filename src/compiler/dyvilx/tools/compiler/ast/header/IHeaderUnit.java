@@ -5,7 +5,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.classes.IClassList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.expression.operator.IOperatorMap;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -17,7 +17,7 @@ import dyvilx.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 
-public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
+public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
 {
 	boolean isHeader();
 
@@ -31,23 +31,23 @@ public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClas
 	void setName(Name name);
 
 	// Package
-	
+
 	void setPackage(Package pack);
-	
+
 	Package getPackage();
-	
+
 	// Package Declaration
-	
+
 	void setPackageDeclaration(PackageDeclaration pack);
-	
+
 	PackageDeclaration getPackageDeclaration();
-	
+
 	// Header Declaration
-	
+
 	void setHeaderDeclaration(HeaderDeclaration declaration);
-	
+
 	HeaderDeclaration getHeaderDeclaration();
-	
+
 	// Import
 
 	boolean hasMemberImports();
@@ -57,9 +57,9 @@ public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClas
 	void addImport(ImportDeclaration component);
 
 	ImportDeclaration getImport(int index);
-	
+
 	// Operators
-	
+
 	int operatorCount();
 
 	@Override
@@ -71,7 +71,7 @@ public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClas
 	// Type Aliases
 
 	int typeAliasCount();
-	
+
 	@Override
 	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
@@ -79,34 +79,34 @@ public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClas
 	void addTypeAlias(ITypeAlias typeAlias);
 
 	// Classes
-	
+
 	@Override
 	int classCount();
-	
+
 	@Override
 	void addClass(IClass iclass);
-	
+
 	@Override
 	IClass getClass(int index);
-	
+
 	@Override
 	IClass getClass(Name name);
-	
+
 	@Override
 	int compilableCount();
-	
+
 	@Override
 	void addCompilable(ICompilable compilable);
-	
-	byte getVisibility(IClassMember member);
-	
+
+	byte getVisibility(ClassMember member);
+
 	// Compilation
-	
+
 	String getInternalName();
-	
+
 	String getInternalName(Name subClass);
-	
+
 	String getFullName();
-	
+
 	String getFullName(Name subClass);
 }

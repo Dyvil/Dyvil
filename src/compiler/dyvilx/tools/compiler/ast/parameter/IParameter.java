@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
@@ -25,7 +25,7 @@ import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 
-public interface IParameter extends IVariable, IClassMember
+public interface IParameter extends IVariable, ClassMember
 {
 	String DEFAULT_PREFIX_INIT = "init$paramDefault$";
 	String DEFAULT_PREFIX      = "$paramDefault$";

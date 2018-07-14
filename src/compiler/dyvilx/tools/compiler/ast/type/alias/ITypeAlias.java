@@ -6,7 +6,7 @@ import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.header.IObjectCompilable;
+import dyvilx.tools.compiler.ast.header.ObjectCompilable;
 import dyvilx.tools.compiler.ast.method.IOverloadable;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -20,7 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends ASTNode, Resolvable, IOverloadable, ITypeParametric, IObjectCompilable
+public interface ITypeAlias extends ASTNode, Resolvable, IOverloadable, ITypeParametric, ObjectCompilable
 {
 	IHeaderUnit getEnclosingHeader();
 

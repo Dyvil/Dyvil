@@ -22,9 +22,9 @@ import dyvilx.tools.compiler.ast.field.*;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
-import dyvilx.tools.compiler.ast.header.IClassCompilable;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -77,8 +77,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IClass         enclosingClass;
 	protected IClassMetadata metadata;
 
-	protected IClassCompilable[] compilables;
-	protected int                compilableCount;
+	protected ClassCompilable[] compilables;
+	protected int               compilableCount;
 
 	protected IType thisType;
 
@@ -310,11 +310,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void addClassCompilable(IClassCompilable compilable)
+	public void addClassCompilable(ClassCompilable compilable)
 	{
 		if (this.compilables == null)
 		{
-			this.compilables = new IClassCompilable[2];
+			this.compilables = new ClassCompilable[2];
 			this.compilables[0] = compilable;
 			this.compilableCount = 1;
 			return;
@@ -323,7 +323,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		int index = this.compilableCount++;
 		if (this.compilableCount > this.compilables.length)
 		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			ClassCompilable[] temp = new ClassCompilable[this.compilableCount];
 			System.arraycopy(this.compilables, 0, temp, 0, index);
 			this.compilables = temp;
 		}
@@ -806,13 +806,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public boolean isMember(IClassMember member)
+	public boolean isMember(ClassMember member)
 	{
 		return member.getEnclosingClass() == this;
 	}
 
 	@Override
-	public byte getVisibility(IClassMember member)
+	public byte getVisibility(ClassMember member)
 	{
 		final IClass enclosingClass = member.getEnclosingClass();
 		if (enclosingClass == this)

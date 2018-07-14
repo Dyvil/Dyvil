@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.header.IObjectCompilable;
+import dyvilx.tools.compiler.ast.header.ObjectCompilable;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
-public abstract class Annotation implements Attribute, Typed, IObjectCompilable, IArgumentsConsumer
+public abstract class Annotation implements Attribute, Typed, ObjectCompilable, IArgumentsConsumer
 {
 	public static final class LazyFields
 	{

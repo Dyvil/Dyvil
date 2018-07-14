@@ -1,10 +1,10 @@
 package dyvilx.tools.compiler.ast.header;
 
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 
-public interface IClassCompilable
+public interface ClassCompilable
 {
 	void write(ClassWriter writer) throws BytecodeException;
 

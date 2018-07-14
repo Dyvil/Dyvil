@@ -9,11 +9,11 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametricMember;
-import dyvilx.tools.compiler.ast.header.IClassCompilable;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilable;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -26,7 +26,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public interface IClass
-	extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
+	extends ClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
 	@Override
 	MemberKind getKind();
@@ -125,9 +125,9 @@ public interface IClass
 
 	IMethod getFunctionalMethod();
 
-	boolean isMember(IClassMember member);
+	boolean isMember(ClassMember member);
 
-	byte getVisibility(IClassMember member);
+	byte getVisibility(ClassMember member);
 
 	void addMethods(Collection<IMethod> methods);
 
@@ -141,7 +141,7 @@ public interface IClass
 	int classCompilableCount();
 
 	@Override
-	void addClassCompilable(IClassCompilable compilable);
+	void addClassCompilable(ClassCompilable compilable);
 
 	// Compilation
 

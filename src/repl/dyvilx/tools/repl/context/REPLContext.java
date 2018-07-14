@@ -28,7 +28,7 @@ import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.ICompilable;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -253,7 +253,7 @@ public class REPLContext extends AbstractHeader
 		this.repl.getOutput().println(buffer.toString());
 	}
 
-	private void initMember(IClassMember member)
+	private void initMember(ClassMember member)
 	{
 		member.setEnclosingClass(this.currentClass);
 

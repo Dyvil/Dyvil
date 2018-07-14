@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.classes.metadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.header.IClassCompilable;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
@@ -18,7 +18,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-public interface IClassMetadata extends IClassCompilable, Resolvable
+public interface IClassMetadata extends ClassCompilable, Resolvable
 {
 	MemberKind getKind();
 

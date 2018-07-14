@@ -7,7 +7,7 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -69,12 +69,12 @@ public class ModifierChecks
 	{
 		Deprecation.checkAnnotations(member, position, markers);
 
-		if (!(member instanceof IClassMember))
+		if (!(member instanceof ClassMember))
 		{
 			return;
 		}
 
-		switch (IContext.getVisibility(context, (IClassMember) member))
+		switch (IContext.getVisibility(context, (ClassMember) member))
 		{
 		case IContext.INTERNAL:
 			markers.add(Markers.semanticError(position, "access.internal", Util.memberNamed(member)));

@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.attribute.modifiers;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 
 import java.lang.annotation.ElementType;
@@ -138,7 +138,7 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static long getFlags(IClassMember member)
+	public static long getFlags(ClassMember member)
 	{
 		final int flags = member.getAttributes().flags();
 		int javaModifiers = flags & JAVA_MODIFIER_MASK;
