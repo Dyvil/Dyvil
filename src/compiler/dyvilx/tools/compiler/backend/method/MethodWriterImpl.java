@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend;
+package dyvilx.tools.compiler.backend.method;
 
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.*;
@@ -6,6 +6,8 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
+import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 import static dyvil.reflect.Opcodes.*;
@@ -14,8 +16,8 @@ public final class MethodWriterImpl implements MethodWriter
 {
 	private static final Long LONG_MINUS_ONE = -1L;
 
-	public    ClassWriter   cw;
-	protected MethodVisitor mv;
+	public    dyvilx.tools.compiler.backend.classes.ClassWriter cw;
+	protected MethodVisitor                                     mv;
 
 	protected Frame frame = new Frame();
 	private boolean visitFrame;
@@ -503,16 +505,16 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.POP2);
 				return;
 			case Opcodes.AUTO_SWAP:
-				BackendUtil.swap(this);
+				this.swap();
 				return;
 			case Opcodes.AUTO_POP:
-				BackendUtil.pop(this);
+				this.pop();
 				return;
 			case Opcodes.AUTO_DUP:
-				BackendUtil.dup(this);
+				this.dup();
 				return;
 			case Opcodes.AUTO_DUP_X1:
-				BackendUtil.dupX1(this);
+				this.dupX1();
 				return;
 			}
 
@@ -943,5 +945,118 @@ public final class MethodWriterImpl implements MethodWriter
 	public String toString()
 	{
 		return "MethodWriter(frame: " + this.frame + ")";
+	}
+
+	void swap() throws BytecodeException
+	{
+		Object t1 = this.frame.pop();
+		Object t2 = this.frame.pop();
+
+		this.frame.push(t1);
+		this.frame.push(t2);
+
+		if (ClassFormat.isTwoWord(t2))
+		{
+			if (ClassFormat.isTwoWord(t1))
+			{
+				// { value4, value3 }, { value2, value1 } ->
+				// { value2, value1 }, { value4, value3 }
+				this.mv.visitInsn(DUP2_X2);
+				this.mv.visitInsn(POP2);
+			}
+			else
+			{
+				// { value3, value2 }, value1 ->
+				// value1, { value3, value2 }
+				this.mv.visitInsn(DUP_X2);
+				this.mv.visitInsn(POP);
+			}
+		}
+		else
+		{
+			if (ClassFormat.isTwoWord(t1))
+			{
+				// value3, { value2, value1 } ->
+				// { value2, value1 }, value3
+				this.mv.visitInsn(DUP2_X1);
+				this.mv.visitInsn(POP2);
+			}
+			else
+			{
+				// value2, value1 -> value1, value1
+				this.mv.visitInsn(SWAP);
+			}
+		}
+	}
+
+	void pop() throws BytecodeException
+	{
+		Object t = this.frame.pop();
+
+		if (ClassFormat.isTwoWord(t))
+		{
+			// { value2, value1 } ->
+			this.mv.visitInsn(POP2);
+		}
+		else
+		{
+			// value1 ->
+			this.mv.visitInsn(POP);
+		}
+	}
+
+	void dup()
+	{
+		Object t = this.frame.peek();
+		this.frame.push(t);
+		if (ClassFormat.isTwoWord(t))
+		{
+			// { value2, value1 } -> { value2, value1 }, { value2, value1 }
+			this.mv.visitInsn(DUP2);
+		}
+		else
+		{
+			// value1 -> value1, value1
+			this.mv.visitInsn(DUP);
+		}
+	}
+
+	void dupX1() throws BytecodeException
+	{
+		Object t1 = this.frame.pop();
+		Object t2 = this.frame.pop();
+
+		this.frame.push(t1);
+		this.frame.push(t2);
+		this.frame.push(t1);
+		if (ClassFormat.isTwoWord(t1))
+		{
+			if (ClassFormat.isTwoWord(t2))
+			{
+				// { value4, value3 }, { value2, value1 } ->
+				// { value2, value1 }, { value4, value3 }, { value2, value1 }
+				this.mv.visitInsn(DUP2_X2);
+			}
+			else
+			{
+				// value3, { value2, value1 } ->
+				// { value2, value1 }, value3, { value2, value1 }
+				this.mv.visitInsn(DUP2_X1);
+			}
+		}
+		else
+		{
+			if (ClassFormat.isTwoWord(t2))
+			{
+				// { value3, value2 }, value1 ->
+				// value1, { value3, value2 }, value1
+				this.mv.visitInsn(DUP_X2);
+			}
+			else
+			{
+				// value2, value1 -> value1, value2, value1
+				this.mv.visitInsn(DUP_X1);
+			}
+		}
 	}
 }

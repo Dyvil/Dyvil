@@ -95,6 +95,11 @@ public final class ClassFormat
 		return AttributeList.of(access);
 	}
 
+	public static boolean isTwoWord(Object type)
+	{
+		return type == LONG || type == DOUBLE;
+	}
+
 	public static String packageToInternal(String pack)
 	{
 		return pack.replace('.', '/');

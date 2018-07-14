@@ -6,7 +6,7 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.io.FileUtils;
 import dyvil.reflect.ReflectUtils;
 import dyvilx.tools.compiler.ast.header.ICompilable;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.File;

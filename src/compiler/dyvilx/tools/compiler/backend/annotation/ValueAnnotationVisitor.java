@@ -1,5 +1,6 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
+import dyvil.lang.Name;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
@@ -7,27 +8,42 @@ import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.AnnotationExpr;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
-public class AnnotationValueReader implements AnnotationVisitor
+public class ValueAnnotationVisitor implements AnnotationVisitor
 {
-	IValueConsumer consumer;
+	private IValueConsumer consumer;
 
-	public AnnotationValueReader(IValueConsumer consumer)
+	public ValueAnnotationVisitor(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
 	}
 
 	@Override
-	public void visit(String key, Object obj)
+	public void visit(String key, Object value)
 	{
-		this.consumer.setValue(IValue.fromObject(obj));
+		final IValue iValue = IValue.fromObject(value);
+		if (iValue == null)
+		{
+			throw new BytecodeException("Cannot convert '" + value + "' into an IValue");
+		}
+
+		this.consumer.setValue(iValue);
+	}
+
+	static IValue getEnumValue(String enumClass, String name)
+	{
+		IType t = ClassFormat.extendedToType(enumClass);
+		return new EnumValue(t, Name.fromRaw(name));
 	}
 
 	@Override
 	public void visitEnum(String key, String enumClass, String name)
 	{
-		IValue enumValue = AnnotationReader.getEnumValue(enumClass, name);
+		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
 			this.consumer.setValue(enumValue);
@@ -35,7 +51,7 @@ public class AnnotationValueReader implements AnnotationVisitor
 	}
 
 	@Override
-	public AnnotationVisitor visitAnnotation(String key, String desc)
+	public AnnotationVisitor visitAnnotation(String name, String desc)
 	{
 		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
 		AnnotationExpr value = new AnnotationExpr(annotation);
@@ -47,15 +63,8 @@ public class AnnotationValueReader implements AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		final ArrayExpr valueList = new ArrayExpr();
-		return new AnnotationValueReader(valueList.getValues())
-		{
-			@Override
-			public void visitEnd()
-			{
-				valueList.getType();
-				this.consumer.setValue(valueList);
-			}
-		};
+		this.consumer.setValue(valueList);
+		return new AnnotationValueReader(valueList.getValues());
 	}
 
 	@Override

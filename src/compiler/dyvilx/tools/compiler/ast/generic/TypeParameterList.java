@@ -10,7 +10,7 @@ import dyvilx.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.IResolvable;
 import dyvilx.tools.compiler.util.Util;

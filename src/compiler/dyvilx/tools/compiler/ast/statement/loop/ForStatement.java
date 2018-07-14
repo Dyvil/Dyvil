@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.ast.statement.IStatement;
 import dyvilx.tools.compiler.ast.statement.control.Label;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;

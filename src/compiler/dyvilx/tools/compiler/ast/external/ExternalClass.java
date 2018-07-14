@@ -40,8 +40,12 @@ import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.annotation.AnnotationClassVisitor;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.ClassParameterAnnotationVisitor;
+import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.visitor.*;
 import dyvilx.tools.compiler.sources.DyvilFileType;
@@ -555,7 +559,7 @@ public final class ExternalClass extends AbstractClass
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
 			                                                        readModifiers(access));
 			this.parameters.add(param);
-			return new SimpleFieldVisitor(param);
+			return new ExternalFieldVisitor(param);
 		}
 
 		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type,
@@ -568,7 +572,7 @@ public final class ExternalClass extends AbstractClass
 
 		this.body.addDataMember(field);
 
-		return new SimpleFieldVisitor(field);
+		return new ExternalFieldVisitor(field);
 	}
 
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
@@ -612,7 +616,7 @@ public final class ExternalClass extends AbstractClass
 
 			this.body.addConstructor(ctor);
 
-			return new SimpleMethodVisitor(ctor);
+			return new ExternalMethodVisitor(ctor);
 		}
 
 		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
@@ -646,7 +650,7 @@ public final class ExternalClass extends AbstractClass
 		}
 
 		this.body.addMethod(method);
-		return new SimpleMethodVisitor(method);
+		return new ExternalMethodVisitor(method);
 	}
 
 	public void visitInnerClass(String name, String outerName, String innerName)

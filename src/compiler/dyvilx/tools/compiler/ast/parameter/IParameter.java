@@ -19,11 +19,11 @@ import dyvilx.tools.compiler.ast.member.IClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 
 public interface IParameter extends IVariable, IClassMember
 {

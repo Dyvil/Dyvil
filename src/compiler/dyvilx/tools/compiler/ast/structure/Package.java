@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.ast.member.INamed;
-import dyvilx.tools.compiler.backend.ClassReader;
+import dyvilx.tools.compiler.backend.classes.ClassReader;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;

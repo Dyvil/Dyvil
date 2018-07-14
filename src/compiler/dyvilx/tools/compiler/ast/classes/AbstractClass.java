@@ -39,7 +39,7 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;

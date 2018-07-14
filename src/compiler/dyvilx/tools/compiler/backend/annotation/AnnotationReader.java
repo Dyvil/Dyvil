@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
 import dyvil.lang.Name;
 import dyvilx.tools.asm.AnnotationVisitor;

@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.external.ExternalClass;
