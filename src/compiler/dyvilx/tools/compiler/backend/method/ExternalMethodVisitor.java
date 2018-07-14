@@ -93,7 +93,7 @@ public final class ExternalMethodVisitor implements MethodVisitor
 		if (!this.method.skipAnnotation(internal, null))
 		{
 			final Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.method, annotation);
+			return new AnnotationReader(this.method.annotationConsumer(), annotation);
 		}
 		return null;
 	}

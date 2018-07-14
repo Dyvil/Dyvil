@@ -3,17 +3,21 @@ package dyvilx.tools.compiler.ast.attribute;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.IAnnotationConsumer;
 
 import java.lang.annotation.ElementType;
+import java.util.function.Consumer;
 
-public interface Attributable extends IAnnotationConsumer
+public interface Attributable
 {
 	ElementType getElementType();
+
+	// --------------- Attributes ---------------
 
 	AttributeList getAttributes();
 
 	void setAttributes(AttributeList attributes);
+
+	// --------------- Annotations ---------------
 
 	default Annotation getAnnotation(IClass type)
 	{
@@ -25,16 +29,19 @@ public interface Attributable extends IAnnotationConsumer
 		return false;
 	}
 
-	@Override
-	default void setAnnotation(Annotation annotation)
+	default Consumer<Annotation> annotationConsumer()
 	{
-		if (this.skipAnnotation(annotation.getTypeDescriptor(), annotation))
-		{
-			return;
-		}
+		return annotation -> {
+			if (this.skipAnnotation(annotation.getTypeDescriptor(), annotation))
+			{
+				return;
+			}
 
-		this.getAttributes().add(annotation);
+			this.getAttributes().add(annotation);
+		};
 	}
+
+	// --------------- Modifiers ---------------
 
 	default boolean hasModifier(int modifier)
 	{

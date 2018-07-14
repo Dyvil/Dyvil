@@ -157,7 +157,7 @@ public class ExternalClassVisitor implements ClassVisitor
 		if (!this.theClass.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(ClassFormat.internalToType(internal));
-			return new AnnotationReader(this.theClass, annotation);
+			return new AnnotationReader(this.theClass.annotationConsumer(), annotation);
 		}
 		return null;
 	}

@@ -29,7 +29,7 @@ public class AnnotationClassVisitor implements MethodVisitor
 		if (!this.parameter.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.parameter, annotation);
+			return new AnnotationReader(this.parameter.annotationConsumer(), annotation);
 		}
 		return null;
 	}
