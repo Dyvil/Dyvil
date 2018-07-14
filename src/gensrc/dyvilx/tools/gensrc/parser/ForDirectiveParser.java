@@ -74,7 +74,7 @@ public class ForDirectiveParser extends Parser
 		case TYPE_ASCRIPTION:
 			if (type == BaseSymbols.COLON)
 			{
-				pm.pushParser(new TypeParser(this.directive.getVariable()));
+				pm.pushParser(new TypeParser(this.directive.getVariable()::setType));
 				this.mode = ARROW;
 				return;
 			}

@@ -6,7 +6,6 @@ import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.external.ExternalConstructor;
 import dyvilx.tools.compiler.ast.external.ExternalMethod;
 import dyvilx.tools.compiler.ast.external.ExternalParameter;
@@ -27,6 +26,8 @@ import dyvilx.tools.compiler.ast.type.generic.GenericType;
 import dyvilx.tools.compiler.ast.type.generic.InternalGenericType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.ast.type.typevar.InternalTypeVarType;
+
+import java.util.function.Consumer;
 
 @SuppressWarnings( { "UnnecessaryBoxing", "unused" })
 public final class ClassFormat
@@ -208,7 +209,7 @@ public final class ClassFormat
 		}
 	}
 
-	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
+	private static Consumer<IType> parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
 		final ParameterList parameterList = methodSignature.getExternalParameterList();
 		return type -> {
@@ -353,87 +354,87 @@ public final class ClassFormat
 		return new InternalType(desc.substring(start, end));
 	}
 
-	private static int readTyped(String desc, int start, ITypeConsumer consumer, boolean nullables)
+	private static int readTyped(String desc, int start, Consumer<IType> consumer, boolean nullables)
 	{
 		switch (desc.charAt(start))
 		{
 		case 'V':
-			consumer.setType(Types.VOID);
+			consumer.accept(Types.VOID);
 			return start + 1;
 		case 'Z':
-			consumer.setType(Types.BOOLEAN);
+			consumer.accept(Types.BOOLEAN);
 			return start + 1;
 		case 'B':
-			consumer.setType(Types.BYTE);
+			consumer.accept(Types.BYTE);
 			return start + 1;
 		case 'S':
-			consumer.setType(Types.SHORT);
+			consumer.accept(Types.SHORT);
 			return start + 1;
 		case 'C':
-			consumer.setType(Types.CHAR);
+			consumer.accept(Types.CHAR);
 			return start + 1;
 		case 'I':
-			consumer.setType(Types.INT);
+			consumer.accept(Types.INT);
 			return start + 1;
 		case 'J':
-			consumer.setType(Types.LONG);
+			consumer.accept(Types.LONG);
 			return start + 1;
 		case 'F':
-			consumer.setType(Types.FLOAT);
+			consumer.accept(Types.FLOAT);
 			return start + 1;
 		case 'D':
-			consumer.setType(Types.DOUBLE);
+			consumer.accept(Types.DOUBLE);
 			return start + 1;
 		case 'L': // class
 		{
 			final int end = getMatchingSemicolon(desc, start, desc.length());
-			consumer.setType(readReferenceType(desc, start + 1, end, nullables));
+			consumer.accept(readReferenceType(desc, start + 1, end, nullables));
 			return end + 1;
 		}
 		case 'R': // reference
 		{
 			final ReferenceType reference = new ReferenceType();
 			final int end = readTyped(desc, start + 1, reference::setType, true);
-			consumer.setType(reference);
+			consumer.accept(reference);
 			return end + 1;
 		}
 		case NullType.NULL_DESC: // null type
-			consumer.setType(Types.NULL);
+			consumer.accept(Types.NULL);
 			return start + 1;
 		case NoneType.NONE_DESC:
-			consumer.setType(Types.NONE);
+			consumer.accept(Types.NONE);
 			return start + 1;
 		case AnyType.ANY_DESC:
-			consumer.setType(Types.ANY);
+			consumer.accept(Types.ANY);
 			return start + 1;
 		case 'T': // type var reference
 		{
 			final int end = desc.indexOf(';', start);
-			consumer.setType(new InternalTypeVarType(desc.substring(start + 1, end)));
+			consumer.accept(new InternalTypeVarType(desc.substring(start + 1, end)));
 			return end + 1;
 		}
 		case '*': // any wildcard
-			consumer.setType(new WildcardType(Variance.COVARIANT));
+			consumer.accept(new WildcardType(Variance.COVARIANT));
 			return start + 1;
 		case '+': // covariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.COVARIANT);
 			final int end = readTyped(desc, start + 1, var::setType, nullables);
-			consumer.setType(var);
+			consumer.accept(var);
 			return end;
 		}
 		case '-': // contravariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
 			final int end = readTyped(desc, start + 1, var::setType, nullables);
-			consumer.setType(var);
+			consumer.accept(var);
 			return end;
 		}
 		case '[': // array
 		{
 			final ArrayType arrayType = new ArrayType();
 			final int end = readTyped(desc, start + 1, arrayType::setElementType, true);
-			consumer.setType(nullable(arrayType, nullables));
+			consumer.accept(nullable(arrayType, nullables));
 			return end;
 		}
 		case '|': // union
@@ -441,7 +442,7 @@ public final class ClassFormat
 			final UnionType union = new UnionType();
 			final int end1 = readTyped(desc, start + 1, union::setLeft, nullables);
 			final int end2 = readTyped(desc, end1, union::setRight, nullables);
-			consumer.setType(union);
+			consumer.accept(union);
 			return end2;
 		}
 		case '&': // intersection
@@ -449,14 +450,14 @@ public final class ClassFormat
 			final IntersectionType intersection = new IntersectionType();
 			final int end1 = readTyped(desc, start + 1, intersection::setLeft, nullables);
 			final int end2 = readTyped(desc, end1, intersection::setRight, nullables);
-			consumer.setType(intersection);
+			consumer.accept(intersection);
 			return end2;
 		}
 		case '?': // option
 		{
 			final NullableType nullableType = new NullableType();
 			final int end = readTyped(desc, start + 1, nullableType::setElementType, false);
-			consumer.setType(nullableType);
+			consumer.accept(nullableType);
 			return end;
 		}
 		}

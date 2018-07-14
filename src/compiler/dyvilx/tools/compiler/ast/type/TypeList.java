@@ -2,7 +2,6 @@ package dyvilx.tools.compiler.ast.type;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -14,15 +13,22 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
-public class TypeList implements ITypeConsumer, Iterable<IType>
+public class TypeList implements Iterable<IType>, Consumer<IType>
 {
+	// --------------- Constants ---------------
+
 	private static final int DEFAULT_CAPACITY = 3;
 
 	public static final TypeList EMPTY = new TypeList(null, 0);
 
+	// --------------- Instance Fields ---------------
+
 	private int     size;
 	private IType[] types;
+
+	// --------------- Constructors ---------------
 
 	public TypeList()
 	{
@@ -44,6 +50,8 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		this.size = size;
 		this.types = types;
 	}
+
+	// --------------- List Operations ---------------
 
 	public int size()
 	{
@@ -87,17 +95,12 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		this.set(this.size, type);
 	}
 
-	@Override
-	public void setType(IType type)
+	public TypeList copy()
 	{
-		this.add(type);
+		return new TypeList(this.types.clone(), this.size);
 	}
 
-	@Override
-	public Iterator<IType> iterator()
-	{
-		return new ArrayIterator<>(this.types, 0, this.size);
-	}
+	// --------------- Resolution Phases ---------------
 
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -147,7 +150,7 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		}
 	}
 
-	// Compilation
+	// --------------- Compilation ---------------
 
 	public void appendDescriptors(StringBuilder buffer, int type)
 	{
@@ -156,6 +159,8 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 			this.types[i].appendDescriptor(buffer, type);
 		}
 	}
+
+	// --------------- Serialization ---------------
 
 	public void write(DataOutput out) throws IOException
 	{
@@ -177,6 +182,8 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		}
 	}
 
+	// --------------- Formatting ---------------
+
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		this.toString(indent, buffer, '<', '>');
@@ -191,8 +198,19 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		Formatting.appendClose(buffer, "type.list.close_paren", close);
 	}
 
-	public TypeList copy()
+	// ------------------------------ Iterable<IType> Implementation ------------------------------
+
+	@Override
+	public Iterator<IType> iterator()
 	{
-		return new TypeList(this.types.clone(), this.size);
+		return new ArrayIterator<>(this.types, 0, this.size);
+	}
+
+	// ------------------------------ Consumer<IType> Implementation ------------------------------
+
+	@Override
+	public void accept(IType type)
+	{
+		this.add(type);
 	}
 }

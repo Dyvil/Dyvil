@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.parser.type;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.Variance;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Mutability;
@@ -22,9 +21,11 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 import static dyvilx.tools.parsing.lexer.BaseSymbols.isTerminator;
 
-public final class TypeParser extends Parser implements ITypeConsumer
+public final class TypeParser extends Parser implements Consumer<IType>
 {
 	protected static final int NAME           = 0;
 	protected static final int GENERICS       = 1;
@@ -42,20 +43,20 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public static final int CLOSE_ANGLE     = 4;
 	public static final int IGNORE_OPERATOR = 8;
 
-	protected ITypeConsumer consumer;
+	protected Consumer<IType> consumer;
 
 	private IType parentType;
 	private IType type;
 
 	private int flags;
 
-	public TypeParser(ITypeConsumer consumer)
+	public TypeParser(Consumer<IType> consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = NAME;
 	}
 
-	public TypeParser(ITypeConsumer consumer, boolean closeAngle)
+	public TypeParser(Consumer<IType> consumer, boolean closeAngle)
 	{
 		this.consumer = consumer;
 
@@ -66,7 +67,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		// this.mode = NAME;
 	}
 
-	protected TypeParser(ITypeConsumer consumer, IType parentType, int flags)
+	protected TypeParser(Consumer<IType> consumer, IType parentType, int flags)
 	{
 		this.consumer = consumer;
 		this.parentType = parentType;
@@ -80,7 +81,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		return this;
 	}
 
-	private TypeParser subParser(ITypeConsumer consumer)
+	private TypeParser subParser(Consumer<IType> consumer)
 	{
 		return new TypeParser(consumer).withFlags(this.flags);
 	}
@@ -267,7 +268,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		}
 		case LAMBDA_END:
 			this.type.expandPosition(token.prev());
-			this.consumer.setType(this.type);
+			this.consumer.accept(this.type);
 			pm.popParser(true);
 			return;
 		case ARRAY_COLON:
@@ -410,7 +411,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 			if (this.type != null)
 			{
-				this.consumer.setType(this.type);
+				this.consumer.accept(this.type);
 			}
 			pm.popParser(true);
 		}
@@ -483,7 +484,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	}
 
 	@Override
-	public void setType(IType type)
+	public void accept(IType type)
 	{
 		this.type = type;
 	}

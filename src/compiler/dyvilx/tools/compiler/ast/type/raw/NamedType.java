@@ -1,7 +1,8 @@
 package dyvilx.tools.compiler.ast.type.raw;
 
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -13,15 +14,13 @@ import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class NamedType implements IUnresolvedType, ITypeConsumer
+public class NamedType implements IUnresolvedType
 {
 	protected IType         parent;
 	protected SourcePosition position;
@@ -76,12 +75,6 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 	public void setParent(IType parent)
 	{
 		this.parent = parent;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.parent = type;
 	}
 
 	@Override
