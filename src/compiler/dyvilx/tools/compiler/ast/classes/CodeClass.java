@@ -31,6 +31,7 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
@@ -137,7 +138,7 @@ public class CodeClass extends AbstractClass
 		}
 
 		this.attributes.resolveTypes(markers, context, this);
-		ModifierUtil.checkModifiers(this, markers);
+		ModifierChecks.checkModifiers(this, markers);
 
 		this.metadata.resolveTypesPre(markers, context);
 

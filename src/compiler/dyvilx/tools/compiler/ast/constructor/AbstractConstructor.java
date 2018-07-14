@@ -8,7 +8,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -31,6 +30,7 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.Names;
@@ -301,7 +301,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void checkCall(MarkerList markers, SourcePosition position, IContext context, ArgumentList arguments)
 	{
-		ModifierUtil.checkVisibility(this, position, markers, context);
+		ModifierChecks.checkVisibility(this, position, markers, context);
 
 		if (this.exceptions == null)
 		{

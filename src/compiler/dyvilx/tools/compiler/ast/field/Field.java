@@ -33,6 +33,7 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -163,7 +164,7 @@ public class Field extends Member implements IField, IDefaultContext
 	@Override
 	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
-		ModifierUtil.checkVisibility(this, position, markers, context);
+		ModifierChecks.checkVisibility(this, position, markers, context);
 		if (receiver == null)
 		{
 			if (!this.isStatic())

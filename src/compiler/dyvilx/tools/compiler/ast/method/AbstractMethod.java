@@ -44,6 +44,7 @@ import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.Names;
@@ -769,7 +770,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
 		ArgumentList arguments, ITypeContext typeContext)
 	{
-		ModifierUtil.checkVisibility(this, position, markers, context);
+		ModifierChecks.checkVisibility(this, position, markers, context);
 
 		if (instance != null)
 		{

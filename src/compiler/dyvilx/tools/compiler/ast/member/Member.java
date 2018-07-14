@@ -5,12 +5,12 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -143,7 +143,7 @@ public abstract class Member implements IMember
 		}
 
 		this.attributes.resolveTypes(markers, context, this);
-		ModifierUtil.checkModifiers(this, markers);
+		ModifierChecks.checkModifiers(this, markers);
 	}
 
 	@Override

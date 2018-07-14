@@ -37,6 +37,7 @@ import dyvilx.tools.compiler.backend.ClassWriter;
 import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
@@ -284,7 +285,7 @@ public class CodeMethod extends AbstractMethod
 			this.value.check(markers, this);
 		}
 
-		ModifierUtil.checkMethodModifiers(markers, this);
+		ModifierChecks.checkMethodModifiers(markers, this);
 
 		context.pop();
 	}
@@ -361,7 +362,7 @@ public class CodeMethod extends AbstractMethod
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			ModifierUtil.checkOverride(this, overrideMethod, markers);
+			ModifierChecks.checkOverride(this, overrideMethod, markers);
 
 			// Type Compatibility Check
 
