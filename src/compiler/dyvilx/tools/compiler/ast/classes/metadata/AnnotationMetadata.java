@@ -9,7 +9,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
-import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
@@ -123,7 +123,7 @@ public final class AnnotationMetadata implements IClassMetadata
 
 		for (int i = 0; i < size; i++)
 		{
-			final INamed value = (INamed) values.get(i);
+			final Named value = (Named) values.get(i);
 			try
 			{
 				this.targets.add(ElementType.valueOf(value.getName().qualified));

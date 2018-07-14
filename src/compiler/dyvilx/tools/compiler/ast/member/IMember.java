@@ -9,7 +9,7 @@ import dyvilx.tools.compiler.phase.IResolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IMember extends ASTNode, IResolvable, INamed, ITyped, Attributable
+public interface IMember extends ASTNode, IResolvable, Named, ITyped, Attributable
 {
 	MemberKind getKind();
 

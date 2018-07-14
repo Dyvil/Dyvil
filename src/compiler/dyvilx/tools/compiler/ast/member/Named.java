@@ -2,9 +2,9 @@ package dyvilx.tools.compiler.ast.member;
 
 import dyvil.lang.Name;
 
-public interface INamed
+public interface Named
 {
-	void setName(Name name);
-	
 	Name getName();
+
+	void setName(Name name);
 }
