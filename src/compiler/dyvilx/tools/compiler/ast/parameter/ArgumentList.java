@@ -18,7 +18,7 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
@@ -27,7 +27,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class ArgumentList implements IResolvable, IValueList
+public class ArgumentList implements Resolvable, IValueList
 {
 	public static final ArgumentList EMPTY = empty();
 

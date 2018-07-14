@@ -22,11 +22,11 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends ASTNode, IResolvable, Named, Attributable, IObjectCompilable
+public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable, IObjectCompilable
 {
 	ITypeParametric getGeneric();
 

@@ -5,7 +5,7 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IResolvable
+public interface Resolvable
 {
 	void resolveTypes(MarkerList markers, IContext context);
 

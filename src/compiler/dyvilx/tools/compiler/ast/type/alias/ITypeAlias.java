@@ -11,7 +11,7 @@ import dyvilx.tools.compiler.ast.method.IOverloadable;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -20,7 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends ASTNode, IResolvable, IOverloadable, ITypeParametric, IObjectCompilable
+public interface ITypeAlias extends ASTNode, Resolvable, IOverloadable, ITypeParametric, IObjectCompilable
 {
 	IHeaderUnit getEnclosingHeader();
 
@@ -28,13 +28,13 @@ public interface ITypeAlias extends ASTNode, IResolvable, IOverloadable, ITypePa
 
 	@Override
 	void setName(Name name);
-	
+
 	@Override
 	Name getName();
-	
+
 	@Override
 	void setType(IType type);
-	
+
 	@Override
 	IType getType();
 

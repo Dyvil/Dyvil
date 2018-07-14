@@ -34,12 +34,12 @@ import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
+public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsumer<IField>
 {
 	private static class MethodLink
 	{

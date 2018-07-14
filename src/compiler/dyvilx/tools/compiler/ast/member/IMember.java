@@ -5,11 +5,11 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.Typed;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IMember extends ASTNode, IResolvable, Named, Typed, Attributable
+public interface IMember extends ASTNode, Resolvable, Named, Typed, Attributable
 {
 	MemberKind getKind();
 

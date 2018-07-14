@@ -11,14 +11,14 @@ import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-public interface IClassMetadata extends IClassCompilable, IResolvable
+public interface IClassMetadata extends IClassCompilable, Resolvable
 {
 	MemberKind getKind();
 

@@ -13,7 +13,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Util;
 import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -23,7 +23,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class ParameterList implements Iterable<IParameter>, IResolvable
+public class ParameterList implements Iterable<IParameter>, Resolvable
 {
 	private static final int DEFAULT_CAPACITY = 3;
 
