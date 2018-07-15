@@ -343,7 +343,7 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 
-		final int modifiers = member.getAttributes().flags();
+		final long modifiers = member.getAttributes().flags();
 		if ((modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0))
 		{
 			set.add(member);
