@@ -94,12 +94,6 @@ public abstract class AbstractMember implements Member
 		this.attributes = attributes;
 	}
 
-	@Override
-	public int getAccessLevel()
-	{
-		return this.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS;
-	}
-
 	// ------------------------------ Named Implementation ------------------------------
 
 	@Override

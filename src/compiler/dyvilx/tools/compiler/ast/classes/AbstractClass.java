@@ -162,12 +162,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return false;
 	}
 
-	@Override
-	public int getAccessLevel()
-	{
-		return this.attributes.flags() & Modifiers.ACCESS_MODIFIERS;
-	}
-
 	// Names
 
 	@Override

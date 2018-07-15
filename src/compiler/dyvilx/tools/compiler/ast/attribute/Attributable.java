@@ -43,6 +43,11 @@ public interface Attributable
 
 	// --------------- Modifiers ---------------
 
+	default int getAccessLevel()
+	{
+		return (int) (this.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS);
+	}
+
 	default boolean hasModifier(int modifier)
 	{
 		return this.getAttributes().hasFlag(modifier);

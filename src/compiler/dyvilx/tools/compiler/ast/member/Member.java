@@ -9,7 +9,5 @@ public interface Member extends ASTNode, Resolvable, Named, Typed, Attributable
 {
 	MemberKind getKind();
 
-	int getAccessLevel();
-
 	String getInternalName();
 }
