@@ -242,8 +242,8 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 
 	public static void copyModifiers(AttributeList from, AttributeList to)
 	{
-		final int exisiting = to.flags();
-		final int newModifiers;
+		final long exisiting = to.flags();
+		final long newModifiers;
 		if ((exisiting & Modifiers.ACCESS_MODIFIERS) != 0)
 		{
 			// only transfer static modifiers to the property
@@ -628,7 +628,7 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 		final String desc = this.getDescriptor();
 
 		writer.visitLineNumber(lineNumber);
-		switch (this.getAttributes().flags() & (Modifiers.STATIC | Modifiers.LAZY))
+		switch ((int) (this.getAttributes().flags() & (Modifiers.STATIC | Modifiers.LAZY)))
 		{
 		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);

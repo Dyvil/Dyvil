@@ -31,9 +31,9 @@ public enum MemberKind
 
 	private final String name;
 	private final String allowedModifiers;
-	private final int    defaultAccess;
+	private final long    defaultAccess;
 
-	MemberKind(String name, String allowedModifiers, int defaultAccess)
+	MemberKind(String name, String allowedModifiers, long defaultAccess)
 	{
 		this.name = name;
 		this.allowedModifiers = allowedModifiers;
@@ -58,7 +58,7 @@ public enum MemberKind
 		return index >= 0 && (this.allowedModifiers.charAt(index + str.length()) == ',');
 	}
 
-	public int getDefaultAccess(Member member)
+	public long getDefaultAccess(Member member)
 	{
 		if (this == FIELD && ((IField) member).getEnclosingClass().isInterface())
 		{

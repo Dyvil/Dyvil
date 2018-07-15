@@ -416,7 +416,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		final IType[] matchTypes;
 		boolean invalid = false;
 
-		final int mod = this.attributes.flags() & Modifiers.INFIX;
+		final long mod = this.attributes.flags() & Modifiers.INFIX;
 		if (receiver == null)
 		{
 			if (mod == Modifiers.INFIX)
@@ -612,7 +612,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 		if (receiver != null)
 		{
-			final int mod = this.attributes.flags() & Modifiers.INFIX;
+			final long mod = this.attributes.flags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && !receiver.isClassAccess() && !parameters.isEmpty())
 			{
 				// infix or extension method, declaring class implicit
@@ -921,7 +921,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 	private int getInvokeOpcode(IClass owner)
 	{
-		int modifiers = this.attributes.flags();
+		long modifiers = this.attributes.flags();
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return Opcodes.INVOKESTATIC;

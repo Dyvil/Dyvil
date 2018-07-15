@@ -17,16 +17,13 @@ import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import static dyvil.reflect.Modifiers.ABSTRACT;
-import static dyvil.reflect.Modifiers.NATIVE;
-
 public class ModifierChecks
 {
 	public static void checkModifiers(Member member, MarkerList markers)
 	{
 		final AttributeList attributes = member.getAttributes();
 		final MemberKind memberKind = member.getKind();
-		final int defaultAccess = memberKind.getDefaultAccess(member);
+		final long defaultAccess = memberKind.getDefaultAccess(member);
 		StringBuilder errorBuilder = null;
 
 		for (Attribute modifier : attributes)
@@ -44,7 +41,7 @@ public class ModifierChecks
 				modifier.toString(errorBuilder);
 			}
 
-			final int visibility = modifier.flags() & Modifiers.VISIBILITY_MODIFIERS;
+			final long visibility = modifier.flags() & Modifiers.VISIBILITY_MODIFIERS;
 			if (visibility != 0 && visibility == defaultAccess)
 			{
 				markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
@@ -89,7 +86,7 @@ public class ModifierChecks
 	public static void checkOverride(IMethod member, IMethod overriden, MarkerList markers)
 	{
 		final int accessLevel = member.getAccessLevel() & ~Modifiers.INTERNAL;
-		final int overrideFlags = overriden.getAttributes().flags();
+		final long overrideFlags = overriden.getAttributes().flags();
 
 		// Final Modifier Check
 		if ((overrideFlags & Modifiers.FINAL) != 0)
@@ -99,7 +96,7 @@ public class ModifierChecks
 
 		// Visibility Check
 
-		switch (overrideFlags & Modifiers.VISIBILITY_MODIFIERS)
+		switch ((int) (overrideFlags & Modifiers.VISIBILITY_MODIFIERS))
 		{
 		case Modifiers.PRIVATE:
 			markers.add(Markers.semanticError(member.getPosition(), "method.override.private", member.getName()));
@@ -132,11 +129,9 @@ public class ModifierChecks
 
 	public static void checkMethodModifiers(MarkerList markers, IMethod member)
 	{
-		final int flags = member.getAttributes().flags();
-
 		final boolean hasValue = member.getValue() != null;
-		final boolean isAbstract = (flags & ABSTRACT) != 0;
-		final boolean isNative = (flags & NATIVE) != 0;
+		final boolean isAbstract = member.isAbstract();
+		final boolean isNative = member.hasModifier(Modifiers.NATIVE);
 
 		// If the method does not have an implementation and is static
 		if (isAbstract)

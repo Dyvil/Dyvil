@@ -105,19 +105,19 @@ public enum BaseModifiers implements Modifier
 
 	public static final String INITIALIZER_MODIFIERS = "private,static,";
 
-	private final int    intValue;
+	private final long   flags;
 	private final String name;
 
-	BaseModifiers(int intValue, String name)
+	BaseModifiers(long flags, String name)
 	{
-		this.intValue = intValue;
+		this.flags = flags;
 		this.name = name;
 	}
 
 	@Override
-	public int flags()
+	public long flags()
 	{
-		return this.intValue;
+		return this.flags;
 	}
 
 	@Override

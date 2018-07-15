@@ -20,7 +20,7 @@ public interface Attribute extends ASTNode, Resolvable
 {
 	@Nullable IType getType();
 
-	int flags();
+	long flags();
 
 	@Override
 	void resolveTypes(MarkerList markers, IContext context);

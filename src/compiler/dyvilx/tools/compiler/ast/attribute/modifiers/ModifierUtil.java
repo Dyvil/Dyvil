@@ -32,21 +32,21 @@ public final class ModifierUtil
 	{
 	}
 
-	public static String accessModifiersToString(int mod)
+	public static String accessModifiersToString(long mod)
 	{
 		final StringBuilder builder = new StringBuilder();
 		appendAccessModifiers(mod, builder);
 		return builder.toString();
 	}
 
-	public static String classTypeToString(int mod)
+	public static String classTypeToString(long mod)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		writeClassType(mod, stringBuilder);
 		return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString();
 	}
 
-	public static void writeClassType(int mod, StringBuilder sb)
+	public static void writeClassType(long mod, StringBuilder sb)
 	{
 		if (mod == 0)
 		{
@@ -82,7 +82,7 @@ public final class ModifierUtil
 		sb.append("class ");
 	}
 
-	public static void appendAccessModifiers(int mod, StringBuilder builder)
+	public static void appendAccessModifiers(long mod, StringBuilder builder)
 	{
 		// @formatter:off
 		if ((mod & PUBLIC) == PUBLIC) { builder.append("public "); }
@@ -93,7 +93,7 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static void appendModifiers(int mod, MemberKind memberKind, StringBuilder builder)
+	public static void appendModifiers(long mod, MemberKind memberKind, StringBuilder builder)
 	{
 		// @formatter:off
 		if ((mod & TRANSIENT) == TRANSIENT) { builder.append("@transient "); }
@@ -140,9 +140,9 @@ public final class ModifierUtil
 
 	public static long getFlags(ClassMember member)
 	{
-		final int flags = member.getAttributes().flags();
-		int javaModifiers = flags & JAVA_MODIFIER_MASK;
-		int dyvilModifiers = flags & DYVIL_MODIFIER_MASK;
+		final long flags = member.getAttributes().flags();
+		int javaModifiers = (int) (flags & JAVA_MODIFIER_MASK);
+		int dyvilModifiers = (int) (flags & DYVIL_MODIFIER_MASK);
 
 		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{

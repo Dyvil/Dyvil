@@ -163,7 +163,7 @@ public interface IClass
 
 	void writeInnerClassInfo(ClassWriter writer);
 
-	static IClassMetadata getClassMetadata(IClass forClass, int modifiers)
+	static IClassMetadata getClassMetadata(IClass forClass, long modifiers)
 	{
 		if ((modifiers & Modifiers.ANNOTATION) != 0)
 		{

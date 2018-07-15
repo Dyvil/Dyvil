@@ -134,7 +134,7 @@ public interface IParameter extends IVariable, ClassMember
 		else
 		{
 			name = method.getInternalName() + "$paramDefault$" + this.getInternalName();
-			access = (method.getAttributes().flags() & Modifiers.MEMBER_MODIFIERS) | Modifiers.STATIC;
+			access = (int) (method.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS) | Modifiers.STATIC;
 		}
 
 		final String desc = "()" + this.getDescriptor();

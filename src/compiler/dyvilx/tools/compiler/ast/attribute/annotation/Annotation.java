@@ -63,7 +63,7 @@ public abstract class Annotation implements Attribute, Typed, ObjectCompilable, 
 	}
 
 	@Override
-	public int flags()
+	public long flags()
 	{
 		return 0;
 	}
