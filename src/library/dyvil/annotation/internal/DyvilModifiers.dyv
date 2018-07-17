@@ -3,4 +3,4 @@ package dyvil.annotation.`internal`
 import java.lang.annotation._
 
 @Retention(.RUNTIME)
-@interface DyvilModifiers(let value: int)
+@interface DyvilModifiers(let value: long)

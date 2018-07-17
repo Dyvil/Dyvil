@@ -15,9 +15,16 @@ public class ModifierVisitor implements AnnotationVisitor
 	@Override
 	public void visit(String name, Object value)
 	{
-		if ("value".equals(name) && value instanceof Integer)
+		if ("value".equals(name))
 		{
-			this.attributes.addFlag((int) value);
+			if (value instanceof Integer)
+			{
+				this.attributes.addFlag((int) value);
+			}
+			else if (value instanceof Long)
+			{
+				this.attributes.addFlag((long) value);
+			}
 		}
 	}
 

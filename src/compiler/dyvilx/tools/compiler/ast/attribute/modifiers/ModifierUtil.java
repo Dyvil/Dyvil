@@ -182,7 +182,7 @@ public final class ModifierUtil
 
 	public static void writeModifiers(AnnotatableVisitor visitor, long flags)
 	{
-		final int dyvilModifiers = (int) (flags >> 32);
+		final long dyvilModifiers = flags >>> 32;
 		if (dyvilModifiers != 0)
 		{
 			final AnnotationVisitor annotationVisitor = visitor.visitAnnotation(DYVIL_MODIFIERS, true);
