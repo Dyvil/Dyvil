@@ -46,7 +46,7 @@ public class EnumValue extends FieldAccess
 			return null;
 		}
 
-		final String valueTypeName = ClassFormat.internalToPackage(value.getType().getDescriptor(IType.NAME_FULL));
+		final String valueTypeName = ClassFormat.internalToPackage(value.getType().getInternalName());
 		if (!valueTypeName.equals(type.getName()))
 		{
 			return null;
