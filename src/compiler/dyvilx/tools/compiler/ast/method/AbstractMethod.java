@@ -42,8 +42,8 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
@@ -226,12 +226,6 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 	public boolean isThisAvailable()
 	{
 		return !this.isStatic();
-	}
-
-	@Override
-	public boolean isAbstract()
-	{
-		return super.isAbstract() && !this.isObjectMethod();
 	}
 
 	@Override
