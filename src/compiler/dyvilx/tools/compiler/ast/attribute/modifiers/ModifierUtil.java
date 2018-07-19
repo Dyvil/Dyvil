@@ -1,12 +1,10 @@
 package dyvilx.tools.compiler.ast.attribute.modifiers;
 
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.member.ClassMember;
+import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-
-import java.lang.annotation.ElementType;
 
 import static dyvil.reflect.Modifiers.*;
 
@@ -22,9 +20,9 @@ public final class ModifierUtil
 
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
-	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-	                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
-	                                               & ~GENERATED; // exclude source-only modifiers
+	private static final long DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
+	                                                & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
+	                                                & ~GENERATED; // exclude source-only modifiers
 
 	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
@@ -138,51 +136,43 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static long getFlags(ClassMember member)
+	public static AttributeList getAttributes(int javaFlags)
 	{
-		final long flags = member.getAttributes().flags();
-		int javaModifiers = (int) (flags & JAVA_MODIFIER_MASK);
-		int dyvilModifiers = (int) (flags & DYVIL_MODIFIER_MASK);
+		if ((javaFlags & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		{
+			javaFlags |= Modifiers.PACKAGE;
+		}
+		return AttributeList.of(javaFlags);
+	}
+
+	public static int getJavaFlags(AttributeList attributes)
+	{
+		final long flags = attributes.flags();
+		int javaFlags = (int) (flags & JAVA_MODIFIER_MASK);
 
 		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{
-			// for private protected members, move the private modifier
-
-			javaModifiers &= ~PRIVATE;
-			dyvilModifiers |= PRIVATE;
+			javaFlags &= ~PRIVATE;
 		}
-		if (member.getElementType() == ElementType.METHOD)
+
+		return javaFlags;
+	}
+
+	public static long getDyvilFlags(AttributeList attributes)
+	{
+		final long flags = attributes.flags();
+		long dyvilFlags = flags & DYVIL_MODIFIER_MASK;
+
+		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{
-			if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
-			{
-				// for static abstract methods, move the abstract modifier
-
-				javaModifiers &= ~ABSTRACT;
-				dyvilModifiers |= ABSTRACT;
-			}
-			if ((flags & FINAL) != 0)
-			{
-				final IClass enclosingClass = member.getEnclosingClass();
-				if (enclosingClass != null && enclosingClass.isInterface())
-				{
-					// for final interface methods, move the final modifier
-
-					javaModifiers &= ~FINAL;
-					dyvilModifiers |= FINAL;
-				}
-			}
+			dyvilFlags |= PRIVATE;
 		}
-		return (long) dyvilModifiers << 32 | javaModifiers;
+
+		return dyvilFlags;
 	}
 
-	public static int getJavaModifiers(long flags)
+	public static void writeDyvilModifiers(AnnotatableVisitor visitor, long dyvilModifiers)
 	{
-		return (int) flags;
-	}
-
-	public static void writeModifiers(AnnotatableVisitor visitor, long flags)
-	{
-		final long dyvilModifiers = flags >>> 32;
 		if (dyvilModifiers != 0)
 		{
 			final AnnotationVisitor annotationVisitor = visitor.visitAnnotation(DYVIL_MODIFIERS, true);

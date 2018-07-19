@@ -2,9 +2,7 @@ package dyvilx.tools.compiler.backend;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
-import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.ASMConstants;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.external.ExternalConstructor;
 import dyvilx.tools.compiler.ast.external.ExternalMethod;
@@ -85,15 +83,6 @@ public final class ClassFormat
 			return ClassFormat.H_INVOKESPECIAL;
 		}
 		return -1;
-	}
-
-	public static AttributeList readModifiers(int access)
-	{
-		if ((access & Modifiers.VISIBILITY_MODIFIERS) == 0)
-		{
-			access |= Modifiers.PACKAGE;
-		}
-		return AttributeList.of(access);
 	}
 
 	public static boolean isTwoWord(Object type)

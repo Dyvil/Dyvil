@@ -286,13 +286,15 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final long flags = ModifierUtil.getFlags(this);
+		final int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
+		final long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			ModifierUtil.getJavaModifiers(flags), "<init>", this.getDescriptor(), this.getSignature(),
+			javaFlags, "<init>", this.getDescriptor(), this.getSignature(),
 			this.getInternalExceptions()));
 
 		// Write Modifiers and Annotations
-		ModifierUtil.writeModifiers(methodWriter, flags);
+		ModifierUtil.writeDyvilModifiers(methodWriter, dyvilFlags);
 
 		this.attributes.write(methodWriter);
 

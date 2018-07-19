@@ -30,9 +30,9 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
@@ -211,8 +211,7 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 		{
 			receiver = TypeChecker
 				           .convertValue(receiver, this.enclosingClass.getThisType(), receiver.getType(), markers,
-				                         context,
-				                         TypeChecker.markerSupplier("field.access.receiver_type", this.name));
+				                         context, TypeChecker.markerSupplier("field.access.receiver_type", this.name));
 		}
 
 		return receiver;
@@ -456,16 +455,16 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final long flags = ModifierUtil.getFlags(this);
-		final int modifiers = ModifierUtil.getJavaModifiers(flags);
+		final int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
+		final long dyvilFlags = ModifierUtil.getJavaFlags(this.attributes);
 
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
 		final Object value = this.getObjectValue();
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
-		this.writeAnnotations(fieldVisitor, flags);
+		final FieldVisitor fieldVisitor = writer.visitField(javaFlags, name, descriptor, signature, value);
+		this.writeAnnotations(fieldVisitor, dyvilFlags);
 		fieldVisitor.visitEnd();
 
 		if (this.property != null)
@@ -480,12 +479,13 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 
 		final String lazyName = name + "$lazy";
 		final String ownerClass = this.enclosingClass.getInternalName();
-		final boolean isStatic = (flags & Modifiers.STATIC) != 0;
+		final boolean isStatic = this.isStatic();
 
 		writer
 			.visitField(isStatic ? Modifiers.PRIVATE | Modifiers.STATIC : Modifiers.PRIVATE, lazyName, "Z", null, null);
 
-		final MethodWriter access = new MethodWriterImpl(writer, writer.visitMethod(modifiers, lazyName,
+		// FIXME properly convert javaFlags for methods
+		final MethodWriter access = new MethodWriterImpl(writer, writer.visitMethod(javaFlags, lazyName,
 		                                                                            "()" + descriptor, null, null));
 		access.visitCode();
 
@@ -544,7 +544,7 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 
 	private void writeAnnotations(FieldVisitor fieldVisitor, long flags)
 	{
-		ModifierUtil.writeModifiers(fieldVisitor, flags);
+		ModifierUtil.writeDyvilModifiers(fieldVisitor, flags);
 
 		final AttributeList annotations = this.getAttributes();
 		if (annotations != null)

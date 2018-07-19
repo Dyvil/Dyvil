@@ -90,28 +90,30 @@ public interface IParameter extends IVariable, ClassMember
 
 	default void writeParameter(MethodWriter writer)
 	{
-		final AttributeList annotations = this.getAttributes();
 		final IType type = this.getInternalType();
-		final long flags = ModifierUtil.getFlags(this);
 
 		final int index = this.getIndex();
 		final int localIndex = writer.localCount();
 
 		this.setLocalIndex(localIndex);
 
-		// Add the ACC_VARARGS modifier if necessary
-		final int javaModifiers = ModifierUtil.getJavaModifiers(flags) | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
-		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaModifiers);
+		final AttributeList attributes = this.getAttributes();
+		int javaFlags = ModifierUtil.getJavaFlags(attributes);
+		final long dyvilFlags = ModifierUtil.getDyvilFlags(attributes);
+
+		if (this.isVarargs())
+		{
+			javaFlags |= Modifiers.ACC_VARARGS;
+		}
+
+		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaFlags);
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
 
-		if (annotations != null)
-		{
-			annotations.write(visitor);
-		}
+		attributes.write(visitor);
 
-		ModifierUtil.writeModifiers(visitor, flags);
+		ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 	}

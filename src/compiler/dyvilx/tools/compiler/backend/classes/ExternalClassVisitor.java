@@ -67,7 +67,7 @@ public class ExternalClassVisitor implements ClassVisitor
 	@Override
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.theClass.setAttributes(readModifiers(access));
+		this.theClass.setAttributes(ModifierUtil.getAttributes(access));
 		this.theClass.setInternalName(name);
 
 		this.theClass.setBody(new ClassBody(this.theClass));
@@ -215,13 +215,13 @@ public class ExternalClassVisitor implements ClassVisitor
 		if (this.classParameters.contains(name))
 		{
 			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name), desc, type,
-			                                                        readModifiers(access));
+			                                                        ModifierUtil.getAttributes(access));
 			this.theClass.getParameters().add(param);
 			return new ExternalFieldVisitor(param);
 		}
 
 		final ExternalField field = new ExternalField(this.theClass, Name.fromQualified(name), desc, type,
-		                                              readModifiers(access));
+		                                              ModifierUtil.getAttributes(access));
 
 		if (value != null)
 		{
@@ -251,7 +251,7 @@ public class ExternalClassVisitor implements ClassVisitor
 				return null;
 			}
 
-			final ExternalConstructor ctor = new ExternalConstructor(this.theClass, readModifiers(access));
+			final ExternalConstructor ctor = new ExternalConstructor(this.theClass, ModifierUtil.getAttributes(access));
 
 			if (signature != null)
 			{
@@ -282,12 +282,13 @@ public class ExternalClassVisitor implements ClassVisitor
 		{
 			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name),
 			                                                        desc.substring(2), readReturnType(desc),
-			                                                        readModifiers(access));
+			                                                        ModifierUtil.getAttributes(access));
 			this.theClass.getParameters().add(param);
 			return new AnnotationClassVisitor(param);
 		}
 
-		final ExternalMethod method = new ExternalMethod(this.theClass, name, desc, signature, readModifiers(access));
+		final ExternalMethod method = new ExternalMethod(this.theClass, name, desc, signature,
+		                                                 ModifierUtil.getAttributes(access));
 
 		if (signature != null)
 		{
