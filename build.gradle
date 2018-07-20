@@ -333,7 +333,7 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	exec.outputs.dir target
 	for (String src : srcs)
 	{
-		exec.inputs.file fileTree(src) {
+		exec.inputs.files fileTree(src) {
 			include dyvilFilters
 		}
 	}
@@ -350,7 +350,7 @@ private void runGenSrc(JavaExec exec, String config, String[] srcs, String targe
 	exec.inputs.file(config)
 	for (String src : srcs)
 	{
-		exec.inputs.file fileTree(src) {
+		exec.inputs.files fileTree(src) {
 			include genSrcFilters
 		}
 	}
