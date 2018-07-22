@@ -16,7 +16,7 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -24,7 +24,7 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.statement.control.Label;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
@@ -476,7 +476,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 	protected void addMethod(MemberStatement memberStatement, MarkerList markers)
 	{
-		final IClassMember member = memberStatement.member;
+		final ClassMember member = memberStatement.member;
 		final MemberKind memberKind = member.getKind();
 		if (memberKind != MemberKind.METHOD)
 		{

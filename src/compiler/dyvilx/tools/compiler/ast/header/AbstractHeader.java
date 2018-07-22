@@ -17,7 +17,7 @@ import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.imports.IImportContext;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -341,7 +341,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public byte getVisibility(IClassMember member)
+	public byte getVisibility(ClassMember member)
 	{
 		IClass iclass = member.getEnclosingClass();
 

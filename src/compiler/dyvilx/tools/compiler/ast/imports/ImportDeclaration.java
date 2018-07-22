@@ -4,7 +4,7 @@ import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.header.IObjectCompilable;
+import dyvilx.tools.compiler.ast.header.ObjectCompilable;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
@@ -14,7 +14,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class ImportDeclaration implements ASTNode, IObjectCompilable, IImportConsumer
+public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportConsumer
 {
 	protected SourcePosition position;
 	protected IImport        theImport;

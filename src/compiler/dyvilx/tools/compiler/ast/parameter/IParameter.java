@@ -15,17 +15,17 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 
-public interface IParameter extends IVariable, IClassMember
+public interface IParameter extends IVariable, ClassMember
 {
 	String DEFAULT_PREFIX_INIT = "init$paramDefault$";
 	String DEFAULT_PREFIX      = "$paramDefault$";
@@ -90,28 +90,30 @@ public interface IParameter extends IVariable, IClassMember
 
 	default void writeParameter(MethodWriter writer)
 	{
-		final AttributeList annotations = this.getAttributes();
 		final IType type = this.getInternalType();
-		final long flags = ModifierUtil.getFlags(this);
 
 		final int index = this.getIndex();
 		final int localIndex = writer.localCount();
 
 		this.setLocalIndex(localIndex);
 
-		// Add the ACC_VARARGS modifier if necessary
-		final int javaModifiers = ModifierUtil.getJavaModifiers(flags) | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
-		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaModifiers);
+		final AttributeList attributes = this.getAttributes();
+		int javaFlags = ModifierUtil.getJavaFlags(attributes);
+		final long dyvilFlags = ModifierUtil.getDyvilFlags(attributes);
+
+		if (this.isVarargs())
+		{
+			javaFlags |= Modifiers.ACC_VARARGS;
+		}
+
+		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaFlags);
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
 
-		if (annotations != null)
-		{
-			annotations.write(visitor);
-		}
+		attributes.write(visitor);
 
-		ModifierUtil.writeModifiers(visitor, flags);
+		ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 	}
@@ -134,7 +136,7 @@ public interface IParameter extends IVariable, IClassMember
 		else
 		{
 			name = method.getInternalName() + "$paramDefault$" + this.getInternalName();
-			access = (method.getAttributes().flags() & Modifiers.MEMBER_MODIFIERS) | Modifiers.STATIC;
+			access = (int) (method.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS) | Modifiers.STATIC;
 		}
 
 		final String desc = "()" + this.getDescriptor();
@@ -167,6 +169,6 @@ public interface IParameter extends IVariable, IClassMember
 
 		IType type = new InternalType(internalType);
 		Annotation annotation = new ExternalAnnotation(type);
-		return new AnnotationReader(this, annotation);
+		return new AnnotationReader(this.annotationConsumer(), annotation);
 	}
 }

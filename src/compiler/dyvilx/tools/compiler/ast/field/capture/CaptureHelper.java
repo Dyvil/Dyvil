@@ -5,8 +5,8 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 

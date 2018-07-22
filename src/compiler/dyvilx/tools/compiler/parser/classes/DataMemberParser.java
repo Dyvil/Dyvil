@@ -89,7 +89,7 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 			if (type == BaseSymbols.COLON)
 			{
 				// ... IDENTIFIER : TYPE ...
-				pm.pushParser(new TypeParser(this.dataMember));
+				pm.pushParser(new TypeParser(this.dataMember::setType));
 				this.mode = VALUE;
 				return;
 			}

@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.compound.NullableType;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvil.lang.Name;

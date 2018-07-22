@@ -1,11 +1,11 @@
 package dyvilx.tools.compiler.ast.expression;
 
+import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
@@ -14,19 +14,25 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class AnnotationExpr implements IValue, IAnnotationConsumer
+import java.util.function.Consumer;
+
+public class AnnotationExpr implements IValue, Consumer<Annotation>
 {
-	private static final Handle ANNOTATION_METAFACTORY = new Handle(ClassFormat.H_INVOKESTATIC,
-	                                                                "dyvil/runtime/AnnotationMetafactory",
-	                                                                "metafactory",
-	                                                                ClassFormat.BSM_HEAD + "[Ljava/lang/Object;"
-	                                                                + ClassFormat.BSM_TAIL);
+	// --------------- Constants ---------------
+
+	private static final Handle ANNOTATION_METAFACTORY //
+		= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/AnnotationMetafactory", "metafactory",
+		             ClassFormat.BSM_HEAD + "[Ljava/lang/Object;" + ClassFormat.BSM_TAIL);
+
+	// --------------- Instance Fields ---------------
 
 	protected Annotation annotation;
+
+	// --------------- Constructors ---------------
 
 	public AnnotationExpr()
 	{
@@ -37,10 +43,27 @@ public class AnnotationExpr implements IValue, IAnnotationConsumer
 		this.annotation = annotation;
 	}
 
-	@Override
-	public void setPosition(SourcePosition position)
+	// --------------- Annotation ---------------
+
+	public Annotation getAnnotation()
 	{
+		return this.annotation;
 	}
+
+	public void setAnnotation(Annotation annotation)
+	{
+		this.annotation = annotation;
+	}
+
+	// ------------------------------ Consumer<Annotation> Implementation ------------------------------
+
+	@Override
+	public void accept(Annotation annotation)
+	{
+		this.setAnnotation(annotation);
+	}
+
+	// ------------------------------ Positioned Implementation ------------------------------
 
 	@Override
 	public SourcePosition getPosition()
@@ -49,15 +72,11 @@ public class AnnotationExpr implements IValue, IAnnotationConsumer
 	}
 
 	@Override
-	public void setAnnotation(Annotation annotation)
+	public void setPosition(SourcePosition position)
 	{
-		this.annotation = annotation;
 	}
 
-	public Annotation getAnnotation()
-	{
-		return this.annotation;
-	}
+	// ------------------------------ IValue Implementation ------------------------------
 
 	@Override
 	public int valueTag()
@@ -82,6 +101,8 @@ public class AnnotationExpr implements IValue, IAnnotationConsumer
 	{
 		return this;
 	}
+
+	// --------------- Transformation Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -122,6 +143,8 @@ public class AnnotationExpr implements IValue, IAnnotationConsumer
 		return this;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -161,6 +184,14 @@ public class AnnotationExpr implements IValue, IAnnotationConsumer
 		final AnnotationVisitor av = visitor.visitAnnotation(key, this.annotation.getType().getExtendedName());
 		this.annotation.write(av);
 		av.visitEnd();
+	}
+
+	// --------------- Formatting ---------------
+
+	@Override
+	public String toString()
+	{
+		return Formattable.toString(this);
 	}
 
 	@Override

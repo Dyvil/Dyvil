@@ -16,9 +16,9 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
@@ -286,13 +286,15 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final long flags = ModifierUtil.getFlags(this);
+		final int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
+		final long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			ModifierUtil.getJavaModifiers(flags), "<init>", this.getDescriptor(), this.getSignature(),
+			javaFlags, "<init>", this.getDescriptor(), this.getSignature(),
 			this.getInternalExceptions()));
 
 		// Write Modifiers and Annotations
-		ModifierUtil.writeModifiers(methodWriter, flags);
+		ModifierUtil.writeDyvilModifiers(methodWriter, dyvilFlags);
 
 		this.attributes.write(methodWriter);
 

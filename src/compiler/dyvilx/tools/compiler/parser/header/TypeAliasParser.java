@@ -79,7 +79,7 @@ public class TypeAliasParser extends Parser
 			// Fallthrough
 		case EQUAL:
 			this.mode = END;
-			pm.pushParser(new TypeParser(this.typeAlias));
+			pm.pushParser(new TypeParser(this.typeAlias::setType));
 
 			if (type != BaseSymbols.EQUALS)
 			{

@@ -22,9 +22,9 @@ import dyvilx.tools.compiler.ast.field.*;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
-import dyvilx.tools.compiler.ast.header.IClassCompilable;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -39,7 +39,7 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;
@@ -77,8 +77,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IClass         enclosingClass;
 	protected IClassMetadata metadata;
 
-	protected IClassCompilable[] compilables;
-	protected int                compilableCount;
+	protected ClassCompilable[] compilables;
+	protected int               compilableCount;
 
 	protected IType thisType;
 
@@ -160,12 +160,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public int getAccessLevel()
-	{
-		return this.attributes.flags() & Modifiers.ACCESS_MODIFIERS;
 	}
 
 	// Names
@@ -274,6 +268,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.interfaces = new TypeList();
 	}
 
+	public void setInterfaces(TypeList interfaces)
+	{
+		this.interfaces = interfaces;
+	}
+
 	// Body
 
 	@Override
@@ -305,11 +304,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void addClassCompilable(IClassCompilable compilable)
+	public void addClassCompilable(ClassCompilable compilable)
 	{
 		if (this.compilables == null)
 		{
-			this.compilables = new IClassCompilable[2];
+			this.compilables = new ClassCompilable[2];
 			this.compilables[0] = compilable;
 			this.compilableCount = 1;
 			return;
@@ -318,7 +317,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		int index = this.compilableCount++;
 		if (this.compilableCount > this.compilables.length)
 		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
+			ClassCompilable[] temp = new ClassCompilable[this.compilableCount];
 			System.arraycopy(this.compilables, 0, temp, 0, index);
 			this.compilables = temp;
 		}
@@ -501,6 +500,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public String getInternalName()
 	{
 		return this.internalName;
+	}
+
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
 	}
 
 	@Override
@@ -796,13 +800,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public boolean isMember(IClassMember member)
+	public boolean isMember(ClassMember member)
 	{
 		return member.getEnclosingClass() == this;
 	}
 
 	@Override
-	public byte getVisibility(IClassMember member)
+	public byte getVisibility(ClassMember member)
 	{
 		final IClass enclosingClass = member.getEnclosingClass();
 		if (enclosingClass == this)
@@ -865,7 +869,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.enclosingClass != null)
 		{
-			final int modifiers = this.getAttributes().flags() & ModifierUtil.JAVA_MODIFIER_MASK;
+			final int modifiers = (int) (this.getAttributes().flags() & ModifierUtil.JAVA_MODIFIER_MASK);
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 		}

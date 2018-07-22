@@ -5,7 +5,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -19,7 +18,9 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class FieldParser<T extends IDataMember> extends AbstractMemberParser implements ITypeConsumer
+import java.util.function.Consumer;
+
+public class FieldParser<T extends IDataMember> extends AbstractMemberParser implements Consumer<IType>
 {
 	protected static final int DECLARATOR = 0;
 	protected static final int NAME       = 1;
@@ -177,7 +178,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 	}
 
 	@Override
-	public void setType(IType type)
+	public void accept(IType type)
 	{
 		this.type = type;
 	}

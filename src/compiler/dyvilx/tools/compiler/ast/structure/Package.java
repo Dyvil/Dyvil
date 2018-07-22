@@ -14,8 +14,8 @@ import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
-import dyvilx.tools.compiler.ast.member.INamed;
-import dyvilx.tools.compiler.backend.ClassReader;
+import dyvilx.tools.compiler.ast.member.Named;
+import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;
@@ -25,7 +25,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.InputStream;
 
-public class Package implements INamed, IDefaultContext, IClassConsumer
+public class Package implements Named, IDefaultContext, IClassConsumer
 {
 	public static RootPackage rootPackage;
 
@@ -303,7 +303,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 			{
 				final ExternalClass externalClass = new ExternalClass(name);
 				consumer.addClass(externalClass);
-				return ClassReader.loadClass(compiler, externalClass, inputStream);
+				return ExternalClassVisitor.loadClass(compiler, externalClass, inputStream);
 			}
 		}
 		return null;

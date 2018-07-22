@@ -4,7 +4,6 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -14,9 +13,10 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -162,7 +162,7 @@ public class ClassParameter extends Field implements IParameter
 			return new ThisExpr(position, this.enclosingClass.getThisType(), markers, context);
 		}
 
-		ModifierUtil.checkVisibility(this, position, markers, context);
+		ModifierChecks.checkVisibility(this, position, markers, context);
 
 		return receiver;
 	}

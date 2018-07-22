@@ -14,7 +14,7 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.header.ISourceHeader;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -31,7 +31,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
+public class TypeAlias extends AbstractMember implements ITypeAlias, IDefaultContext
 {
 	protected @Nullable TypeParameterList typeParameters;
 

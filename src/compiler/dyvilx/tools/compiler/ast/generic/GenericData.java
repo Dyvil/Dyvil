@@ -8,10 +8,10 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class GenericData implements IResolvable, ITypeContext
+public final class GenericData implements Resolvable, ITypeContext
 {
 	protected @NonNull ITypeParametricMember member;
 

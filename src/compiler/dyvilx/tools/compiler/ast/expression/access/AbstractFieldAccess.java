@@ -7,14 +7,14 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalChainAware;
 import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public abstract class AbstractFieldAccess implements IValue, INamed, IReceiverAccess, OptionalChainAware
+public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAccess, OptionalChainAware
 {
 	protected IValue receiver;
 	protected Name   name;

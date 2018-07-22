@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -138,7 +138,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		return receiver == null || context.getThisClass() == receiver.getType().getTheClass();
 	}
 
-	static IDataMember resolveField(IContext context, ITyped receiver, Name name)
+	static IDataMember resolveField(IContext context, Typed receiver, Name name)
 	{
 		if (receiver != null)
 		{

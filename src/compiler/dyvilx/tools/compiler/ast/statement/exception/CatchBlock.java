@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.statement.exception;
 
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -16,7 +16,7 @@ import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class CatchBlock implements IResolvable, IDefaultContext, IValueConsumer
+public class CatchBlock implements Resolvable, IDefaultContext, IValueConsumer
 {
 	public IValue action;
 

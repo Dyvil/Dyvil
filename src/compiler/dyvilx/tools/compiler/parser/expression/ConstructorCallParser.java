@@ -58,7 +58,7 @@ public class ConstructorCallParser extends Parser
 				token.next().type() == BaseSymbols.OPEN_PARENTHESIS ? null : ArgumentList.empty();
 			this.call = new ConstructorCall(token.raw(), arguments);
 			this.mode = CONSTRUCTOR_PARAMETERS;
-			pm.pushParser(new TypeParser(this.call));
+			pm.pushParser(new TypeParser(this.call::setType));
 			return;
 		case CONSTRUCTOR_PARAMETERS:
 			// new ...

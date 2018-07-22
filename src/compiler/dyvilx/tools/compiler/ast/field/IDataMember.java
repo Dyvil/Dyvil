@@ -9,11 +9,11 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.WriteableExpression;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -21,7 +21,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IDataMember extends IMember, IAccessible, IValueConsumer
+public interface IDataMember extends Member, IAccessible, IValueConsumer
 {
 	IValue getValue();
 
@@ -124,7 +124,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		return this;
 	}
 
-	static void toString(String prefix, StringBuilder buffer, IMember field, String key)
+	static void toString(String prefix, StringBuilder buffer, Member field, String key)
 	{
 		final IType type = field.getType();
 
@@ -138,7 +138,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		}
 	}
 
-	static void appendKeyword(StringBuilder buffer, IMember member)
+	static void appendKeyword(StringBuilder buffer, Member member)
 	{
 		if (member.hasModifier(Modifiers.ENUM_CONST))
 		{

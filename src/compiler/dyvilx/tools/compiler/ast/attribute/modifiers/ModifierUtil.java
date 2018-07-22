@@ -1,24 +1,10 @@
 package dyvilx.tools.compiler.ast.attribute.modifiers;
 
 import dyvil.reflect.Modifiers;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.attribute.Attribute;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.member.IClassMember;
-import dyvilx.tools.compiler.ast.member.IMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.transform.Deprecation;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.compiler.util.Util;
-import dyvilx.tools.parsing.marker.Marker;
-import dyvilx.tools.parsing.marker.MarkerList;
-
-import java.lang.annotation.ElementType;
 
 import static dyvil.reflect.Modifiers.*;
 
@@ -34,9 +20,9 @@ public final class ModifierUtil
 
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
-	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-	                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
-	                                               & ~GENERATED; // exclude source-only modifiers
+	private static final long DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
+	                                                & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
+	                                                & ~GENERATED; // exclude source-only modifiers
 
 	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
@@ -44,21 +30,21 @@ public final class ModifierUtil
 	{
 	}
 
-	public static String accessModifiersToString(int mod)
+	public static String accessModifiersToString(long mod)
 	{
 		final StringBuilder builder = new StringBuilder();
 		appendAccessModifiers(mod, builder);
 		return builder.toString();
 	}
 
-	public static String classTypeToString(int mod)
+	public static String classTypeToString(long mod)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		writeClassType(mod, stringBuilder);
 		return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString();
 	}
 
-	public static void writeClassType(int mod, StringBuilder sb)
+	public static void writeClassType(long mod, StringBuilder sb)
 	{
 		if (mod == 0)
 		{
@@ -94,7 +80,7 @@ public final class ModifierUtil
 		sb.append("class ");
 	}
 
-	public static void appendAccessModifiers(int mod, StringBuilder builder)
+	public static void appendAccessModifiers(long mod, StringBuilder builder)
 	{
 		// @formatter:off
 		if ((mod & PUBLIC) == PUBLIC) { builder.append("public "); }
@@ -105,7 +91,7 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static void appendModifiers(int mod, MemberKind memberKind, StringBuilder builder)
+	public static void appendModifiers(long mod, MemberKind memberKind, StringBuilder builder)
 	{
 		// @formatter:off
 		if ((mod & TRANSIENT) == TRANSIENT) { builder.append("@transient "); }
@@ -150,207 +136,43 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static void checkModifiers(IMember member, MarkerList markers)
+	public static AttributeList getAttributes(int javaFlags)
 	{
-		final AttributeList attributes = member.getAttributes();
-		final MemberKind memberKind = member.getKind();
-		final int defaultAccess = memberKind.getDefaultAccess(member);
-		StringBuilder errorBuilder = null;
-
-		for (Attribute modifier : attributes)
+		if ((javaFlags & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
-			if (!memberKind.isAttributeAllowed(modifier))
-			{
-				if (errorBuilder == null)
-				{
-					errorBuilder = new StringBuilder();
-				}
-				else
-				{
-					errorBuilder.append(", ");
-				}
-				modifier.toString(errorBuilder);
-			}
-
-			final int visibility = modifier.flags() & Modifiers.VISIBILITY_MODIFIERS;
-			if (visibility != 0 && visibility == defaultAccess)
-			{
-				markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
-				                             Util.memberNamed(member),
-				                             ModifierUtil.accessModifiersToString(visibility)));
-			}
+			javaFlags |= Modifiers.PACKAGE;
 		}
-
-		if (errorBuilder != null)
-		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
-			                                  errorBuilder.toString()));
-		}
-		if (!attributes.hasAnyFlag(Modifiers.VISIBILITY_MODIFIERS))
-		{
-			// If there is no explicit or implicit visibility modifier already, add the default one
-			attributes.addFlag(defaultAccess);
-		}
+		return AttributeList.of(javaFlags);
 	}
 
-	public static void checkVisibility(IMember member, SourcePosition position, MarkerList markers, IContext context)
+	public static int getJavaFlags(AttributeList attributes)
 	{
-		Deprecation.checkAnnotations(member, position, markers);
-
-		if (!(member instanceof IClassMember))
-		{
-			return;
-		}
-
-		switch (IContext.getVisibility(context, (IClassMember) member))
-		{
-		case IContext.INTERNAL:
-			markers.add(Markers.semanticError(position, "access.internal", Util.memberNamed(member)));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(Markers.semanticError(position, "access.invisible", Util.memberNamed(member),
-			                                  accessModifiersToString(member.getAccessLevel())));
-			break;
-		}
-	}
-
-	public static void checkOverride(IMethod member, IMethod overriden, MarkerList markers)
-	{
-		final int accessLevel = member.getAccessLevel() & ~Modifiers.INTERNAL;
-		final int overrideFlags = overriden.getAttributes().flags();
-
-		// Final Modifier Check
-		if ((overrideFlags & Modifiers.FINAL) != 0)
-		{
-			markers.add(Markers.semanticError(member.getPosition(), "method.override.final", member.getName()));
-		}
-
-		// Visibility Check
-
-		switch (overrideFlags & Modifiers.VISIBILITY_MODIFIERS)
-		{
-		case Modifiers.PRIVATE:
-			markers.add(Markers.semanticError(member.getPosition(), "method.override.private", member.getName()));
-			break;
-		case Modifiers.PRIVATE_PROTECTED:
-			if (accessLevel == Modifiers.PRIVATE_PROTECTED)
-			{
-				return;
-			}
-			// Fallthrough
-		case Modifiers.PROTECTED:
-			if (accessLevel == Modifiers.PROTECTED)
-			{
-				return;
-			}
-			// Fallthrough
-		case Modifiers.PUBLIC:
-			if (accessLevel == Modifiers.PUBLIC)
-			{
-				return;
-			}
-		}
-
-		final Marker marker = Markers.semanticError(member.getPosition(), "method.override.visibility.mismatch",
-		                                            member.getName());
-		marker.addInfo(Markers.getSemantic("method.override.visibility", accessModifiersToString(overrideFlags)));
-		markers.add(marker);
-	}
-
-	public static void checkMethodModifiers(MarkerList markers, IMethod member)
-	{
-		final int flags = member.getAttributes().flags();
-
-		final boolean hasValue = member.getValue() != null;
-		final boolean isAbstract = (flags & ABSTRACT) != 0;
-		final boolean isNative = (flags & NATIVE) != 0;
-
-		// If the method does not have an implementation and is static
-		if (isAbstract)
-		{
-			if (hasValue)
-			{
-				markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
-				                                  Util.memberNamed(member)));
-			}
-			if (isNative)
-			{
-				markers.add(
-					Markers.semanticError(member.getPosition(), "modifiers.native.abstract", Util.memberNamed(member)));
-			}
-
-			final IClass enclosingClass = member.getEnclosingClass();
-			if (!enclosingClass.isAbstract())
-			{
-				markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
-				                                  Util.memberNamed(member), enclosingClass.getName()));
-			}
-
-			return;
-		}
-		if (hasValue)
-		{
-			if (isNative)
-			{
-				markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
-				                                  Util.memberNamed(member)));
-			}
-
-			return;
-		}
-
-		if (!isNative)
-		{
-			markers
-				.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
-		}
-	}
-
-	public static long getFlags(IClassMember member)
-	{
-		final int flags = member.getAttributes().flags();
-		int javaModifiers = flags & JAVA_MODIFIER_MASK;
-		int dyvilModifiers = flags & DYVIL_MODIFIER_MASK;
+		final long flags = attributes.flags();
+		int javaFlags = (int) (flags & JAVA_MODIFIER_MASK);
 
 		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{
-			// for private protected members, move the private modifier
-
-			javaModifiers &= ~PRIVATE;
-			dyvilModifiers |= PRIVATE;
+			javaFlags &= ~PRIVATE;
 		}
-		if (member.getElementType() == ElementType.METHOD)
+
+		return javaFlags;
+	}
+
+	public static long getDyvilFlags(AttributeList attributes)
+	{
+		final long flags = attributes.flags();
+		long dyvilFlags = flags & DYVIL_MODIFIER_MASK;
+
+		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{
-			if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
-			{
-				// for static abstract methods, move the abstract modifier
-
-				javaModifiers &= ~ABSTRACT;
-				dyvilModifiers |= ABSTRACT;
-			}
-			if ((flags & FINAL) != 0)
-			{
-				final IClass enclosingClass = member.getEnclosingClass();
-				if (enclosingClass != null && enclosingClass.isInterface())
-				{
-					// for final interface methods, move the final modifier
-
-					javaModifiers &= ~FINAL;
-					dyvilModifiers |= FINAL;
-				}
-			}
+			dyvilFlags |= PRIVATE;
 		}
-		return (long) dyvilModifiers << 32 | javaModifiers;
+
+		return dyvilFlags;
 	}
 
-	public static int getJavaModifiers(long flags)
+	public static void writeDyvilModifiers(AnnotatableVisitor visitor, long dyvilModifiers)
 	{
-		return (int) flags;
-	}
-
-	public static void writeModifiers(AnnotatableVisitor visitor, long flags)
-	{
-		final int dyvilModifiers = (int) (flags >> 32);
 		if (dyvilModifiers != 0)
 		{
 			final AnnotationVisitor annotationVisitor = visitor.visitAnnotation(DYVIL_MODIFIERS, true);

@@ -5,7 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public class VoidValue implements IConstantValue
@@ -20,19 +20,19 @@ public class VoidValue implements IConstantValue
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return VOID;
 	}
-	
+
 	@Override
 	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(SourcePosition position)
 	{
@@ -62,13 +62,13 @@ public class VoidValue implements IConstantValue
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public boolean toStringBuilder(StringBuilder builder)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{

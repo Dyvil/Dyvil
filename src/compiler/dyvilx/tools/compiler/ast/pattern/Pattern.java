@@ -6,14 +6,14 @@ import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface Pattern extends ASTNode, ITyped
+public interface Pattern extends ASTNode, Typed
 {
 	int NULL    = 0;
 	int BOOLEAN = 1;

@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.parser.type;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.generic.CodeTypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
@@ -19,7 +18,9 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class TypeParameterParser extends AbstractMemberParser implements ITypeConsumer
+import java.util.function.Consumer;
+
+public final class TypeParameterParser extends AbstractMemberParser implements Consumer<IType>
 {
 	public static final int ANNOTATIONS = 0;
 	public static final int VARIANCE    = 1;
@@ -169,7 +170,7 @@ public final class TypeParameterParser extends AbstractMemberParser implements I
 	}
 
 	@Override
-	public void setType(IType type)
+	public void accept(IType type)
 	{
 		switch (this.getBoundMode())
 		{

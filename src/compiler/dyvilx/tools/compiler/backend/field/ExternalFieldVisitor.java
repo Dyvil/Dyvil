@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.field;
 
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.Attribute;
@@ -10,12 +10,14 @@ import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
 
-public class SimpleFieldVisitor implements FieldVisitor
+public class ExternalFieldVisitor implements FieldVisitor
 {
 	private IDataMember field;
 
-	public SimpleFieldVisitor(IDataMember field)
+	public ExternalFieldVisitor(IDataMember field)
 	{
 		this.field = field;
 	}
@@ -32,7 +34,7 @@ public class SimpleFieldVisitor implements FieldVisitor
 		if (!this.field.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.field, annotation);
+			return new AnnotationReader(this.field.annotationConsumer(), annotation);
 		}
 		return null;
 	}

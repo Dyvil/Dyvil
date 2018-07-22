@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.method;
 
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -15,8 +15,12 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.DyvilNameVisitor;
+import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
+import dyvilx.tools.compiler.backend.annotation.ReceiverTypeVisitor;
 
-public final class SimpleMethodVisitor implements MethodVisitor
+public final class ExternalMethodVisitor implements MethodVisitor
 {
 	private final IExternalCallableMember method;
 	private       InlineIntrinsicData     intrinsicData;
@@ -24,7 +28,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	private       int                     parameterIndex;
 	private       String[]                localNames;
 
-	public SimpleMethodVisitor(IExternalCallableMember method)
+	public ExternalMethodVisitor(IExternalCallableMember method)
 	{
 		this.method = method;
 	}
@@ -89,7 +93,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		if (!this.method.skipAnnotation(internal, null))
 		{
 			final Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.method, annotation);
+			return new AnnotationReader(this.method.annotationConsumer(), annotation);
 		}
 		return null;
 	}

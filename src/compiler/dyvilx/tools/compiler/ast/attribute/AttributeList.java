@@ -26,7 +26,7 @@ public class AttributeList implements Iterable<Attribute>
 	protected Attribute @Nullable [] data;
 
 	protected int size;
-	protected int flags;
+	protected long flags;
 
 	public AttributeList()
 	{
@@ -37,7 +37,7 @@ public class AttributeList implements Iterable<Attribute>
 		this.data = new Attribute[capacity];
 	}
 
-	public static AttributeList of(int flags)
+	public static AttributeList of(long flags)
 	{
 		AttributeList list = new AttributeList();
 		list.flags = flags;
@@ -62,17 +62,17 @@ public class AttributeList implements Iterable<Attribute>
 
 	// Flags
 
-	public int flags()
+	public long flags()
 	{
 		return this.flags;
 	}
 
-	public boolean hasFlag(int flag)
+	public boolean hasFlag(long flag)
 	{
 		return (this.flags & flag) == flag;
 	}
 
-	public boolean hasAnyFlag(int flag)
+	public boolean hasAnyFlag(long flag)
 	{
 		return (this.flags & flag) != 0;
 	}
@@ -110,7 +110,7 @@ public class AttributeList implements Iterable<Attribute>
 		this.flags |= attribute.flags();
 	}
 
-	public void addFlag(int modifier)
+	public void addFlag(long modifier)
 	{
 		this.flags |= modifier;
 	}
@@ -134,6 +134,7 @@ public class AttributeList implements Iterable<Attribute>
 	{
 		this.ensureCapacity(this.size + list.size);
 		System.arraycopy(list.data, 0, this.data, this.size, list.size);
+		this.flags |= list.flags;
 	}
 
 	public void addAnnotations(AttributeList list)
@@ -164,13 +165,13 @@ public class AttributeList implements Iterable<Attribute>
 		this.data[--this.size] = null;
 	}
 
-	public AttributeList filtered(int mask)
+	public AttributeList filtered(long mask)
 	{
 		AttributeList copy = new AttributeList(this.size);
 		for (int i = 0; i < this.size; i++)
 		{
 			final Attribute attribute = this.data[i];
-			final int flags = attribute.flags();
+			final long flags = attribute.flags();
 			if (flags == 0 || (flags & mask) != 0)
 			{
 				copy.add(attribute);
@@ -270,7 +271,7 @@ public class AttributeList implements Iterable<Attribute>
 	{
 		if (list == null)
 		{
-			out.writeInt(0);
+			out.writeLong(0);
 			out.writeShort(0);
 			return;
 		}
@@ -285,7 +286,7 @@ public class AttributeList implements Iterable<Attribute>
 			}
 		}
 
-		out.writeInt(list.flags);
+		out.writeLong(list.flags);
 		out.writeShort(annotations);
 		for (int i = 0; i < annotations; i++)
 		{
@@ -295,7 +296,7 @@ public class AttributeList implements Iterable<Attribute>
 
 	public static AttributeList read(DataInput in) throws IOException
 	{
-		final int flags = in.readInt();
+		final long flags = in.readLong();
 		final int annotations = in.readShort();
 		final AttributeList list = new AttributeList(annotations);
 

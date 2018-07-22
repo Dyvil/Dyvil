@@ -4,7 +4,7 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvilx.tools.compiler.transform.ConstantFolder;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class MethodCall extends AbstractCall implements INamed
+public class MethodCall extends AbstractCall implements Named
 {
 	protected Name name;
 

@@ -33,10 +33,11 @@ import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
@@ -48,6 +49,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
+
+import static dyvil.reflect.Modifiers.ABSTRACT;
+import static dyvil.reflect.Modifiers.FINAL;
 
 public class CodeMethod extends AbstractMethod
 {
@@ -284,7 +288,7 @@ public class CodeMethod extends AbstractMethod
 			this.value.check(markers, this);
 		}
 
-		ModifierUtil.checkMethodModifiers(markers, this);
+		ModifierChecks.checkMethodModifiers(markers, this);
 
 		context.pop();
 	}
@@ -361,7 +365,7 @@ public class CodeMethod extends AbstractMethod
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			ModifierUtil.checkOverride(this, overrideMethod, markers);
+			ModifierChecks.checkOverride(this, overrideMethod, markers);
 
 			// Type Compatibility Check
 
@@ -553,25 +557,41 @@ public class CodeMethod extends AbstractMethod
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final boolean interfaceClass = this.enclosingClass.isInterface();
+		final boolean staticAbstract = this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT);
 
-		final long flags = ModifierUtil.getFlags(this);
+		int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
+		long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+
+		if (staticAbstract)
+		{
+			// for static abstract methods, move the abstract modifier
+
+			javaFlags &= ~ABSTRACT;
+			dyvilFlags |= ABSTRACT;
+		}
+		if (interfaceClass && this.hasModifier(Modifiers.FINAL))
+		{
+			// for final interface methods, move the final modifier
+
+			javaFlags &= ~FINAL;
+			dyvilFlags |= FINAL;
+		}
+
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
 
-		MethodWriter methodWriter = new MethodWriterImpl(writer, writer
-			                                                         .visitMethod(ModifierUtil.getJavaModifiers(flags),
-			                                                                      mangledName, descriptor, signature,
-			                                                                      exceptionTypes));
+		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(javaFlags, mangledName, descriptor,
+		                                                                            signature, exceptionTypes));
 
 		if (!this.isStatic())
 		{
 			methodWriter.setThisType(ownerClassName);
 		}
 
-		this.writeAnnotations(methodWriter, flags);
+		this.writeAnnotations(methodWriter, dyvilFlags);
 
 		this.writeParameters(methodWriter);
 
@@ -586,7 +606,7 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitLabel(end);
 			methodWriter.visitEnd(this.type);
 		}
-		else if (this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT))
+		else if (staticAbstract)
 		{
 			// no value, but no abstract flag
 
@@ -750,7 +770,7 @@ public class CodeMethod extends AbstractMethod
 		return this.isTypeParametric() || this.type.needsSignature() || this.parameters.needsSignature();
 	}
 
-	protected void writeAnnotations(MethodWriter writer, long flags)
+	protected void writeAnnotations(MethodWriter writer, long dyvilFlags)
 	{
 		this.attributes.write(writer);
 
@@ -772,7 +792,7 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, flags);
+		ModifierUtil.writeDyvilModifiers(writer, dyvilFlags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

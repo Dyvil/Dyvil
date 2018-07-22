@@ -1,4 +1,4 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -15,9 +15,16 @@ public class ModifierVisitor implements AnnotationVisitor
 	@Override
 	public void visit(String name, Object value)
 	{
-		if ("value".equals(name) && value instanceof Integer)
+		if ("value".equals(name))
 		{
-			this.attributes.addFlag((int) value);
+			if (value instanceof Integer)
+			{
+				this.attributes.addFlag((int) value);
+			}
+			else if (value instanceof Long)
+			{
+				this.attributes.addFlag((long) value);
+			}
 		}
 	}
 

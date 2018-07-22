@@ -222,7 +222,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 
 		// Header Access Check
-		int accessLevel = headerDeclaration.getAttributes().flags() & Modifiers.ACCESS_MODIFIERS;
+		int accessLevel = headerDeclaration.getAccessLevel();
 		if ((accessLevel & Modifiers.INTERNAL) != 0)
 		{
 			if (header instanceof ExternalHeader)

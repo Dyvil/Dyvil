@@ -9,7 +9,7 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;

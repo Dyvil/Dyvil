@@ -1,14 +1,14 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvil.lang.Name;
 
 public class DyvilNameVisitor implements AnnotationVisitor
 {
-	private final IMember member;
+	private final Member member;
 
-	public DyvilNameVisitor(IMember member)
+	public DyvilNameVisitor(Member member)
 	{
 		this.member = member;
 	}

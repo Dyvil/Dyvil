@@ -1,28 +1,30 @@
 package dyvilx.tools.compiler.parser.type;
 
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public final class TypeListParser extends Parser
 {
 	private static final int TYPE      = 0;
 	private static final int SEPARATOR = 1;
 
-	protected ITypeConsumer consumer;
+	protected Consumer<IType> consumer;
 
 	private boolean closeAngle;
 
-	public TypeListParser(ITypeConsumer consumer)
+	public TypeListParser(Consumer<IType> consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = TYPE;
 	}
 
-	public TypeListParser(ITypeConsumer consumer, boolean closeAngle)
+	public TypeListParser(Consumer<IType> consumer, boolean closeAngle)
 	{
 		this.consumer = consumer;
 		this.closeAngle = closeAngle;

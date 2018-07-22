@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -11,8 +12,8 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class EnumValue extends FieldAccess
@@ -36,6 +37,31 @@ public class EnumValue extends FieldAccess
 	public EnumValue(SourcePosition position, IDataMember field)
 	{
 		super(position, null, field);
+	}
+
+	public static <T extends Enum<T>> T eval(IValue value, Class<T> type)
+	{
+		if (!(value instanceof FieldAccess))
+		{
+			return null;
+		}
+
+		final String valueTypeName = ClassFormat.internalToPackage(value.getType().getInternalName());
+		if (!valueTypeName.equals(type.getName()))
+		{
+			return null;
+		}
+
+		final String constantName = ((FieldAccess) value).getName().qualified;
+
+		try
+		{
+			return Enum.valueOf(type, constantName);
+		}
+		catch (IllegalArgumentException ex)
+		{
+			return null;
+		}
 	}
 
 	@Override

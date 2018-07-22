@@ -8,7 +8,7 @@ import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.generic.GenericData;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;

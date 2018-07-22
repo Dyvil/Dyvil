@@ -11,9 +11,9 @@ import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
-import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
@@ -23,7 +23,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 import java.io.DataInput;
@@ -184,8 +184,8 @@ public abstract class TypeParameter implements ITypeParameter
 		if (reifiedAnnotation != null)
 		{
 			final IParameter parameter = Types.REIFIED_CLASS.getParameters().get(0);
-			this.reifiedKind = AnnotationUtil
-				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
+			this.reifiedKind = EnumValue
+				                   .eval(reifiedAnnotation.getArguments().getOrDefault(parameter), Reified.Type.class);
 		}
 	}
 

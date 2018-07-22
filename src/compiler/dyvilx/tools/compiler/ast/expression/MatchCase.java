@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.ast.expression;
 
 import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -18,7 +18,7 @@ import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class MatchCase implements IResolvable, IDefaultContext, IPatternConsumer
+public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 {
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.condition.type");
