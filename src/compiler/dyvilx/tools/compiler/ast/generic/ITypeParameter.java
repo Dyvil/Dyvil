@@ -12,21 +12,21 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.header.IObjectCompilable;
-import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.header.ObjectCompilable;
+import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends ASTNode, IResolvable, INamed, Attributable, IObjectCompilable
+public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable, ObjectCompilable
 {
 	ITypeParametric getGeneric();
 

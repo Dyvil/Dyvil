@@ -23,7 +23,7 @@ import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.IObjectType;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;

@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.pattern.operator;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public class OrPattern extends BinaryPattern

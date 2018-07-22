@@ -3,7 +3,7 @@ package dyvilx.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvil.source.position.SourcePosition;
 
@@ -13,14 +13,14 @@ public class StringForStatement extends ForEachStatement
 	{
 		super(position, var);
 	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvilx.tools.asm.Label startLabel = this.startLabel.getTarget();
 		dyvilx.tools.asm.Label updateLabel = this.updateLabel.getTarget();
 		dyvilx.tools.asm.Label endLabel = this.endLabel.getTarget();
-		
+
 		final IVariable var = this.variable;
 		final int lineNumber = this.lineNumber();
 
@@ -29,10 +29,10 @@ public class StringForStatement extends ForEachStatement
 		writer.visitLabel(scopeLabel);
 
 		final int localCount = writer.localCount();
-		
+
 		// Load the String
 		var.getValue().writeExpression(writer, null);
-		
+
 		// Local Variables
 		final int stringVarIndex = writer.localCount();
 		final int lengthVarIndex = stringVarIndex + 1;
@@ -45,16 +45,16 @@ public class StringForStatement extends ForEachStatement
 		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
 		writer.visitInsn(Opcodes.DUP);
 		writer.visitVarInsn(Opcodes.ISTORE, lengthVarIndex);
-		
+
 		// Initial Boundary Check - if the length is 0, skip the loop.
 		writer.visitJumpInsn(Opcodes.IFEQ, endLabel);
-		
+
 		// Set index to 0
 		writer.visitLdcInsn(0);
 		writer.visitVarInsn(Opcodes.ISTORE, indexVarIndex);
-		
+
 		writer.visitTargetLabel(startLabel);
-		
+
 		// Get the char at the index
 		writer.visitVarInsn(Opcodes.ALOAD, stringVarIndex);
 		writer.visitVarInsn(Opcodes.ILOAD, indexVarIndex);
@@ -63,13 +63,13 @@ public class StringForStatement extends ForEachStatement
 		// Autocasting
 		Types.CHAR.writeCast(writer, var.getType(), lineNumber);
 		var.writeInit(writer, null);
-		
+
 		// Action
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, Types.VOID);
 		}
-		
+
 		writer.visitLabel(updateLabel);
 		// Increment index
 		writer.visitIincInsn(indexVarIndex, 1);
@@ -77,11 +77,11 @@ public class StringForStatement extends ForEachStatement
 		writer.visitVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.visitVarInsn(Opcodes.ILOAD, lengthVarIndex);
 		writer.visitJumpInsn(Opcodes.IF_ICMPLT, startLabel);
-		
+
 		// Local Variables
 		writer.resetLocals(localCount);
 		writer.visitLabel(endLabel);
-		
+
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}
 }

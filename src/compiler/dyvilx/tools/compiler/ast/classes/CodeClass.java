@@ -27,10 +27,11 @@ import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
-import dyvilx.tools.compiler.backend.MethodWriterImpl;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
@@ -137,7 +138,7 @@ public class CodeClass extends AbstractClass
 		}
 
 		this.attributes.resolveTypes(markers, context, this);
-		ModifierUtil.checkModifiers(this, markers);
+		ModifierChecks.checkModifiers(this, markers);
 
 		this.metadata.resolveTypesPre(markers, context);
 
@@ -478,23 +479,19 @@ public class CodeClass extends AbstractClass
 	{
 		// Header
 
-		String signature = this.getSignature();
-		String superClass = null;
-		String[] interfaces = this.getInterfaceArray();
+		final boolean isInterface = this.isInterface();
+		final String signature = this.getSignature();
+		final String superClass = this.superType != null ? this.superType.getInternalName() : null;
+		final String[] interfaces = this.getInterfaceArray();
 
-		if (this.superType != null)
+		int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
+		final long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+
+		if (!isInterface)
 		{
-			superClass = this.superType.getInternalName();
+			javaFlags |= ASMConstants.ACC_SUPER;
 		}
-
-		final long flags = ModifierUtil.getFlags(this);
-		int modifiers = ModifierUtil.getJavaModifiers(flags);
-
-		if ((modifiers & Modifiers.INTERFACE) == 0)
-		{
-			modifiers |= ASMConstants.ACC_SUPER;
-		}
-		writer.visit(ClassFormat.CLASS_VERSION, modifiers, this.getInternalName(), signature, superClass, interfaces);
+		writer.visit(ClassFormat.CLASS_VERSION, javaFlags, this.getInternalName(), signature, superClass, interfaces);
 
 		// Source
 
@@ -509,7 +506,7 @@ public class CodeClass extends AbstractClass
 
 		// Annotations
 
-		this.writeAnnotations(writer, flags);
+		this.writeAnnotations(writer, dyvilFlags);
 
 		// Super Types
 
@@ -536,7 +533,7 @@ public class CodeClass extends AbstractClass
 
 		// Compute Trait Classes
 		final Set<IClass> traitClasses;
-		if ((modifiers & Modifiers.INTERFACE) == 0)
+		if (isInterface)
 		{
 			traitClasses = new ArraySet<>();
 			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();
@@ -715,7 +712,7 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, long flags)
 	{
-		ModifierUtil.writeModifiers(writer, flags);
+		ModifierUtil.writeDyvilModifiers(writer, flags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

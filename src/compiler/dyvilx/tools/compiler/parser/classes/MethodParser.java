@@ -107,7 +107,7 @@ public class MethodParser extends AbstractMemberParser
 				pm.report(Markers.syntaxWarning(token, "method.type.colon.deprecated"));
 				// Fallthrough
 			case DyvilSymbols.ARROW_RIGHT:
-				pm.pushParser(new TypeParser(this.method));
+				pm.pushParser(new TypeParser(this.method::setType));
 				this.mode = EXCEPTIONS;
 				return;
 			}

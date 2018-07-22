@@ -8,7 +8,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -16,11 +16,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public interface Attribute extends ASTNode, IResolvable
+public interface Attribute extends ASTNode, Resolvable
 {
 	@Nullable IType getType();
 
-	int flags();
+	long flags();
 
 	@Override
 	void resolveTypes(MarkerList markers, IContext context);

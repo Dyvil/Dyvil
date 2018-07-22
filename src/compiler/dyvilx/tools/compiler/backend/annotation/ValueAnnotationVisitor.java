@@ -1,70 +1,74 @@
-package dyvilx.tools.compiler.backend.visitor;
+package dyvilx.tools.compiler.backend.annotation;
 
 import dyvil.lang.Name;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
-import dyvilx.tools.compiler.ast.consumer.IAnnotationConsumer;
+import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.AnnotationExpr;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
-import dyvilx.tools.compiler.ast.parameter.NamedArgumentList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
-public class AnnotationReader implements AnnotationVisitor
+public class ValueAnnotationVisitor implements AnnotationVisitor
 {
-	private IAnnotationConsumer consumer;
-	private Annotation          annotation;
-	private NamedArgumentList   arguments;
+	private IValueConsumer consumer;
 
-	public AnnotationReader(IAnnotationConsumer consumer, Annotation annotation)
+	public ValueAnnotationVisitor(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.annotation = annotation;
-		this.annotation.setArguments(this.arguments = new NamedArgumentList());
 	}
 
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.arguments.add(Name.fromRaw(key), IValue.fromObject(value));
+		final IValue iValue = IValue.fromObject(value);
+		if (iValue == null)
+		{
+			throw new BytecodeException("Cannot convert '" + value + "' into an IValue");
+		}
+
+		this.consumer.setValue(iValue);
 	}
 
 	static IValue getEnumValue(String enumClass, String name)
 	{
-		return new EnumValue(ClassFormat.extendedToType(enumClass), Name.fromRaw(name));
+		IType t = ClassFormat.extendedToType(enumClass);
+		return new EnumValue(t, Name.fromRaw(name));
 	}
 
 	@Override
 	public void visitEnum(String key, String enumClass, String name)
 	{
-		this.arguments.add(Name.fromRaw(key), getEnumValue(enumClass, name));
+		IValue enumValue = getEnumValue(enumClass, name);
+		if (enumValue != null)
+		{
+			this.consumer.setValue(enumValue);
+		}
 	}
 
 	@Override
-	public AnnotationVisitor visitAnnotation(String key, String desc)
+	public AnnotationVisitor visitAnnotation(String name, String desc)
 	{
 		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
 		AnnotationExpr value = new AnnotationExpr(annotation);
-		this.arguments.add(Name.fromRaw(key), value);
+		this.consumer.setValue(value);
 		return new AnnotationReader(value, annotation);
 	}
 
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ArrayExpr valueList = new ArrayExpr();
-		this.arguments.add(Name.fromRaw(key), valueList);
+		final ArrayExpr valueList = new ArrayExpr();
+		this.consumer.setValue(valueList);
 		return new AnnotationValueReader(valueList.getValues());
 	}
 
 	@Override
 	public void visitEnd()
 	{
-		if (this.consumer != null)
-		{
-			this.consumer.setAnnotation(this.annotation);
-		}
 	}
 }

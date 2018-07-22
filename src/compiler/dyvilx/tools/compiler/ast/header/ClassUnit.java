@@ -5,7 +5,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.structure.Package;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;

@@ -12,7 +12,7 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.imports.IImportContext;
-import dyvilx.tools.compiler.ast.member.IClassMember;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -175,7 +175,7 @@ public interface IContext extends IMemberContext, IImportContext
 		return matches;
 	}
 
-	static byte getVisibility(IContext context, IClassMember member)
+	static byte getVisibility(IContext context, ClassMember member)
 	{
 		IClass thisClass = context.getThisClass();
 		if (thisClass != null)

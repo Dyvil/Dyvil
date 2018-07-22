@@ -15,9 +15,9 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Markers;
@@ -25,7 +25,7 @@ import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface IValue extends ASTNode, ITyped, WriteableExpression
+public interface IValue extends ASTNode, Typed, WriteableExpression
 {
 	// --- Expression IDs ---
 

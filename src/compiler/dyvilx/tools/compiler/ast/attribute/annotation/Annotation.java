@@ -13,14 +13,14 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.header.IObjectCompilable;
+import dyvilx.tools.compiler.ast.header.ObjectCompilable;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
-import dyvilx.tools.compiler.ast.type.ITyped;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
-public abstract class Annotation implements Attribute, ITyped, IObjectCompilable, IArgumentsConsumer
+public abstract class Annotation implements Attribute, Typed, ObjectCompilable, IArgumentsConsumer
 {
 	public static final class LazyFields
 	{
@@ -63,7 +63,7 @@ public abstract class Annotation implements Attribute, ITyped, IObjectCompilable
 	}
 
 	@Override
-	public int flags()
+	public long flags()
 	{
 		return 0;
 	}

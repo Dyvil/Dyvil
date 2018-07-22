@@ -9,10 +9,10 @@ import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.ClassWriter;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -21,7 +21,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public class Initializer extends Member implements IInitializer, IDefaultContext
+public class Initializer extends AbstractMember implements IInitializer, IDefaultContext
 {
 	protected IValue value;
 

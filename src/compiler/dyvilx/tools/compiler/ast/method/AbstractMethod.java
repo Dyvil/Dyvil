@@ -32,7 +32,7 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.member.Member;
+import dyvilx.tools.compiler.ast.member.AbstractMember;
 import dyvilx.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvilx.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -44,8 +44,9 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.Names;
@@ -61,7 +62,7 @@ import java.lang.annotation.ElementType;
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
 
-public abstract class AbstractMethod extends Member implements IMethod, ILabelContext, IDefaultContext
+public abstract class AbstractMethod extends AbstractMember implements IMethod, ILabelContext, IDefaultContext
 {
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
@@ -227,12 +228,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public boolean isThisAvailable()
 	{
 		return !this.isStatic() || this.hasModifier(Modifiers.EXTENSION);
-	}
-
-	@Override
-	public boolean isAbstract()
-	{
-		return super.isAbstract() && !this.isObjectMethod();
 	}
 
 	@Override
@@ -423,7 +418,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final IType[] matchTypes;
 		boolean invalid = false;
 
-		final int mod = this.attributes.flags() & Modifiers.INFIX;
+		final long mod = this.attributes.flags() & Modifiers.INFIX;
 		if (receiver == null)
 		{
 			if (mod == Modifiers.INFIX)
@@ -619,7 +614,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		if (receiver != null)
 		{
-			final int mod = this.attributes.flags() & Modifiers.INFIX;
+			final long mod = this.attributes.flags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && !receiver.isClassAccess() && !parameters.isEmpty())
 			{
 				// infix or extension method, declaring class implicit
@@ -777,7 +772,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
 		ArgumentList arguments, ITypeContext typeContext)
 	{
-		ModifierUtil.checkVisibility(this, position, markers, context);
+		ModifierChecks.checkVisibility(this, position, markers, context);
 
 		if (instance != null)
 		{
@@ -928,7 +923,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	private int getInvokeOpcode(IClass owner)
 	{
-		int modifiers = this.attributes.flags();
+		long modifiers = this.attributes.flags();
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return Opcodes.INVOKESTATIC;

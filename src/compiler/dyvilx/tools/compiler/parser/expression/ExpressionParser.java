@@ -176,7 +176,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 
 				final CastOperator castOperator = new CastOperator(token.raw(), this.value, optional);
-				pm.pushParser(new TypeParser(castOperator).withFlags(TypeParser.IGNORE_OPERATOR));
+				pm.pushParser(new TypeParser(castOperator::setType).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = castOperator;
 				return;
 			}
@@ -185,7 +185,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION is
 
 				final InstanceOfOperator instanceOfOperator = new InstanceOfOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(instanceOfOperator).withFlags(TypeParser.IGNORE_OPERATOR));
+				pm.pushParser(new TypeParser(instanceOfOperator::setType).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = instanceOfOperator;
 				return;
 			}

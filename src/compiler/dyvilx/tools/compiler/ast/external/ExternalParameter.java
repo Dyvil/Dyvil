@@ -12,7 +12,7 @@ import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.method.IExternalCallableMember;
 import dyvilx.tools.compiler.ast.parameter.AbstractParameter;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ExternalParameter extends AbstractParameter

@@ -22,9 +22,9 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.visitor.AnnotationReader;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalCallableMember

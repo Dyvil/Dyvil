@@ -1,9 +1,9 @@
 package dyvilx.tools.compiler.ast.type.raw;
 
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ResolvedClassType extends ClassType
@@ -48,7 +48,7 @@ public class ResolvedClassType extends ClassType
 		final IClass iclass = this.theClass;
 		if (iclass != null)
 		{
-			ModifierUtil.checkVisibility(iclass, this.position, markers, context);
+			ModifierChecks.checkVisibility(iclass, this.position, markers, context);
 		}
 
 		super.checkType(markers, context, position);

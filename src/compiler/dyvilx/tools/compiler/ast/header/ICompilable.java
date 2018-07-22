@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.ast.header;
 
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public interface ICompilable

@@ -10,10 +10,10 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -118,7 +118,7 @@ public class InterfaceMetadata implements IClassMetadata
 		}
 	}
 
-	protected void processMember(IMember member, MarkerList markers)
+	protected void processMember(Member member, MarkerList markers)
 	{
 	}
 

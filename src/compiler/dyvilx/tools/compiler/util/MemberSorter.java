@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.util;
 
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.member.IMember;
+import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 
 public class MemberSorter
 {
-	public static final Comparator<? super IMember> MEMBER_COMPARATOR = MemberSorter::compareMembers;
+	public static final Comparator<? super Member>  MEMBER_COMPARATOR = MemberSorter::compareMembers;
 	public static final Comparator<? super IMethod> METHOD_COMPARATOR = MemberSorter::compareMethods;
 
 	public static final Comparator<? super IClass> CLASS_COMPARATOR = (a, b) ->
@@ -26,7 +26,7 @@ public class MemberSorter
 		return name1.qualified.compareToIgnoreCase(name2.qualified);
 	}
 
-	public static int compareMembers(IMember member1, IMember member2)
+	public static int compareMembers(Member member1, Member member2)
 	{
 		return compareNames(member1.getName(), member2.getName());
 	}

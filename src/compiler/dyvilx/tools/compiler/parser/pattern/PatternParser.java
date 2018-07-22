@@ -1,27 +1,30 @@
 package dyvilx.tools.compiler.parser.pattern;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvilx.tools.compiler.ast.pattern.*;
+import dyvilx.tools.compiler.ast.pattern.BindingPattern;
+import dyvilx.tools.compiler.ast.pattern.Pattern;
+import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.pattern.constant.*;
 import dyvilx.tools.compiler.ast.pattern.object.UnapplyPattern;
 import dyvilx.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvilx.tools.compiler.ast.pattern.operator.OrPattern;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.parser.classes.DataMemberParser;
-import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.classes.DataMemberParser;
+import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class PatternParser extends Parser implements ITypeConsumer
+import java.util.function.Consumer;
+
+public class PatternParser extends Parser implements Consumer<IType>
 {
 	private static final int PATTERN         = 0;
 	private static final int NEGATIVE_NUMBER = 1;
@@ -216,7 +219,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			{
 				final TypeCheckPattern typeCheck = new TypeCheckPattern(token.raw(), this.pattern);
 				this.pattern = typeCheck;
-				pm.pushParser(new TypeParser(typeCheck));
+				pm.pushParser(new TypeParser(typeCheck::setType));
 				return;
 			}
 
@@ -271,7 +274,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 	}
 
 	@Override
-	public void setType(IType type)
+	public void accept(IType type)
 	{
 		this.type = type;
 	}

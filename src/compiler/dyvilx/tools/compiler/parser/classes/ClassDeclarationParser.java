@@ -9,7 +9,6 @@ import dyvilx.tools.compiler.ast.attribute.modifiers.Modifier;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
-import dyvilx.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
@@ -27,7 +26,9 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class ClassDeclarationParser extends Parser implements ITypeConsumer
+import java.util.function.Consumer;
+
+public final class ClassDeclarationParser extends Parser implements Consumer<IType>
 {
 	private static final int NAME                   = 0;
 	private static final int GENERICS               = 1;
@@ -280,7 +281,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	}
 
 	@Override
-	public void setType(IType type)
+	public void accept(IType type)
 	{
 		switch (this.mode)
 		{

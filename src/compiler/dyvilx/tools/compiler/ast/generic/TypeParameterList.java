@@ -10,9 +10,9 @@ import dyvilx.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.backend.MethodWriter;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.phase.IResolvable;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -21,7 +21,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class TypeParameterList implements IResolvable, Iterable<ITypeParameter>
+public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 {
 	private static final int DEFAULT_CAPACITY = 3;
 

@@ -5,7 +5,7 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.Attributable;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.member.INamed;
+import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.Marker;
@@ -16,7 +16,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class HeaderDeclaration implements ASTNode, INamed, Attributable, IObjectCompilable
+public class HeaderDeclaration implements ASTNode, Named, Attributable, ObjectCompilable
 {
 	protected final IHeaderUnit header;
 
