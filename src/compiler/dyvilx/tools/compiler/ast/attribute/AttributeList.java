@@ -271,7 +271,7 @@ public class AttributeList implements Iterable<Attribute>
 	{
 		if (list == null)
 		{
-			out.writeInt(0);
+			out.writeLong(0);
 			out.writeShort(0);
 			return;
 		}
@@ -286,7 +286,7 @@ public class AttributeList implements Iterable<Attribute>
 			}
 		}
 
-		out.writeInt(Math.toIntExact(list.flags)); // FIXME
+		out.writeLong(list.flags);
 		out.writeShort(annotations);
 		for (int i = 0; i < annotations; i++)
 		{
@@ -296,7 +296,7 @@ public class AttributeList implements Iterable<Attribute>
 
 	public static AttributeList read(DataInput in) throws IOException
 	{
-		final int flags = in.readInt(); // FIXME
+		final long flags = in.readLong();
 		final int annotations = in.readShort();
 		final AttributeList list = new AttributeList(annotations);
 
