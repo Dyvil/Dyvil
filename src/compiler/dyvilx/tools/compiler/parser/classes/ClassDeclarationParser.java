@@ -74,7 +74,7 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 		switch (this.mode)
 		{
 		case NAME:
-			if (this.classAttributes.hasFlag(Modifiers.EXTENSION_CLASS))
+			if (this.classAttributes.hasFlag(Modifiers.EXTENSION))
 			{
 				this.theClass = this.consumer.createClass(null, null, this.classAttributes);
 				this.mode = EXTENSION_GENERICS;
@@ -246,7 +246,7 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 			pm.reparse();
 			return;
 		case EXTENSION_GENERICS:
-			assert this.classAttributes.hasFlag(Modifiers.EXTENSION_CLASS);
+			assert this.classAttributes.hasFlag(Modifiers.EXTENSION);
 
 			if (TypeParser.isGenericStart(token, type))
 			{
@@ -259,7 +259,7 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 			}
 			// Fallthrough
 		case EXTENSION_TYPE:
-			assert this.classAttributes.hasFlag(Modifiers.EXTENSION_CLASS);
+			assert this.classAttributes.hasFlag(Modifiers.EXTENSION);
 
 			pm.pushParser(new TypeParser(this.theClass::setSuperType), true);
 			this.mode = BODY;

@@ -104,7 +104,7 @@ public class ModifierParser
 		case DyvilKeywords.EXTENSION:
 			if (token.next().type() != DyvilKeywords.FUNC)
 			{
-				return Modifiers.EXTENSION_CLASS;
+				return Modifiers.EXTENSION;
 			}
 			return -1;
 		}

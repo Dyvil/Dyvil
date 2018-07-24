@@ -269,7 +269,7 @@ public class CodeClass extends AbstractClass
 			this.superType.check(markers, context);
 
 			final IClass superClass;
-			if (!this.hasModifier(Modifiers.EXTENSION_CLASS) && (superClass = this.superType.getTheClass()) != null)
+			if (!this.hasModifier(Modifiers.EXTENSION) && (superClass = this.superType.getTheClass()) != null)
 			{
 				final AttributeList superAttributes = superClass.getAttributes();
 				if (superAttributes.hasAnyFlag(Modifiers.CLASS_TYPE_MODIFIERS))

@@ -200,7 +200,7 @@ public interface IClass
 		{
 			return new ObjectClassMetadata(forClass);
 		}
-		if ((modifiers & Modifiers.EXTENSION_CLASS) != 0)
+		if ((modifiers & Modifiers.EXTENSION) != 0)
 		{
 			return new ExtensionMetadata(forClass);
 		}

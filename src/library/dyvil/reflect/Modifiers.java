@@ -122,8 +122,6 @@ public interface Modifiers
 
 	int PRIVATE_PROTECTED = PRIVATE | PROTECTED;
 
-	int EXTENSION_FLAG = 0x00080000;
-
 	// Type Modifiers
 
 	int OBJECT = 0x00010000;
@@ -140,8 +138,6 @@ public interface Modifiers
 	 * not be visible in the bytecode.
 	 */
 	int CASE_CLASS = 0x00020000;
-
-	int EXTENSION_CLASS = 0x00040000;
 
 	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
 
@@ -170,7 +166,7 @@ public interface Modifiers
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
-	int EXTENSION = EXTENSION_FLAG | INFIX;
+	int EXTENSION = 0x00040000;
 
 	// Field Modifiers
 
