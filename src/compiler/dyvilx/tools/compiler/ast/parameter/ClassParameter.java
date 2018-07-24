@@ -44,6 +44,12 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
+
+	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type)
+	{
+		super(enclosingClass, position, name, type);
+	}
+
 	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type,
 		                     AttributeList attributes)
 	{

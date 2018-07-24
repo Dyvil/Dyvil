@@ -20,9 +20,9 @@ public final class ExternalField extends Field
 	private int resolved = CONSTANT_VALUE;
 	private Object constantValue;
 
-	public ExternalField(IClass iclass, Name name, String desc, IType type, AttributeList attributes)
+	public ExternalField(IClass iclass, Name name, String desc, IType type)
 	{
-		super(iclass, name, type, attributes);
+		super(iclass, name, type);
 		this.descriptor = desc;
 	}
 

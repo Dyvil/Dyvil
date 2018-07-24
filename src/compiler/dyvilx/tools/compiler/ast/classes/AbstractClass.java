@@ -869,7 +869,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.enclosingClass != null)
 		{
-			final int modifiers = (int) (this.getAttributes().flags() & ModifierUtil.JAVA_MODIFIER_MASK);
+			final int modifiers = (int) (this.getAttributes().flags() & Modifiers.JAVA_MODIFIER_MASK);
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 		}

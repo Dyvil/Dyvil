@@ -33,9 +33,9 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 
 	private byte resolved;
 
-	public ExternalConstructor(IClass enclosingClass, AttributeList attributes)
+	public ExternalConstructor(IClass enclosingClass)
 	{
-		super(enclosingClass, attributes);
+		super(enclosingClass);
 		this.type = enclosingClass.getThisType();
 	}
 

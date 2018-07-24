@@ -1,9 +1,7 @@
 package dyvilx.tools.compiler.ast.attribute.modifiers;
 
-import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 
 import static dyvil.reflect.Modifiers.*;
@@ -11,20 +9,11 @@ import static dyvil.reflect.Modifiers.*;
 public final class ModifierUtil
 {
 	public static final String DYVIL_MODIFIERS   = "Ldyvil/annotation/internal/DyvilModifiers;";
-	public static final String OVERRIDE_INTERNAL = "java/lang/Override";
 
 	public static final String NATIVE_INTERNAL    = "dyvil/annotation/native";
 	public static final String STRICTFP_INTERNAL  = "dyvil/annotation/strictfp";
 	public static final String TRANSIENT_INTERNAL = "dyvil/annotation/transient";
 	public static final String VOLATILE_INTERNAL  = "dyvil/annotation/volatile";
-
-	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
-
-	private static final long DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-	                                                & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
-	                                                & ~GENERATED; // exclude source-only modifiers
-
-	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
 	private ModifierUtil()
 	{
@@ -134,41 +123,6 @@ public final class ModifierUtil
 			if ((mod & OVERRIDE) == OVERRIDE) { builder.append("override "); }
 		}
 		// @formatter:on
-	}
-
-	public static AttributeList getAttributes(int javaFlags)
-	{
-		if ((javaFlags & Modifiers.VISIBILITY_MODIFIERS) == 0)
-		{
-			javaFlags |= Modifiers.PACKAGE;
-		}
-		return AttributeList.of(javaFlags);
-	}
-
-	public static int getJavaFlags(AttributeList attributes)
-	{
-		final long flags = attributes.flags();
-		int javaFlags = (int) (flags & JAVA_MODIFIER_MASK);
-
-		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
-		{
-			javaFlags &= ~PRIVATE;
-		}
-
-		return javaFlags;
-	}
-
-	public static long getDyvilFlags(AttributeList attributes)
-	{
-		final long flags = attributes.flags();
-		long dyvilFlags = flags & DYVIL_MODIFIER_MASK;
-
-		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
-		{
-			dyvilFlags |= PRIVATE;
-		}
-
-		return dyvilFlags;
 	}
 
 	public static void writeDyvilModifiers(AnnotatableVisitor visitor, long dyvilModifiers)

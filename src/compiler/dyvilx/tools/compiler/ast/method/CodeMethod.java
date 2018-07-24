@@ -50,9 +50,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static dyvil.reflect.Modifiers.ABSTRACT;
-import static dyvil.reflect.Modifiers.FINAL;
-
 public class CodeMethod extends AbstractMethod
 {
 	protected IValue value;
@@ -559,23 +556,8 @@ public class CodeMethod extends AbstractMethod
 		final boolean interfaceClass = this.enclosingClass.isInterface();
 		final boolean staticAbstract = this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT);
 
-		int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
-		long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
-
-		if (staticAbstract)
-		{
-			// for static abstract methods, move the abstract modifier
-
-			javaFlags &= ~ABSTRACT;
-			dyvilFlags |= ABSTRACT;
-		}
-		if (interfaceClass && this.hasModifier(Modifiers.FINAL))
-		{
-			// for final interface methods, move the final modifier
-
-			javaFlags &= ~FINAL;
-			dyvilFlags |= FINAL;
-		}
+		int javaFlags = this.getJavaFlags();
+		long dyvilFlags = this.getDyvilFlags();
 
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getInternalName();

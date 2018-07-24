@@ -5,7 +5,6 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -472,18 +471,13 @@ public class CodeClass extends AbstractClass
 	{
 		// Header
 
-		final boolean isInterface = this.isInterface();
 		final String signature = this.getSignature();
 		final String superClass = this.superType != null ? this.superType.getInternalName() : null;
 		final String[] interfaces = this.getInterfaceArray();
 
-		int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
-		final long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+		int javaFlags = this.getJavaFlags();
+		final long dyvilFlags = this.getDyvilFlags();
 
-		if (!isInterface)
-		{
-			javaFlags |= ASMConstants.ACC_SUPER;
-		}
 		writer.visit(ClassFormat.CLASS_VERSION, javaFlags, this.getInternalName(), signature, superClass, interfaces);
 
 		// Source

@@ -77,6 +77,12 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 		this.enclosingClass = enclosingClass;
 	}
 
+	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type)
+	{
+		super(position, name, type);
+		this.enclosingClass = enclosingClass;
+	}
+
 	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
 		super(position, name, type, attributes);
@@ -455,8 +461,8 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
-		final long dyvilFlags = ModifierUtil.getJavaFlags(this.attributes);
+		final int javaFlags = this.getJavaFlags();
+		final long dyvilFlags = this.getDyvilFlags();
 
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
