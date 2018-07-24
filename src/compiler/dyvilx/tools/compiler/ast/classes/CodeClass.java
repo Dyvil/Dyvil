@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.ast.classes;
 
-import dyvil.collection.Set;
-import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -24,7 +22,6 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
-import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
@@ -49,8 +46,6 @@ public class CodeClass extends AbstractClass
 	// Metadata
 	protected IHeaderUnit    unit;
 	protected SourcePosition position;
-
-	protected boolean traitInit;
 
 	public CodeClass()
 	{
@@ -531,18 +526,6 @@ public class CodeClass extends AbstractClass
 			}
 		}
 
-		// Compute Trait Classes
-		final Set<IClass> traitClasses;
-		if (isInterface)
-		{
-			traitClasses = new ArraySet<>();
-			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();
-		}
-		else
-		{
-			traitClasses = null;
-		}
-
 		// Class Body
 
 		for (int i = 0; i < this.compilableCount; i++)
@@ -566,82 +549,6 @@ public class CodeClass extends AbstractClass
 		initWriter.visitCode();
 		this.writeStaticInit(initWriter);
 		initWriter.visitEnd(Types.VOID);
-
-		if (traitClasses == null || traitClasses.isEmpty())
-		{
-			return;
-		}
-
-		// Create the virtual <traitinit> method
-
-		initWriter = new MethodWriterImpl(writer, writer
-			                                          .visitMethod(Modifiers.PROTECTED, TraitMetadata.INIT_NAME, "()V",
-			                                                       null, null));
-		initWriter.visitCode();
-		initWriter.setLocalType(0, this.getInternalName());
-
-		for (IClass traitClass : traitClasses)
-		{
-			final String internal = traitClass.getInternalName();
-
-			// Load 'this'
-			initWriter.visitVarInsn(Opcodes.ALOAD, 0);
-
-			// Invoke the static <traitinit> method of the trait class
-			initWriter.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V",
-			                           true);
-		}
-
-		initWriter.visitInsn(Opcodes.RETURN);
-		initWriter.visitEnd();
-	}
-
-	/**
-	 * Fills the list of traits and returns a status. If {@code top} is true, the returned value represents whether or
-	 * not the super type of the given class has traits
-	 *
-	 * @param currentClass
-	 * 	the current class to process
-	 * @param traitClasses
-	 * 	the list of trait classes
-	 * @param top
-	 * 	{@code true} if this is the top call
-	 */
-	private static boolean fillTraitClasses(IClass currentClass, Set<IClass> traitClasses, boolean top)
-	{
-		boolean traits = false;
-
-		final TypeList interfaces = currentClass.getInterfaces();
-		if (interfaces != null)
-		{
-			for (IType type : interfaces)
-			{
-				final IClass interfaceClass = type.getTheClass();
-				if (interfaceClass == null)
-				{
-					continue;
-				}
-
-				if (interfaceClass.hasModifier(Modifiers.TRAIT_CLASS))
-				{
-					traitClasses.add(interfaceClass);
-					traits = true;
-				}
-
-				fillTraitClasses(interfaceClass, traitClasses, false);
-			}
-		}
-
-		final IType superType = currentClass.getSuperType();
-		final IClass superClass;
-		if (superType == null || (superClass = superType.getTheClass()) == null)
-		{
-			return traits && !top;
-		}
-
-		return top ?
-			       fillTraitClasses(superClass, traitClasses, false) :
-			       traits || fillTraitClasses(superClass, traitClasses, false);
 	}
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
@@ -669,12 +576,20 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.traitInit)
+		if (!this.hasModifier(Modifiers.INTERFACE)) // only generate trait init calls in classes
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
-			writer
-				.visitMethodInsn(Opcodes.INVOKEVIRTUAL, this.getInternalName(), TraitMetadata.INIT_NAME, "()V", false);
-			// Invoke the virtual <traitinit> method of this class
+			// for each inherited trait that is not inherited by our super-class, call the initializer.
+			for (IClass traitClass : TraitMetadata.getNewTraits(this))
+			{
+				final String internal = traitClass.getInternalName();
+
+				// Load 'this'
+				writer.visitVarInsn(Opcodes.ALOAD, 0);
+
+				// Invoke the static <traitinit> method of the trait class
+				writer.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V",
+				                       true);
+			}
 		}
 
 		for (int i = 0; i < this.compilableCount; i++)

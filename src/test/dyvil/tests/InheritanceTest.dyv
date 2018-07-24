@@ -4,28 +4,21 @@ using dyvil.Test
 
 class InheritanceTest
 {
-	trait IFoo<T>
+	static func apply() -> Test = test "Inheritance" {
+		traitInit()
+		doubleTraitInit()
+		traitInitOrder()
+		traitConstructor()
+	}
+
+	// --------------- Double-Layer Trait Initialization ---------------
+
+	trait IFoo
 	{
 		func onFooInit() -> void
 
 		init { this.onFooInit }
 	}
-
-	trait IBar<T>
-	{
-		func bar() -> T
-	}
-
-	interface IFooBar<T> extends IFoo, IBar<T>
-
-	static class FooBar implements IFooBar<String>
-	{
-		override func bar() -> String = "FooBar.bar"
-
-		override func onFooInit() -> void {}
-	}
-
-	// Double-Layer Trait Initialization
 
 	static class Foo1 implements IFoo
 	{
@@ -43,7 +36,38 @@ class InheritanceTest
 		override func onFooInit() -> void = this.foo2Init += 1
 	}
 
-	// Trait Constructor Test
+	static func traitInit() -> Test = test "Trait Init" {
+		let foo1 = new Foo1
+		foo1.fooInit =?= true
+	}
+
+	static func doubleTraitInit() -> Test = test "Double Trait Init" {
+		let foo2 = new Foo2
+		foo2.foo2Init =?= 1
+	}
+
+	// --------------- Trait Initialization Order ---------------
+
+	static var initOrder: String = ""
+
+	// example adapted from https://stackoverflow.com/a/34243727/
+	// note that here, A implements T, which changes the init order slightly.
+
+	static trait H                           { init { initOrder += 'H' } }
+	static trait R                           { init { initOrder += 'R' } }
+	static trait S extends H                 { init { initOrder += 'S' } }
+	static trait T extends R, H              { init { initOrder += 'T' } }
+
+	static class X                           { init { initOrder += 'X' } }
+	static class A extends X implements T    { init { initOrder += 'A' } }
+	static class B extends A implements T, S { init { initOrder += 'B' } }
+
+	static func traitInitOrder() -> Test = test "Trait Initialization Order" {
+		let b = new B
+		initOrder =?= "XRHTASB"
+	}
+
+	// --------------- Trait Constructor ---------------
 
 	trait Named
 	{
@@ -63,22 +87,8 @@ class InheritanceTest
 		private var name: String { public override get; public override set }
 	) implements Named
 
-	static func apply() -> Test = test "Inheritance" {
-		let foo1 = new Foo1
-		let foo2 = new Foo2
-		let fooBar = new FooBar
-
-		test "Double-Layer Interface" { fooBar.bar =?= "FooBar.bar" }
-		test "Trait Init" { foo1.fooInit =?= true }
-
-		test "Double-Layer Trait Init" {
-			// Check that Foo2.onFooInit has only been called once
-			foo2.foo2Init =?= 1
-		}
-
-		test "Trait Constructor" {
-			let person: Named = new Person("Test Subject")
-			person.name =?= "Test Subject"
-		}
+	static func traitConstructor() -> Test = test "Trait Constructor" {
+		let person: Named = new Person("Test Subject")
+		person.name =?= "Test Subject"
 	}
 }
