@@ -30,14 +30,15 @@ public interface IParameter extends IVariable, ClassMember
 	String DEFAULT_PREFIX_INIT = "init$paramDefault$";
 	String DEFAULT_PREFIX      = "$paramDefault$";
 
-	@Override
-	Name getName();
+	// ------------------------------ Attributable Implementation ------------------------------
 
 	@Override
-	void setName(Name name);
+	default int getJavaFlags()
+	{
+		return ClassMember.super.getJavaFlags() | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
+	}
 
-	@Override
-	String getInternalName();
+	// --------------- Label ---------------
 
 	Name getLabel();
 
@@ -98,8 +99,8 @@ public interface IParameter extends IVariable, ClassMember
 		this.setLocalIndex(localIndex);
 
 		final AttributeList attributes = this.getAttributes();
-		int javaFlags = ModifierUtil.getJavaFlags(attributes);
-		final long dyvilFlags = ModifierUtil.getDyvilFlags(attributes);
+		int javaFlags = this.getJavaFlags();
+		final long dyvilFlags = this.getDyvilFlags();
 
 		if (this.isVarargs())
 		{

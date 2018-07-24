@@ -292,6 +292,11 @@ public interface Modifiers
 
 	int INITIALIZER_MODIFIERS = PRIVATE | STATIC;
 
+	int JAVA_MODIFIER_MASK = 0xFFFF;
+
+	long DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
+	                           & ~DEPRECATED & ~OVERRIDE & ~GENERATED; // exclude source-only modifiers
+
 	static void main(String[] args)
 	{
 		String[] fields = new String[64];

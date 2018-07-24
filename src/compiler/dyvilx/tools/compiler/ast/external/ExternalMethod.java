@@ -36,10 +36,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private byte resolved;
 
-	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, AttributeList attributes)
+	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature)
 	{
-		super(enclosingClass, null, null, attributes);
-		this.name = Name.fromQualified(name);
+		super(enclosingClass, Name.fromQualified(name));
 		this.internalName = name;
 		this.signature = signature;
 		this.descriptor = desc;

@@ -286,8 +286,8 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int javaFlags = ModifierUtil.getJavaFlags(this.attributes);
-		final long dyvilFlags = ModifierUtil.getDyvilFlags(this.attributes);
+		final int javaFlags = this.getJavaFlags();
+		final long dyvilFlags = this.getDyvilFlags();
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
 			javaFlags, "<init>", this.getDescriptor(), this.getSignature(),

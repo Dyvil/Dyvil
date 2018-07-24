@@ -67,7 +67,7 @@ public class ExternalClassVisitor implements ClassVisitor
 	@Override
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.theClass.setAttributes(ModifierUtil.getAttributes(access));
+		this.theClass.setJavaFlags(access);
 		this.theClass.setInternalName(name);
 
 		this.theClass.setBody(new ClassBody(this.theClass));
@@ -214,14 +214,14 @@ public class ExternalClassVisitor implements ClassVisitor
 
 		if (this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name), desc, type,
-			                                                        ModifierUtil.getAttributes(access));
+			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name), desc, type);
+			param.setJavaFlags(access);
 			this.theClass.getParameters().add(param);
 			return new ExternalFieldVisitor(param);
 		}
 
-		final ExternalField field = new ExternalField(this.theClass, Name.fromQualified(name), desc, type,
-		                                              ModifierUtil.getAttributes(access));
+		final ExternalField field = new ExternalField(this.theClass, Name.fromQualified(name), desc, type);
+		field.setJavaFlags(access);
 
 		if (value != null)
 		{
@@ -251,7 +251,8 @@ public class ExternalClassVisitor implements ClassVisitor
 				return null;
 			}
 
-			final ExternalConstructor ctor = new ExternalConstructor(this.theClass, ModifierUtil.getAttributes(access));
+			final ExternalConstructor ctor = new ExternalConstructor(this.theClass);
+			ctor.setJavaFlags(access);
 
 			if (signature != null)
 			{
@@ -281,14 +282,14 @@ public class ExternalClassVisitor implements ClassVisitor
 		if (this.theClass.isAnnotation() && (access & Modifiers.STATIC) == 0)
 		{
 			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name),
-			                                                        desc.substring(2), readReturnType(desc),
-			                                                        ModifierUtil.getAttributes(access));
+			                                                        desc.substring(2), readReturnType(desc));
+			param.setJavaFlags(access);
 			this.theClass.getParameters().add(param);
 			return new AnnotationClassVisitor(param);
 		}
 
-		final ExternalMethod method = new ExternalMethod(this.theClass, name, desc, signature,
-		                                                 ModifierUtil.getAttributes(access));
+		final ExternalMethod method = new ExternalMethod(this.theClass, name, desc, signature);
+		method.setJavaFlags(access);
 
 		if (signature != null)
 		{

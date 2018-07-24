@@ -21,6 +21,7 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -42,6 +43,14 @@ public interface IClass
 
 	@Override
 	void setEnclosingClass(IClass enclosingClass);
+
+	// ------------------------------ Attributable Implementation ------------------------------
+
+	@Override
+	default int getJavaFlags()
+	{
+		return ITypeParametricMember.super.getJavaFlags() | (!this.isInterface() ? ClassFormat.ACC_SUPER : 0);
+	}
 
 	// Modifiers
 

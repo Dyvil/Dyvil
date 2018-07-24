@@ -17,9 +17,9 @@ public class ExternalClassParameter extends ClassParameter
 
 	private byte resolved;
 
-	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type, AttributeList attributes)
+	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type)
 	{
-		super(enclosingClass, null, name, type, attributes);
+		super(enclosingClass, null, name, type);
 		this.descriptor = desc;
 	}
 

@@ -41,6 +41,28 @@ public interface Attributable
 		};
 	}
 
+	// --------------- Flags ---------------
+
+	default int getJavaFlags()
+	{
+		return (int) (this.getAttributes().flags() & Modifiers.JAVA_MODIFIER_MASK);
+	}
+
+	default long getDyvilFlags()
+	{
+		return this.getAttributes().flags() & Modifiers.DYVIL_MODIFIER_MASK;
+	}
+
+	default void setJavaFlags(int javaFlags)
+	{
+		this.getAttributes().addFlag(javaFlags);
+	}
+
+	default void setDyvilFlags(long dyvilFlags)
+	{
+		this.getAttributes().addFlag(dyvilFlags);
+	}
+
 	// --------------- Modifiers ---------------
 
 	default int getAccessLevel()
