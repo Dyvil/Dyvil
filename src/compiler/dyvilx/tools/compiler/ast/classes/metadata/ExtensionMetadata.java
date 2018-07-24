@@ -7,7 +7,7 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.ClassWriter;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -32,7 +32,8 @@ public class ExtensionMetadata implements IClassMetadata
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		this.theClass.setPosition(this.theClass.getSuperType().getPosition());
-		this.theClass.setName(Name.fromQualified("extension_" + this.theClass.getSuperType().getInternalName().replace('/', '_')));
+		this.theClass.setName(
+			Name.fromQualified("extension_" + this.theClass.getSuperType().getInternalName().replace('/', '_')));
 	}
 
 	@Override
