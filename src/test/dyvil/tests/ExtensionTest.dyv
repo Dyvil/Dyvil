@@ -5,8 +5,18 @@ using dyvil.Strings
 
 public class ExtensionTest
 {
+	static func apply() -> Test = test "Extension Methods" {
+		sourceFallback()
+		sourceOverride()
+		nonSource()
+	}
+
+	// --------------- Extension of Source Classes ---------------
+
 	static class A
+
 	static class B extends A
+
 	static class C extends B
 	{
 		public func custom() -> String = "custom"
@@ -14,42 +24,44 @@ public class ExtensionTest
 
 	static class D extends C
 
-	extension func custom(a: A) -> String = "fallback"
+	extension func custom(this: A) -> String = "fallback"
 
-	static func empty(this: String) -> String = ""
-
-	static func apply() -> Test = test "Extension Methods" {
+	static func sourceFallback() -> Test = test "Source Fallback" {
 		let a = new A
 		let b = new B
+
+		a.custom =?= "fallback"
+		b.custom =?= "fallback"
+	}
+
+	static func sourceOverride() -> Test = test "Source Override" {
 		let c = new C
 		let d = new D
 
 		let cA: A = c
 		let cB: B = c
 
-		test "Fallback" {
-			a.custom =?= "fallback"
-			b.custom =?= "fallback"
-		}
-
-		test "Override" {
-			c.custom =?= "custom"
-			cA.custom =?= "custom"
-			cB.custom =?= "custom"
-			d.custom =?= "custom"
-		}
-
-		a.name = "foo"
-
-		test "Name Method" {
-			a.name =?= "foo"
-		}
-
-		test "Static Extension" {
-			String.empty() =?= ""
-			String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
-		}
+		c.custom =?= "custom"
+		cA.custom =?= "custom"
+		cB.custom =?= "custom"
+		d.custom =?= "custom"
 	}
+
+	// --------------- Extension of non-Source Class ---------------
+
+	static extension func empty(this: String) -> String = ""
+
+	extension func size(this: String) -> int = this.length
+
+	static func nonSource() -> Test = test "Non-Source" {
+		String.empty =?= ""
+
+		String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
+
+		"abc".size =?= 3
+	}
+
+	// --------------- Speed Test ---------------
 
 	static func testSpeed() -> void
 	{
@@ -72,10 +84,4 @@ public class ExtensionTest
 		print dump
 		print "Dynamic Dispatch Speed: \(totalTime / count) ns / invocation"
 	}
-
-	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>()
-
-	postfix func name(value: any) -> String! = nameMap[value]
-
-	infix func name_=(value: any, newName: String) -> void = nameMap[value] = newName
 }
