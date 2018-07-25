@@ -147,5 +147,5 @@ abstract class Strings
 		return buffer.toString!!
 	}
 
-	extension func toString(o: any, builder: StringBuilder) -> void = builder.append o
+	extension func toString(this: any, builder: StringBuilder) -> void = builder.append this
 }
