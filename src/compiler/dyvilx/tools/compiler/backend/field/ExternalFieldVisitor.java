@@ -11,7 +11,7 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
-import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
+import dyvilx.tools.compiler.backend.annotation.DyvilModifiersVisitor;
 
 public class ExternalFieldVisitor implements FieldVisitor
 {
@@ -27,7 +27,7 @@ public class ExternalFieldVisitor implements FieldVisitor
 	{
 		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
-			return new ModifierVisitor(this.field.getAttributes());
+			return new DyvilModifiersVisitor(this.field);
 		}
 
 		String internal = ClassFormat.extendedToInternal(type);

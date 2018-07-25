@@ -17,7 +17,7 @@ import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 import dyvilx.tools.compiler.backend.annotation.DyvilNameVisitor;
-import dyvilx.tools.compiler.backend.annotation.ModifierVisitor;
+import dyvilx.tools.compiler.backend.annotation.DyvilModifiersVisitor;
 import dyvilx.tools.compiler.backend.annotation.ReceiverTypeVisitor;
 
 public final class ExternalMethodVisitor implements MethodVisitor
@@ -69,7 +69,7 @@ public final class ExternalMethodVisitor implements MethodVisitor
 		final IParameter param = this.method.getExternalParameterList().get(parameter);
 		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
-			return new ModifierVisitor(param.getAttributes());
+			return new DyvilModifiersVisitor(param);
 		}
 
 		final String internal = ClassFormat.extendedToInternal(type);
@@ -82,7 +82,7 @@ public final class ExternalMethodVisitor implements MethodVisitor
 		switch (type)
 		{
 		case ModifierUtil.DYVIL_MODIFIERS:
-			return new ModifierVisitor(this.method.getAttributes());
+			return new DyvilModifiersVisitor(this.method);
 		case AnnotationUtil.DYVIL_NAME:
 			return new DyvilNameVisitor(this.method);
 		case AnnotationUtil.RECEIVER_TYPE:
