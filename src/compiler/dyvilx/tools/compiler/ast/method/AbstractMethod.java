@@ -969,7 +969,6 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			return this.descriptor;
 		}
 
-		// Similar copy in NestedMethod.getDescriptor
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 
@@ -1107,7 +1106,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 		if (!this.isStatic())
 		{
-			receiver.writeNullCheckedExpression(writer, this.enclosingClass.getReceiverType());
+			receiver.writeNullCheckedExpression(writer, this.getReceiverType());
 			return;
 		}
 
@@ -1128,7 +1127,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		}
 
 		// static
-		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
+		receiver.writeExpression(writer, this.getReceiverType());
 		writer.visitInsn(Opcodes.AUTO_POP);
 	}
 

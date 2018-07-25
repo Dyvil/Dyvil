@@ -577,14 +577,14 @@ public class CodeMethod extends AbstractMethod
 		if (!this.isStatic())
 		{
 			methodWriter.setThisType(ownerClassName);
-		}
 
-		if (this.hasModifier(Modifiers.EXTENSION))
-		{
-			final IType thisType = this.getThisType();
-			methodWriter.visitParameter(0, "this", thisType, 0);
+			if (this.hasModifier(Modifiers.EXTENSION))
+			{
+				final IType thisType = this.getThisType();
+				methodWriter.visitParameter(0, "this", thisType, 0);
 
-			IType.writeAnnotations(thisType, writer, TypeReference.newFormalParameterReference(0), "");
+				IType.writeAnnotations(thisType, writer, TypeReference.newFormalParameterReference(0), "");
+			}
 		}
 
 		this.writeAnnotations(methodWriter, dyvilFlags);
@@ -616,7 +616,7 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitEnd(this.type);
 		}
 
-		if (!this.isStatic() || this.hasModifier(Modifiers.EXTENSION))
+		if (!this.isStatic())
 		{
 			methodWriter.visitLocalVariable("this", 'L' + ownerClassName + ';', null, start, end, 0);
 		}
