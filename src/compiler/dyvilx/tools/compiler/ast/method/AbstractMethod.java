@@ -923,12 +923,11 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 	private int getInvokeOpcode(IClass owner)
 	{
-		long modifiers = this.attributes.flags();
-		if ((modifiers & Modifiers.STATIC) != 0)
+		if (this.isStatic() || this.hasModifier(Modifiers.EXTENSION))
 		{
 			return Opcodes.INVOKESTATIC;
 		}
-		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		if (this.hasModifier(Modifiers.PRIVATE))
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
@@ -974,7 +973,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 
-		if (this.hasModifier(Modifiers.EXTENSION))
+		if (!this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
 		{
 			this.getThisType().appendExtendedName(buffer);
 		}
@@ -1007,7 +1006,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 		buffer.append('(');
 
-		if (this.hasModifier(Modifiers.EXTENSION))
+		if (!this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
 		{
 			this.getThisType().appendSignature(buffer, false);
 		}
@@ -1168,7 +1167,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
-		if (this.hasModifier(Modifiers.EXTENSION))
+		if (this.hasModifier(Modifiers.EXTENSION) && !this.hasModifier(Modifiers.STATIC))
 		{
 			// extension method invocation
 			final Handle handle = new Handle(ClassFormat.H_INVOKESTATIC, this.enclosingClass.getInternalName(),
@@ -1198,7 +1197,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 				owner = this.enclosingClass.getInternalName();
 				isInterface = this.enclosingClass.isInterface();
 			}
-			else if (this.isStatic())
+			else if (this.isStatic() || this.hasModifier(Modifiers.EXTENSION))
 			{
 				opcode = Opcodes.INVOKESTATIC;
 				owner = this.enclosingClass.getInternalName();
