@@ -1,10 +1,16 @@
 language: java
 jdk: oraclejdk8
-
-notifications:
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/d003c26687bb4fbd481f
-
 install: true
-script: ./gradlew build test
+
+jobs:
+  include:
+    - stage: build
+      script: ./gradlew build
+    - stage: test
+      script: ./gradlew test
+    - stage: bootstrap
+      script: ./gradlew bootstrap
+    - stage: build-2
+      script: ./gradlew build
+    - stage: test-2
+      script: ./gradlew test
