@@ -98,18 +98,6 @@ public class CodeMethod extends AbstractMethod
 		{
 			// Resolve the explicit receiver type, but do not expose type parameters of this method
 			this.thisType = this.thisType.resolveType(markers, context);
-
-			// Check the self type for compatibility
-			final IType thisType = this.thisType;
-			final IClass thisClass = thisType.getTheClass();
-			if (!this.isStatic() && thisClass != null && thisClass != this.enclosingClass)
-			{
-				final Marker marker = Markers.semanticError(thisType.getPosition(), "method.this_type.incompatible",
-				                                            this.getName());
-				marker.addInfo(Markers.getSemantic("method.this_type", thisType));
-				marker.addInfo(Markers.getSemantic("method.enclosing_class", this.enclosingClass.getFullName()));
-				markers.add(marker);
-			}
 		}
 		else
 		{
@@ -218,6 +206,18 @@ public class CodeMethod extends AbstractMethod
 		if (this.thisType != null)
 		{
 			this.thisType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+
+			// Check the explicit this type for compatibility
+			final IType thisType = this.thisType;
+			final IClass thisClass = thisType.getTheClass();
+			if (thisClass != null && thisClass != this.enclosingClass && !this.hasModifier(Modifiers.EXTENSION))
+			{
+				final Marker marker = Markers.semanticError(thisType.getPosition(), "method.this_type.incompatible",
+				                                            this.getName());
+				marker.addInfo(Markers.getSemantic("method.this_type", thisType));
+				marker.addInfo(Markers.getSemantic("method.enclosing_class", this.enclosingClass.getFullName()));
+				markers.add(marker);
+			}
 		}
 
 		this.parameters.checkTypes(markers, context);
