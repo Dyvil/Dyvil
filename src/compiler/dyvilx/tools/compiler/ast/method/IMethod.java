@@ -18,8 +18,8 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import static dyvil.reflect.Modifiers.ABSTRACT;
-import static dyvil.reflect.Modifiers.FINAL;
+import static dyvil.reflect.Modifiers.*;
+import static dyvil.reflect.Modifiers.STATIC;
 
 public interface IMethod extends ICallableMember, ITypeParametricMember, IContext
 {
@@ -38,14 +38,17 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 		if (this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT))
 		{
 			// for static abstract methods, move the abstract modifier
-
 			javaFlags &= ~ABSTRACT;
 		}
-		if ((javaFlags & Modifiers.FINAL) != 0 && this.getEnclosingClass().hasModifier(Modifiers.INTERFACE))
+		if (this.hasModifier(Modifiers.FINAL) && this.getEnclosingClass().hasModifier(Modifiers.INTERFACE))
 		{
 			// for final interface methods, move the final modifier
-
 			javaFlags &= ~FINAL;
+		}
+		if (this.hasModifier(Modifiers.EXTENSION))
+		{
+			// extension methods are internally always static, but the dyvil flags store if they are declared static
+			javaFlags |= STATIC;
 		}
 		return javaFlags;
 	}
@@ -57,16 +60,29 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 		if (this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT))
 		{
 			// for static abstract methods, move the abstract modifier
-
 			dyvilFlags |= ABSTRACT;
 		}
 		if (this.hasModifier(Modifiers.FINAL) && this.getEnclosingClass().hasModifier(Modifiers.INTERFACE))
 		{
 			// for final interface methods, move the final modifier
-
 			dyvilFlags |= FINAL;
 		}
+		if (this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
+		{
+			// extension methods are internally always static, but the dyvil flags store if they are declared static
+			dyvilFlags |= Modifiers.STATIC;
+		}
 		return dyvilFlags;
+	}
+
+	@Override
+	default void setDyvilFlags(long dyvilFlags)
+	{
+		if ((dyvilFlags & Modifiers.EXTENSION) != 0 && (dyvilFlags & Modifiers.STATIC) == 0)
+		{
+			// non-static extension methods need to remove the static flag from the previously set Java modifiers
+			this.getAttributes().removeFlag(Modifiers.STATIC);
+		}
 	}
 
 	// --------------- Matching ---------------
