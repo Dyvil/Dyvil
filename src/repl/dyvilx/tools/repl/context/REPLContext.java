@@ -257,13 +257,19 @@ public class REPLContext extends AbstractHeader
 	{
 		member.setEnclosingClass(this.currentClass);
 
-		// Ensure public & static
-		final AttributeList modifiers = member.getAttributes();
-		if ((modifiers.flags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		final AttributeList attributes = member.getAttributes();
+
+		// ensure public unless another visibility modifier is present
+		if (!attributes.hasAnyFlag(Modifiers.VISIBILITY_MODIFIERS))
 		{
-			modifiers.addFlag(Modifiers.PUBLIC);
+			attributes.addFlag(Modifiers.PUBLIC);
 		}
-		modifiers.addFlag(Modifiers.STATIC);
+
+		// ensure static unless it's an extension method
+		if (!attributes.hasFlag(Modifiers.EXTENSION))
+		{
+			attributes.addFlag(Modifiers.STATIC);
+		}
 	}
 
 	@Override
