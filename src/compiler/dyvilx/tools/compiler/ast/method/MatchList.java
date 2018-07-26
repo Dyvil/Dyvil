@@ -128,19 +128,6 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 			return null;
 		case 1:
 			return this.candidates[0];
-		case 2:
-			final Candidate<T> c1 = this.candidates[0];
-			final Candidate<T> c2 = this.candidates[1];
-			final int compareTo = c1.compareTo(c2);
-			if (compareTo < 0)
-			{
-				return c1;
-			}
-			if (compareTo > 0)
-			{
-				return c2;
-			}
-			return null;
 		}
 
 		// this.sort(); // calling isAmbiguous() sorts this list
