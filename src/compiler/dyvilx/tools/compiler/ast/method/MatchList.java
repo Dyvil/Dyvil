@@ -104,7 +104,20 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 		}
 
 		this.sort();
-		return this.candidates[0].compareTo(this.candidates[1]) == 0;
+
+		final Candidate<T> first = this.candidates[0];
+		for (int i = 1; i < this.size; i++)
+		{
+			final Candidate<T> candidate = this.candidates[i];
+			if (candidate.member != first.member && first.compareTo(candidate) == 0)
+			{
+				// if two candidates have the same rank but different members, its ambiguous
+				// sometimes the same member is added twice, but we don't count that as ambiguous.
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public Candidate<T> getBestCandidate()
