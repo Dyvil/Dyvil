@@ -83,6 +83,7 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 			// non-static extension methods need to remove the static flag from the previously set Java modifiers
 			this.getAttributes().removeFlag(Modifiers.STATIC);
 		}
+		ICallableMember.super.setDyvilFlags(dyvilFlags);
 	}
 
 	// --------------- Matching ---------------
