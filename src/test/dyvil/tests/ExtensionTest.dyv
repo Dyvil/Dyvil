@@ -59,6 +59,12 @@ public class ExtensionTest
 		String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
 
 		"abc".size =?= 3
+
+		let lambda1 = () => String.empty
+		let lambda2 = (s: String) => s.size
+
+		lambda1() =?= ""
+		lambda2("asdf") =?= 4
 	}
 
 	// --------------- Speed Test ---------------
