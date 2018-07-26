@@ -115,12 +115,6 @@ public final class ThisExpr implements IValue
 
 		if (this.type != Types.UNKNOWN)
 		{
-			// Replace e.g. this<List> with this<List<T>> in class List<type T>
-			final IClass iclass = this.type.getTheClass();
-			if (iclass != null)
-			{
-				this.type = iclass.getThisType();
-			}
 			return this;
 		}
 
