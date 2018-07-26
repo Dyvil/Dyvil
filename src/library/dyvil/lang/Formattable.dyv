@@ -3,7 +3,7 @@ package dyvil.lang
 interface Formattable
 {
 	@BytecodeName("toString")
-	static func apply(this: String, from: Formattable) -> String
+	static extension func apply(this: String, from: Formattable) -> String
 	{
 		let buffer = new StringBuilder
 		from.toString(buffer)

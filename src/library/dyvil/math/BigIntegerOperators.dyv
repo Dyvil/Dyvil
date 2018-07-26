@@ -6,8 +6,8 @@ abstract class BigIntegerOperators
 {
 	private init() {}
 
-	inline static func apply(this: BigInteger, _ l: long) -> BigInteger = BigInteger.valueOf(l)
-	inline static func apply(this: BigInteger, _ s: String) -> BigInteger = new BigInteger(s)
+	inline static extension func apply(this: BigInteger, _ l: long) -> BigInteger = BigInteger.valueOf(l)
+	inline static extension func apply(this: BigInteger, _ s: String) -> BigInteger = new BigInteger(s)
 
 	implicit inline postfix func toBigInteger(_ l: long) -> BigInteger = BigInteger.valueOf(l)
 

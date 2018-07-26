@@ -15,9 +15,9 @@ abstract class MathUtils
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static func min(this: Math, _ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
+		static extension func min(this: Math, _ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
 
-		static func min(this: Math, _ values: T...) -> T
+		static extension func min(this: Math, _ values: T...) -> T
 		{
 			var min = #if (FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
@@ -26,7 +26,7 @@ abstract class MathUtils
 		}
 
 		@BytecodeName("min$_array")
-		inline static func min(this: Math, _ array: [T]) -> T = min(array...)
+		inline static extension func min(this: Math, _ array: [T]) -> T = min(array...)
 	}
 
 	// max
@@ -35,9 +35,9 @@ abstract class MathUtils
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static func max(this: Math, _ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
+		static extension func max(this: Math, _ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
 
-		static func max(this: Math, _ values: T...) -> T
+		static extension func max(this: Math, _ values: T...) -> T
 		{
 			var max = #if (FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
@@ -46,14 +46,14 @@ abstract class MathUtils
 		}
 
 		@BytecodeName("max$_array")
-		inline static func max(this: Math, _ array: [T]) -> T = max(array...)
+		inline static extension func max(this: Math, _ array: [T]) -> T = max(array...)
 	}
 
 	// sum
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func sum(this: Math, _ values: [T]) -> T
+		static extension func sum(this: Math, _ values: [T]) -> T
 		{
 			var sum: T = 0
 			for (v <- values) sum += v
@@ -81,7 +81,7 @@ abstract class MathUtils
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func product(this: Math, _ values: [T]) -> T
+		static extension func product(this: Math, _ values: [T]) -> T
 		{
 			var product: T = 1
 			for (v <- values) product *= v
@@ -109,14 +109,14 @@ abstract class MathUtils
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func average(this: Math, _ values: [T]) -> double = sum(values) / (values.size as double)
+		static extension func average(this: Math, _ values: [T]) -> double = sum(values) / (values.size as double)
 	}
 
 	// clamp
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		infix func clamp(this: Math, _ v: T, min: T, max: T) -> T
+		infix func clamp(_ v: T, min: T, max: T) -> T
 		{
 			if (v < min) return min
 			if (v > max) return max
@@ -128,7 +128,7 @@ abstract class MathUtils
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		infix func interpolate(this: Math, _ v: double, min: T, max: T) -> T
+		infix func interpolate(_ v: double, min: T, max: T) -> T
 		{
 			if (v <= 0) return min
 			if (v >= 1) return max
@@ -176,13 +176,13 @@ abstract class MathUtils
 		return l
 	}
 
-	static func nPr(this: Math, n: long, r: long) -> long = n! _/ (n - r)!
+	static extension func nPr(this: Math, n: long, r: long) -> long = n! _/ (n - r)!
 
-	static func nCr(this: Math, n: long, r: long) -> long = n! _/ (r! * (n - r)!)
+	static extension func nCr(this: Math, n: long, r: long) -> long = n! _/ (r! * (n - r)!)
 
 	// powers of two
 
-	prefix func nextPowerOf2(this: Math, _ v: int) -> int
+	static extension func nextPowerOf2(this: Math, _ v: int) -> int
 	{
 		var j = v - 1
 		j |= j >> 1
@@ -193,12 +193,12 @@ abstract class MathUtils
 		return j + 1
 	}
 
-	prefix func isPowerOf2(this: Math, _ v: int) -> boolean = (v & -v) == v
+	static extension func isPowerOf2(this: Math, _ v: int) -> boolean = (v & -v) == v
 
 	private const deBruijnBits: [int] = [ 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31,
 		27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 ]
 
 	private static func deBruijn(v: int) -> int = deBruijnBits[(v * 125613361L >> 27) as int & 0x1F]
 
-	static func log2(this: Math, _ v: int) -> int = isPowerOf2(v) ? deBruijn(v) : deBruijn(nextPowerOf2(v)) - 1
+	static extension func log2(this: Math, _ v: int) -> int = isPowerOf2(v) ? deBruijn(v) : deBruijn(nextPowerOf2(v)) - 1
 }

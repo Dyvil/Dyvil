@@ -6,10 +6,10 @@ abstract class BigDecimalOperators
 {
 	private init() {}
 
-	inline static func apply(this: BigDecimal, _ i: long) -> BigDecimal = BigDecimal.valueOf(i)
-	inline static func apply(this: BigDecimal, _ d: double) -> BigDecimal = BigDecimal.valueOf(d)
-	inline static func apply(this: BigDecimal, _ b: BigInteger) -> BigDecimal = new BigDecimal(b)
-	inline static func apply(this: BigDecimal, _ s: String) -> BigDecimal = new BigDecimal(s)
+	inline static extension func apply(this: BigDecimal, _ i: long) -> BigDecimal = BigDecimal.valueOf(i)
+	inline static extension func apply(this: BigDecimal, _ d: double) -> BigDecimal = BigDecimal.valueOf(d)
+	inline static extension func apply(this: BigDecimal, _ b: BigInteger) -> BigDecimal = new BigDecimal(b)
+	inline static extension func apply(this: BigDecimal, _ s: String) -> BigDecimal = new BigDecimal(s)
 
 	implicit inline postfix func toBigDecimal(_ l: long) -> BigDecimal = BigDecimal.valueOf(l)
 	implicit inline postfix func toBigDecimal(_ d: double) -> BigDecimal = BigDecimal.valueOf(d)

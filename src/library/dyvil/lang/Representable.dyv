@@ -31,14 +31,14 @@ interface Representable
 	 * representation is `null`.
 	 */
 	@BytecodeName('repr')
-	static func apply(this: String, explicit representing value: Representable!) -> String
+	static extension func apply(this: String, explicit representing value: Representable!) -> String
 		= if let value = value { String(representing: value) } else { 'null' }
 
 	/**
 	 * Returns the representation of the argument as defined by the {@link represent(to:)} method.
 	 */
 	@BytecodeName('repr_nonNull')
-	static func apply(this: String, explicit representing value: Representable) -> String
+	static extension func apply(this: String, explicit representing value: Representable) -> String
 	{
 		let builder = new StringBuilder
 		value.represent(to: builder)
@@ -67,7 +67,7 @@ interface Representable
 	 * containing references to themselves or other types of cyclic references.
 	 */
 	@BytecodeName('repr')
-	static func apply(this: String, explicit representing value: any!) -> String
+	static extension func apply(this: String, explicit representing value: any!) -> String
 	{
 		let builder = new StringBuilder
 		reflect(value, builder, new mutable.IdentityHashSet<any>)
