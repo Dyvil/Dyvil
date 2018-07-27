@@ -188,7 +188,7 @@ class AnonymousClassMetadata implements IClassMetadata
 
 		// Signature & Parameter Data
 
-		initWriter.setThisType(this.theClass.getInternalName());
+		initWriter.setLocalType(0, this.theClass.getInternalName());
 
 		parameterList.write(initWriter);
 

@@ -895,7 +895,7 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		{
 			if (thisCaptured)
 			{
-				methodWriter.setThisType(this.owner);
+				methodWriter.setLocalType(0, this.owner);
 				index = 1;
 			}
 
