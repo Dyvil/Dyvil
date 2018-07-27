@@ -64,6 +64,8 @@ import static dyvil.reflect.Opcodes.IFNE;
 
 public abstract class AbstractMethod extends AbstractMember implements IMethod, ILabelContext, IDefaultContext
 {
+	// --------------------------------------------- Constants ---------------------------------------------
+
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
 	                                                         ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodHandle;"
@@ -73,7 +75,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
 	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
-	// --------------------------------------------------
+	// --------------------------------------------- Fields ---------------------------------------------
 
 	protected @Nullable TypeParameterList typeParameters;
 
@@ -84,13 +86,16 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 	protected @Nullable TypeList exceptions;
 
-	// Metadata
+	// ------------------------------ Metadata ------------------------------
+
 	protected           IClass        enclosingClass;
 	protected           String        internalName;
 	protected           String        descriptor;
 	protected           String        signature;
 	protected @Nullable IntrinsicData intrinsicData;
 	protected @Nullable Set<IMethod>  overrideMethods;
+
+	// --------------------------------------------- Constructors ---------------------------------------------
 
 	public AbstractMethod(IClass enclosingClass)
 	{
@@ -121,11 +126,17 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		super(position, name, type, attributes);
 	}
 
+	// --------------------------------------------- Getters and Setters ---------------------------------------------
+
+	// ------------------------------ Header ------------------------------
+
 	@Override
-	public void setEnclosingClass(IClass enclosingClass)
+	public IHeaderUnit getHeader()
 	{
-		this.enclosingClass = enclosingClass;
+		return this.enclosingClass.getHeader();
 	}
+
+	// ------------------------------ Enclosing Class ------------------------------
 
 	@Override
 	public IClass getEnclosingClass()
@@ -133,6 +144,13 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		return this.enclosingClass;
 	}
 
+	@Override
+	public void setEnclosingClass(IClass enclosingClass)
+	{
+		this.enclosingClass = enclosingClass;
+	}
+
+	// ------------------------------ Type Parameters ------------------------------
 	@Override
 	public boolean isTypeParametric()
 	{
@@ -149,10 +167,40 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		return this.typeParameters = new TypeParameterList();
 	}
 
+	// ------------------------------ Parameters ------------------------------
+
 	@Override
 	public ParameterList getParameters()
 	{
 		return this.parameters;
+	}
+
+	// ------------------------------ Return Type ------------------------------
+
+	@Override
+	public IType getReturnType()
+	{
+		return this.type;
+	}
+
+	// ------------------------------ Exceptions ------------------------------
+
+	@Override
+	public TypeList getExceptions()
+	{
+		if (this.exceptions != null)
+		{
+			return this.exceptions;
+		}
+		return this.exceptions = new TypeList();
+	}
+
+	// --------------------------------------------- Attributes ---------------------------------------------
+
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.METHOD;
 	}
 
 	@Override
@@ -209,22 +257,6 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 	}
 
 	@Override
-	public ElementType getElementType()
-	{
-		return ElementType.METHOD;
-	}
-
-	@Override
-	public TypeList getExceptions()
-	{
-		if (this.exceptions != null)
-		{
-			return this.exceptions;
-		}
-		return this.exceptions = new TypeList();
-	}
-
-	@Override
 	public boolean isThisAvailable()
 	{
 		return !this.isStatic();
@@ -245,12 +277,6 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public IHeaderUnit getHeader()
-	{
-		return this.enclosingClass.getHeader();
 	}
 
 	@Override
@@ -378,12 +404,6 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			}
 		}
 		return FALSE;
-	}
-
-	@Override
-	public IType getReturnType()
-	{
-		return this.type;
 	}
 
 	@Override
