@@ -5,28 +5,23 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 
 public class FieldThis implements IAccessible
 {
 	protected final IClass      owner;
 	protected final IAccessible targetAccess;
-	protected final IClass      targetClass;
+	protected final IType       targetType;
 
 	private String name;
 	private String desc;
 
-	public FieldThis(IClass owner, IAccessible targetAccess, IClass targetClass)
+	public FieldThis(IClass owner, IAccessible targetAccess, IType targetType)
 	{
 		this.owner = owner;
-		this.targetClass = targetClass;
+		this.targetType = targetType;
 		this.targetAccess = targetAccess;
-	}
-
-	public IClass getTargetClass()
-	{
-		return this.targetClass;
 	}
 
 	public IAccessible getTargetAccess()
@@ -40,7 +35,7 @@ public class FieldThis implements IAccessible
 		{
 			return this.name;
 		}
-		return this.name = "this$" + this.targetClass.getName().qualified;
+		return this.name = "this$" + this.targetType.getName().qualified;
 	}
 
 	public String getDescriptor()
@@ -49,13 +44,13 @@ public class FieldThis implements IAccessible
 		{
 			return this.desc;
 		}
-		return this.desc = 'L' + this.targetClass.getInternalName() + ';';
+		return this.desc = 'L' + this.targetType.getInternalName() + ';';
 	}
 
 	@Override
 	public IType getType()
 	{
-		return this.targetClass.getThisType();
+		return this.targetType;
 	}
 
 	public void writeField(ClassWriter writer)

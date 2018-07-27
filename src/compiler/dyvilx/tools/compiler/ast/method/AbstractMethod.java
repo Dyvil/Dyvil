@@ -23,8 +23,10 @@ import dyvilx.tools.compiler.ast.context.ILabelContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
 import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvilx.tools.compiler.ast.field.IAccessible;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.field.VariableThis;
 import dyvilx.tools.compiler.ast.generic.GenericData;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -265,6 +267,12 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			return this.thisType;
 		}
 		return this.thisType = this.enclosingClass.getThisType();
+	}
+
+	@Override
+	public IAccessible getAccessibleThis(IType type)
+	{
+		return Types.isSuperType(type, this.getThisType()) ? VariableThis.DEFAULT : null;
 	}
 
 	@Override

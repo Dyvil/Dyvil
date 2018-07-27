@@ -794,9 +794,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IAccessible getAccessibleThis(IClass type)
+	public IAccessible getAccessibleThis(IType type)
 	{
-		return type == this || Types.isSuperClass(type, this) ? VariableThis.DEFAULT : null;
+		return Types.isSuperType(type, this.getThisType()) ? VariableThis.DEFAULT : null;
 	}
 
 	@Override

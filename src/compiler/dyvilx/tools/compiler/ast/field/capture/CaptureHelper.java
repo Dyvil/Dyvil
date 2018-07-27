@@ -2,12 +2,12 @@ package dyvilx.tools.compiler.ast.field.capture;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IVariable;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
@@ -17,9 +17,9 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 {
 	private final Function<? super IVariable, ? extends T> captureSupplier;
 
-	private T[]    capturedFields;
-	private int    capturedFieldCount;
-	private IClass thisClass;
+	private T[]   capturedFields;
+	private int   capturedFieldCount;
+	private IType thisType;
 
 	public CaptureHelper(Function<? super IVariable, ? extends T> captureSupplier)
 	{
@@ -32,14 +32,19 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 		return new ArrayIterator<>(this.capturedFields, 0, this.capturedFieldCount);
 	}
 
-	public IClass getThisClass()
+	public IType getThisType()
 	{
-		return this.thisClass;
+		return this.thisType;
 	}
 
-	public void setThisClass(IClass thisClass)
+	public void setThisType(IType thisType)
 	{
-		this.thisClass = thisClass;
+		this.thisType = thisType;
+	}
+
+	public boolean isThisCaptured()
+	{
+		return this.thisType != null;
 	}
 
 	public T capture(IVariable variable)
@@ -103,16 +108,11 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 		return this.capturedFieldCount > 0;
 	}
 
-	public boolean isThisCaptured()
-	{
-		return this.thisClass != null;
-	}
-
 	public void appendThisCaptureType(StringBuilder buffer)
 	{
-		if (this.thisClass != null)
+		if (this.thisType != null)
 		{
-			buffer.append('L').append(this.thisClass.getInternalName()).append(';');
+			this.thisType.appendExtendedName(buffer);
 		}
 	}
 
@@ -126,9 +126,9 @@ public class CaptureHelper<T extends CaptureDataMember> implements Iterable<T>
 
 	public void writeCaptures(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.thisClass != null)
+		if (this.thisType != null)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, 0);
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, 0);
 		}
 
 		for (int i = 0; i < this.capturedFieldCount; i++)

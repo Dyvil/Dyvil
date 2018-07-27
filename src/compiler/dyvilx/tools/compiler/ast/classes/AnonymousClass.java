@@ -14,6 +14,7 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
@@ -86,9 +87,9 @@ public class AnonymousClass extends CodeClass
 	}
 
 	@Override
-	public IAccessible getAccessibleThis(IClass type)
+	public IAccessible getAccessibleThis(IType type)
 	{
-		if (type == this)
+		if (Types.isSuperType(type, this.getThisType()))
 		{
 			return VariableThis.DEFAULT;
 		}
@@ -197,8 +198,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTargetClass().getThisType(),
-			                                  Modifiers.MANDATED);
+			index = initWriter.visitParameter(index, thisField.getName(), thisField.getType(), Modifiers.MANDATED);
 		}
 
 		captureHelper.writeCaptureParameters(initWriter, index);

@@ -26,7 +26,7 @@ public final class ThisExpr implements IValue
 	public ThisExpr(IClass type)
 	{
 		this.type = type.getThisType();
-		this.getter = type.getAccessibleThis(type);
+		this.getter = type.getAccessibleThis(this.type);
 	}
 
 	public ThisExpr(IType type)
@@ -151,8 +151,7 @@ public final class ThisExpr implements IValue
 			return;
 		}
 
-		final IClass theClass = this.type.getTheClass();
-		this.getter = context.getAccessibleThis(theClass);
+		this.getter = context.getAccessibleThis(this.type);
 		if (this.getter == null)
 		{
 			markers.add(Markers.semanticError(this.position, "this.instance", this.type));

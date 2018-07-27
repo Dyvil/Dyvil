@@ -110,7 +110,7 @@ public interface IStaticContext extends IContext
 	}
 
 	@Override
-	default IAccessible getAccessibleThis(IClass type)
+	default IAccessible getAccessibleThis(IType type)
 	{
 		return null;
 	}
