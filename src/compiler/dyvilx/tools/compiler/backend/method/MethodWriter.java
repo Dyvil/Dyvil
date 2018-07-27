@@ -9,8 +9,6 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
 	Frame getFrame();
 
-	void setThisType(String type);
-
 	void setLocalType(int index, Object type);
 
 	void setHasReturn(boolean hasReturn);

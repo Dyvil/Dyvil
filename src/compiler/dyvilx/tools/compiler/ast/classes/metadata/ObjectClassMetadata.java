@@ -128,7 +128,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString",
 			                                                                      "()Ljava/lang/String;", null, null));
 			mw.visitCode();
-			mw.setThisType(internalName);
+			mw.setLocalType(0, internalName);
 			mw.visitLdcInsn(this.theClass.getName().unqualified);
 			mw.visitInsn(Opcodes.ARETURN);
 			mw.visitEnd(Types.STRING);
@@ -141,7 +141,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals",
 			                                                                      "(Ljava/lang/Object;)Z", null, null));
 			mw.visitCode();
-			mw.setThisType(internalName);
+			mw.setLocalType(0, internalName);
 			mw.visitParameter(1, "obj", Types.ANY, 0);
 			mw.visitVarInsn(Opcodes.ALOAD, 0);
 			mw.visitVarInsn(Opcodes.ALOAD, 1);
@@ -160,7 +160,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
 			                                           writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null, null));
 			mw.visitCode();
-			mw.setThisType(internalName);
+			mw.setLocalType(0, internalName);
 			mw.visitLdcInsn(internalName.hashCode());
 			mw.visitInsn(Opcodes.IRETURN);
 			mw.visitEnd();
@@ -188,7 +188,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 	private static void writeResolveBody(MethodWriter mw, String internal) throws BytecodeException
 	{
-		mw.setThisType(internal);
+		mw.setLocalType(0, internal);
 		mw.visitCode();
 		writeGetInstance(mw, internal);
 		mw.visitInsn(Opcodes.ARETURN);

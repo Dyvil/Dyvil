@@ -570,7 +570,7 @@ public class CodeMethod extends AbstractMethod
 
 		if (!this.isStatic())
 		{
-			methodWriter.setThisType(ownerClassName);
+			methodWriter.setLocalType(0, ownerClassName);
 		}
 
 		this.writeAnnotations(methodWriter, dyvilFlags);
@@ -647,7 +647,7 @@ public class CodeMethod extends AbstractMethod
 
 			if (!this.isStatic())
 			{
-				methodWriter.setThisType(ownerClassName);
+				methodWriter.setLocalType(0, ownerClassName);
 				methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 			}
 

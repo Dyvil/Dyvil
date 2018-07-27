@@ -304,7 +304,7 @@ public class CodeConstructor extends AbstractConstructor
 		}
 
 		// Write Parameters
-		methodWriter.setThisType(this.enclosingClass.getInternalName());
+		methodWriter.setLocalType(0, this.enclosingClass.getInternalName());
 		this.parameters.write(methodWriter);
 
 		// Write Code
