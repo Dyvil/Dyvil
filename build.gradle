@@ -145,46 +145,36 @@ repositories {
 dependencies {
 	compile fileTree('libs/')
 
-	// Runtime Dependencies (Resources)
+	// --------------- Library ---------------
 
-	//noinspection GroovyAssignabilityCheck
-	def libRun = files("$buildDir/classes/dyvil/library")
-	//noinspection GroovyAssignabilityCheck
-	def dpfRun = files("$buildDir/classes/dyvil/dpf")
-	//noinspection GroovyAssignabilityCheck
-	def testRun = files("$buildDir/classes/dyvil/test")
+	sourceSets.library.compileClasspath += files('libs/dyvil-library.jar')
 
-	//noinspection GroovyAssignabilityCheck
-	def bootstrap = files('libs/dyvil-library.jar')
-	def libComp = sourceSets.library.output
+	def libraryCP = sourceSets.library.output + sourceSets.library.compileClasspath
 
-	libraryCompile libRun
-	libraryCompile bootstrap
+	// --------------- Compiler ---------------
 
-	// compiler -> library
-	compilerCompile libComp
-	compilerCompile libRun
-	compilerCompile bootstrap
+	sourceSets.compiler.compileClasspath += libraryCP
 
-	// dpf -> library
-	dpfCompile libComp
-	dpfCompile libRun, dpfRun
-	dpfCompile bootstrap
+	def compilerCP = sourceSets.compiler.output + sourceSets.compiler.compileClasspath
 
-	// repl -> library, compiler
-	replCompile libComp, sourceSets.compiler.output
-	replCompile libRun, dpfRun, testRun
-	replCompile bootstrap
+	// --------------- DPF ---------------
 
-	// gensrc -> library, compiler
-	gensrcCompile libComp, sourceSets.compiler.output
-	gensrcCompile libRun
-	gensrcCompile bootstrap
+	sourceSets.dpf.compileClasspath += libraryCP
 
-	// test -> library, junit
-	testCompile libComp, 'junit:junit:4.12'
-	testCompile libRun, dpfRun, testRun
-	testCompile bootstrap
+	// --------------- REPL ---------------
+
+	sourceSets.repl.compileClasspath += compilerCP
+
+	// --------------- GenSrc ---------------
+
+	sourceSets.gensrc.compileClasspath += compilerCP
+
+	// --------------- Test ---------------
+
+	// https://mvnrepository.com/artifact/junit/junit
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+
+	sourceSets.test.compileClasspath += libraryCP
 }
 
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
