@@ -147,34 +147,36 @@ dependencies {
 
 	// --------------- Library ---------------
 
-	sourceSets.library.compileClasspath += files('libs/dyvil-library.jar')
+	libraryCompile(files("$buildDir/classes/dyvil/library", 'libs/dyvil-library.jar'))
 
 	def libraryCP = sourceSets.library.output + sourceSets.library.compileClasspath
 
 	// --------------- Compiler ---------------
 
-	sourceSets.compiler.compileClasspath += libraryCP
+	compilerCompile(files("$buildDir/classes/dyvil/compiler"), libraryCP)
 
 	def compilerCP = sourceSets.compiler.output + sourceSets.compiler.compileClasspath
 
 	// --------------- DPF ---------------
 
-	sourceSets.dpf.compileClasspath += libraryCP
+	dpfCompile(files("$buildDir/classes/dyvil/dpf"), libraryCP)
+
+	def dpfCP = sourceSets.dpf.output + sourceSets.dpf.compileClasspath
 
 	// --------------- REPL ---------------
 
-	sourceSets.repl.compileClasspath += compilerCP
+	replCompile(files("$buildDir/classes/dyvil/repl"), compilerCP)
 
 	// --------------- GenSrc ---------------
 
-	sourceSets.gensrc.compileClasspath += compilerCP
+	gensrcCompile(files("$buildDir/classes/dyvil/gensrc"), compilerCP)
 
 	// --------------- Test ---------------
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
-	sourceSets.test.compileClasspath += libraryCP
+	testCompile(files("$buildDir/classes/dyvil/test"), dpfCP)
 }
 
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
