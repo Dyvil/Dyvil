@@ -516,13 +516,13 @@ task prepareRelease(type: Copy) {
 	])
 
 	doLast {
-		println "Release v$version"
+		println "Release v$Constants.version"
 		println ""
-		println "Library v$libraryVersion"
-		println "Compiler v$compilerVersion"
-		println "REPL v$replVersion"
-		println "Dyvil Property Format v$dpfVersion"
-		println "GenSrc v$genSrcVersion"
+		println "Library v$Constants.libraryVersion"
+		println "Compiler v$Constants.compilerVersion"
+		println "REPL v$Constants.replVersion"
+		println "Dyvil Property Format v$Constants.dpfVersion"
+		println "GenSrc v$Constants.genSrcVersion"
 	}
 }
 
