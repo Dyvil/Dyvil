@@ -7,8 +7,6 @@ apply plugin: 'application'
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
-import static Constants.*
-
 // ---------------------------------------- Main Settings ----------------------------------------
 
 class Constants
@@ -34,7 +32,7 @@ class Constants
 }
 
 project.group = 'clashsoft'
-project.version = version
+project.version = Constants.version
 
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
@@ -46,12 +44,12 @@ if (buildNum)
 {
 	String info = "+nightly." + buildNum
 
-	version += info
-	libraryVersion += info
-	compilerVersion += info
-	replVersion += info
-	dpfVersion += info
-	genSrcVersion += info
+	Constants.version += info
+	Constants.libraryVersion += info
+	Constants.compilerVersion += info
+	Constants.replVersion += info
+	Constants.dpfVersion += info
+	Constants.genSrcVersion += info
 
 	nightly = true
 }
@@ -135,7 +133,7 @@ sourceSets {
 
 //noinspection GroovyAssignabilityCheck
 processResources {
-	include resourceFilters
+	include Constants.resourceFilters
 }
 
 // ---------------------------------------- Dependencies ----------------------------------------
@@ -145,7 +143,6 @@ repositories {
 }
 
 dependencies {
-	// This is only here so IDEs recognize these files as dependencies
 	compile fileTree('libs/')
 
 	// Runtime Dependencies (Resources)
@@ -200,7 +197,7 @@ task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 	from sourceSets.library.java
 	into "$buildDir/src/java/library"
 
-	include javaFilters
+	include Constants.javaFilters
 	includeEmptyDirs = false
 }
 
@@ -213,7 +210,7 @@ task copyLibraryDyvil(type: Sync, dependsOn: 'genLibrary') {
 	from "$buildDir/gensrc/library"
 	into "$buildDir/src/dyvil/library"
 
-	include dyvilFilters
+	include Constants.dyvilFilters
 	includeEmptyDirs = false
 }
 
@@ -223,14 +220,15 @@ task copyCompilerJava(type: Sync) {
 	from sourceSets.compiler.java
 	into "$buildDir/src/java/compiler"
 
-	include javaFilters
+	include Constants.javaFilters
 	includeEmptyDirs = false
 
 	filesMatching('**/DyvilCompiler.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$',
-				tokens: [ version        : version,
-				          libraryVersion : libraryVersion,
-				          compilerVersion: compilerVersion ])
+		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+				version        : Constants.version,
+				libraryVersion : Constants.libraryVersion,
+				compilerVersion: Constants.compilerVersion
+		])
 	}
 }
 
@@ -243,11 +241,13 @@ task copyReplJava(type: Sync) {
 	from sourceSets.repl.java
 	into "$buildDir/src/java/repl"
 
-	include javaFilters
+	include Constants.javaFilters
 	includeEmptyDirs = false
 
 	filesMatching('**/DyvilREPL.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [ replVersion: replVersion ])
+		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+				replVersion: Constants.replVersion
+		])
 	}
 }
 
@@ -262,7 +262,7 @@ task copyDPFDyvil(type: Sync, dependsOn: 'genDPF') {
 	into "$buildDir/src/dyvil/dpf"
 
 	includeEmptyDirs = false
-	include dyvilFilters
+	include Constants.dyvilFilters
 }
 
 // GenSrc
@@ -271,7 +271,7 @@ task copyGensrcJava(type: Sync) {
 	from sourceSets.gensrc.java
 	into "$buildDir/src/java/gensrc"
 
-	include javaFilters
+	include Constants.javaFilters
 	includeEmptyDirs = false
 }
 
@@ -285,7 +285,7 @@ task copyTestDyvil(type: Sync) {
 	into "$buildDir/src/dyvil/test"
 
 	includeEmptyDirs = false
-	include dyvilFilters
+	include Constants.dyvilFilters
 }
 
 // ---------------------------------------- Compilation Tasks ----------------------------------------
@@ -325,7 +325,7 @@ task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestD
 
 private void runCompiler(JavaExec exec, String config, String target, String... srcs)
 {
-	exec.main = compilerMainClass
+	exec.main = Constants.compilerMainClass
 	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
 	exec.args = [ "@$config", 'compile', '--ansi' ]
 
@@ -334,14 +334,14 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	for (String src : srcs)
 	{
 		exec.inputs.files fileTree(src) {
-			include dyvilFilters
+			include Constants.dyvilFilters
 		}
 	}
 }
 
 private void runGenSrc(JavaExec exec, String config, String[] srcs, String target, String gensrc)
 {
-	exec.main = genSrcMainClass
+	exec.main = Constants.genSrcMainClass
 	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
 	exec.args = [ "@$config", 'compile', 'test', '--ansi' ]
 
@@ -351,7 +351,7 @@ private void runGenSrc(JavaExec exec, String config, String[] srcs, String targe
 	for (String src : srcs)
 	{
 		exec.inputs.files fileTree(src) {
-			include genSrcFilters
+			include Constants.genSrcFilters
 		}
 	}
 }
@@ -384,20 +384,20 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 	from sourceSets.library.resources
 
 	from("$buildDir/classes/dyvil/library") {
-		include binaryFilters
+		include Constants.binaryFilters
 	}
 
-	archiveName = "dyvil-library-${ libraryVersion }.jar"
+	archiveName = "dyvil-library-${ Constants.libraryVersion }.jar"
 }
 
 task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
 
 	from("$buildDir/classes/dyvil/dpf") {
-		include binaryFilters
+		include Constants.binaryFilters
 	}
 
-	archiveName = "dyvil-property-format-${ dpfVersion }.jar"
+	archiveName = "dyvil-property-format-${ Constants.dpfVersion }.jar"
 }
 
 /**
@@ -407,9 +407,9 @@ task buildCompiler(type: Jar, dependsOn: 'compilerClasses') {
 	from sourceSets.compiler.output
 	from sourceSets.compiler.resources
 
-	archiveName = "dyvil-compiler-${ compilerVersion }.jar"
+	archiveName = "dyvil-compiler-${ Constants.compilerVersion }.jar"
 
-	manifest.attributes("Main-Class": compilerMainClass)
+	manifest.attributes("Main-Class": Constants.compilerMainClass)
 }
 
 /**
@@ -419,18 +419,18 @@ task buildREPL(type: Jar, dependsOn: 'replClasses') {
 	from sourceSets.repl.output
 	from sourceSets.repl.resources
 
-	archiveName = "dyvil-repl-${ replVersion }.jar"
+	archiveName = "dyvil-repl-${ Constants.replVersion }.jar"
 
-	manifest.attributes("Main-Class": replMainClass)
+	manifest.attributes("Main-Class": Constants.replMainClass)
 }
 
 task buildGenSrc(type: Jar, dependsOn: 'gensrcClasses') {
 	from sourceSets.gensrc.output
 	from sourceSets.gensrc.resources
 
-	archiveName = "dyvil-gensrc-${ genSrcVersion }.jar"
+	archiveName = "dyvil-gensrc-${ Constants.genSrcVersion }.jar"
 
-	manifest.attributes("Main-Class": genSrcMainClass)
+	manifest.attributes("Main-Class": Constants.genSrcMainClass)
 }
 
 /**
@@ -449,15 +449,15 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.gensrc.resources
 
 	from("$buildDir/classes/dyvil/library") {
-		include binaryFilters
+		include Constants.binaryFilters
 	}
 	from("$buildDir/classes/dyvil/dpf") {
-		include binaryFilters
+		include Constants.binaryFilters
 	}
 
-	archiveName = "dyvil-${ version }.jar"
+	archiveName = "dyvil-${ Constants.version }.jar"
 
-	manifest.attributes("Main-Class": replMainClass)
+	manifest.attributes("Main-Class": Constants.replMainClass)
 }
 
 build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF', 'buildGenSrc' ])
@@ -509,18 +509,19 @@ task prepareRelease(type: Copy) {
 	}
 	else
 	{
-		into "versions/$devStage"
+		into "versions/$Constants.devStage"
 		include 'template.dyp'
-		rename 'template\\.dyp', "v${ version }.dyp"
+		rename 'template\\.dyp', "v${ Constants.version }.dyp"
 	}
 
-	filter(ReplaceTokens, beginToken: '$$', endToken: '$$',
-			tokens: [ version        : version,
-			          libraryVersion : libraryVersion,
-			          compilerVersion: compilerVersion,
-			          replVersion    : replVersion,
-			          dpfVersion     : dpfVersion,
-			          genSrcVersion  : genSrcVersion ])
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+			version        : Constants.version,
+			libraryVersion : Constants.libraryVersion,
+			compilerVersion: Constants.compilerVersion,
+			replVersion    : Constants.replVersion,
+			dpfVersion     : Constants.dpfVersion,
+			genSrcVersion  : Constants.genSrcVersion
+	])
 
 	doLast {
 		println "Release v$version"
