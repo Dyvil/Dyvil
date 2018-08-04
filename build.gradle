@@ -293,11 +293,11 @@ tasks.withType(JavaCompile).all {
 }
 
 task genLibrary(type: JavaExec) { JavaExec exec ->
-	runGenSrc(exec, 'config/genlib.dyc', [ 'src/library/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/library-gen/", "$buildDir/gensrc/library/")
+	runGenSrc(exec, 'config/genlib.dyc', [ 'src/library/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/dyvil/library-gen/", "$buildDir/gensrc/library/")
 }
 
 task genDPF(type: JavaExec) { JavaExec exec ->
-	runGenSrc(exec, 'config/gendpf.dyc', [ 'src/dpf/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/dpf-gen/", "$buildDir/gensrc/dpf/")
+	runGenSrc(exec, 'config/gendpf.dyc', [ 'src/dpf/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/dyvil/dpf-gen/", "$buildDir/gensrc/dpf/")
 }
 
 /**
