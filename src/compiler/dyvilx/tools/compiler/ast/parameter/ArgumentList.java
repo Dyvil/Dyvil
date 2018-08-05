@@ -29,13 +29,19 @@ import java.util.Iterator;
 
 public class ArgumentList implements Resolvable, IValueList
 {
+	// =============== Constants ===============
+
 	public static final ArgumentList EMPTY = empty();
 
 	public static final int MISMATCH = -1;
 	public static final int DEFAULT  = -2;
 
+	// =============== Fields ===============
+
 	protected IValue[] values;
 	protected int      size;
+
+	// =============== Constructors ===============
 
 	public ArgumentList()
 	{
@@ -65,12 +71,16 @@ public class ArgumentList implements Resolvable, IValueList
 		this.size = size;
 	}
 
-	// List Methods
+	// =============== Static Methods ===============
 
 	public static ArgumentList empty()
 	{
 		return new ArgumentList(new IValue[0], 0);
 	}
+
+	// =============== Instance Methods ===============
+
+	// --------------- IValueList Methods ---------------
 
 	public IValue[] getArray()
 	{
@@ -97,24 +107,19 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public ArgumentList appended(IValue value)
 	{
-		IValue[] values = new IValue[this.size + 1];
-		System.arraycopy(this.values, 0, values, 0, this.size);
-		values[this.size] = value;
-		return new ArgumentList(values, this.size + 1);
+		return this.appended(null, value);
 	}
 
 	public ArgumentList appended(Name name, IValue value)
 	{
-		return this.appended(value);
+		ArgumentList copy = this.copy(this.size + 1);
+		copy.add(name, value);
+		return copy;
 	}
 
 	public ArgumentList concat(ArgumentList that)
 	{
-		final int size = this.size + that.size;
-		final ArgumentList list = that instanceof NamedArgumentList ?
-			                          new NamedArgumentList(size) :
-			                          new ArgumentList(size);
-		list.addAll(this);
+		final ArgumentList list = this.copy(this.size + that.size);
 		list.addAll(that);
 		return list;
 	}
@@ -209,12 +214,15 @@ public class ArgumentList implements Resolvable, IValueList
 	@Override
 	public IValue get(int index)
 	{
-		if (index >= this.size)
-		{
-			return null;
-		}
-		return this.values[index];
+		return index >= this.size ? null : this.values[index];
 	}
+
+	public IValue get(int index, Name key)
+	{
+		return this.get(index);
+	}
+
+	// --------------- Parameter-based Methods ---------------
 
 	public IValue get(IParameter parameter)
 	{
@@ -227,12 +235,7 @@ public class ArgumentList implements Resolvable, IValueList
 		return value != null ? value : parameter.getValue();
 	}
 
-	public IValue get(int index, Name key)
-	{
-		return this.get(index);
-	}
-
-	// Utilities for Homogeneous Lists
+	// --------------- Homogeneous List Methods ---------------
 
 	public IType getCommonType()
 	{
@@ -269,7 +272,7 @@ public class ArgumentList implements Resolvable, IValueList
 		return true;
 	}
 
-	// Resolution
+	// --------------- Resolution ---------------
 
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
@@ -534,7 +537,7 @@ public class ArgumentList implements Resolvable, IValueList
 		return true;
 	}
 
-	// Compilation
+	// --------------- Compilation ---------------
 
 	public boolean hasParameterOrder()
 	{
@@ -554,7 +557,7 @@ public class ArgumentList implements Resolvable, IValueList
 		}
 	}
 
-	// Phases
+	// --------------- Phases ---------------
 
 	public boolean isResolved()
 	{
@@ -622,7 +625,7 @@ public class ArgumentList implements Resolvable, IValueList
 		}
 	}
 
-	// String Conversion
+	// --------------- Formatting ---------------
 
 	@Override
 	public final String toString()
@@ -686,11 +689,16 @@ public class ArgumentList implements Resolvable, IValueList
 		this.values[index].getType().toString("", buffer);
 	}
 
-	// Copying
+	// --------------- Copying ---------------
 
 	public ArgumentList copy()
 	{
 		return new ArgumentList(Arrays.copyOf(this.values, this.size), this.size);
+	}
+
+	public ArgumentList copy(int capacity)
+	{
+		return new ArgumentList(Arrays.copyOf(this.values, capacity), this.size);
 	}
 
 	public NamedArgumentList toNamed()
