@@ -40,7 +40,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 	// =============== Fields ===============
 
-	protected Name[]   keys;
+	protected Name[]   labels;
 	protected IValue[] values;
 	protected int      size;
 
@@ -71,9 +71,9 @@ public class ArgumentList implements Resolvable, IValueList
 		this(new Name[values.length], values, size);
 	}
 
-	public ArgumentList(Name[] keys, IValue[] values, int size)
+	public ArgumentList(Name[] labels, IValue[] values, int size)
 	{
-		this.keys = keys;
+		this.labels = labels;
 		this.values = values;
 		this.size = size;
 	}
@@ -115,30 +115,30 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		if (min >= this.values.length)
 		{
-			final Name[] tempKeys = new Name[min];
+			final Name[] tempLabels = new Name[min];
 			final IValue[] tempValues = new IValue[min];
-			System.arraycopy(this.keys, 0, tempKeys, 0, this.size);
+			System.arraycopy(this.labels, 0, tempLabels, 0, this.size);
 			System.arraycopy(this.values, 0, tempValues, 0, this.size);
-			this.keys = tempKeys;
+			this.labels = tempLabels;
 			this.values = tempValues;
 		}
 	}
 
-	private int findIndex(int index, Name name)
+	private int findIndex(int index, Name label)
 	{
-		if (name != null)
+		if (label != null)
 		{
-			// First, try to match the parameter name against the argument labels
+			// First, try to match the parameter label against the argument labels
 			for (int i = 0; i < this.size; i++)
 			{
-				if (this.keys[i] == name)
+				if (this.labels[i] == label)
 				{
 					return i;
 				}
 			}
 		}
 
-		// The specified name was not found, check the indices:
+		// The specified label was not found, check the indices:
 
 		if (index >= this.size)
 		{
@@ -148,7 +148,7 @@ public class ArgumentList implements Resolvable, IValueList
 		// Require that no argument labels exists before or at the index
 		for (int i = 0; i <= index; i++)
 		{
-			if (this.keys[i] != null)
+			if (this.labels[i] != null)
 			{
 				return -1;
 			}
@@ -162,7 +162,7 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		for (; startIndex < this.size; startIndex++)
 		{
-			if (this.keys[startIndex] != null)
+			if (this.labels[startIndex] != null)
 			{
 				return startIndex;
 			}
@@ -179,14 +179,14 @@ public class ArgumentList implements Resolvable, IValueList
 		return this.get(index, null);
 	}
 
-	public IValue get(int index, Name key)
+	public IValue get(int index, Name label)
 	{
-		if (key == null)
+		if (label == null)
 		{
 			return index < this.size ? this.values[index] : null;
 		}
 
-		final int argIndex = this.findIndex(index, key);
+		final int argIndex = this.findIndex(index, label);
 		if (argIndex < 0)
 		{
 			return null;
@@ -202,26 +202,26 @@ public class ArgumentList implements Resolvable, IValueList
 		this.set(index, null, value);
 	}
 
-	public void set(int index, Name key, IValue value)
+	public void set(int index, Name label, IValue value)
 	{
-		if (key == null)
+		if (label == null)
 		{
 			this.values[index] = value;
 			return;
 		}
 
-		final int argIndex = this.findIndex(index, key);
+		final int argIndex = this.findIndex(index, label);
 		if (argIndex >= 0)
 		{
 			this.values[argIndex] = value;
 		}
 	}
 
-	public void setName(int i, Name name)
+	public void setLabel(int i, Name label)
 	{
 		if (i < this.size)
 		{
-			this.keys[i] = name;
+			this.labels[i] = label;
 		}
 	}
 
@@ -234,12 +234,12 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	@Override
-	public void add(Name name, IValue value)
+	public void add(Name label, IValue value)
 	{
 		final int size = this.size;
 		this.ensureCapacity(size + 1);
 		this.values[size] = value;
-		this.keys[size] = name;
+		this.labels[size] = label;
 		this.size = size + 1;
 	}
 
@@ -247,7 +247,7 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		this.ensureCapacity(this.size + list.size);
 		System.arraycopy(list.values, 0, this.values, this.size, list.size);
-		System.arraycopy(((NamedArgumentList) list).keys, 0, this.keys, this.size, list.size);
+		System.arraycopy(((NamedArgumentList) list).labels, 0, this.labels, this.size, list.size);
 		this.size += list.size;
 	}
 
@@ -258,27 +258,27 @@ public class ArgumentList implements Resolvable, IValueList
 		this.insert(index, null, value);
 	}
 
-	public void insert(int index, Name key, IValue value)
+	public void insert(int index, Name label, IValue value)
 	{
 		final int newSize = this.size + 1;
 		if (newSize >= this.values.length)
 		{
-			final Name[] keys = new Name[newSize];
+			final Name[] labels = new Name[newSize];
 			final IValue[] values = new IValue[newSize];
-			System.arraycopy(this.keys, 0, keys, 0, index);
+			System.arraycopy(this.labels, 0, labels, 0, index);
 			System.arraycopy(this.values, 0, values, 0, index);
-			keys[index] = key;
+			labels[index] = label;
 			values[index] = value;
-			System.arraycopy(this.keys, index, keys, index + 1, this.size - index);
+			System.arraycopy(this.labels, index, labels, index + 1, this.size - index);
 			System.arraycopy(this.values, index, values, index + 1, this.size - index);
-			this.keys = keys;
+			this.labels = labels;
 			this.values = values;
 		}
 		else
 		{
-			System.arraycopy(this.keys, index, this.keys, index + 1, this.size - index);
+			System.arraycopy(this.labels, index, this.labels, index + 1, this.size - index);
 			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
-			this.keys[index] = key;
+			this.labels[index] = label;
 			this.values[index] = value;
 		}
 		this.size = newSize;
@@ -291,10 +291,10 @@ public class ArgumentList implements Resolvable, IValueList
 		return this.appended(null, value);
 	}
 
-	public ArgumentList appended(Name name, IValue value)
+	public ArgumentList appended(Name label, IValue value)
 	{
 		ArgumentList copy = this.copy(this.size + 1);
-		copy.add(name, value);
+		copy.add(label, value);
 		return copy;
 	}
 
@@ -411,9 +411,9 @@ public class ArgumentList implements Resolvable, IValueList
 		{
 			return param.isVarargs() && this != EMPTY ? 0 : checkDefault(param);
 		}
-		if (this.keys[argumentIndex] == null && param.hasModifier(Modifiers.EXPLICIT))
+		if (this.labels[argumentIndex] == null && param.hasModifier(Modifiers.EXPLICIT))
 		{
-			// explicit parameters require a named argument list
+			// explicit parameters require an argument label
 			return checkDefault(param);
 		}
 
@@ -625,7 +625,7 @@ public class ArgumentList implements Resolvable, IValueList
 		if (moved > 0)
 		{
 			System.arraycopy(this.values, endIndex, this.values, index + 1, moved);
-			System.arraycopy(this.keys, endIndex, this.keys, index + 1, moved);
+			System.arraycopy(this.labels, endIndex, this.labels, index + 1, moved);
 		}
 		this.size = index + moved + 1;
 	}
@@ -659,7 +659,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.keys[i] != null)
+			if (this.labels[i] != null)
 			{
 				return false;
 			}
@@ -778,21 +778,21 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			final Name key = this.keys[i];
+			final Name label = this.labels[i];
 			final IValue value = this.values[i];
 
 			value.resolveTypes(markers, context);
 
-			if (key == null)
+			if (label == null)
 			{
 				continue;
 			}
 
 			for (int j = 0; j < i; j++)
 			{
-				if (this.keys[j] == key)
+				if (this.labels[j] == label)
 				{
-					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.key", key));
+					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.label", label));
 					break;
 				}
 			}
@@ -878,10 +878,10 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
-		final Name key = this.keys[index];
-		if (key != null)
+		final Name label = this.labels[index];
+		if (label != null)
 		{
-			buffer.append(key);
+			buffer.append(label);
 			Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
 		}
 
@@ -912,11 +912,10 @@ public class ArgumentList implements Resolvable, IValueList
 
 	protected void appendType(@NonNull StringBuilder buffer, int index)
 	{
-		final Name key = this.keys[index];
-
-		if (key != null)
+		final Name label = this.labels[index];
+		if (label != null)
 		{
-			buffer.append(key).append(": ");
+			buffer.append(label).append(": ");
 		}
 
 		this.values[index].getType().toString("", buffer);
@@ -931,7 +930,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public ArgumentList copy(int capacity)
 	{
-		return new ArgumentList(Arrays.copyOf(this.keys, capacity), Arrays.copyOf(this.values, capacity), this.size);
+		return new ArgumentList(Arrays.copyOf(this.labels, capacity), Arrays.copyOf(this.values, capacity), this.size);
 	}
 
 	public NamedArgumentList toNamed()

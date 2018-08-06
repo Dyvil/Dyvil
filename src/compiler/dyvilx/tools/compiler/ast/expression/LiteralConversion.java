@@ -49,7 +49,7 @@ public class LiteralConversion extends AbstractCall
 		final NamedArgumentList namedArguments = arguments.toNamed();
 		for (int i = 1; i < names.length; i++)
 		{
-			namedArguments.setName(i - 1, names[i]);
+			namedArguments.setLabel(i - 1, names[i]);
 		}
 		this.arguments = namedArguments;
 	}
