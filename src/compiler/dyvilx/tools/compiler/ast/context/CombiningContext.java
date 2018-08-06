@@ -190,7 +190,7 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IAccessible getAccessibleThis(IClass type)
+	public IAccessible getAccessibleThis(IType type)
 	{
 		IAccessible i = this.inner.getAccessibleThis(type);
 		return i == null ? this.outer.getAccessibleThis(type) : i;

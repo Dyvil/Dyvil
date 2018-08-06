@@ -8,7 +8,7 @@ import dyvilx.tools.compiler.ast.expression.AnnotationExpr;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
-import dyvilx.tools.compiler.ast.parameter.NamedArgumentList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.backend.ClassFormat;
 
 import java.util.function.Consumer;
@@ -17,13 +17,13 @@ public class AnnotationReader implements AnnotationVisitor
 {
 	private Consumer<Annotation> consumer;
 	private Annotation           annotation;
-	private NamedArgumentList    arguments;
+	private ArgumentList         arguments;
 
 	public AnnotationReader(Consumer<Annotation> consumer, Annotation annotation)
 	{
 		this.consumer = consumer;
 		this.annotation = annotation;
-		this.annotation.setArguments(this.arguments = new NamedArgumentList());
+		this.annotation.setArguments(this.arguments = new ArgumentList());
 	}
 
 	@Override

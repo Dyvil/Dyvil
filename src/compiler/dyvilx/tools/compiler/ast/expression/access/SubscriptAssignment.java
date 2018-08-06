@@ -21,7 +21,7 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	{
 		this.position = position;
 		this.receiver = receiver;
-		this.arguments = arguments.appended(Names.eq, rhs);
+		this.arguments = arguments.appended(rhs);
 	}
 
 	@Override

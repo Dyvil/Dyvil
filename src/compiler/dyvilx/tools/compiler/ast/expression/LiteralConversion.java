@@ -9,7 +9,6 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.transform.Names;
@@ -40,18 +39,11 @@ public class LiteralConversion extends AbstractCall
 
 		Name[] names = parseAnnotation(annotation);
 		this.name = names[0];
-		if (names.length <= 1)
-		{
-			this.arguments = arguments;
-			return;
-		}
-
-		final NamedArgumentList namedArguments = arguments.toNamed();
 		for (int i = 1; i < names.length; i++)
 		{
-			namedArguments.setName(i - 1, names[i]);
+			arguments.setLabel(i - 1, names[i]);
 		}
-		this.arguments = namedArguments;
+		this.arguments = arguments;
 	}
 
 	public LiteralConversion(IValue literal, Name name, ArgumentList arguments)

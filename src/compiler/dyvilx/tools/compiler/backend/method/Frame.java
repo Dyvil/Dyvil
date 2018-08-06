@@ -148,13 +148,6 @@ public class Frame
 		return frameType.toString();
 	}
 
-	public void setInstance(String type)
-	{
-		this.localCount = 1;
-		this.maxLocals = 1;
-		this.locals[0] = type;
-	}
-
 	private void ensureLocals(int count)
 	{
 		if (count > this.locals.length)

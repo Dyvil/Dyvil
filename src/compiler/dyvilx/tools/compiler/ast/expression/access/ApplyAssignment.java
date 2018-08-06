@@ -20,7 +20,7 @@ public class ApplyAssignment extends AbstractCall implements IValueConsumer
 	{
 		this.position = position;
 		this.receiver = instance;
-		this.arguments = arguments.appended(Names.eq, rhs);
+		this.arguments = arguments.appended(rhs);
 	}
 
 	@Override

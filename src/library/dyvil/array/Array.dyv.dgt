@@ -14,8 +14,11 @@
 #let(GENERIC_2)         {#if (IS_GENERIC) {<T, REIFIED U>} #else {<REIFIED U>}}
 #let(GENERIC_REIFIED)   {#if (IS_GENERIC) {<REIFIED T>}}
 #let(T)                 {#if (IS_GENERIC) {#("T")} #else {PRIMITIVE}}
-#let(APPLY_T)           {#if (IS_GENERIC) {ObjectArray<T>} #else {new [PRIMITIVE]}}
-#let(APPLY_WITH_SIZE)   {#if (IS_GENERIC) {ObjectArray(size, of: array.elementType)} #else {new [PRIMITIVE](size)}}
+
+#func(APPLY(body BODY: String) -> String) {#if (IS_GENERIC) {ObjectArray<T>(BODY)} #else {new [PRIMITIVE](#({
+	let index = BODY.lastIndexOf(',');
+	index < 0 ? BODY : BODY.substring(0, index)
+}))}}
 
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
@@ -36,12 +39,7 @@ public abstract class #(TYPE_NAME)Array
 {
 	private init() {} // no instances
 
-	#if (IS_GENERIC) {
-		public const EMPTY: [final ERASURE] = []
-	}
-	#else {
-		public const EMPTY: [final T] = []
-	}
+	public const EMPTY: [final #if (IS_GENERIC) {ERASURE} #else {T}] = []
 
 	static inline func apply GENERIC_REIFIED() -> [T] = []
 
@@ -63,21 +61,24 @@ public abstract class #(TYPE_NAME)Array
 
 	static func apply GENERIC_REIFIED(size: int, repeatedValue: T) -> [T]
 	{
-		let array = APPLY_T(size)
+		let array = #APPLY{size}
+
 		for (i <- 0 ..< size) array[i] = repeatedValue
 		return array
 	}
 
 	static func apply GENERIC_REIFIED(size: int, valueSupplier: () -> T) -> [T]
 	{
-		let array = APPLY_T(size)
+		let array = #APPLY{size}
+
 		for (i <- 0 ..< size) array[i] = valueSupplier()
 		return array
 	}
 
 	static func apply GENERIC_REIFIED(size: int, valueMapper: int -> T) -> [T]
 	{
-		let array = APPLY_T(size)
+		let array = #APPLY{size}
+
 		for (i <- 0 ..< size) array[i] = valueMapper(i)
 		return array
 	}
@@ -86,7 +87,8 @@ public abstract class #(TYPE_NAME)Array
 		@BytecodeName('rangeClosed')
 		static func apply GENERIC(from: T, to: T) -> [T]
 		{
-			let array = APPLY_T((to - from + 1)#if (RANGE_CAST) { as int})
+			let array = #APPLY{(to - from + 1)#if (RANGE_CAST) { as int}}
+
 			var index = 0
 			for (i <- from .. to) { array[index] = i; index += 1 }
 			return array
@@ -95,7 +97,8 @@ public abstract class #(TYPE_NAME)Array
 		@BytecodeName('rangeOpen')
 		static func apply GENERIC(from: T, explicit toExclusive: T) -> [T]
 		{
-			let array = APPLY_T((toExclusive - from)#if (RANGE_CAST) { as int})
+			let array = #APPLY{(toExclusive - from)#if (RANGE_CAST) { as int}}
+
 			var index = 0
 			for (i <- from ..< toExclusive) { array[index] = i; index += 1 }
 			return array
@@ -123,7 +126,8 @@ public abstract class #(TYPE_NAME)Array
 	infix func subscript GENERIC(array: [T], range: Range<int>) -> [T]
 	{
 		let size = range.size
-		let result = APPLY_WITH_SIZE
+		let result = #APPLY{size, of: array.elementType}
+
 		System.arraycopy(array, range.first, result, 0, size)
 		return result
 	}
@@ -179,9 +183,21 @@ public abstract class #(TYPE_NAME)Array
 	infix func added GENERIC(array: [T], value: T) -> [T]
 	{
 		let size = array.size
-		let result = APPLY_T(size + 1 #if (IS_GENERIC) {, of: array.elementType })
+		let result = #APPLY{size + 1, of: array.elementType}
+
 		System.arraycopy(array, 0, result, 0, size)
 		result[size] = value
+		return result
+	}
+
+	infix func inserted GENERIC(array: [T], at index: int, value: T) -> [T]
+	{
+		let size = array.size
+		let result = #APPLY{size + 1, of: array.elementType}
+
+		System.arraycopy(array, 0, result, 0, index)
+		result[index] = value
+		System.arraycopy(array, index, result, index + 1, size - index)
 		return result
 	}
 
@@ -190,7 +206,7 @@ public abstract class #(TYPE_NAME)Array
 		let size1 = array.size
 		let size2 = with.size
 		let size = size1 + size2
-		let result = APPLY_WITH_SIZE
+		let result = #APPLY{size, of: array.elementType}
 
 		System.arraycopy(array, 0, result, 0, size1)
 		System.arraycopy(with, 0, result, size1, size2)
@@ -204,9 +220,9 @@ public abstract class #(TYPE_NAME)Array
 		// Calculate number of elements in new array
 		for (element <- array) if (element == value) size -= 1
 
-		let result = APPLY_WITH_SIZE
-		var index = 0
+		let result = #APPLY{size, of: array.elementType}
 
+		var index = 0
 		for (element <- array)
 		{
 			if (element != value)
@@ -221,9 +237,9 @@ public abstract class #(TYPE_NAME)Array
 	infix func difference GENERIC(array: [T], from: [T]) -> [T]
 	{
 		let size = array.size
-		let result = APPLY_WITH_SIZE
-		var index = 0
+		let result = #APPLY{size, of: array.elementType}
 
+		var index = 0
 		for (v <- array)
 		{
 			if (!from.contains(v))
@@ -238,9 +254,9 @@ public abstract class #(TYPE_NAME)Array
 	infix func intersection GENERIC(array: [T], with: [T]) -> [T]
 	{
 		let size = array.size
-		let result = APPLY_WITH_SIZE
-		var index = 0
+		let result = #APPLY{size, of: array.elementType}
 
+		var index = 0
 		for (v <- array)
 		{
 			if (with.contains(v))
@@ -252,12 +268,12 @@ public abstract class #(TYPE_NAME)Array
 		return result.trim(index)
 	}
 
-	#if (IS_GENERIC /* Object Arrays do not need a specialized mapped method */ ) {}
-	#else {
+	#if (!IS_GENERIC /* Object Arrays do not need a specialized mapped method */ ) {
 		infix func mappedTo#(TYPE_NAME)(array: [T], mapper: T -> T) -> [T]
 		{
 			let size = array.size
-			let result = APPLY_T(size)
+			let result = #APPLY{size}
+
 			for (i <- 0 ..< size) result[i] = mapper(array[i])
 			return result
 		}
@@ -272,11 +288,11 @@ public abstract class #(TYPE_NAME)Array
 		return result
 	}
 
-	#if (TYPE_NAME != 'Object' /* Object Arrays do not need a specialized flatMapped method */) {
+	#if (!IS_GENERIC /* Object Arrays do not need a specialized flatMapped method */) {
 		infix func flatMappedTo#(TYPE_NAME)(array: [T], mapper: T -> [T]) -> [T]
 		{
 			var size = 0
-			var result = APPLY_T(array.size << 2)
+			var result = #APPLY{array.size << 2}
 
 			for (v <- array)
 			{
@@ -308,9 +324,9 @@ public abstract class #(TYPE_NAME)Array
 	infix func filtered GENERIC(array: [T], condition: T -> boolean) -> [T]
 	{
 		let size = array.size
-		let result = APPLY_WITH_SIZE
-		var index = 0
+		let result = #APPLY{size, of: array.elementType}
 
+		var index = 0
 		for (v <- array)
 		{
 			if (condition(v))
@@ -326,7 +342,7 @@ public abstract class #(TYPE_NAME)Array
 	{
 		#if (TYPE_NAME == 'Boolean') {
 			let size = array.size
-			let result = new [T](size)
+			let result = new [boolean](size)
 
 			// Count the number of 'false' entries in the array
 			var falseEntries = 0
@@ -378,14 +394,15 @@ public abstract class #(TYPE_NAME)Array
 
 	infix func copy GENERIC(array: [T], withSize size: int) -> [T]
 	{
-		let result = APPLY_WITH_SIZE
+		let result = #APPLY{size, of: array.elementType}
+
 		System.arraycopy(array, 0, result, 0, Math.min(size, array.size))
 		return result
 	}
 
 	infix func trim GENERIC(array: [T], toSize size: int) -> [T] = array.size <= size ? array : array.copy(size)
 
-	#if(TYPE_NAME != 'Object' /* Object arrays cannot be boxed */) {
+	#if(!IS_GENERIC /* Object arrays cannot be boxed */) {
 		infix func boxed(array: [T]) -> [WRAPPER]
 		{
 			let size = array.size

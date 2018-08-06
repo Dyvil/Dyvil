@@ -40,12 +40,6 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public void setThisType(String type)
-	{
-		this.frame.setInstance(type);
-	}
-
-	@Override
 	public void setLocalType(int index, Object type)
 	{
 		this.frame.setLocal(index, type);

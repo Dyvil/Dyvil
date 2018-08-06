@@ -43,6 +43,10 @@ public class CallDirective extends MethodCall
 
 	public void setBlock(StatementList block)
 	{
+		if (this.arguments == ArgumentList.EMPTY)
+		{
+			this.arguments = new ArgumentList();
+		}
 		this.arguments.add(FuncDirective.convertBlock(block));
 	}
 

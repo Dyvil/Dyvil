@@ -52,7 +52,11 @@ import java.util.Iterator;
 
 public class CodeMethod extends AbstractMethod
 {
+	// --------------------------------------------- Fields ---------------------------------------------
+
 	protected IValue value;
+
+	// --------------------------------------------- Constructors ---------------------------------------------
 
 	public CodeMethod(IClass iclass)
 	{
@@ -79,6 +83,10 @@ public class CodeMethod extends AbstractMethod
 		super(position, name, type, attributes);
 	}
 
+	// --------------------------------------------- Getters and Setters ---------------------------------------------
+
+	// ------------------------------ Value ------------------------------
+
 	@Override
 	public IValue getValue()
 	{
@@ -90,6 +98,8 @@ public class CodeMethod extends AbstractMethod
 	{
 		this.value = value;
 	}
+
+	// --------------------------------------------- Resolution Phases ---------------------------------------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -296,6 +306,8 @@ public class CodeMethod extends AbstractMethod
 		context.pop();
 	}
 
+	// ------------------------------ Duplicates ------------------------------
+
 	private void checkDuplicates(MarkerList markers)
 	{
 		final Collection<IMethod> candidates = new ArrayList<>();
@@ -322,26 +334,7 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	@Override
-	public IntrinsicData getIntrinsicData()
-	{
-		final Annotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
-		if (annotation == null)
-		{
-			return null;
-		}
-
-		try
-		{
-			// FIXME dirty hack. This can probably be solved by using a recursive resolution scheme instead of a phase-based one
-			annotation.resolve(null, Types.LANG_HEADER);
-			return this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
-		}
-		catch (Exception ignored)
-		{
-			return super.getIntrinsicData();
-		}
-	}
+	// ------------------------------ Overrides ------------------------------
 
 	private void checkOverrideMethods(MarkerList markers)
 	{
@@ -494,6 +487,8 @@ public class CodeMethod extends AbstractMethod
 		                                   overrideMethod.getEnclosingClass().getFullName()));
 	}
 
+	// ------------------------------  ------------------------------
+
 	@Override
 	public void foldConstants()
 	{
@@ -556,6 +551,31 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
+	// --------------------------------------------- Intrinsics ---------------------------------------------
+
+	@Override
+	public IntrinsicData getIntrinsicData()
+	{
+		final Annotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
+		if (annotation == null)
+		{
+			return null;
+		}
+
+		try
+		{
+			// FIXME dirty hack. This can probably be solved by using a recursive resolution scheme instead of a phase-based one
+			annotation.resolve(null, Types.LANG_HEADER);
+			return this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
+		}
+		catch (Exception ignored)
+		{
+			return super.getIntrinsicData();
+		}
+	}
+
+	// --------------------------------------------- Compilation ---------------------------------------------
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -576,7 +596,7 @@ public class CodeMethod extends AbstractMethod
 
 		if (!this.isStatic())
 		{
-			methodWriter.setThisType(ownerClassName);
+			methodWriter.setLocalType(0, ownerClassName);
 
 			if (this.hasModifier(Modifiers.EXTENSION))
 			{
@@ -661,7 +681,7 @@ public class CodeMethod extends AbstractMethod
 
 			if (!this.isStatic())
 			{
-				methodWriter.setThisType(ownerClassName);
+				methodWriter.setLocalType(0, ownerClassName);
 				methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 			}
 
@@ -810,6 +830,8 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 	}
+
+	// --------------------------------------------- Serialization ---------------------------------------------
 
 	@Override
 	public void writeSignature(DataOutput out) throws IOException

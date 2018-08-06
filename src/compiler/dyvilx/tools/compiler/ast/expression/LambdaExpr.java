@@ -508,9 +508,9 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 	}
 
 	@Override
-	public IAccessible getAccessibleThis(IClass type)
+	public IAccessible getAccessibleThis(IType type)
 	{
-		this.getCaptureHelper().setThisClass(type);
+		this.getCaptureHelper().setThisType(type);
 		return VariableThis.DEFAULT;
 	}
 
@@ -895,7 +895,7 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		{
 			if (thisCaptured)
 			{
-				methodWriter.setThisType(this.owner);
+				methodWriter.setLocalType(0, this.owner);
 				index = 1;
 			}
 

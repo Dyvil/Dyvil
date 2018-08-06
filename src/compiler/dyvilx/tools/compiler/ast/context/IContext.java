@@ -95,7 +95,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IDataMember capture(IVariable variable);
 
-	IAccessible getAccessibleThis(IClass type);
+	IAccessible getAccessibleThis(IType type);
 
 	@Override
 	IValue resolveImplicit(IType type);
