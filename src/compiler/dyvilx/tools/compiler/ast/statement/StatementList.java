@@ -208,17 +208,17 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void add(Name name, IValue value)
+	public void add(Name label, IValue value)
 	{
 		final int index = this.valueCount;
 		this.add(value);
 
-		final Label label = new Label(name, value);
+		final Label theLabel = new Label(label, value);
 
 		if (this.labels == null)
 		{
 			this.labels = new Label[index + 1];
-			this.labels[index] = label;
+			this.labels[index] = theLabel;
 			return;
 		}
 		if (index >= this.labels.length)
@@ -227,7 +227,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
 			this.labels = temp;
 		}
-		this.labels[index] = label;
+		this.labels[index] = theLabel;
 	}
 
 	@Override
