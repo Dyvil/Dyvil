@@ -123,15 +123,15 @@ public class ArgumentList implements Resolvable, IValueList
 		}
 	}
 
-	protected void ensureLabels(int min)
+	protected void ensureLabels()
 	{
 		if (this.labels == null)
 		{
-			this.labels = new Name[min];
+			this.labels = new Name[this.values.length];
 			return;
 		}
 
-		this.ensureLabelsCapacity(min);
+		this.ensureLabelsCapacity(this.values.length);
 	}
 
 	private void ensureLabelsCapacity(int min)
@@ -291,9 +291,9 @@ public class ArgumentList implements Resolvable, IValueList
 		this.ensureValues(index + 1);
 		this.values[index] = value;
 
-		if (label != null)
+		if (label != null || this.labels != null)
 		{
-			this.ensureLabels(index + 1);
+			this.ensureLabels();
 			this.labels[index] = label;
 		}
 
