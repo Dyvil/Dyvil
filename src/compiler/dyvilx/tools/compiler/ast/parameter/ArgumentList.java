@@ -15,8 +15,8 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -33,11 +33,14 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public static final ArgumentList EMPTY = empty();
 
+	private static final int DEFAULT_CAPACITY = 3;
+
 	public static final int MISMATCH = -1;
 	public static final int DEFAULT  = -2;
 
 	// =============== Fields ===============
 
+	protected Name[]   keys;
 	protected IValue[] values;
 	protected int      size;
 
@@ -45,28 +48,32 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public ArgumentList()
 	{
-		this.values = new IValue[3];
+		this(DEFAULT_CAPACITY);
+	}
+
+	public ArgumentList(int capacity)
+	{
+		this(new Name[capacity], new IValue[capacity], 0);
 	}
 
 	public ArgumentList(IValue value)
 	{
-		this.values = new IValue[] { value };
-		this.size = 1;
+		this(new Name[] { null }, new IValue[] { value }, 1);
 	}
 
 	public ArgumentList(IValue... values)
 	{
-		this.values = values;
-		this.size = values.length;
-	}
-
-	public ArgumentList(int size)
-	{
-		this.values = new IValue[size];
+		this(new Name[values.length], values, values.length);
 	}
 
 	public ArgumentList(IValue[] values, int size)
 	{
+		this(new Name[values.length], values, size);
+	}
+
+	public ArgumentList(Name[] keys, IValue[] values, int size)
+	{
+		this.keys = keys;
 		this.values = values;
 		this.size = size;
 	}
@@ -144,25 +151,93 @@ public class ArgumentList implements Resolvable, IValueList
 		this.values[this.size - 1] = value;
 	}
 
-	public void set(int index, Name key, IValue value)
-	{
-		this.values[index] = value;
-	}
-
 	@Override
 	public void set(int index, IValue value)
 	{
-		this.values[index] = value;
+		this.set(index, null, value);
+	}
+
+	public void set(int index, Name key, IValue value)
+	{
+		if (key == null)
+		{
+			this.values[index] = value;
+			return;
+		}
+
+		final int argIndex = this.findIndex(index, key);
+		if (argIndex >= 0)
+		{
+			this.values[argIndex] = value;
+		}
+	}
+
+	public void setName(int i, Name name)
+	{
+		if (i < this.size)
+		{
+			this.keys[i] = name;
+		}
 	}
 
 	protected void ensureCapacity(int min)
 	{
 		if (min >= this.values.length)
 		{
-			IValue[] temp = new IValue[min];
-			System.arraycopy(this.values, 0, temp, 0, this.size);
-			this.values = temp;
+			final Name[] tempKeys = new Name[min];
+			final IValue[] tempValues = new IValue[min];
+			System.arraycopy(this.keys, 0, tempKeys, 0, this.size);
+			System.arraycopy(this.values, 0, tempValues, 0, this.size);
+			this.keys = tempKeys;
+			this.values = tempValues;
 		}
+	}
+
+	private int findIndex(int index, Name name)
+	{
+		if (name != null)
+		{
+			// First, try to match the parameter name against the argument labels
+			for (int i = 0; i < this.size; i++)
+			{
+				if (this.keys[i] == name)
+				{
+					return i;
+				}
+			}
+		}
+
+		// The specified name was not found, check the indices:
+
+		if (index >= this.size)
+		{
+			return -1;
+		}
+
+		// Require that no argument labels exists before or at the index
+		for (int i = 0; i <= index; i++)
+		{
+			if (this.keys[i] != null)
+			{
+				return -1;
+			}
+		}
+
+		// No argument labels present before the requested index
+		return index;
+	}
+
+	private int findNextName(int startIndex)
+	{
+		for (; startIndex < this.size; startIndex++)
+		{
+			if (this.keys[startIndex] != null)
+			{
+				return startIndex;
+			}
+		}
+
+		return this.size;
 	}
 
 	@Override
@@ -177,6 +252,7 @@ public class ArgumentList implements Resolvable, IValueList
 		final int size = this.size;
 		this.ensureCapacity(size + 1);
 		this.values[size] = value;
+		this.keys[size] = name;
 		this.size = size + 1;
 	}
 
@@ -184,6 +260,7 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		this.ensureCapacity(this.size + list.size);
 		System.arraycopy(list.values, 0, this.values, this.size, list.size);
+		System.arraycopy(((NamedArgumentList) list).keys, 0, this.keys, this.size, list.size);
 		this.size += list.size;
 	}
 
@@ -197,15 +274,22 @@ public class ArgumentList implements Resolvable, IValueList
 		final int newSize = this.size + 1;
 		if (newSize >= this.values.length)
 		{
-			final IValue[] temp = new IValue[newSize];
-			System.arraycopy(this.values, 0, temp, 0, index);
-			temp[index] = value;
-			System.arraycopy(this.values, index, temp, index + 1, this.size - index);
-			this.values = temp;
+			final Name[] keys = new Name[newSize];
+			final IValue[] values = new IValue[newSize];
+			System.arraycopy(this.keys, 0, keys, 0, index);
+			System.arraycopy(this.values, 0, values, 0, index);
+			keys[index] = key;
+			values[index] = value;
+			System.arraycopy(this.keys, index, keys, index + 1, this.size - index);
+			System.arraycopy(this.values, index, values, index + 1, this.size - index);
+			this.keys = keys;
+			this.values = values;
 		}
 		else
 		{
+			System.arraycopy(this.keys, index, this.keys, index + 1, this.size - index);
 			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+			this.keys[index] = key;
 			this.values[index] = value;
 		}
 		this.size = newSize;
@@ -214,12 +298,22 @@ public class ArgumentList implements Resolvable, IValueList
 	@Override
 	public IValue get(int index)
 	{
-		return index >= this.size ? null : this.values[index];
+		return this.get(index, null);
 	}
 
 	public IValue get(int index, Name key)
 	{
-		return this.get(index);
+		if (key == null)
+		{
+			return index < this.size ? this.values[index] : null;
+		}
+
+		final int argIndex = this.findIndex(index, key);
+		if (argIndex < 0)
+		{
+			return null;
+		}
+		return this.values[argIndex];
 	}
 
 	// --------------- Parameter-based Methods ---------------
@@ -299,13 +393,14 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
-		                     IImplicitContext implicitContext)
+		IImplicitContext implicitContext)
 	{
-		if (argumentIndex >= this.size)
+		argumentIndex = this.findIndex(argumentIndex, param.getLabel());
+		if (argumentIndex < 0)
 		{
 			return param.isVarargs() && this != EMPTY ? 0 : checkDefault(param);
 		}
-		if (param.hasModifier(Modifiers.EXPLICIT))
+		if (this.keys[argumentIndex] == null && param.hasModifier(Modifiers.EXPLICIT))
 		{
 			// explicit parameters require a named argument list
 			return checkDefault(param);
@@ -322,7 +417,9 @@ public class ArgumentList implements Resolvable, IValueList
 			return MISMATCH;
 		}
 
-		return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
+		// Varargs Parameter
+		final int endIndex = this.findNextName(argumentIndex + 1);
+		return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, endIndex, param,
 		                         implicitContext);
 	}
 
@@ -332,14 +429,14 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
-		                                   IType type, IImplicitContext implicitContext)
+		IType type, IImplicitContext implicitContext)
 	{
 		return !argument.checkVarargs(false) && checkMatch_(matchValues, matchTypes, matchIndex, argument, type,
 		                                                    implicitContext);
 	}
 
 	private static boolean checkMatch_(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
-		                                  IType type, IImplicitContext implicitContext)
+		IType type, IImplicitContext implicitContext)
 	{
 		final int result = TypeChecker.getTypeMatch(argument, type, implicitContext);
 		if (result == IValue.MISMATCH)
@@ -353,8 +450,8 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	protected static int checkVarargsMatch(int[] matchValues, IType[] matchTypes, int matchStartIndex, //
-		                                      IValue[] values, int startIndex, int endIndex, //
-		                                      IParameter param, IImplicitContext implicitContext)
+		IValue[] values, int startIndex, int endIndex, //
+		IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
 		final IType paramType = param.getCovariantType();
@@ -392,7 +489,7 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
-		                          IContext context)
+		IContext context)
 	{
 		if (genericData != null && value.isPolyExpression())
 		{
@@ -414,7 +511,7 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	protected void resolveMissing(IParameter param, GenericData genericData, SourcePosition position,
-		                                      MarkerList markers, IContext context)
+		MarkerList markers, IContext context)
 	{
 		if (this == EMPTY)
 		{
@@ -466,8 +563,7 @@ public class ArgumentList implements Resolvable, IValueList
 		{
 			// make sure to resolve and type-check the implicit value
 			// (implicit values should be only field accesses, but might need some capture or "this<Outer" resolution)
-			final IValue value = convertValue(implicit.resolve(markers, context), param, genericData, markers,
-			                                  context);
+			final IValue value = convertValue(implicit.resolve(markers, context), param, genericData, markers, context);
 			this.add(param.getLabel(), value);
 			return;
 		}
@@ -493,9 +589,10 @@ public class ArgumentList implements Resolvable, IValueList
 	}
 
 	public void checkValue(int index, IParameter param, GenericData genericData, SourcePosition position,
-		                      MarkerList markers, IContext context)
+		MarkerList markers, IContext context)
 	{
-		if (index >= this.size)
+		index = this.findIndex(index, param.getLabel());
+		if (index < 0)
 		{
 			this.resolveMissing(param, genericData, position, markers, context);
 			return;
@@ -507,20 +604,23 @@ public class ArgumentList implements Resolvable, IValueList
 			return;
 		}
 
-		if (!checkVarargsValue(this.values, index, this.size, param, genericData, markers, context))
+		final int endIndex = this.findNextName(index + 1);
+		if (!checkVarargsValue(this.values, index, endIndex, param, genericData, markers, context))
 		{
 			return;
 		}
 
-		for (int i = index + 1; i < this.size; i++)
+		final int moved = this.size - endIndex;
+		if (moved > 0)
 		{
-			this.values[i] = null;
+			System.arraycopy(this.values, endIndex, this.values, index + 1, moved);
+			System.arraycopy(this.keys, endIndex, this.keys, index + 1, moved);
 		}
-		this.size = index + 1;
+		this.size = index + moved + 1;
 	}
 
 	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param,
-		                                          GenericData genericData, MarkerList markers, IContext context)
+		GenericData genericData, MarkerList markers, IContext context)
 	{
 		final IValue value = values[startIndex];
 		if (value.checkVarargs(true))
@@ -541,6 +641,18 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public boolean hasParameterOrder()
 	{
+		if (this.size <= 1)
+		{
+			return true;
+		}
+
+		for (int i = 0; i < this.size; i++)
+		{
+			if (this.keys[i] != null)
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
@@ -551,10 +663,89 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public void writeValues(MethodWriter writer, ParameterList parameters, int startIndex) throws BytecodeException
 	{
-		for (int i = 0, count = parameters.size() - startIndex; i < count; i++)
+		if (this.hasParameterOrder())
 		{
-			this.writeValue(i, parameters.get(i + startIndex), writer);
+			for (int i = 0, count = parameters.size() - startIndex; i < count; i++)
+			{
+				this.writeValue(i, parameters.get(i + startIndex), writer);
+			}
+
+			return;
 		}
+
+		final int locals = writer.localCount();
+
+		final int paramCount = parameters.size() - startIndex;
+
+		// Step 1: Associate parameters to arguments
+		final IParameter[] params = new IParameter[this.size];
+		for (int i = 0; i < paramCount; i++)
+		{
+			final IParameter param = parameters.get(i + startIndex);
+			final int argIndex = this.findIndex(i, param.getLabel());
+			if (argIndex >= 0)
+			{
+				params[argIndex] = param;
+			}
+		}
+
+		// Save the local indices in the targets array for later use
+		// Maps parameter index -> local index of stored argument
+		final int[] targets = new int[paramCount];
+		// Fill the array with -1s to mark missing values
+		Arrays.fill(targets, -1);
+
+		// Step 2: Write all arguments that already have parameter order
+		int argStartIndex = 0;
+		for (int i = 0; i < this.size; i++)
+		{
+			IParameter param = params[i];
+			if (param.getIndex() == startIndex + i)
+			{
+				this.values[i].writeExpression(writer, param.getCovariantType());
+				targets[i] = -2;
+				argStartIndex = i + 1;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		// Step 3: Write the remaining arguments in order and save them in local variables
+
+		if (argStartIndex < this.size)
+		{
+			for (int i = argStartIndex; i < this.size; i++)
+			{
+				final IParameter parameter = params[i];
+				final IType parameterType = parameter.getCovariantType();
+				final IValue value = this.values[i];
+
+				final int localIndex = value.writeStore(writer, parameterType);
+				targets[parameter.getIndex() - startIndex] = localIndex;
+			}
+
+			// Step 4: Load the local variables in order
+			for (int i = 0; i < paramCount; i++)
+			{
+				final IParameter parameter = parameters.get(i + startIndex);
+				final int target = targets[parameter.getIndex() - startIndex];
+
+				switch (target)
+				{
+				case -1:
+				case -2:
+					// Value for parameter was already written in Step 2
+					continue;
+				default:
+					// Value for parameter exists -> load the variable
+					writer.visitVarInsn(parameter.getCovariantType().getLoadOpcode(), target);
+				}
+			}
+		}
+
+		writer.resetLocals(locals);
 	}
 
 	// --------------- Phases ---------------
@@ -576,7 +767,24 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.values[i].resolveTypes(markers, context);
+			final Name key = this.keys[i];
+			final IValue value = this.values[i];
+
+			value.resolveTypes(markers, context);
+
+			if (key == null)
+			{
+				continue;
+			}
+
+			for (int j = 0; j < i; j++)
+			{
+				if (this.keys[j] == key)
+				{
+					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.key", key));
+					break;
+				}
+			}
 		}
 	}
 
@@ -659,6 +867,13 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
+		final Name key = this.keys[index];
+		if (key != null)
+		{
+			buffer.append(key);
+			Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
+		}
+
 		this.values[index].toString(indent, buffer);
 	}
 
@@ -686,6 +901,13 @@ public class ArgumentList implements Resolvable, IValueList
 
 	protected void appendType(@NonNull StringBuilder buffer, int index)
 	{
+		final Name key = this.keys[index];
+
+		if (key != null)
+		{
+			buffer.append(key).append(": ");
+		}
+
 		this.values[index].getType().toString("", buffer);
 	}
 
@@ -693,12 +915,12 @@ public class ArgumentList implements Resolvable, IValueList
 
 	public ArgumentList copy()
 	{
-		return new ArgumentList(Arrays.copyOf(this.values, this.size), this.size);
+		return this.copy(this.size);
 	}
 
 	public ArgumentList copy(int capacity)
 	{
-		return new ArgumentList(Arrays.copyOf(this.values, capacity), this.size);
+		return new ArgumentList(Arrays.copyOf(this.keys, capacity), Arrays.copyOf(this.values, capacity), this.size);
 	}
 
 	public NamedArgumentList toNamed()
