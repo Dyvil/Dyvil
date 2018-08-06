@@ -1030,9 +1030,4 @@ public class ArgumentList implements Resolvable, IValueList
 		return new ArgumentList(this.labels == null ? null : Arrays.copyOf(this.labels, capacity),
 		                        Arrays.copyOf(this.values, capacity), this.size);
 	}
-
-	public NamedArgumentList toNamed()
-	{
-		return new NamedArgumentList(new Name[this.values.length], this.values, this.size);
-	}
 }
