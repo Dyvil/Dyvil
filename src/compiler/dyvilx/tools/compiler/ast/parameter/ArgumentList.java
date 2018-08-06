@@ -458,8 +458,6 @@ public class ArgumentList implements Resolvable, IValueList
 		return true;
 	}
 
-	// --------------- Resolution ---------------
-
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.size == 0)
@@ -483,6 +481,103 @@ public class ArgumentList implements Resolvable, IValueList
 
 		return min;
 	}
+
+	// --------------- Phases ---------------
+
+	public boolean isResolved()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.labels == null)
+		{
+			for (int i = 0; i < this.size; i++)
+			{
+				this.values[i].resolveTypes(markers, context);
+			}
+
+			return;
+		}
+
+		for (int i = 0; i < this.size; i++)
+		{
+			final Name label = this.labels[i];
+			final IValue value = this.values[i];
+
+			value.resolveTypes(markers, context);
+
+			if (label == null)
+			{
+				continue;
+			}
+
+			for (int j = 0; j < i; j++)
+			{
+				if (this.labels[j] == label)
+				{
+					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.label", label));
+					break;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].resolve(markers, context);
+		}
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i].checkTypes(markers, context);
+		}
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i].check(markers, context);
+		}
+	}
+
+	@Override
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].foldConstants();
+		}
+	}
+
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
+		}
+	}
+
+	// --------------- Match Resolution ---------------
 
 	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
 		IImplicitContext implicitContext)
@@ -579,6 +674,8 @@ public class ArgumentList implements Resolvable, IValueList
 		}
 		return count;
 	}
+
+	// --------------- Value and Varargs Conversion ---------------
 
 	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
 		IContext context)
@@ -842,101 +939,6 @@ public class ArgumentList implements Resolvable, IValueList
 		}
 
 		writer.resetLocals(locals);
-	}
-
-	// --------------- Phases ---------------
-
-	public boolean isResolved()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			if (!this.values[i].isResolved())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		if (this.labels == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				this.values[i].resolveTypes(markers, context);
-			}
-
-			return;
-		}
-
-		for (int i = 0; i < this.size; i++)
-		{
-			final Name label = this.labels[i];
-			final IValue value = this.values[i];
-
-			value.resolveTypes(markers, context);
-
-			if (label == null)
-			{
-				continue;
-			}
-
-			for (int j = 0; j < i; j++)
-			{
-				if (this.labels[j] == label)
-				{
-					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.label", label));
-					break;
-				}
-			}
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].resolve(markers, context);
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i].checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i].check(markers, context);
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
-		}
 	}
 
 	// --------------- Formatting ---------------
