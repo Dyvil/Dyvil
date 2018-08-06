@@ -176,14 +176,14 @@ public class ArgumentList implements Resolvable, IValueList
 	@Override
 	public IValue get(int index)
 	{
-		return this.get(index, null);
+		return index < this.size ? this.values[index] : null;
 	}
 
 	public IValue get(int index, Name label)
 	{
 		if (label == null)
 		{
-			return index < this.size ? this.values[index] : null;
+			return this.get(index);
 		}
 
 		final int argIndex = this.findIndex(index, label);
@@ -194,19 +194,27 @@ public class ArgumentList implements Resolvable, IValueList
 		return this.values[argIndex];
 	}
 
+	public Name getLabel(int index)
+	{
+		return index < this.size ? this.labels[index] : null;
+	}
+
 	// - - - - - - - - Set Operations - - - - - - - -
 
 	@Override
 	public void set(int index, IValue value)
 	{
-		this.set(index, null, value);
+		if (index < this.size)
+		{
+			this.values[index] = value;
+		}
 	}
 
 	public void set(int index, Name label, IValue value)
 	{
 		if (label == null)
 		{
-			this.values[index] = value;
+			this.set(index, value);
 			return;
 		}
 
