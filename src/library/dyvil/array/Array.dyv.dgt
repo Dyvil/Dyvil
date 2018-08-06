@@ -190,6 +190,17 @@ public abstract class #(TYPE_NAME)Array
 		return result
 	}
 
+	infix func inserted GENERIC(array: [T], at index: int, value: T) -> [T]
+	{
+		let size = array.size
+		let result = #APPLY{size + 1, of: array.elementType}
+
+		System.arraycopy(array, 0, result, 0, index)
+		result[index] = value
+		System.arraycopy(array, index, result, index + 1, size - index)
+		return result
+	}
+
 	infix func union GENERIC(array: [T], with: [T]) -> [T]
 	{
 		let size1 = array.size
