@@ -89,16 +89,13 @@ public class ArgumentList implements Resolvable, IValueList
 
 	// --------------- IValueList Methods ---------------
 
-	public IValue[] getArray()
-	{
-		return this.values;
-	}
-
 	@Override
 	public Iterator<IValue> iterator()
 	{
 		return new ArrayIterator<>(this.values, 0, this.size);
 	}
+
+	// - - - - - - - - Size - - - - - - - -
 
 	@Override
 	public int size()
@@ -112,73 +109,7 @@ public class ArgumentList implements Resolvable, IValueList
 		return this.size == 0;
 	}
 
-	public ArgumentList appended(IValue value)
-	{
-		return this.appended(null, value);
-	}
-
-	public ArgumentList appended(Name name, IValue value)
-	{
-		ArgumentList copy = this.copy(this.size + 1);
-		copy.add(name, value);
-		return copy;
-	}
-
-	public ArgumentList concat(ArgumentList that)
-	{
-		final ArgumentList list = this.copy(this.size + that.size);
-		list.addAll(that);
-		return list;
-	}
-
-	public IValue getFirst()
-	{
-		return this.size <= 0 ? null : this.values[0];
-	}
-
-	public void setFirst(IValue value)
-	{
-		this.values[0] = value;
-	}
-
-	public IValue getLast()
-	{
-		return this.values[this.size - 1];
-	}
-
-	public void setLast(IValue value)
-	{
-		this.values[this.size - 1] = value;
-	}
-
-	@Override
-	public void set(int index, IValue value)
-	{
-		this.set(index, null, value);
-	}
-
-	public void set(int index, Name key, IValue value)
-	{
-		if (key == null)
-		{
-			this.values[index] = value;
-			return;
-		}
-
-		final int argIndex = this.findIndex(index, key);
-		if (argIndex >= 0)
-		{
-			this.values[argIndex] = value;
-		}
-	}
-
-	public void setName(int i, Name name)
-	{
-		if (i < this.size)
-		{
-			this.keys[i] = name;
-		}
-	}
+	// - - - - - - - - Helper Methods - - - - - - - -
 
 	protected void ensureCapacity(int min)
 	{
@@ -240,6 +171,62 @@ public class ArgumentList implements Resolvable, IValueList
 		return this.size;
 	}
 
+	// - - - - - - - - Get Operations - - - - - - - -
+
+	@Override
+	public IValue get(int index)
+	{
+		return this.get(index, null);
+	}
+
+	public IValue get(int index, Name key)
+	{
+		if (key == null)
+		{
+			return index < this.size ? this.values[index] : null;
+		}
+
+		final int argIndex = this.findIndex(index, key);
+		if (argIndex < 0)
+		{
+			return null;
+		}
+		return this.values[argIndex];
+	}
+
+	// - - - - - - - - Set Operations - - - - - - - -
+
+	@Override
+	public void set(int index, IValue value)
+	{
+		this.set(index, null, value);
+	}
+
+	public void set(int index, Name key, IValue value)
+	{
+		if (key == null)
+		{
+			this.values[index] = value;
+			return;
+		}
+
+		final int argIndex = this.findIndex(index, key);
+		if (argIndex >= 0)
+		{
+			this.values[argIndex] = value;
+		}
+	}
+
+	public void setName(int i, Name name)
+	{
+		if (i < this.size)
+		{
+			this.keys[i] = name;
+		}
+	}
+
+	// - - - - - - - - Add Operations - - - - - - - -
+
 	@Override
 	public void add(IValue value)
 	{
@@ -263,6 +250,8 @@ public class ArgumentList implements Resolvable, IValueList
 		System.arraycopy(((NamedArgumentList) list).keys, 0, this.keys, this.size, list.size);
 		this.size += list.size;
 	}
+
+	// - - - - - - - - Insert Operations - - - - - - - -
 
 	public void insert(int index, IValue value)
 	{
@@ -295,25 +284,47 @@ public class ArgumentList implements Resolvable, IValueList
 		this.size = newSize;
 	}
 
-	@Override
-	public IValue get(int index)
+	// --------------- Non-mutating Add Operations ---------------
+
+	public ArgumentList appended(IValue value)
 	{
-		return this.get(index, null);
+		return this.appended(null, value);
 	}
 
-	public IValue get(int index, Name key)
+	public ArgumentList appended(Name name, IValue value)
 	{
-		if (key == null)
-		{
-			return index < this.size ? this.values[index] : null;
-		}
+		ArgumentList copy = this.copy(this.size + 1);
+		copy.add(name, value);
+		return copy;
+	}
 
-		final int argIndex = this.findIndex(index, key);
-		if (argIndex < 0)
-		{
-			return null;
-		}
-		return this.values[argIndex];
+	public ArgumentList concat(ArgumentList that)
+	{
+		final ArgumentList list = this.copy(this.size + that.size);
+		list.addAll(that);
+		return list;
+	}
+
+	// --------------- First and Last Getters and Setters ---------------
+
+	public IValue getFirst()
+	{
+		return this.size <= 0 ? null : this.values[0];
+	}
+
+	public void setFirst(IValue value)
+	{
+		this.values[0] = value;
+	}
+
+	public IValue getLast()
+	{
+		return this.values[this.size - 1];
+	}
+
+	public void setLast(IValue value)
+	{
+		this.values[this.size - 1] = value;
 	}
 
 	// --------------- Parameter-based Methods ---------------
