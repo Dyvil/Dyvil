@@ -1,12 +1,11 @@
 package dyvilx.tools.compiler.parser.expression;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
@@ -14,17 +13,25 @@ import dyvilx.tools.parsing.token.IToken;
 
 public class ArgumentListParser extends Parser implements IValueConsumer
 {
+	// =============== Constants ===============
+
 	private static final int NAME      = 0;
 	private static final int VALUE     = 1;
 	private static final int SEPARATOR = 2;
 
+	// =============== Instance Fields ===============
+
+	// --------------- Constructor Fields ---------------
+
 	private final IArgumentsConsumer consumer;
 
-	private Name name;
+	// --------------- Temporary Fields ---------------
 
-	private Name[] names;
-	private IValue[] values = new IValue[2];
-	private int valueCount;
+	private Name label;
+
+	private ArgumentList arguments = new ArgumentList();
+
+	// =============== Constructors ===============
 
 	public ArgumentListParser(IArgumentsConsumer consumer)
 	{
@@ -32,19 +39,22 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		// this.mode = NAME
 	}
 
-	private void end(IParserManager pm)
+	// =============== Static Methods ===============
+
+	public static void parseArguments(IParserManager pm, IToken next, IArgumentsConsumer consumer)
 	{
-		if (this.names == null)
+		final int nextType = next.type();
+
+		if (BaseSymbols.isCloseBracket(nextType))
 		{
-			this.consumer.setArguments(new ArgumentList(this.values, this.valueCount));
-		}
-		else
-		{
-			this.consumer.setArguments(new NamedArgumentList(this.names, this.values, this.valueCount));
+			consumer.setArguments(ArgumentList.empty());
+			return;
 		}
 
-		pm.popParser(true);
+		pm.pushParser(new ArgumentListParser(consumer));
 	}
+
+	// =============== Instance Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -52,7 +62,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		final int type = token.type();
 		if (BaseSymbols.isCloseBracket(type) || type == Tokens.EOF)
 		{
-			if (this.name != null)
+			if (this.label != null)
 			{
 				pm.report(token, "arguments.expression");
 			}
@@ -65,18 +75,18 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		{
 		case NAME:
 			this.mode = VALUE;
-			this.name = null;
+			this.label = null;
 			if (token.next().type() == BaseSymbols.COLON)
 			{
 				if (Tokens.isIdentifier(type))
 				{
-					this.name = token.nameValue();
+					this.label = token.nameValue();
 					pm.skip();
 					return;
 				}
 				else if (Tokens.isKeyword(type)) // TODO do not accept modifier keywords
 				{
-					this.name = Name.fromRaw(token.stringValue());
+					this.label = Name.fromRaw(token.stringValue());
 					pm.skip();
 					return;
 				}
@@ -98,50 +108,17 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		}
 	}
 
-	public static void parseArguments(IParserManager pm, IToken next, IArgumentsConsumer consumer)
-	{
-		final int nextType = next.type();
-
-		if (BaseSymbols.isCloseBracket(nextType))
-		{
-			consumer.setArguments(ArgumentList.empty());
-			return;
-		}
-
-		pm.pushParser(new ArgumentListParser(consumer));
-	}
-
 	@Override
 	public void setValue(IValue value)
 	{
-		final int index = this.valueCount++;
-		if (index >= this.values.length)
-		{
-			if (this.names != null)
-			{
-				final Name[] tempNames = new Name[this.valueCount];
-				System.arraycopy(this.names, 0, tempNames, 0, index);
-				this.names = tempNames;
-			}
+		this.arguments.add(this.label, value);
+		this.label = null;
+	}
 
-			final IValue[] tempValues = new IValue[this.valueCount];
-			System.arraycopy(this.values, 0, tempValues, 0, index);
-			this.values = tempValues;
-		}
+	private void end(IParserManager pm)
+	{
+		this.consumer.setArguments(this.arguments);
 
-		this.values[index] = value;
-
-		if (this.name == null)
-		{
-			return;
-		}
-
-		if (this.names == null)
-		{
-			this.names = new Name[Math.max(this.valueCount, 2)];
-		}
-
-		this.names[index] = this.name;
-		this.name = null;
+		pm.popParser(true);
 	}
 }
