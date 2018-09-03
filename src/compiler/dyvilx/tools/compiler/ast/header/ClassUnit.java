@@ -1,9 +1,14 @@
 package dyvilx.tools.compiler.ast.header;
 
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.MatchList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.ObjectFormat;
@@ -92,6 +97,19 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 			this.innerClasses = temp;
 		}
 		this.innerClasses[index] = compilable;
+	}
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass iclass = this.classes[i];
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getMethodMatches(list, receiver, name, arguments);
+			}
+		}
 	}
 
 	@Override
