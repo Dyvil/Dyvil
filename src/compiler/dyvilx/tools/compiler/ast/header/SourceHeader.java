@@ -26,6 +26,8 @@ import java.io.IOException;
 
 public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefaultContext
 {
+	// =============== Fields ===============
+
 	protected TokenList tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
@@ -34,6 +36,8 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	public final File       outputFile;
 
 	protected final DyvilCompiler compiler;
+
+	// =============== Constructors ===============
 
 	public SourceHeader(DyvilCompiler compiler, Package pack, File input, File output)
 	{
@@ -60,6 +64,10 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		this.name = Name.fromQualified(name.substring(start + 1, end));
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
 	@Override
 	public MarkerList getMarkers()
 	{
@@ -83,6 +91,8 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		return this.outputFile;
 	}
+
+	// --------------- Phases ---------------
 
 	protected boolean load()
 	{
