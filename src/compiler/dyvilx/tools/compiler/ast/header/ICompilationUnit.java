@@ -9,13 +9,9 @@ import dyvilx.tools.compiler.sources.FileType;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import java.io.File;
-
 public interface ICompilationUnit extends ASTNode
 {
 	FileSource getFileSource();
-
-	File getOutputFile();
 
 	MarkerList getMarkers();
 

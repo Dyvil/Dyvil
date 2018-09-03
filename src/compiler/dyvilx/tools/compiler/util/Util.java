@@ -16,6 +16,8 @@ import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
 
+import java.io.File;
+
 // TODO get rid of this class
 public final class Util
 {
@@ -227,6 +229,14 @@ public final class Util
 			return Name.from(newQualified, newUnqualified);
 		}
 		return name;
+	}
+
+	public static Name getHeaderName(File input)
+	{
+		final String name = input.getAbsolutePath();
+		final int start = name.lastIndexOf(File.separatorChar);
+		final int end = name.lastIndexOf('.');
+		return Name.fromQualified(name.substring(start + 1, end).replace('.', '/'));
 	}
 
 	// endregion

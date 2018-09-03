@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.ast.header;
 
-import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.FileSource;
 import dyvil.source.position.SourcePosition;
@@ -16,6 +15,7 @@ import dyvilx.tools.compiler.parser.SemicolonInference;
 import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.util.Markers;
+import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
@@ -33,7 +33,6 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 
 	public final FileSource fileSource;
 	public final File       outputDirectory;
-	public final File       outputFile;
 
 	protected final DyvilCompiler compiler;
 
@@ -42,26 +41,11 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	public SourceHeader(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		this.compiler = compiler;
-
 		this.pack = pack;
+
 		this.fileSource = new FileSource(input);
-
-		this.setNameFromFile(input);
-
-		final String name = output.getPath();
-		final int start = name.lastIndexOf(File.separatorChar);
-		final int end = name.lastIndexOf('.');
-
-		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
-	}
-
-	protected void setNameFromFile(File input)
-	{
-		final String name = input.getAbsolutePath();
-		final int start = name.lastIndexOf(File.separatorChar);
-		final int end = name.lastIndexOf('.');
-		this.name = Name.fromQualified(name.substring(start + 1, end));
+		this.name = Util.getHeaderName(input);
+		this.outputDirectory = output.getParentFile();
 	}
 
 	// =============== Methods ===============
@@ -84,12 +68,6 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	public FileSource getFileSource()
 	{
 		return this.fileSource;
-	}
-
-	@Override
-	public File getOutputFile()
-	{
-		return this.outputFile;
 	}
 
 	// --------------- Phases ---------------

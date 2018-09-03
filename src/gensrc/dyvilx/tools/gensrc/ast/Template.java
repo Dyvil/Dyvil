@@ -67,18 +67,6 @@ public class Template extends ClassUnit
 		this.markers = new MarkerList(I18n.SYNTAX);
 	}
 
-	@Override
-	protected void setNameFromFile(File input)
-	{
-		final String path = input.getAbsolutePath();
-		final int startIndex = path.lastIndexOf('/');
-		final int endIndex = path.lastIndexOf('.');
-
-		final String name = path.substring(startIndex + 1, endIndex).replace(".", "_");
-
-		this.name = Name.fromRaw(name);
-	}
-
 	public String getTemplateName()
 	{
 		return this.getPackage().getInternalName() + this.fileSource.file().getName();
