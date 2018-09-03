@@ -251,17 +251,19 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IHeaderUnit c : this.headers)
-		{
-			if (c.getName() == name)
-			{
-				return c.getClass(name);
-			}
-		}
-
 		for (IClass c : this.classes)
 		{
 			if (c.getName() == name)
+			{
+				return c;
+			}
+		}
+
+		for (IHeaderUnit h : this.headers)
+		{
+			final IClass c;
+			// TODO Maybe remove the first check
+			if (h.getName() == name && (c = h.getClass(name)) != null)
 			{
 				return c;
 			}
