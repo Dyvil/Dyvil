@@ -34,7 +34,12 @@ import java.io.IOException;
 
 public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
+	// =============== Fields ===============
+
+	// --------------- In-Source Declarations ---------------
+
 	protected PackageDeclaration packageDeclaration;
+
 	protected HeaderDeclaration  headerDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
@@ -46,11 +51,16 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	protected IOperator[] operators;
 	protected int         operatorCount;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected Name    name;
 	protected Package pack;
 
+	// - - - - - - - - Caches - - - - - - - -
+
 	protected Map<Name, IOperator> infixOperatorMap;
+
+	// =============== Constructors ===============
 
 	public AbstractHeader()
 	{
@@ -61,17 +71,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.name = name;
 	}
 
-	@Override
-	public boolean isHeader()
-	{
-		return true;
-	}
+	// =============== Methods ===============
 
-	@Override
-	public IContext getContext()
-	{
-		return new HeaderContext(this);
-	}
+	// --------------- Getters and Setters ---------------
 
 	@Override
 	public SourcePosition getPosition()
@@ -132,6 +134,8 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.headerDeclaration = declaration;
 	}
 
+	// --------------- Imports ---------------
+
 	@Override
 	public int importCount()
 	{
@@ -163,7 +167,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		return this.importCount > 0;
 	}
 
-	// Operators
+	// --------------- Operators ---------------
 
 	@Override
 	public int operatorCount()
@@ -216,7 +220,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		}
 	}
 
-	// Type Aliases
+	// --------------- Type Aliases ---------------
 
 	@Override
 	public int typeAliasCount()
@@ -247,7 +251,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.typeAliases[index] = typeAlias;
 	}
 
-	// Classes
+	// --------------- Classes ---------------
 
 	@Override
 	public int classCount()
@@ -272,6 +276,8 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		return null;
 	}
 
+	// --------------- Compilables ---------------
+
 	@Override
 	public int compilableCount()
 	{
@@ -283,7 +289,21 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	{
 	}
 
-	// IContext override implementations
+	// --------------- Header Info ---------------
+
+	@Override
+	public boolean isHeader()
+	{
+		return true;
+	}
+
+	@Override
+	public IContext getContext()
+	{
+		return new HeaderContext(this);
+	}
+
+	// --------------- Context Implementation ---------------
 
 	@Override
 	public IHeaderUnit getHeader()
@@ -375,7 +395,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		}
 	}
 
-	// Compilation
+	// --------------- Compilation ---------------
 
 	@Override
 	public String getFullName()
@@ -473,6 +493,8 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			this.addTypeAlias(ta);
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
