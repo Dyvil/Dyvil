@@ -236,7 +236,7 @@ public final class Util
 		final String name = input.getAbsolutePath();
 		final int start = name.lastIndexOf(File.separatorChar);
 		final int end = name.lastIndexOf('.');
-		return Name.fromQualified(name.substring(start + 1, end).replace('.', '/'));
+		return Name.fromQualified(name.substring(start + 1, end).replace('.', '_'));
 	}
 
 	// endregion
