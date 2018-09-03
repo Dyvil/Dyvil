@@ -463,6 +463,14 @@ public class REPLContext extends AbstractHeader
 			method.checkMatch(list, receiver, name, arguments);
 		}
 
+		for (IClass iclass : this.classes.values())
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getMethodMatches(list, receiver, name, arguments);
+			}
+		}
+
 		if (name == null)
 		{
 			return;
