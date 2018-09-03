@@ -51,10 +51,16 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	protected IOperator[] operators;
 	protected int         operatorCount;
 
+	protected IClass[] classes = new IClass[1];
+	protected int      classCount;
+
 	// --------------- Metadata ---------------
 
 	protected Name    name;
 	protected Package pack;
+
+	protected ICompilable[] innerClasses = new ICompilable[2];
+	protected int           innerClassCount;
 
 	// - - - - - - - - Caches - - - - - - - -
 
@@ -256,23 +262,42 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public int classCount()
 	{
-		return 0;
-	}
-
-	@Override
-	public IClass getClass(Name name)
-	{
-		return null;
+		return this.classCount;
 	}
 
 	@Override
 	public void addClass(IClass iclass)
 	{
+		iclass.setHeader(this);
+
+		int index = this.classCount++;
+		if (index >= this.classes.length)
+		{
+			IClass[] temp = new IClass[this.classCount];
+			System.arraycopy(this.classes, 0, temp, 0, this.classes.length);
+			this.classes = temp;
+		}
+
+		this.classes[index] = iclass;
 	}
 
 	@Override
 	public IClass getClass(int index)
 	{
+		return this.classes[index];
+	}
+
+	@Override
+	public IClass getClass(Name name)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass theClass = this.classes[i];
+			if (theClass.getName() == name)
+			{
+				return theClass;
+			}
+		}
 		return null;
 	}
 
@@ -281,12 +306,20 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public int compilableCount()
 	{
-		return 0;
+		return this.innerClassCount;
 	}
 
 	@Override
 	public void addCompilable(ICompilable compilable)
 	{
+		int index = this.innerClassCount++;
+		if (index >= this.innerClasses.length)
+		{
+			ICompilable[] temp = new ICompilable[this.innerClassCount];
+			System.arraycopy(this.innerClasses, 0, temp, 0, this.innerClasses.length);
+			this.innerClasses = temp;
+		}
+		this.innerClasses[index] = compilable;
 	}
 
 	// --------------- Header Info ---------------
@@ -358,6 +391,25 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		}
 
 		return candidate;
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		return this.getClass(name);
+	}
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass iclass = this.classes[i];
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getMethodMatches(list, receiver, name, arguments);
+			}
+		}
 	}
 
 	@Override
@@ -563,6 +615,11 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			this.headerDeclaration.toString(prefix, buffer);
 			buffer.append('\n');
 			buffer.append('\n');
+		}
+
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].toString(prefix, buffer);
 		}
 	}
 }

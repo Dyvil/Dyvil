@@ -5,10 +5,12 @@ import dyvil.source.FileSource;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.backend.ObjectFormat;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.SemicolonInference;
@@ -121,6 +123,11 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		{
 			this.typeAliases[i].resolveTypes(this.markers, context);
 		}
+
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].resolveTypes(this.markers, context);
+		}
 	}
 
 	@Override
@@ -132,20 +139,26 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			                                               AttributeList.of(Modifiers.PUBLIC));
 		}
 
-		this.resolveImports();
-	}
-
-	protected void resolveImports()
-	{
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolve(this.markers, this);
+		}
+
+		final IContext context = this.getContext();
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].resolve(this.markers, context);
 		}
 	}
 
 	@Override
 	public void checkTypes()
 	{
+		final IContext context = this.getContext();
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].checkTypes(this.markers, context);
+		}
 	}
 
 	@Override
@@ -157,16 +170,30 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		{
 			this.headerDeclaration.check(this.markers);
 		}
+
+		final IContext context = this.getContext();
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].check(this.markers, context);
+		}
 	}
 
 	@Override
 	public void foldConstants()
 	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].foldConstants();
+		}
 	}
 
 	@Override
 	public void cleanup()
 	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].cleanup(this, null);
+		}
 	}
 
 	protected boolean printMarkers()
@@ -183,6 +210,24 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			return;
 		}
 
-		ObjectFormat.write(this.compiler, this.outputFile, this);
+		if (this.headerDeclaration != null)
+		{
+			final File file = new File(this.outputDirectory, this.name.qualified + DyvilFileType.OBJECT_EXTENSION);
+			ObjectFormat.write(this.compiler, file, this);
+		}
+
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass theClass = this.classes[i];
+			final File file = new File(this.outputDirectory, theClass.getFileName());
+			ClassWriter.compile(this.compiler, file, theClass);
+		}
+
+		for (int i = 0; i < this.innerClassCount; i++)
+		{
+			final ICompilable compilable = this.innerClasses[i];
+			final File file = new File(this.outputDirectory, compilable.getFileName());
+			ClassWriter.compile(this.compiler, file, compilable);
+		}
 	}
 }
