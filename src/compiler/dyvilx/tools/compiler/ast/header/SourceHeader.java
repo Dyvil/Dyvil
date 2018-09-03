@@ -133,7 +133,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void resolve()
 	{
-		if (this.headerDeclaration == null)
+		if (this.headerDeclaration == null && this.isHeader())
 		{
 			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
 			                                               AttributeList.of(Modifiers.PUBLIC));
