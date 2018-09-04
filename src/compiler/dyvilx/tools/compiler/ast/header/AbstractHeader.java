@@ -288,21 +288,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.innerClasses[index] = compilable;
 	}
 
-	// --------------- Header Info ---------------
-
-	@Override
-	public boolean isHeader()
-	{
-		return true;
-	}
+	// --------------- Context Implementation ---------------
 
 	@Override
 	public IContext getContext()
 	{
 		return new HeaderContext(this);
 	}
-
-	// --------------- Context Implementation ---------------
 
 	@Override
 	public IHeaderUnit getHeader()

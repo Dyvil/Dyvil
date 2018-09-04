@@ -74,6 +74,12 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		return this.fileSource;
 	}
 
+	@Override
+	public boolean needsHeaderDeclaration()
+	{
+		return true;
+	}
+
 	// --------------- Phases ---------------
 
 	protected boolean load()
@@ -132,7 +138,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void resolve()
 	{
-		if (this.headerDeclaration == null && this.isHeader())
+		if (this.headerDeclaration == null && this.needsHeaderDeclaration())
 		{
 			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
 			                                               AttributeList.of(Modifiers.PUBLIC));

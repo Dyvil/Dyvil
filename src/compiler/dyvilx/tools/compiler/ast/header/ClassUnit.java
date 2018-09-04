@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.header;
 
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
@@ -18,9 +20,17 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 	}
 
 	@Override
-	public boolean isHeader()
+	public boolean needsHeaderDeclaration()
 	{
-		return this.headerDeclaration != null;
+		for (IClass iclass : this.classes)
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
