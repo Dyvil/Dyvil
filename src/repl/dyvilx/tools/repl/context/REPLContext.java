@@ -41,6 +41,9 @@ import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.repl.DyvilREPL;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+
 public class REPLContext extends AbstractHeader
 	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
@@ -552,5 +555,17 @@ public class REPLContext extends AbstractHeader
 	public String getInternalName(Name subClass)
 	{
 		return CLASS_PACKAGE + '/' + subClass.qualified;
+	}
+
+	// --------------- Header Compilation ---------------
+
+	@Override
+	public void read(DataInput in)
+	{
+	}
+
+	@Override
+	public void write(DataOutput out)
+	{
 	}
 }
