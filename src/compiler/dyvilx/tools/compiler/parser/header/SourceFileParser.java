@@ -53,7 +53,7 @@ public class SourceFileParser extends AbstractMemberParser
 		switch (this.mode)
 		{
 		case SEPARATOR:
-			if (this.unit.classCount() > 0)
+			if (this.unit.getClasses().size() > 0)
 			{
 				// any classes -> only allow classes from here
 				this.mode = CLASS;

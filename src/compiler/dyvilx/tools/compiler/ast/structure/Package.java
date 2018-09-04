@@ -263,7 +263,7 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		{
 			final IClass c;
 			// TODO Maybe remove the first check
-			if (h.getName() == name && (c = h.getClass(name)) != null)
+			if (h.getName() == name && (c = h.getClasses().get(name)) != null)
 			{
 				return c;
 			}

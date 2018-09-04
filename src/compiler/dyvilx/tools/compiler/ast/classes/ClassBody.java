@@ -23,7 +23,6 @@ import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -39,7 +38,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsumer<IField>
+public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 {
 	private static class MethodLink
 	{
@@ -63,8 +62,7 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 
 	protected final IClass enclosingClass;
 
-	private IClass[] classes;
-	private int      classCount;
+	private ClassList classes = new ClassList(0);
 
 	private IField[] fields = new IField[3];
 	private int fieldCount;
@@ -108,53 +106,22 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 
 	// region Nested Classes
 
-	@Override
-	public int classCount()
+	public ClassList getClasses()
 	{
-		return this.classCount;
+		return this.classes;
 	}
 
 	@Override
 	public void addClass(IClass iclass)
 	{
+		this.linkClass(iclass);
+		this.classes.add(iclass);
+	}
+
+	private void linkClass(IClass iclass)
+	{
 		iclass.setEnclosingClass(this.enclosingClass);
-
-		if (this.classes == null)
-		{
-			this.classes = new IClass[2];
-			this.classes[0] = iclass;
-			this.classCount = 1;
-			return;
-		}
-
-		int index = this.classCount++;
-		if (index >= this.classes.length)
-		{
-			IClass[] temp = new IClass[this.classCount];
-			System.arraycopy(this.classes, 0, temp, 0, index);
-			this.classes = temp;
-		}
-		this.classes[index] = iclass;
-	}
-
-	@Override
-	public IClass getClass(int index)
-	{
-		return this.classes[index];
-	}
-
-	@Override
-	public IClass getClass(Name name)
-	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			final IClass iclass = this.classes[i];
-			if (iclass.getName() == name)
-			{
-				return iclass;
-			}
-		}
-		return null;
+		iclass.setHeader(this.enclosingClass.getHeader());
 	}
 
 	// endregion
@@ -261,9 +228,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 
 		IValue candidate = null;
 
-		for (int i = 0; i < this.classCount; i++)
+		for (IClass iclass : this.classes)
 		{
-			final IClass iclass = this.classes[i];
 			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
 				continue;
@@ -791,14 +757,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		final IHeaderUnit header = this.enclosingClass.getHeader();
-
-		for (int i = 0; i < this.classCount; i++)
-		{
-			final IClass innerClass = this.classes[i];
-			innerClass.setHeader(header);
-			innerClass.resolveTypes(markers, context);
-		}
+		this.classes.forEach(this::linkClass);
+		this.classes.resolveTypes(markers, context);
 
 		for (int i = 0; i < this.fieldCount; i++)
 		{
@@ -825,10 +785,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].resolve(markers, context);
-		}
+		this.classes.resolve(markers, context);
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			this.fields[i].resolve(markers, context);
@@ -854,10 +812,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].checkTypes(markers, context);
-		}
+		this.classes.checkTypes(markers, context);
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			this.fields[i].checkTypes(markers, context);
@@ -883,10 +839,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].check(markers, context);
-		}
+		this.classes.check(markers, context);
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			this.fields[i].check(markers, context);
@@ -912,10 +866,8 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].foldConstants();
-		}
+		this.classes.foldConstants();
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			this.fields[i].foldConstants();
@@ -941,13 +893,9 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			final IClass innerClass = this.classes[i];
+		this.classes.forEach(compilableList::addCompilable);
+		this.classes.cleanup(compilableList, classCompilableList);
 
-			compilableList.addCompilable(innerClass);
-			innerClass.cleanup(compilableList, classCompilableList);
-		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			this.fields[i].cleanup(compilableList, classCompilableList);
@@ -976,9 +924,9 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		for (int i = 0; i < this.classCount; i++)
+		for (IClass iclass : this.classes)
 		{
-			this.classes[i].writeInnerClassInfo(writer);
+			iclass.writeInnerClassInfo(writer);
 		}
 
 		for (int i = 0; i < this.fieldCount; i++)
@@ -1067,10 +1015,7 @@ public class ClassBody implements ASTNode, Resolvable, IClassList, IMemberConsum
 
 	private void bodyToString(String prefix, StringBuilder buffer)
 	{
-		if (this.classCount > 0)
-		{
-			this.membersToString(prefix, this.classes, this.classCount, buffer);
-		}
+		this.classes.toString(prefix, buffer);
 
 		if (this.fieldCount > 0)
 		{

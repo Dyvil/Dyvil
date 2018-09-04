@@ -622,11 +622,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	private IClass resolveInnerClass(Name name)
 	{
-		if (this.body != null)
-		{
-			return this.body.getClass(name);
-		}
-		return null;
+		return this.body != null ? this.body.getClasses().get(name) : null;
 	}
 
 	@Override

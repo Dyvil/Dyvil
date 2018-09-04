@@ -7,6 +7,7 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.classes.ClassList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IStaticContext;
@@ -46,8 +47,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	protected IOperator[] operators;
 	protected int         operatorCount;
 
-	protected IClass[] classes = new IClass[1];
-	protected int      classCount;
+	protected ClassList classes = new ClassList();
 
 	// --------------- Metadata ---------------
 
@@ -255,45 +255,16 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	// --------------- Classes ---------------
 
 	@Override
-	public int classCount()
+	public ClassList getClasses()
 	{
-		return this.classCount;
+		return this.classes;
 	}
 
 	@Override
 	public void addClass(IClass iclass)
 	{
 		iclass.setHeader(this);
-
-		int index = this.classCount++;
-		if (index >= this.classes.length)
-		{
-			IClass[] temp = new IClass[this.classCount];
-			System.arraycopy(this.classes, 0, temp, 0, this.classes.length);
-			this.classes = temp;
-		}
-
-		this.classes[index] = iclass;
-	}
-
-	@Override
-	public IClass getClass(int index)
-	{
-		return this.classes[index];
-	}
-
-	@Override
-	public IClass getClass(Name name)
-	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			final IClass theClass = this.classes[i];
-			if (theClass.getName() == name)
-			{
-				return theClass;
-			}
-		}
-		return null;
+		this.classes.add(iclass);
 	}
 
 	// --------------- Compilables ---------------
@@ -391,15 +362,14 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.getClass(name);
+		return this.classes.get(name);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (int i = 0; i < this.classCount; i++)
+		for (IClass iclass : this.classes)
 		{
-			final IClass iclass = this.classes[i];
 			if (iclass.hasModifier(Modifiers.EXTENSION))
 			{
 				iclass.getMethodMatches(list, receiver, name, arguments);
@@ -547,10 +517,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			buffer.append('\n');
 		}
 
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].toString(prefix, buffer);
-		}
+		this.classes.toString(prefix, buffer);
 	}
 }
 

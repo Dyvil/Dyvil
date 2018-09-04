@@ -330,7 +330,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		final IClass bodyClass = this.body.getClass(name);
+		final IClass bodyClass = this.body.getClasses().get(name);
 		if (bodyClass != null)
 		{
 			return bodyClass;

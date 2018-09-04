@@ -57,7 +57,6 @@ public class REPLContext extends AbstractHeader
 	private final Map<Name, IField>    fields     = new IdentityHashMap<>();
 	private final Map<Name, IProperty> properties = new IdentityHashMap<>();
 	private final List<IMethod>        methods    = new ArrayList<>();
-	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	// Updated for every input
 	private   int        resultIndex;
@@ -91,11 +90,6 @@ public class REPLContext extends AbstractHeader
 	public List<IMethod> getMethods()
 	{
 		return this.methods;
-	}
-
-	public Map<Name, IClass> getClasses()
-	{
-		return this.classes;
 	}
 
 	// Evaluation
@@ -202,7 +196,7 @@ public class REPLContext extends AbstractHeader
 		case ANNOTATION:
 		case ENUM:
 		case OBJECT:
-			this.classes.put(member.getName(), (IClass) member);
+			this.addClass((IClass) member);
 			break;
 		}
 
@@ -429,7 +423,7 @@ public class REPLContext extends AbstractHeader
 
 		IValue candidate = null;
 
-		for (IClass iclass : this.classes.values())
+		for (IClass iclass : this.classes)
 		{
 			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
@@ -466,7 +460,7 @@ public class REPLContext extends AbstractHeader
 			method.checkMatch(list, receiver, name, arguments);
 		}
 
-		for (IClass iclass : this.classes.values())
+		for (IClass iclass : this.classes)
 		{
 			if (iclass.hasModifier(Modifiers.EXTENSION))
 			{

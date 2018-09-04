@@ -1,23 +1,24 @@
 package dyvilx.tools.compiler.ast.header;
 
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.classes.ClassList;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.classes.IClassList;
+import dyvilx.tools.compiler.ast.consumer.IClassConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
-import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.expression.operator.IOperatorMap;
+import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
+import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAliasMap;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.ASTNode;
 
-public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
+public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClassConsumer, ICompilableList, IOperatorMap, ITypeAliasMap
 {
 	boolean isHeader();
 
@@ -78,19 +79,18 @@ public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClass
 	@Override
 	void addTypeAlias(ITypeAlias typeAlias);
 
-	// Classes
+	// --------------- Classes ---------------
+
+	ClassList getClasses();
 
 	@Override
-	int classCount();
+	default void addClass(IClass iclass)
+	{
+		iclass.setHeader(this);
+		this.getClasses().add(iclass);
+	}
 
-	@Override
-	void addClass(IClass iclass);
-
-	@Override
-	IClass getClass(int index);
-
-	@Override
-	IClass getClass(Name name);
+	// --------------- Compilables ---------------
 
 	@Override
 	int compilableCount();

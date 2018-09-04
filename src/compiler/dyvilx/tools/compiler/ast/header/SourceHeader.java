@@ -126,10 +126,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			this.typeAliases[i].resolveTypes(this.markers, context);
 		}
 
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].resolveTypes(this.markers, context);
-		}
+		this.classes.resolveTypes(this.markers, context);
 	}
 
 	@Override
@@ -146,21 +143,13 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			this.importDeclarations[i].resolve(this.markers, this);
 		}
 
-		final IContext context = this.getContext();
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].resolve(this.markers, context);
-		}
+		this.classes.resolve(this.markers, this.getContext());
 	}
 
 	@Override
 	public void checkTypes()
 	{
-		final IContext context = this.getContext();
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].checkTypes(this.markers, context);
-		}
+		this.classes.checkTypes(this.markers, this.getContext());
 	}
 
 	@Override
@@ -173,29 +162,19 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			this.headerDeclaration.check(this.markers);
 		}
 
-		final IContext context = this.getContext();
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].check(this.markers, context);
-		}
+		this.classes.check(this.markers, this.getContext());
 	}
 
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].foldConstants();
-		}
+		this.classes.foldConstants();
 	}
 
 	@Override
 	public void cleanup()
 	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].cleanup(this, null);
-		}
+		this.classes.cleanup(this, null);
 	}
 
 	protected boolean printMarkers()
@@ -218,11 +197,9 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			ObjectFormat.write(this.compiler, file, this);
 		}
 
-		for (int i = 0; i < this.classCount; i++)
+		for (IClass iclass : this.classes)
 		{
-			final IClass theClass = this.classes[i];
-			final File file = new File(this.outputDirectory, theClass.getFileName());
-			ClassWriter.compile(this.compiler, file, theClass);
+			ClassWriter.compile(this.compiler, new File(this.outputDirectory, iclass.getFileName()), iclass);
 		}
 
 		for (int i = 0; i < this.innerClassCount; i++)
@@ -269,10 +246,10 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		}
 
 		// Classes
-		out.writeShort(this.classCount);
-		for (int i = 0; i < this.classCount; i++)
+		out.writeShort(this.classes.size());
+		for (IClass iclass : this.classes)
 		{
-			out.writeUTF(this.classes[i].getName().qualified);
+			out.writeUTF(iclass.getName().qualified);
 		}
 	}
 }
