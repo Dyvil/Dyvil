@@ -255,7 +255,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		out.writeShort(this.classes.size());
 		for (IClass iclass : this.classes)
 		{
-			out.writeUTF(iclass.getName().qualified);
+			out.writeUTF(iclass.getInternalName());
 		}
 	}
 }
