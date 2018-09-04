@@ -551,6 +551,12 @@ public class REPLContext extends AbstractHeader
 		return CLASS_PACKAGE + '/' + subClass.qualified;
 	}
 
+	@Override
+	public boolean needsHeaderDeclaration()
+	{
+		return false;
+	}
+
 	// --------------- Header Compilation ---------------
 
 	@Override
