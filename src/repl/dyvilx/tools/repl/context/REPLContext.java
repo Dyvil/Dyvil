@@ -196,7 +196,7 @@ public class REPLContext extends AbstractHeader
 		case ANNOTATION:
 		case ENUM:
 		case OBJECT:
-			this.addClass((IClass) member);
+			this.classes.add((IClass) member);
 			break;
 		}
 
