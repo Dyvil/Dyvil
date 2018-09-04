@@ -25,12 +25,7 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
 import dyvilx.tools.compiler.config.Formatting;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
@@ -479,71 +474,6 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			return this.pack.getInternalName() + this.name.qualified + '$' + subClass;
 		}
 		return this.pack.getInternalName() + subClass.qualified;
-	}
-
-	@Override
-	public void write(DataOutput out) throws IOException
-	{
-		// Header Name
-		this.headerDeclaration.write(out);
-
-		// Import Declarations
-		int imports = this.importCount;
-		out.writeShort(imports);
-		for (int i = 0; i < imports; i++)
-		{
-			this.importDeclarations[i].write(out);
-		}
-
-		// Operators Definitions
-		out.writeShort(this.operatorCount);
-		for (int i = 0; i < this.operatorCount; i++)
-		{
-			this.operators[i].writeData(out);
-		}
-
-		// Type Aliases
-		out.writeShort(this.typeAliasCount);
-		for (int i = 0; i < this.typeAliasCount; i++)
-		{
-			this.typeAliases[i].write(out);
-		}
-
-		// Classes
-		out.writeShort(0);
-	}
-
-	@Override
-	public void read(DataInput in) throws IOException
-	{
-		this.headerDeclaration = new HeaderDeclaration(this);
-		this.headerDeclaration.read(in);
-
-		this.name = this.headerDeclaration.getName();
-
-		// Import Declarations
-		int imports = in.readShort();
-		for (int i = 0; i < imports; i++)
-		{
-			ImportDeclaration id = new ImportDeclaration(null);
-			id.read(in);
-			this.addImport(id);
-		}
-
-		int operators = in.readShort();
-		for (int i = 0; i < operators; i++)
-		{
-			Operator op = Operator.read(in);
-			this.addOperator(op);
-		}
-
-		int typeAliases = in.readShort();
-		for (int i = 0; i < typeAliases; i++)
-		{
-			TypeAlias ta = new TypeAlias();
-			ta.read(in);
-			this.addTypeAlias(ta);
-		}
 	}
 
 	// --------------- Formatting ---------------

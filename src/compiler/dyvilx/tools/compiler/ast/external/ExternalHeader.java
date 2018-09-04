@@ -1,16 +1,25 @@
 package dyvilx.tools.compiler.ast.external;
 
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
+import dyvilx.tools.compiler.ast.expression.operator.Operator;
 import dyvilx.tools.compiler.ast.header.AbstractHeader;
+import dyvilx.tools.compiler.ast.header.HeaderDeclaration;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvil.lang.Name;
+import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class ExternalHeader extends AbstractHeader implements IDefaultContext
 {
@@ -18,6 +27,8 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	private static final int TYPE_ALIASES = 1 << 1;
 
 	private byte resolved;
+
+	private List<String> classNames;
 
 	public ExternalHeader()
 	{
@@ -76,5 +87,54 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 		}
 
 		super.resolveTypeAlias(matches, receiver, name, arguments);
+	}
+
+	// --------------- Compilation ---------------
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.headerDeclaration = new HeaderDeclaration(this);
+		this.headerDeclaration.read(in);
+
+		this.name = this.headerDeclaration.getName();
+
+		// Import Declarations
+		final int imports = in.readShort();
+		for (int i = 0; i < imports; i++)
+		{
+			final ImportDeclaration id = new ImportDeclaration(null);
+			id.read(in);
+			this.addImport(id);
+		}
+
+		final int operators = in.readShort();
+		for (int i = 0; i < operators; i++)
+		{
+			this.addOperator(Operator.read(in));
+		}
+
+		final int typeAliases = in.readShort();
+		for (int i = 0; i < typeAliases; i++)
+		{
+			final TypeAlias ta = new TypeAlias();
+			ta.read(in);
+			this.addTypeAlias(ta);
+		}
+
+		final int classes = in.readShort();
+		if (classes > 0)
+		{
+			this.classNames = new ArrayList<>(classes);
+			for (int i = 0; i < classes; i++)
+			{
+				this.classNames.add(in.readUTF());
+			}
+		}
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
 	}
 }

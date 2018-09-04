@@ -23,6 +23,8 @@ import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
@@ -228,6 +230,49 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			final ICompilable compilable = this.innerClasses[i];
 			final File file = new File(this.outputDirectory, compilable.getFileName());
 			ClassWriter.compile(this.compiler, file, compilable);
+		}
+	}
+
+	// --------------- Compilation ---------------
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// Header Name
+		this.headerDeclaration.write(out);
+
+		// Import Declarations
+		int imports = this.importCount;
+		out.writeShort(imports);
+		for (int i = 0; i < imports; i++)
+		{
+			this.importDeclarations[i].write(out);
+		}
+
+		// Operators Definitions
+		out.writeShort(this.operatorCount);
+		for (int i = 0; i < this.operatorCount; i++)
+		{
+			this.operators[i].writeData(out);
+		}
+
+		// Type Aliases
+		out.writeShort(this.typeAliasCount);
+		for (int i = 0; i < this.typeAliasCount; i++)
+		{
+			this.typeAliases[i].write(out);
+		}
+
+		// Classes
+		out.writeShort(this.classCount);
+		for (int i = 0; i < this.classCount; i++)
+		{
+			out.writeUTF(this.classes[i].getName().qualified);
 		}
 	}
 }
