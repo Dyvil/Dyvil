@@ -264,7 +264,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	public void addClass(IClass iclass)
 	{
 		iclass.setHeader(this);
-		this.classes.add(iclass);
+		this.getClasses().add(iclass);
 	}
 
 	// --------------- Compilables ---------------
@@ -362,13 +362,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.classes.get(name);
+		return this.getClasses().get(name);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (IClass iclass : this.classes)
+		for (IClass iclass : this.getClasses())
 		{
 			if (iclass.hasModifier(Modifiers.EXTENSION))
 			{
@@ -517,7 +517,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			buffer.append('\n');
 		}
 
-		this.classes.toString(prefix, buffer);
+		this.getClasses().toString(prefix, buffer);
 	}
 }
 

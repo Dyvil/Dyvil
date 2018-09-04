@@ -4,6 +4,8 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.classes.ClassList;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
@@ -25,6 +27,7 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 {
 	private static final int IMPORTS      = 1;
 	private static final int TYPE_ALIASES = 1 << 1;
+	private static final int CLASSES = 1 << 2;
 
 	private byte resolved;
 
@@ -42,6 +45,10 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 
 	private void resolveImports()
 	{
+		if ((this.resolved & IMPORTS) != 0)
+		{
+			return;
+		}
 		this.resolved |= IMPORTS;
 
 		for (int i = 0; i < this.importCount; i++)
@@ -54,12 +61,35 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 
 	private void resolveTypeAliases()
 	{
+		if ((this.resolved & TYPE_ALIASES) != 0)
+		{
+			return;
+		}
+
 		this.resolved |= TYPE_ALIASES;
 
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
 			this.typeAliases[i].resolveTypes(null, this);
 		}
+	}
+
+	private void resolveClasses()
+	{
+		if ((this.resolved & CLASSES) != 0)
+		{
+			return;
+		}
+
+		this.resolved |= CLASSES;
+
+		for (String className : this.classNames)
+		{
+			this.addClass(this.pack.resolveClass(className));
+		}
+
+		// not needed anymore
+		this.classNames = null;
 	}
 
 	@Override
@@ -71,21 +101,32 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	@Override
 	public IContext getContext()
 	{
-		if ((this.resolved & IMPORTS) == 0)
-		{
-			this.resolveImports();
-		}
+		this.resolveImports();
 		return super.getContext();
+	}
+
+	@Override
+	public ClassList getClasses()
+	{
+		this.resolveClasses();
+		return super.getClasses();
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		// optimization
+		if (this.classNames != null && !this.classNames.contains(name.qualified))
+		{
+			return null;
+		}
+		return super.resolveClass(name);
 	}
 
 	@Override
 	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		if ((this.resolved & TYPE_ALIASES) == 0)
-		{
-			this.resolveTypeAliases();
-		}
-
+		this.resolveTypeAliases();
 		super.resolveTypeAlias(matches, receiver, name, arguments);
 	}
 
