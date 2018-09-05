@@ -48,7 +48,7 @@ extends DPFValueVisitor implements Value, Expandable
 		return mappings[builder.toString()] ?? this
 	}
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

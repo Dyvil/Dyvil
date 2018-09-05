@@ -77,7 +77,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 		                   this.node?.expand(mappings, false))
 	}
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

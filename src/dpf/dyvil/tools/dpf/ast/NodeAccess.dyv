@@ -50,7 +50,7 @@ implements dyvil.tools.dpf.model.NodeAccess, NodeElement
 		return nodeAccess
 	}
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

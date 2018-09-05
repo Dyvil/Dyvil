@@ -84,7 +84,7 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		return builder.toString
 	}
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
