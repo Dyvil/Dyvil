@@ -370,6 +370,18 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (IClass iclass : this.getClasses())
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getImplicitMatches(list, value, targetType);
+			}
+		}
+	}
+
+	@Override
 	public byte getVisibility(ClassMember member)
 	{
 		IClass iclass = member.getEnclosingClass();
