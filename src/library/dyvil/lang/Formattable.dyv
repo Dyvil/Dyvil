@@ -2,13 +2,18 @@ package dyvil.lang
 
 interface Formattable
 {
-	@BytecodeName("toString")
-	static extension func apply(this: String, from: Formattable) -> String
-	{
-		let buffer = new StringBuilder
-		from.toString(buffer)
-		return buffer.toString
-	}
+	// for Java interop
+	static func toString(formattable: Formattable) -> String = String(formatting: formattable)
 
 	func toString(buffer: StringBuilder) -> void
+}
+
+extension String
+{
+	static func apply(formatting formattable: Formattable) -> String
+	{
+		let buffer = new StringBuilder
+		formattable.toString(buffer)
+		return buffer.toString
+	}
 }
