@@ -43,7 +43,6 @@ public class CodeClass extends AbstractClass
 	protected AttributeList constructorAttributes;
 
 	// Metadata
-	protected IHeaderUnit    unit;
 	protected SourcePosition position;
 
 	public CodeClass()
@@ -59,7 +58,7 @@ public class CodeClass extends AbstractClass
 
 	public CodeClass(IHeaderUnit unit, Name name)
 	{
-		this.unit = unit;
+		this.setHeader(unit);
 		this.name = name;
 	}
 
@@ -73,24 +72,6 @@ public class CodeClass extends AbstractClass
 	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
-	}
-
-	@Override
-	public IHeaderUnit getHeader()
-	{
-		return this.unit;
-	}
-
-	@Override
-	public void setHeader(IHeaderUnit unit)
-	{
-		this.unit = unit;
-	}
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
 	}
 
 	@Override
@@ -451,7 +432,7 @@ public class CodeClass extends AbstractClass
 		{
 			return this.enclosingClass.getFullName() + '.' + this.name;
 		}
-		return this.fullName = this.unit.getFullName(this.name);
+		return this.fullName = this.enclosingHeader.getFullName(this.name);
 	}
 
 	@Override
@@ -465,7 +446,7 @@ public class CodeClass extends AbstractClass
 		{
 			return this.enclosingClass.getInternalName() + '$' + this.name;
 		}
-		return this.internalName = this.unit.getInternalName(this.name);
+		return this.internalName = this.enclosingHeader.getInternalName(this.name);
 	}
 
 	@Override

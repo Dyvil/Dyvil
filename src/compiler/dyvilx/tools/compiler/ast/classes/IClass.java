@@ -19,6 +19,7 @@ import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
+import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
@@ -43,6 +44,10 @@ public interface IClass
 
 	@Override
 	void setEnclosingClass(IClass enclosingClass);
+
+	Package getPackage();
+
+	void setPackage(Package pack);
 
 	// ------------------------------ Attributable Implementation ------------------------------
 

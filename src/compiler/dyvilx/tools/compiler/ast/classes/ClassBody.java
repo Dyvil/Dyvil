@@ -121,7 +121,6 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 	private void linkClass(IClass iclass)
 	{
 		iclass.setEnclosingClass(this.enclosingClass);
-		iclass.setHeader(this.enclosingClass.getHeader());
 	}
 
 	// endregion
