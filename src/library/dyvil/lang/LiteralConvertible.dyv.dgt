@@ -1,0 +1,35 @@
+package dyvil.lang
+
+#func(from(TYPE: String)){@interface From#(TYPE){} (let methodName: String = "apply")
+}
+
+abstract class LiteralConvertible
+{
+	private init() {} // no instances
+
+	// --------------- Numeric Literals ---------------
+
+	#from{Int}
+	#from{Long}
+	#from{Float}
+	#from{Double}
+
+	// --------------- String Literals ---------------
+
+	#from{Char}
+	#from{String}
+	#from{StringInterpolation}
+
+	// --------------- Compound Literals ---------------
+
+	#from{ColonOperator}
+	#from{Tuple}
+	#from{Array}
+	#from{Map}
+
+	// --------------- Special Literals ---------------
+
+	#from{Boolean}
+	#from{Class}
+	#from{Type}
+}
