@@ -2,6 +2,6 @@ package dyvil.annotation.`internal`
 
 import java.lang.annotation._
 
-@Target([ .METHOD ])
+@Target([ .METHOD, .TYPE ])
 @Retention(.RUNTIME)
 @interface DyvilName(let value: String)
