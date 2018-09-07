@@ -9,6 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
+import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -73,6 +74,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	protected String fullName;
 	protected String internalName;
+	protected String internalSimpleName;
 
 	protected Package        enclosingPackage;
 	protected IHeaderUnit    enclosingHeader;
@@ -182,6 +184,20 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		case Deprecation.JAVA_INTERNAL:
 			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
+		case AnnotationUtil.DYVIL_NAME_INTERNAL:
+			if (annotation == null)
+			{
+				return false;
+			}
+
+			final IValue firstValue = annotation.getArguments().getFirst();
+			if (firstValue != null)
+			{
+				// In Dyvil source code, the @DyvilName is called @BytecodeName,
+				// and it sets the name to be used in the bytecode
+				this.setInternalSimpleName(firstValue.stringValue());
+			}
+			return true;
 		}
 		return false;
 	}
@@ -209,7 +225,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public String getFullName()
 	{
-		return this.fullName;
+		if (this.fullName != null)
+		{
+			return this.fullName;
+		}
+
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getFullName() + '.' + this.name.qualified;
+		}
+		if (this.enclosingHeader != null)
+		{
+			return this.fullName = this.enclosingHeader.getFullName(this.name);
+		}
+		if (this.enclosingPackage != null)
+		{
+			return this.fullName = this.enclosingPackage.getFullName() + "." + this.name.qualified;
+		}
+
+		return this.name.unqualified;
 	}
 
 	// Generics
@@ -529,12 +563,44 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public String getInternalName()
 	{
-		return this.internalName;
+		if (this.internalName != null)
+		{
+			return this.internalName;
+		}
+
+		if (this.enclosingClass != null)
+		{
+			return this.internalName = this.enclosingClass.getInternalName() + '$' + this.getInternalSimpleName();
+		}
+		if (this.enclosingHeader != null)
+		{
+			return this.internalName = this.enclosingHeader.getInternalName(this.getInternalSimpleName());
+		}
+		if (this.enclosingPackage != null)
+		{
+			return this.enclosingPackage.getInternalName() + this.getInternalSimpleName();
+		}
+		return this.getInternalSimpleName();
 	}
 
 	public void setInternalName(String internalName)
 	{
 		this.internalName = internalName;
+	}
+
+	public String getInternalSimpleName()
+	{
+		if (this.internalSimpleName != null)
+		{
+			return this.internalSimpleName;
+		}
+		return this.internalSimpleName = this.name.qualified;
+	}
+
+	public void setInternalSimpleName(String internalSimpleName)
+	{
+		this.internalSimpleName = internalSimpleName;
+		this.internalName = null;
 	}
 
 	@Override

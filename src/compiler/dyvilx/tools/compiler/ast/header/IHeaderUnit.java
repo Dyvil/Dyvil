@@ -104,7 +104,7 @@ public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClass
 
 	String getInternalName();
 
-	String getInternalName(Name subClass);
+	String getInternalName(String subName);
 
 	String getFullName();
 

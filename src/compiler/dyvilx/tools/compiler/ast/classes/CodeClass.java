@@ -422,34 +422,6 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public String getFullName()
-	{
-		if (this.fullName != null)
-		{
-			return this.fullName;
-		}
-		if (this.enclosingClass != null)
-		{
-			return this.enclosingClass.getFullName() + '.' + this.name;
-		}
-		return this.fullName = this.enclosingHeader.getFullName(this.name);
-	}
-
-	@Override
-	public String getInternalName()
-	{
-		if (this.internalName != null)
-		{
-			return this.internalName;
-		}
-		if (this.enclosingClass != null)
-		{
-			return this.enclosingClass.getInternalName() + '$' + this.name;
-		}
-		return this.internalName = this.enclosingHeader.getInternalName(this.name);
-	}
-
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		// Header
