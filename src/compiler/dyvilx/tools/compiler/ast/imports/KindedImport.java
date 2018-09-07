@@ -12,8 +12,7 @@ import java.io.IOException;
 
 public class KindedImport implements IImport
 {
-	private IImport child;
-	private int     mask;
+	// =============== Constants ===============
 
 	public static final int PACKAGE  = 0x1;
 	public static final int HEADER   = 0x2;
@@ -32,6 +31,13 @@ public class KindedImport implements IImport
 
 	public static final int USING_DECLARATION = STATIC | INLINE | HEADER;
 
+	// =============== Fields ===============
+
+	private IImport child;
+	private int     mask;
+
+	// =============== Constructors ===============
+
 	public KindedImport()
 	{
 	}
@@ -41,6 +47,8 @@ public class KindedImport implements IImport
 		this.child = child;
 		this.mask = mask;
 	}
+
+	// =============== Static Methods ===============
 
 	public static int parseMask(int type)
 	{
@@ -64,6 +72,10 @@ public class KindedImport implements IImport
 		}
 		return 0;
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Import Implementation ---------------
 
 	@Override
 	public int importTag()
@@ -99,6 +111,8 @@ public class KindedImport implements IImport
 		return mask == ANY ? this.mask : this.mask | mask;
 	}
 
+	// --------------- Resolution ---------------
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
@@ -111,10 +125,11 @@ public class KindedImport implements IImport
 		this.child.resolve(markers, context, parentContext, this.orMask(mask));
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeData(DataOutput out) throws IOException
 	{
-		// currently, only 7 bits are used, so a byte is sufficient
 		out.writeShort(this.mask);
 		IImport.writeImport(this.child, out);
 	}
@@ -126,6 +141,8 @@ public class KindedImport implements IImport
 		this.child = IImport.readImport(in);
 	}
 
+	// --------------- Formatting ---------------
+
 	@Override
 	public String toString()
 	{
@@ -135,6 +152,11 @@ public class KindedImport implements IImport
 	@Override
 	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
+		if ((this.mask & IMPLICIT) != 0)
+		{
+			buffer.append("implicit ");
+		}
+
 		switch (this.mask & STATIC)
 		{
 		case STATIC:
@@ -144,7 +166,10 @@ public class KindedImport implements IImport
 			buffer.append("var ");
 			break;
 		case FUNC:
-			buffer.append("func ");
+			if ((this.mask & IMPLICIT) == 0)
+			{
+				buffer.append("func ");
+			}
 			break;
 		}
 
@@ -160,10 +185,16 @@ public class KindedImport implements IImport
 		{
 			buffer.append("operator ");
 		}
-		if ((this.mask & HEADER) != 0)
+
+		if ((this.mask & INLINE) != 0)
+		{
+			buffer.append("inline ");
+		}
+		else if ((this.mask & HEADER) != 0)
 		{
 			buffer.append("header ");
 		}
+
 		if ((this.mask & PACKAGE) != 0)
 		{
 			buffer.append("package ");
