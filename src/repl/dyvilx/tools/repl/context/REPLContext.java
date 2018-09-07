@@ -41,6 +41,9 @@ import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.repl.DyvilREPL;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+
 public class REPLContext extends AbstractHeader
 	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
@@ -54,7 +57,6 @@ public class REPLContext extends AbstractHeader
 	private final Map<Name, IField>    fields     = new IdentityHashMap<>();
 	private final Map<Name, IProperty> properties = new IdentityHashMap<>();
 	private final List<IMethod>        methods    = new ArrayList<>();
-	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	// Updated for every input
 	private   int        resultIndex;
@@ -88,11 +90,6 @@ public class REPLContext extends AbstractHeader
 	public List<IMethod> getMethods()
 	{
 		return this.methods;
-	}
-
-	public Map<Name, IClass> getClasses()
-	{
-		return this.classes;
 	}
 
 	// Evaluation
@@ -199,7 +196,7 @@ public class REPLContext extends AbstractHeader
 		case ANNOTATION:
 		case ENUM:
 		case OBJECT:
-			this.classes.put(member.getName(), (IClass) member);
+			this.classes.add((IClass) member);
 			break;
 		}
 
@@ -257,13 +254,19 @@ public class REPLContext extends AbstractHeader
 	{
 		member.setEnclosingClass(this.currentClass);
 
-		// Ensure public & static
-		final AttributeList modifiers = member.getAttributes();
-		if ((modifiers.flags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		final AttributeList attributes = member.getAttributes();
+
+		// ensure public unless another visibility modifier is present
+		if (!attributes.hasAnyFlag(Modifiers.VISIBILITY_MODIFIERS))
 		{
-			modifiers.addFlag(Modifiers.PUBLIC);
+			attributes.addFlag(Modifiers.PUBLIC);
 		}
-		modifiers.addFlag(Modifiers.STATIC);
+
+		// ensure static unless it's an extension method
+		if (!attributes.hasFlag(Modifiers.EXTENSION))
+		{
+			attributes.addFlag(Modifiers.STATIC);
+		}
 	}
 
 	@Override
@@ -420,7 +423,7 @@ public class REPLContext extends AbstractHeader
 
 		IValue candidate = null;
 
-		for (IClass iclass : this.classes.values())
+		for (IClass iclass : this.classes)
 		{
 			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
 			{
@@ -455,6 +458,14 @@ public class REPLContext extends AbstractHeader
 		for (IMethod method : this.methods)
 		{
 			method.checkMatch(list, receiver, name, arguments);
+		}
+
+		for (IClass iclass : this.classes)
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getMethodMatches(list, receiver, name, arguments);
+			}
 		}
 
 		if (name == null)
@@ -538,5 +549,23 @@ public class REPLContext extends AbstractHeader
 	public String getInternalName(Name subClass)
 	{
 		return CLASS_PACKAGE + '/' + subClass.qualified;
+	}
+
+	@Override
+	public boolean needsHeaderDeclaration()
+	{
+		return false;
+	}
+
+	// --------------- Header Compilation ---------------
+
+	@Override
+	public void read(DataInput in)
+	{
+	}
+
+	@Override
+	public void write(DataOutput out)
+	{
 	}
 }

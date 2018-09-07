@@ -5,17 +5,17 @@ import dyvil.collection.iterator._
 
 class Iterators
 {
-	static func apply<type E>(this: Iterator) -> Iterator<E>
+	static extension func apply<type E>(this: Iterator) -> Iterator<E>
 	{
 		return EmptyIterator<E>()
 	}
 
-	static func apply<type E>(this: Iterator, element: E) -> Iterator<E>
+	static extension func apply<type E>(this: Iterator, element: E) -> Iterator<E>
 	{
 		return SingletonIterator(element)
 	}
 
-	static func apply<type E>(this: Iterator, elements: E...) -> Iterator<E>
+	static extension func apply<type E>(this: Iterator, elements: E...) -> Iterator<E>
 	{
 		return ArrayIterator(elements)
 	}

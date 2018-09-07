@@ -62,7 +62,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	protected @NonNull ParameterList parameters = new ParameterList();
 
-	protected IType superType = Types.OBJECT;
+	protected           IType    superType = Types.OBJECT;
 	protected @Nullable TypeList interfaces;
 
 	// Body
@@ -74,7 +74,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected String fullName;
 	protected String internalName;
 
+	protected Package        enclosingPackage;
+	protected IHeaderUnit    enclosingHeader;
 	protected IClass         enclosingClass;
+
 	protected IClassMetadata metadata;
 
 	protected ClassCompilable[] compilables;
@@ -95,9 +98,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public abstract IHeaderUnit getHeader();
-
-	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
@@ -107,6 +107,33 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
+		this.enclosingPackage = enclosingClass.getPackage();
+		this.enclosingHeader = enclosingClass.getHeader();
+	}
+
+	@Override
+	public Package getPackage()
+	{
+		return this.enclosingPackage;
+	}
+
+	@Override
+	public void setPackage(Package pack)
+	{
+		this.enclosingPackage = pack;
+	}
+
+	@Override
+	public IHeaderUnit getHeader()
+	{
+		return this.enclosingHeader;
+	}
+
+	@Override
+	public void setHeader(IHeaderUnit header)
+	{
+		this.enclosingHeader = header;
+		this.enclosingPackage = header.getPackage();
 	}
 
 	@Override
@@ -155,9 +182,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		case Deprecation.JAVA_INTERNAL:
 			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
-		case "java/lang/FunctionalInterface":
-			this.attributes.addFlag(Modifiers.FUNCTIONAL);
-			return true;
 		}
 		return false;
 	}
@@ -204,6 +228,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return this.typeParameters;
 		}
 		return this.typeParameters = new TypeParameterList();
+	}
+
+	@Override
+	public void setTypeParameters(TypeParameterList typeParameters)
+	{
+		this.typeParameters = typeParameters;
 	}
 
 	// Class Parameters
@@ -440,7 +470,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
-		                        Set<IClass> checkedClasses)
+		Set<IClass> checkedClasses)
 	{
 		if (checkedClasses.contains(this))
 		{
@@ -466,7 +496,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext,
-		                             Set<IClass> checkedClasses)
+		Set<IClass> checkedClasses)
 	{
 		if (this.superType != null)
 		{
@@ -619,11 +649,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	private IClass resolveInnerClass(Name name)
 	{
-		if (this.body != null)
-		{
-			return this.body.getClass(name);
-		}
-		return null;
+		return this.body != null ? this.body.getClasses().get(name) : null;
 	}
 
 	@Override
@@ -808,6 +834,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public byte getVisibility(ClassMember member)
 	{
+		if (member == this)
+		{
+			return VISIBLE;
+		}
+
 		final IClass enclosingClass = member.getEnclosingClass();
 		if (enclosingClass == this)
 		{
@@ -830,7 +861,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PRIVATE_PROTECTED)
 		{
-			if (Types.isSuperClass(enclosingClass, this))
+			if (enclosingClass != null && Types.isSuperClass(enclosingClass, this))
 			{
 				// The enclosing class of the member is a super class of this
 				return VISIBLE;
@@ -838,9 +869,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			final IHeaderUnit thisUnit = this.getHeader();
-			final IHeaderUnit memberUnit = enclosingClass.getHeader();
-			if (thisUnit != null && memberUnit != null && thisUnit.getPackage() == memberUnit.getPackage())
+			final Package thatPackage = enclosingClass != null ?
+				                            enclosingClass.getPackage() :
+				                            member instanceof IClass ? ((IClass) member).getPackage() : null;
+			if (this.getPackage() == thatPackage)
 			{
 				// The two units are in the same package
 				return VISIBLE;

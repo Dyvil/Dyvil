@@ -27,7 +27,7 @@ case class ListValue(protected let elements: List<Value> { public get })
 		{
 			element.accept(listVisitor.visitElement())
 		}
-		
+
 		listVisitor.visitEnd()
 	}
 
@@ -47,7 +47,7 @@ case class ListValue(protected let elements: List<Value> { public get })
 
 	// String
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

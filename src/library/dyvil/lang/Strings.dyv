@@ -35,12 +35,12 @@ abstract class Strings
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: .WARNING)
 	inline static func char(c: String) -> char = c[0]
 
-	static func apply(this: String, from: any!) -> String = "\(from)"
+	static extension func apply(this: String, from: any!) -> String = "\(from)"
 
-	implicit static func apply(this: String, from: CharSequence) -> String = "\(from)"
+	implicit static extension func apply(this: String, from: CharSequence) -> String = "\(from)"
 
 	@BytecodeName("fromShared")
-	static func apply(this: String, fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
+	static extension func apply(this: String, fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
 
 	// Subscripts
 
@@ -147,5 +147,5 @@ abstract class Strings
 		return buffer.toString!!
 	}
 
-	extension func toString(o: any, builder: StringBuilder) -> void = builder.append o
+	extension func toString(this: any, builder: StringBuilder) -> void = builder.append this
 }

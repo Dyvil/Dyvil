@@ -1,15 +1,15 @@
 package dyvilx.tools.compiler.backend.annotation;
 
 import dyvilx.tools.asm.AnnotationVisitor;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.Attributable;
 
-public class ModifierVisitor implements AnnotationVisitor
+public class DyvilModifiersVisitor implements AnnotationVisitor
 {
-	private final AttributeList attributes;
+	private final Attributable attributable;
 
-	public ModifierVisitor(AttributeList attributes)
+	public DyvilModifiersVisitor(Attributable attributable)
 	{
-		this.attributes = attributes;
+		this.attributable = attributable;
 	}
 
 	@Override
@@ -19,11 +19,11 @@ public class ModifierVisitor implements AnnotationVisitor
 		{
 			if (value instanceof Integer)
 			{
-				this.attributes.addFlag((int) value);
+				this.attributable.setDyvilFlags((int) value);
 			}
 			else if (value instanceof Long)
 			{
-				this.attributes.addFlag((long) value);
+				this.attributable.setDyvilFlags((long) value);
 			}
 		}
 	}

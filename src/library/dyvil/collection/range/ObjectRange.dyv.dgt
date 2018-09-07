@@ -55,7 +55,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 	override func iterator() -> Iterator<T> = new Iterator<T>()
 	{
-		var current: T = this<ObjectRange>.start
+		var current: T = this<ObjectRange<T>>.start
 
 		override func next() -> T
 		{
@@ -68,7 +68,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 		override func hasNext() -> boolean
 		{
-			return this.current LESS_OP this<ObjectRange>.end
+			return this.current LESS_OP this<ObjectRange<T>>.end
 		}
 
 		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"

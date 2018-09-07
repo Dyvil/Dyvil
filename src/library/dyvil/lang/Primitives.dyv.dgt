@@ -17,7 +17,7 @@ abstract class Primitives
 
 	// Void Conversions
 
-	postfix func apply(this: Void) -> Void = VOID_INSTANCE
+	static extension func apply(this: Void) -> Void = VOID_INSTANCE
 
 	@Intrinsic([ /* NOOP */ ])
 	postfix func voidValue(_ v: Void) -> void {}
@@ -35,7 +35,7 @@ abstract class Primitives
 		// TYPE_NAME Conversions
 
 		@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-		implicit static func apply(this: WRAPPER, value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)!!
+		implicit static extension func apply(this: WRAPPER, value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)!!
 
 		@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
 		  strings: [ "java/lang/WRAPPER", "#(PRIMITIVE)Value", "()DESC_CHAR" ])

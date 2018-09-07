@@ -43,7 +43,6 @@ public class CodeClass extends AbstractClass
 	protected AttributeList constructorAttributes;
 
 	// Metadata
-	protected IHeaderUnit    unit;
 	protected SourcePosition position;
 
 	public CodeClass()
@@ -59,7 +58,7 @@ public class CodeClass extends AbstractClass
 
 	public CodeClass(IHeaderUnit unit, Name name)
 	{
-		this.unit = unit;
+		this.setHeader(unit);
 		this.name = name;
 	}
 
@@ -73,24 +72,6 @@ public class CodeClass extends AbstractClass
 	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
-	}
-
-	@Override
-	public IHeaderUnit getHeader()
-	{
-		return this.unit;
-	}
-
-	@Override
-	public void setHeader(IHeaderUnit unit)
-	{
-		this.unit = unit;
-	}
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
 	}
 
 	@Override
@@ -268,18 +249,20 @@ public class CodeClass extends AbstractClass
 		{
 			this.superType.check(markers, context);
 
-			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null)
+			final IClass superClass;
+			if (!this.hasModifier(Modifiers.EXTENSION) && (superClass = this.superType.getTheClass()) != null)
 			{
-				final long modifiers = superClass.getAttributes().flags();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
+				final AttributeList superAttributes = superClass.getAttributes();
+				if (superAttributes.hasAnyFlag(Modifiers.CLASS_TYPE_MODIFIERS))
 				{
-					markers.add(Markers.semanticError(this.position, "class.extend.type",
-					                                  ModifierUtil.classTypeToString(modifiers), superClass.getName()));
+					markers.add(Markers.semanticError(this.superType.getPosition(), "class.extend.type",
+					                                  ModifierUtil.classTypeToString(superAttributes.flags()),
+					                                  superClass.getName()));
 				}
-				else if ((modifiers & Modifiers.FINAL) != 0)
+				else if (superAttributes.hasFlag(Modifiers.FINAL))
 				{
-					markers.add(Markers.semanticError(this.position, "class.extend.final", superClass.getName()));
+					markers.add(Markers.semanticError(this.superType.getPosition(), "class.extend.final",
+					                                  superClass.getName()));
 				}
 			}
 		}
@@ -322,7 +305,7 @@ public class CodeClass extends AbstractClass
 
 	public void checkFunctional(MarkerList markers)
 	{
-		final boolean hasAnnotation = this.hasModifier(Modifiers.FUNCTIONAL);
+		final boolean hasAnnotation = this.getAttributes().getAnnotation(Types.FUNCTIONALINTERFACE_CLASS) != null;
 		if (hasAnnotation && !this.isInterface())
 		{
 			// FunctionalInterface annotation on class or object
@@ -449,7 +432,7 @@ public class CodeClass extends AbstractClass
 		{
 			return this.enclosingClass.getFullName() + '.' + this.name;
 		}
-		return this.fullName = this.unit.getFullName(this.name);
+		return this.fullName = this.enclosingHeader.getFullName(this.name);
 	}
 
 	@Override
@@ -463,7 +446,7 @@ public class CodeClass extends AbstractClass
 		{
 			return this.enclosingClass.getInternalName() + '$' + this.name;
 		}
-		return this.internalName = this.unit.getInternalName(this.name);
+		return this.internalName = this.enclosingHeader.getInternalName(this.name);
 	}
 
 	@Override
@@ -624,10 +607,6 @@ public class CodeClass extends AbstractClass
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
-		}
-		if (this.hasModifier(Modifiers.FUNCTIONAL))
-		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true).visitEnd();
 		}
 
 		this.attributes.write(writer);

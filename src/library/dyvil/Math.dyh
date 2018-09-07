@@ -16,11 +16,7 @@ using   java.lang.Math._
 import  dyvil.math.Complex
 
 // BigInteger
-import  java.math.BigInteger
-using   dyvil.math.BigIntegerOperators._
-
-type    BigInt = BigInteger
+using   dyvil.math.BigIntegers
 
 // BigDecimal
-import  java.math.BigDecimal
-using   dyvil.math.BigDecimalOperators._
+using   dyvil.math.BigDecimals

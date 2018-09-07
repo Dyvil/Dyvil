@@ -25,7 +25,7 @@ public class AttributeList implements Iterable<Attribute>
 {
 	protected Attribute @Nullable [] data;
 
-	protected int size;
+	protected int  size;
 	protected long flags;
 
 	public AttributeList()
@@ -77,6 +77,16 @@ public class AttributeList implements Iterable<Attribute>
 		return (this.flags & flag) != 0;
 	}
 
+	public void addFlag(long flag)
+	{
+		this.flags |= flag;
+	}
+
+	public void removeFlag(long flag)
+	{
+		this.flags &= ~flag;
+	}
+
 	// Attributes and Annotations
 
 	public Attribute get(int index)
@@ -108,11 +118,6 @@ public class AttributeList implements Iterable<Attribute>
 		this.ensureCapacity(this.size + 1);
 		this.data[this.size++] = attribute;
 		this.flags |= attribute.flags();
-	}
-
-	public void addFlag(long modifier)
-	{
-		this.flags |= modifier;
 	}
 
 	private void ensureCapacity(int capacity)

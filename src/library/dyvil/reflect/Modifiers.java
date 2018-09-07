@@ -139,12 +139,6 @@ public interface Modifiers
 	 */
 	int CASE_CLASS = 0x00020000;
 
-	/**
-	 * <i>Dyvil</i> {@code functional} modifier. This modifier is a shortcut for the {@link FunctionalInterface}
-	 * annotation.
-	 */
-	int FUNCTIONAL = 0x00040000;
-
 	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
 
 	int TRAIT = 0x00080000;
@@ -172,9 +166,7 @@ public interface Modifiers
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
-	int EXTENSION_FLAG = 0x00080000;
-
-	int EXTENSION = EXTENSION_FLAG | INFIX;
+	int EXTENSION = 0x00040000;
 
 	// Field Modifiers
 
@@ -299,7 +291,7 @@ public interface Modifiers
 	int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	long DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-	                           & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE & ~GENERATED; // exclude source-only modifiers
+	                           & ~DEPRECATED & ~OVERRIDE & ~GENERATED; // exclude source-only modifiers
 
 	static void main(String[] args)
 	{

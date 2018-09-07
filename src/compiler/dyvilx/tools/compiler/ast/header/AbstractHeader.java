@@ -7,6 +7,7 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
+import dyvilx.tools.compiler.ast.classes.ClassList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IStaticContext;
@@ -25,16 +26,16 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
 import dyvilx.tools.compiler.config.Formatting;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
+	// =============== Fields ===============
+
+	// --------------- In-Source Declarations ---------------
+
 	protected PackageDeclaration packageDeclaration;
+
 	protected HeaderDeclaration  headerDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
@@ -46,11 +47,21 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	protected IOperator[] operators;
 	protected int         operatorCount;
 
-	// Metadata
+	protected ClassList classes = new ClassList();
+
+	// --------------- Metadata ---------------
+
 	protected Name    name;
 	protected Package pack;
 
+	protected ICompilable[] innerClasses = new ICompilable[2];
+	protected int           innerClassCount;
+
+	// - - - - - - - - Caches - - - - - - - -
+
 	protected Map<Name, IOperator> infixOperatorMap;
+
+	// =============== Constructors ===============
 
 	public AbstractHeader()
 	{
@@ -61,17 +72,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.name = name;
 	}
 
-	@Override
-	public boolean isHeader()
-	{
-		return true;
-	}
+	// =============== Methods ===============
 
-	@Override
-	public IContext getContext()
-	{
-		return new HeaderContext(this);
-	}
+	// --------------- Getters and Setters ---------------
 
 	@Override
 	public SourcePosition getPosition()
@@ -132,6 +135,8 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.headerDeclaration = declaration;
 	}
 
+	// --------------- Imports ---------------
+
 	@Override
 	public int importCount()
 	{
@@ -163,7 +168,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		return this.importCount > 0;
 	}
 
-	// Operators
+	// --------------- Operators ---------------
 
 	@Override
 	public int operatorCount()
@@ -216,7 +221,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		}
 	}
 
-	// Type Aliases
+	// --------------- Type Aliases ---------------
 
 	@Override
 	public int typeAliasCount()
@@ -247,43 +252,49 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		this.typeAliases[index] = typeAlias;
 	}
 
-	// Classes
+	// --------------- Classes ---------------
 
 	@Override
-	public int classCount()
+	public ClassList getClasses()
 	{
-		return 0;
-	}
-
-	@Override
-	public IClass getClass(Name name)
-	{
-		return null;
+		return this.classes;
 	}
 
 	@Override
 	public void addClass(IClass iclass)
 	{
+		iclass.setHeader(this);
+		this.getClasses().add(iclass);
 	}
 
-	@Override
-	public IClass getClass(int index)
-	{
-		return null;
-	}
+	// --------------- Compilables ---------------
 
 	@Override
 	public int compilableCount()
 	{
-		return 0;
+		return this.innerClassCount;
 	}
 
 	@Override
 	public void addCompilable(ICompilable compilable)
 	{
+		int index = this.innerClassCount++;
+		if (index >= this.innerClasses.length)
+		{
+			ICompilable[] temp = new ICompilable[this.innerClassCount];
+			System.arraycopy(this.innerClasses, 0, temp, 0, this.innerClasses.length);
+			this.innerClasses = temp;
+		}
+		this.innerClasses[index] = compilable;
 	}
 
-	// IContext override implementations
+	// --------------- Context Implementation ---------------
+
+	@Override
+	public IContext getContext()
+	{
+		return new HeaderContext(this);
+	}
 
 	@Override
 	public IHeaderUnit getHeader()
@@ -341,6 +352,36 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
+	public IClass resolveClass(Name name)
+	{
+		return this.getClasses().get(name);
+	}
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		for (IClass iclass : this.getClasses())
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getMethodMatches(list, receiver, name, arguments);
+			}
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (IClass iclass : this.getClasses())
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION))
+			{
+				iclass.getImplicitMatches(list, value, targetType);
+			}
+		}
+	}
+
+	@Override
 	public byte getVisibility(ClassMember member)
 	{
 		IClass iclass = member.getEnclosingClass();
@@ -375,7 +416,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		}
 	}
 
-	// Compilation
+	// --------------- Compilation ---------------
 
 	@Override
 	public String getFullName()
@@ -409,70 +450,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 		return this.pack.getInternalName() + subClass.qualified;
 	}
 
-	@Override
-	public void write(DataOutput out) throws IOException
-	{
-		// Header Name
-		this.headerDeclaration.write(out);
-
-		// Import Declarations
-		int imports = this.importCount;
-		out.writeShort(imports);
-		for (int i = 0; i < imports; i++)
-		{
-			this.importDeclarations[i].write(out);
-		}
-
-		// Operators Definitions
-		out.writeShort(this.operatorCount);
-		for (int i = 0; i < this.operatorCount; i++)
-		{
-			this.operators[i].writeData(out);
-		}
-
-		// Type Aliases
-		out.writeShort(this.typeAliasCount);
-		for (int i = 0; i < this.typeAliasCount; i++)
-		{
-			this.typeAliases[i].write(out);
-		}
-
-		// Classes
-		out.writeShort(0);
-	}
-
-	@Override
-	public void read(DataInput in) throws IOException
-	{
-		this.headerDeclaration = new HeaderDeclaration(this);
-		this.headerDeclaration.read(in);
-
-		this.name = this.headerDeclaration.getName();
-
-		// Import Declarations
-		int imports = in.readShort();
-		for (int i = 0; i < imports; i++)
-		{
-			ImportDeclaration id = new ImportDeclaration(null);
-			id.read(in);
-			this.addImport(id);
-		}
-
-		int operators = in.readShort();
-		for (int i = 0; i < operators; i++)
-		{
-			Operator op = Operator.read(in);
-			this.addOperator(op);
-		}
-
-		int typeAliases = in.readShort();
-		for (int i = 0; i < typeAliases; i++)
-		{
-			TypeAlias ta = new TypeAlias();
-			ta.read(in);
-			this.addTypeAlias(ta);
-		}
-	}
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
@@ -542,6 +520,8 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			buffer.append('\n');
 			buffer.append('\n');
 		}
+
+		this.getClasses().toString(prefix, buffer);
 	}
 }
 

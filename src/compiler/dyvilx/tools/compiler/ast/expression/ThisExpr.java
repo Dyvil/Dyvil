@@ -105,17 +105,17 @@ public final class ThisExpr implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		this.type = this.type.resolveType(markers, context);
+	}
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.type.resolve(markers, context);
+
 		if (this.type != Types.UNKNOWN)
 		{
-			this.type = this.type.resolveType(markers, context);
-
-			// Replace e.g. this<List> with this<List<T>> in class List<type T>
-			final IClass iclass = this.type.getTheClass();
-			if (iclass != null)
-			{
-				this.type = iclass.getThisType();
-			}
-			return;
+			return this;
 		}
 
 		final IType thisType = context.getThisType();
@@ -127,12 +127,7 @@ public final class ThisExpr implements IValue
 		{
 			markers.add(Markers.semanticError(this.position, "this.access.unresolved"));
 		}
-	}
 
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.type.resolve(markers, context);
 		return this;
 	}
 

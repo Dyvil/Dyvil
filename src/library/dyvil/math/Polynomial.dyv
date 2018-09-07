@@ -227,7 +227,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	// String
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(buffer: StringBuilder) -> void
 	{

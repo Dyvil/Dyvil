@@ -1,64 +1,60 @@
 package dyvilx.tools.compiler.ast.header;
 
-import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.FileSource;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.backend.ObjectFormat;
+import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.SemicolonInference;
 import dyvilx.tools.compiler.parser.header.SourceFileParser;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.util.Markers;
+import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
 public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefaultContext
 {
+	// =============== Fields ===============
+
 	protected TokenList tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
 	public final FileSource fileSource;
 	public final File       outputDirectory;
-	public final File       outputFile;
 
 	protected final DyvilCompiler compiler;
+
+	// =============== Constructors ===============
 
 	public SourceHeader(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		this.compiler = compiler;
-
 		this.pack = pack;
+
 		this.fileSource = new FileSource(input);
-
-		this.setNameFromFile(input);
-
-		final String name = output.getPath();
-		final int start = name.lastIndexOf(File.separatorChar);
-		final int end = name.lastIndexOf('.');
-
-		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
+		this.name = Util.getHeaderName(input);
+		this.outputDirectory = output.getParentFile();
 	}
 
-	protected void setNameFromFile(File input)
-	{
-		final String name = input.getAbsolutePath();
-		final int start = name.lastIndexOf(File.separatorChar);
-		final int end = name.lastIndexOf('.');
-		this.name = Name.fromQualified(name.substring(start + 1, end));
-	}
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
 
 	@Override
 	public MarkerList getMarkers()
@@ -79,10 +75,12 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
-	public File getOutputFile()
+	public boolean needsHeaderDeclaration()
 	{
-		return this.outputFile;
+		return true;
 	}
+
+	// --------------- Phases ---------------
 
 	protected boolean load()
 	{
@@ -133,31 +131,31 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		{
 			this.typeAliases[i].resolveTypes(this.markers, context);
 		}
+
+		this.classes.resolveTypes(this.markers, context);
 	}
 
 	@Override
 	public void resolve()
 	{
-		if (this.headerDeclaration == null)
+		if (this.headerDeclaration == null && this.needsHeaderDeclaration())
 		{
 			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
 			                                               AttributeList.of(Modifiers.PUBLIC));
 		}
 
-		this.resolveImports();
-	}
-
-	protected void resolveImports()
-	{
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolve(this.markers, this);
 		}
+
+		this.classes.resolve(this.markers, this.getContext());
 	}
 
 	@Override
 	public void checkTypes()
 	{
+		this.classes.checkTypes(this.markers, this.getContext());
 	}
 
 	@Override
@@ -169,16 +167,20 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		{
 			this.headerDeclaration.check(this.markers);
 		}
+
+		this.classes.check(this.markers, this.getContext());
 	}
 
 	@Override
 	public void foldConstants()
 	{
+		this.classes.foldConstants();
 	}
 
 	@Override
 	public void cleanup()
 	{
+		this.classes.cleanup(this, null);
 	}
 
 	protected boolean printMarkers()
@@ -195,6 +197,65 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			return;
 		}
 
-		ObjectFormat.write(this.compiler, this.outputFile, this);
+		if (this.headerDeclaration != null)
+		{
+			final File file = new File(this.outputDirectory, this.name.qualified + DyvilFileType.OBJECT_EXTENSION);
+			ObjectFormat.write(this.compiler, file, this);
+		}
+
+		for (IClass iclass : this.classes)
+		{
+			ClassWriter.compile(this.compiler, new File(this.outputDirectory, iclass.getFileName()), iclass);
+		}
+
+		for (int i = 0; i < this.innerClassCount; i++)
+		{
+			final ICompilable compilable = this.innerClasses[i];
+			final File file = new File(this.outputDirectory, compilable.getFileName());
+			ClassWriter.compile(this.compiler, file, compilable);
+		}
+	}
+
+	// --------------- Compilation ---------------
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// Header Name
+		this.headerDeclaration.write(out);
+
+		// Import Declarations
+		int imports = this.importCount;
+		out.writeShort(imports);
+		for (int i = 0; i < imports; i++)
+		{
+			this.importDeclarations[i].write(out);
+		}
+
+		// Operators Definitions
+		out.writeShort(this.operatorCount);
+		for (int i = 0; i < this.operatorCount; i++)
+		{
+			this.operators[i].writeData(out);
+		}
+
+		// Type Aliases
+		out.writeShort(this.typeAliasCount);
+		for (int i = 0; i < this.typeAliasCount; i++)
+		{
+			this.typeAliases[i].write(out);
+		}
+
+		// Classes
+		out.writeShort(this.classes.size());
+		for (IClass iclass : this.classes)
+		{
+			out.writeUTF(iclass.getInternalName());
+		}
 	}
 }

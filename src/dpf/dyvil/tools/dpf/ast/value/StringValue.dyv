@@ -12,7 +12,7 @@ case class StringValue(protected let value: String) implements Constant
 
 	override func appendString(builder: StringBuilder) -> void = builder.append(this.value)
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void = StringLiterals.appendStringLiteral(this.value, buffer)
 }

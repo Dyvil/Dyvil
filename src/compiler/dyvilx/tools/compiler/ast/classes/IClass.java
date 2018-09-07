@@ -9,6 +9,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametricMember;
+import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilable;
@@ -18,6 +19,7 @@ import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
+import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
@@ -42,6 +44,10 @@ public interface IClass
 
 	@Override
 	void setEnclosingClass(IClass enclosingClass);
+
+	Package getPackage();
+
+	void setPackage(Package pack);
 
 	// ------------------------------ Attributable Implementation ------------------------------
 
@@ -118,6 +124,11 @@ public interface IClass
 
 	// Generics
 
+	@Override
+	TypeParameterList getTypeParameters();
+
+	void setTypeParameters(TypeParameterList typeParameters);
+
 	IType resolveType(ITypeParameter typeVar, IType concrete);
 
 	// Body
@@ -193,6 +204,10 @@ public interface IClass
 		if ((modifiers & Modifiers.OBJECT) != 0)
 		{
 			return new ObjectClassMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.EXTENSION) != 0)
+		{
+			return new ExtensionMetadata(forClass);
 		}
 		// All modifiers above are single-bit flags
 		if ((modifiers & Modifiers.CASE_CLASS) != 0)

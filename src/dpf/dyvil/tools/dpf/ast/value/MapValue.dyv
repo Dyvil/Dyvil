@@ -39,7 +39,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 			entry.getKey().accept(mapVisitor.visitKey())
 			entry.getValue().accept(mapVisitor.visitValue())
 		}
-		
+
 		mapVisitor.visitEnd()
 	}
 
@@ -64,7 +64,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 	// String
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
@@ -77,9 +77,9 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 		let keys: [Value] = this.entries.toKeyArray(class Value)
 		let values: [Value] = this.entries.toValueArray(class Value)
-		
+
 		let innerIndent = indent + '\t'
-		
+
 		buffer.append('{\n').append(innerIndent)
 		keys[0].toString(innerIndent, buffer)
 		buffer.append(' : ')

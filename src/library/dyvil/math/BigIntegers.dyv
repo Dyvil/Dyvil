@@ -1,0 +1,55 @@
+package dyvil.math
+
+import java.math.BigInteger
+
+type BigInt = BigInteger
+
+extension BigInt
+{
+	implicit inline static func apply(_ l: long) -> BigInt = BigInt.valueOf(l)
+
+	inline static func apply(_ s: String) -> BigInt = new BigInt(s)
+
+	// Additive Operators
+
+	inline prefix func + (rhs: BigInt) -> BigInt = rhs
+
+	inline infix func + (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.add(rhs)
+
+	inline prefix func - (rhs: BigInt) -> BigInt = rhs.negate()
+
+	inline infix func - (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.subtract(rhs)
+
+	// Multiplicative Operators
+
+	inline infix func * (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.multiply(rhs)
+
+	infix func / (lhs: BigInt, rhs: BigInt) -> java.math.BigDecimal = new java.math.BigDecimal(lhs).divide(new java.math.BigDecimal(rhs))
+
+	inline infix func _/ (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.divide(rhs)
+
+	inline infix func % (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.remainder(rhs)
+
+	infix func /% (lhs: BigInt, rhs: BigInt) -> (BigInt, BigInt) = lhs.divideAndRemainder(rhs).{ ($0[0], $0[1]) }
+
+	inline infix func ** (lhs: BigInt, rhs: int) -> BigInt = lhs.pow(rhs)
+
+	// Bitwise Operators
+
+	prefix func ~ (rhs: BigInt) -> BigInt = rhs.xor(BigInt.valueOf(-1))
+
+	inline infix func & (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.and(rhs)
+
+	inline infix func | (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.or(rhs)
+
+	inline infix func ^ (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.xor(rhs)
+
+	inline infix func << (lhs: BigInt, rhs: int) -> BigInt = lhs.shiftLeft(rhs)
+
+	inline infix func >> (lhs: BigInt, rhs: int) -> BigInt = lhs.shiftRight(rhs)
+}
+
+extension long
+{
+	inline func toBigInt() -> BigInt = BigInt(this)
+}

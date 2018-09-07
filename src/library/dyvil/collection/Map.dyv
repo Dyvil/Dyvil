@@ -105,9 +105,9 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func subscript_&(key: K) -> ObjectRef<V> = new ObjectRef<V>()
 	{
-		override func get() -> V = this<Map>.get(key)
+		override func get() -> V = this<Map<K, V>>.get(key)
 
-		override func set(value: V) -> void = this<Map>.put(key, value)
+		override func set(value: V) -> void = this<Map<K, V>>.put(key, value)
 	}
 
 	func get(key: any!) -> V? = if (let e = this.getEntry(key)) { return e.getValue() } else { return null }

@@ -20,7 +20,6 @@ import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -46,24 +45,12 @@ public final class ExternalClass extends AbstractClass
 	private static final int ANNOTATIONS         = 1 << 5;
 	private static final int MEMBER_CLASSES      = 1 << 6;
 
-	protected Package enclosingPackage;
-
 	private byte                resolved;
 	private Map<String, String> innerTypes; // inner name -> full internal name
 
 	public ExternalClass(Name name)
 	{
 		this.name = name;
-	}
-
-	public Package getEnclosingPackage()
-	{
-		return this.enclosingPackage;
-	}
-
-	public void setEnclosingPackage(Package enclosingPackage)
-	{
-		this.enclosingPackage = enclosingPackage;
 	}
 
 	@Override
@@ -205,17 +192,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IHeaderUnit getHeader()
-	{
-		return null;
-	}
-
-	@Override
-	public void setHeader(IHeaderUnit unit)
-	{
-	}
-
-	@Override
 	public IClass getThisClass()
 	{
 		this.resolveGenerics();
@@ -330,7 +306,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		final IClass bodyClass = this.body.getClass(name);
+		final IClass bodyClass = this.body.getClasses().get(name);
 		if (bodyClass != null)
 		{
 			return bodyClass;

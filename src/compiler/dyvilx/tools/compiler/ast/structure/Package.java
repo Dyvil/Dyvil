@@ -251,17 +251,19 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IHeaderUnit c : this.headers)
-		{
-			if (c.getName() == name)
-			{
-				return c.getClass(name);
-			}
-		}
-
 		for (IClass c : this.classes)
 		{
 			if (c.getName() == name)
+			{
+				return c;
+			}
+		}
+
+		for (IHeaderUnit h : this.headers)
+		{
+			final IClass c;
+			// TODO Maybe remove the first check
+			if (h.getName() == name && (c = h.getClasses().get(name)) != null)
 			{
 				return c;
 			}
@@ -272,25 +274,27 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		final int cashIndex = qualifiedName.lastIndexOf('$');
 		if (cashIndex < 0)
 		{
-			return this.loadClass(name, qualifiedName);
+			return this.loadClass(name);
 		}
 
 		final Name outerName = Name.fromRaw(qualifiedName.substring(0, cashIndex));
 		final Name innerName = Name.fromRaw(qualifiedName.substring(cashIndex + 1));
 
 		final IClass outerClass = this.resolveClass(outerName);
-		if (outerClass != null)
+		final IClass innerClass;
+		if (outerClass != null && (innerClass = outerClass.resolveClass(innerName)) != null)
 		{
-			return outerClass.resolveClass(innerName);
+			return innerClass;
 		}
 
-		return this.loadClass(name, qualifiedName);
+		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
+		// different name than its enclosing compilation unit
+		return this.loadClass(name);
 	}
 
-	private IClass loadClass(Name name, String qualifiedName)
+	private IClass loadClass(Name name)
 	{
-		final String fileName = this.getInternalName() + qualifiedName + DyvilFileType.CLASS_EXTENSION;
-		return loadClass(fileName, name, this);
+		return loadClass(this.getInternalName() + name.qualified + DyvilFileType.CLASS_EXTENSION, name, this);
 	}
 
 	public static IClass loadClass(String fileName, Name name, IClassConsumer consumer)

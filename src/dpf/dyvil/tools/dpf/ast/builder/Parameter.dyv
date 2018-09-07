@@ -39,7 +39,7 @@ extends DPFValueVisitor implements ASTNode, Expandable
 		return parameter
 	}
 
-	public override func toString() -> String = String(this)
+	public override func toString() -> String = format(this)
 
 	public override func toString(indent: String, buffer: StringBuilder) -> void
 	{

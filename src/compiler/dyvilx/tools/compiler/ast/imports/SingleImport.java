@@ -218,7 +218,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
 		if (headerDeclaration == null)
 		{
-			return header.isHeader();
+			return header.needsHeaderDeclaration();
 		}
 
 		// Header Access Check

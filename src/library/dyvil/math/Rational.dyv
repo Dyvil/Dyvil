@@ -130,7 +130,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	// String
 
-	override func toString() -> String = String(this)
+	override func toString() -> String = format(this)
 
 	override func toString(buffer: StringBuilder) -> void = buffer.append(this.numerator).append(" / ").append(this.denominator)
 }

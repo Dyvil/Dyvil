@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.parser.classes;
 
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.CodeAnnotation;
@@ -41,6 +42,10 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 	private static final int BODY                   = 9;
 	private static final int BODY_END               = 10;
 
+	private static final int EXTENSION_GENERICS     = 11;
+	private static final int EXTENSION_GENERICS_END = 12;
+	private static final int EXTENSION_TYPE         = 13;
+
 	protected IClassConsumer consumer;
 
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
@@ -69,6 +74,14 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 		switch (this.mode)
 		{
 		case NAME:
+			if (this.classAttributes.hasFlag(Modifiers.EXTENSION))
+			{
+				this.theClass = this.consumer.createClass(null, null, this.classAttributes);
+				this.mode = EXTENSION_GENERICS;
+				pm.reparse();
+				return;
+			}
+
 			if (!Tokens.isIdentifier(type))
 			{
 				pm.report(token, "class.identifier");
@@ -231,6 +244,39 @@ public final class ClassDeclarationParser extends Parser implements Consumer<ITy
 			}
 			this.mode = IMPLEMENTS;
 			pm.reparse();
+			return;
+		case EXTENSION_GENERICS:
+			assert this.classAttributes.hasFlag(Modifiers.EXTENSION);
+
+			if (TypeParser.isGenericStart(token, type))
+			{
+				// extension < ...
+
+				pm.splitJump(token, 1);
+				pm.pushParser(new TypeParameterListParser(this.theClass));
+				this.mode = EXTENSION_GENERICS_END;
+				return;
+			}
+			// Fallthrough
+		case EXTENSION_TYPE:
+			assert this.classAttributes.hasFlag(Modifiers.EXTENSION);
+
+			pm.pushParser(new TypeParser(this.theClass::setSuperType), true);
+			this.mode = BODY;
+			return;
+		case EXTENSION_GENERICS_END:
+			// extension < ... >
+
+			this.mode = EXTENSION_TYPE;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "generic.close_angle");
+			return;
 		}
 	}
 
