@@ -38,9 +38,41 @@ public class ExtensionMetadata implements IClassMetadata
 	@Override
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		this.theClass.setPosition(this.theClass.getSuperType().getPosition());
-		this.theClass.setName(
-			Name.fromQualified("extension_" + this.theClass.getSuperType().getInternalName().replace('/', '_')));
+		final IType superType = this.theClass.getSuperType();
+		this.theClass.setPosition(superType.getPosition());
+		this.theClass.setName(mangleName(superType));
+	}
+
+	private static Name mangleName(IType type)
+	{
+		final String signature = type.getSignature();
+		final StringBuilder mangled = new StringBuilder("extension_");
+
+		for (int i = 0; i < signature.length(); i++)
+		{
+			final char c = signature.charAt(i);
+			switch (c)
+			{
+			case '<':
+				mangled.append("_$__");
+				break;
+			case '>':
+				mangled.append("__$_");
+				break;
+			case ',':
+			case ';':
+				mangled.append("__");
+				break;
+			case '/':
+				mangled.append("_");
+				break;
+			default:
+				mangled.append(c);
+				break;
+			}
+		}
+
+		return Name.fromQualified(mangled.toString());
 	}
 
 	@Override
