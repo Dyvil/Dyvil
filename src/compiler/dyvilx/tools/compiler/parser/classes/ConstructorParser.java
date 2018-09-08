@@ -5,7 +5,6 @@ import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.expression.access.InitializerCall;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.expression.ArgumentListParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.method.ParameterListParser;
@@ -54,29 +53,26 @@ public class ConstructorParser extends AbstractMemberParser
 		case DECLARATOR:
 			switch (type)
 			{
-			case DyvilSymbols.AT:
-				this.parseAnnotation(pm, token);
-				return;
 			case DyvilKeywords.INIT:
 				this.member = this.consumer.createConstructor(token.raw(), this.attributes);
 				this.mode = PARAMETERS;
 				return;
 			}
 
-			if (this.parseModifier(pm, token))
+			if (this.parseAttribute(pm, token))
 			{
 				return;
 			}
 
 			// Fallthrough
 		case PARAMETERS:
-			this.mode = PARAMETERS_END;
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
+				this.mode = PARAMETERS_END;
 				pm.pushParser(new ParameterListParser(this.member));
 				return;
 			}
-			pm.reparse();
+
 			pm.report(token, "constructor.parameters.open_paren");
 			return;
 		case PARAMETERS_END:

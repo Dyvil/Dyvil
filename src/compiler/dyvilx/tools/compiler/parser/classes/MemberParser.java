@@ -103,8 +103,8 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				return;
 			}
 
-			int classType;
-			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
+			final int classType = ModifierParser.parseClassTypeModifier(token, pm);
+			if (classType >= 0)
 			{
 				this.attributes.addFlag(classType);
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.consumer, this.attributes);

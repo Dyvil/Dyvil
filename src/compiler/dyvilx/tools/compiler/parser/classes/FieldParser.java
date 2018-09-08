@@ -10,7 +10,6 @@ import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
@@ -41,7 +40,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 
 	private SourcePosition position;
 	private Name           name;
-	private IType type = Types.UNKNOWN;
+	private IType          type = Types.UNKNOWN;
 
 	public FieldParser(IMemberConsumer<T> consumer)
 	{
@@ -71,9 +70,6 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 		case DECLARATOR:
 			switch (type)
 			{
-			case DyvilSymbols.AT:
-				this.parseAnnotation(pm, token);
-				return;
 			case DyvilKeywords.CONST:
 				this.attributes.addFlag(Modifiers.CONST);
 				this.mode = NAME;
@@ -86,7 +82,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 				return;
 			}
 
-			if (this.parseModifier(pm, token))
+			if (this.parseAttribute(pm, token))
 			{
 				return;
 			}

@@ -56,16 +56,13 @@ public class MethodParser extends AbstractMemberParser
 		case DECLARATOR:
 			switch (type)
 			{
-			case DyvilSymbols.AT:
-				this.parseAnnotation(pm, token);
-				return;
 			case DyvilKeywords.FUNC:
 			case DyvilKeywords.OPERATOR:
 				this.mode = METHOD_NAME;
 				return;
 			}
 
-			if (this.parseModifier(pm, token))
+			if (this.parseAttribute(pm, token))
 			{
 				return;
 			}
