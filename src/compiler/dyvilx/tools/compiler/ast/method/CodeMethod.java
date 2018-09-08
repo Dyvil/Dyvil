@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.method;
 import dyvil.annotation.Reified;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -310,8 +309,7 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkDuplicates(MarkerList markers)
 	{
-		final Collection<IMethod> candidates = new ArrayList<>();
-		this.enclosingClass.addMethods(candidates);
+		final Collection<IMethod> candidates = this.enclosingClass.allMethods();
 		if (candidates.isEmpty())
 		{
 			return;

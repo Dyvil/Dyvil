@@ -149,7 +149,7 @@ public interface IClass
 
 	byte getVisibility(ClassMember member);
 
-	void addMethods(Collection<IMethod> methods);
+	Collection<IMethod> allMethods();
 
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 

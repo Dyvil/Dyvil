@@ -1,10 +1,12 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableCollection;
 import dyvil.collection.List;
-import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.iterator.FilterIterator;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
@@ -30,8 +32,8 @@ import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Markers;
@@ -268,10 +270,12 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 		return () -> new ArrayIterator<>(this.properties, 0, this.propertyCount);
 	}
 
-	public Iterable<IProperty> allProperties()
+	public ImmutableCollection<IProperty> allProperties()
 	{
-		final ArrayList.Builder<IProperty> builder = new ArrayList.Builder<>(this.propertyCount + this.fieldCount);
+		final ArrayList<IProperty> builder = new ArrayList<>(this.propertyCount + this.fieldCount);
+
 		builder.addAll(this.properties());
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty property = this.fields[i].getProperty();
@@ -280,7 +284,8 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 				builder.add(property);
 			}
 		}
-		return builder.build();
+
+		return builder.view();
 	}
 
 	public int propertyCount()
@@ -338,42 +343,42 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 		return () -> new ArrayIterator<>(this.methods, 0, this.methodCount);
 	}
 
-	public Iterable<IMethod> allMethods()
+	public Collection<IMethod> allMethods()
 	{
-		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(
-			this.methodCount + this.propertyCount * 2 + this.fieldCount);
+		final ArrayList<IMethod> result = new ArrayList<>(this.methodCount + this.propertyCount * 2 + this.fieldCount * 2);
 
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			builder.add(this.methods[i]);
+			result.add(this.methods[i]);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			addPropertyMethods(builder, this.properties[i]);
+			addPropertyMethods(result, this.properties[i]);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty prop = this.fields[i].getProperty();
 			if (prop != null)
 			{
-				addPropertyMethods(builder, prop);
+				addPropertyMethods(result, prop);
 			}
 		}
-		return builder.build();
+
+		return result.view();
 	}
 
-	private static void addPropertyMethods(ArrayList.Builder<IMethod> builder, IProperty prop)
+	protected static void addPropertyMethods(Collection<IMethod> collection, IProperty prop)
 	{
 		final IMethod getter = prop.getGetter();
 		if (getter != null)
 		{
-			builder.add(getter);
+			collection.add(getter);
 		}
 
 		final IMethod setter = prop.getSetter();
 		if (setter != null)
 		{
-			builder.add(setter);
+			collection.add(setter);
 		}
 	}
 

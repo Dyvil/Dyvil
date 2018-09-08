@@ -4,6 +4,8 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -383,57 +385,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// --------------- Methods ---------------
 
 	@Override
-	public void addMethods(Collection<IMethod> methods)
+	public Collection<IMethod> allMethods()
 	{
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		final Collection<IMethod> bodyMethods = this.body != null ? this.body.allMethods() : EmptyList.apply();
+		final int parameters = this.parameters.size();
+
+		final Collection<IMethod> result = new ArrayList<>(parameters * 2 + bodyMethods.size());
+
+		for (int i = 0; i < parameters; i++)
 		{
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				addMethods(methods, property);
+				ClassBody.addPropertyMethods(result, property);
 			}
 		}
 
-		if (this.body != null)
-		{
-			for (int i = 0, count = this.body.methodCount(); i < count; i++)
-			{
-				final IMethod method = this.body.getMethod(i);
-				if (method != null)
-				{
-					methods.add(method);
-				}
-			}
+		result.addAll(bodyMethods);
 
-			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-			{
-				final IProperty property = this.body.getField(i).getProperty();
-				if (property != null)
-				{
-					addMethods(methods, property);
-				}
-			}
-
-			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-			{
-				addMethods(methods, this.body.getProperty(i));
-			}
-		}
-	}
-
-	private static void addMethods(Collection<IMethod> methods, IProperty property)
-	{
-		final IMethod getter = property.getGetter();
-		if (getter != null)
-		{
-			methods.add(getter);
-		}
-
-		final IMethod setter = property.getSetter();
-		if (setter != null)
-		{
-			methods.add(setter);
-		}
+		return result.view();
 	}
 
 	@Override
