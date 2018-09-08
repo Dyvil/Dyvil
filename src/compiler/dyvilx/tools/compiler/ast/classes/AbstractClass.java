@@ -51,43 +51,43 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractClass implements IClass, IDefaultContext
 {
-	// Modifiers and Annotations
+	// =============== Fields ===============
 
 	protected @NonNull AttributeList attributes;
 
-	// Signature
-
-	protected Name name;
+	protected @Nullable Name name;
 
 	protected @Nullable TypeParameterList typeParameters;
 
 	protected @NonNull ParameterList parameters = new ParameterList();
 
-	protected           IType    superType = Types.OBJECT;
+	protected @Nullable IType    superType = Types.OBJECT;
 	protected @Nullable TypeList interfaces;
 
-	// Body
+	protected @Nullable ClassBody body;
 
-	protected ClassBody body;
+	// --------------- Metadata ---------------
 
-	// Metadata
-
-	protected String fullName;
-	protected String internalName;
-	protected String internalSimpleName;
-
-	protected Package        enclosingPackage;
-	protected IHeaderUnit    enclosingHeader;
-	protected IClass         enclosingClass;
+	protected Package     enclosingPackage;
+	protected IHeaderUnit enclosingHeader;
+	protected IClass      enclosingClass;
 
 	protected IClassMetadata metadata;
 
 	protected ClassCompilable[] compilables;
 	protected int               compilableCount;
 
+	// --------------- Cache ---------------
+
+	protected String fullName;
+	protected String internalName;
+	protected String internalSimpleName;
+
 	protected IType thisType;
 
 	protected IType classType = new ClassType(this);
+
+	// =============== Constructors ===============
 
 	public AbstractClass()
 	{
@@ -98,6 +98,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		this.attributes = attributes;
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
 
 	@Override
 	public IClass getEnclosingClass()
@@ -143,6 +147,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		return this.classType;
 	}
+
+	// --------------- Attributes ---------------
 
 	@Override
 	public MemberKind getKind()
@@ -202,13 +208,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return false;
 	}
 
-	// Names
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
+	// --------------- Name ---------------
 
 	@Override
 	public Name getName()
@@ -217,36 +217,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void setFullName(String name)
+	public void setName(Name name)
 	{
-		this.fullName = name;
+		this.name = name;
 	}
 
-	@Override
-	public String getFullName()
-	{
-		if (this.fullName != null)
-		{
-			return this.fullName;
-		}
-
-		if (this.enclosingClass != null)
-		{
-			return this.enclosingClass.getFullName() + '.' + this.name.qualified;
-		}
-		if (this.enclosingHeader != null)
-		{
-			return this.fullName = this.enclosingHeader.getFullName(this.name);
-		}
-		if (this.enclosingPackage != null)
-		{
-			return this.fullName = this.enclosingPackage.getFullName() + "." + this.name.qualified;
-		}
-
-		return this.name.unqualified;
-	}
-
-	// Generics
+	// --------------- Type Parameters ---------------
 
 	@Override
 	public boolean isTypeParametric()
@@ -270,7 +246,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		this.typeParameters = typeParameters;
 	}
 
-	// Class Parameters
+	// --------------- Class Parameters ---------------
 
 	@Override
 	public ParameterList getParameters()
@@ -284,18 +260,18 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return new ClassParameter(this, position, name, type, attributes);
 	}
 
-	// Super Types
-
-	@Override
-	public void setSuperType(IType type)
-	{
-		this.superType = type;
-	}
+	// --------------- Super Type ---------------
 
 	@Override
 	public IType getSuperType()
 	{
 		return this.superType;
+	}
+
+	@Override
+	public void setSuperType(IType type)
+	{
+		this.superType = type;
 	}
 
 	@Override
@@ -320,7 +296,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return false;
 	}
 
-	// Interfaces
+	// --------------- Interfaces ---------------
 
 	@Override
 	public TypeList getInterfaces()
@@ -337,7 +313,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		this.interfaces = interfaces;
 	}
 
-	// Body
+	// --------------- Body ---------------
 
 	@Override
 	public ClassBody getBody()
@@ -360,6 +336,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		this.body = body;
 	}
+
+	// --------------- Class Compilables ---------------
 
 	@Override
 	public int classCompilableCount()
@@ -388,17 +366,21 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		this.compilables[index] = compilable;
 	}
 
-	@Override
-	public void setMetadata(IClassMetadata metadata)
-	{
-		this.metadata = metadata;
-	}
+	// --------------- Metadata ---------------
 
 	@Override
 	public IClassMetadata getMetadata()
 	{
 		return this.metadata;
 	}
+
+	@Override
+	public void setMetadata(IClassMetadata metadata)
+	{
+		this.metadata = metadata;
+	}
+
+	// --------------- Methods ---------------
 
 	@Override
 	public void addMethods(Collection<IMethod> methods)
@@ -560,86 +542,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return this.metadata.getFunctionalMethod();
 	}
 
-	@Override
-	public String getInternalName()
-	{
-		if (this.internalName != null)
-		{
-			return this.internalName;
-		}
-
-		if (this.enclosingClass != null)
-		{
-			return this.internalName = this.enclosingClass.getInternalName() + '$' + this.getInternalSimpleName();
-		}
-		if (this.enclosingHeader != null)
-		{
-			return this.internalName = this.enclosingHeader.getInternalName(this.getInternalSimpleName());
-		}
-		if (this.enclosingPackage != null)
-		{
-			return this.enclosingPackage.getInternalName() + this.getInternalSimpleName();
-		}
-		return this.getInternalSimpleName();
-	}
-
-	public void setInternalName(String internalName)
-	{
-		this.internalName = internalName;
-	}
-
-	public String getInternalSimpleName()
-	{
-		if (this.internalSimpleName != null)
-		{
-			return this.internalSimpleName;
-		}
-		return this.internalSimpleName = this.name.qualified;
-	}
-
-	public void setInternalSimpleName(String internalSimpleName)
-	{
-		this.internalSimpleName = internalSimpleName;
-		this.internalName = null;
-	}
-
-	@Override
-	public String getSignature()
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.appendSignature(buffer);
-		}
-
-		if (this.superType != null)
-		{
-			this.superType.appendSignature(buffer, false);
-		}
-		if (this.interfaces != null)
-		{
-			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
-		}
-		return buffer.toString();
-	}
-
-	@Override
-	public String[] getInterfaceArray()
-	{
-		if (this.interfaces == null)
-		{
-			return null;
-		}
-
-		final int size = this.interfaces.size();
-		final String[] interfaces = new String[size];
-		for (int i = 0; i < size; i++)
-		{
-			interfaces[i] = this.interfaces.get(i).getInternalName();
-		}
-		return interfaces;
-	}
+	// --------------- Context ---------------
 
 	@Override
 	public IType resolveType(ITypeParameter typeParameter, IType concrete)
@@ -948,6 +851,129 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return INVISIBLE;
 	}
 
+	// --------------- Compilation ---------------
+
+	// - - - - - - - - Internal Name - - - - - - - -
+
+	@Override
+	public String getInternalName()
+	{
+		if (this.internalName != null)
+		{
+			return this.internalName;
+		}
+
+		if (this.enclosingClass != null)
+		{
+			return this.internalName = this.enclosingClass.getInternalName() + '$' + this.getInternalSimpleName();
+		}
+		if (this.enclosingHeader != null)
+		{
+			return this.internalName = this.enclosingHeader.getInternalName(this.getInternalSimpleName());
+		}
+		if (this.enclosingPackage != null)
+		{
+			return this.enclosingPackage.getInternalName() + this.getInternalSimpleName();
+		}
+		return this.getInternalSimpleName();
+	}
+
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
+	}
+
+	public String getInternalSimpleName()
+	{
+		if (this.internalSimpleName != null)
+		{
+			return this.internalSimpleName;
+		}
+		return this.internalSimpleName = this.name.qualified;
+	}
+
+	public void setInternalSimpleName(String internalSimpleName)
+	{
+		this.internalSimpleName = internalSimpleName;
+		this.internalName = null;
+	}
+
+	// - - - - - - - - Full Name - - - - - - - -
+
+	@Override
+	public String getFullName()
+	{
+		if (this.fullName != null)
+		{
+			return this.fullName;
+		}
+
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getFullName() + '.' + this.name.qualified;
+		}
+		if (this.enclosingHeader != null)
+		{
+			return this.fullName = this.enclosingHeader.getFullName(this.name);
+		}
+		if (this.enclosingPackage != null)
+		{
+			return this.fullName = this.enclosingPackage.getFullName() + "." + this.name.qualified;
+		}
+
+		return this.name.unqualified;
+	}
+
+	@Override
+	public void setFullName(String name)
+	{
+		this.fullName = name;
+	}
+
+	// - - - - - - - - Signature - - - - - - - -
+
+	@Override
+	public String getSignature()
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		if (this.typeParameters != null)
+		{
+			this.typeParameters.appendSignature(buffer);
+		}
+
+		if (this.superType != null)
+		{
+			this.superType.appendSignature(buffer, false);
+		}
+		if (this.interfaces != null)
+		{
+			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
+		}
+		return buffer.toString();
+	}
+
+	// - - - - - - - - Interfaces - - - - - - - -
+
+	@Override
+	public String[] getInterfaceArray()
+	{
+		if (this.interfaces == null)
+		{
+			return null;
+		}
+
+		final int size = this.interfaces.size();
+		final String[] interfaces = new String[size];
+		for (int i = 0; i < size; i++)
+		{
+			interfaces[i] = this.interfaces.get(i).getInternalName();
+		}
+		return interfaces;
+	}
+
+	// - - - - - - - - File Name - - - - - - - -
+
 	@Override
 	public String getFileName()
 	{
@@ -962,6 +988,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return internalName.substring(slashIndex + 1) + DyvilFileType.CLASS_EXTENSION;
 	}
 
+	// - - - - - - - - Inner Class Info - - - - - - - -
+
 	@Override
 	public void writeInnerClassInfo(ClassWriter writer)
 	{
@@ -972,6 +1000,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
