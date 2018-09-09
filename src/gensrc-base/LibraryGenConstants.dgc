@@ -18,6 +18,8 @@ class LibraryGenConstants
 
 	public const SUBRANGE_SPECS: [Specialization] = [ BYTE_SPEC, SHORT_SPEC ]
 
+	public const FLOATING_POINT_SPECS: [Specialization] = [ FLOAT_SPEC, DOUBLE_SPEC ]
+
 	public const NUMBER_SPECS: [Specialization] = [ BYTE_SPEC, SHORT_SPEC, INT_SPEC, LONG_SPEC, FLOAT_SPEC, DOUBLE_SPEC ]
 
 	public const BASIC_SPECS: [Specialization] = [ BOOLEAN_SPEC, CHAR_SPEC, INT_SPEC, LONG_SPEC, FLOAT_SPEC, DOUBLE_SPEC ]
