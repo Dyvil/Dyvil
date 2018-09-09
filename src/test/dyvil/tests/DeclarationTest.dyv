@@ -1,5 +1,7 @@
 package dyvil.tests
 
+using dyvil.Test
+
 class DeclarationTest
 {
 	static func apply() -> Test = test "Declarations" {
