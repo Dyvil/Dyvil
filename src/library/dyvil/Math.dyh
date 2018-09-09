@@ -2,21 +2,17 @@ package dyvil
 
 import  dyvil.math._
 
-// Rings
+// Groups and Rings
 
 import  dyvil.math.group._
 using   dyvil.math.group.GroupOperators._
 using   dyvil.math.group.GroupImplicits._
 
-// Math Utilities
+// Extension Headers
+
 using   dyvil.math.MathUtils._
+using   dyvil.math.Combinatorics._
+using   dyvil.math.BigIntegers._
+using   dyvil.math.BigDecimals._
+
 using   java.lang.Math._
-
-// Complex Numbers
-import  dyvil.math.Complex
-
-// BigInteger
-using   dyvil.math.BigIntegers
-
-// BigDecimal
-using   dyvil.math.BigDecimals

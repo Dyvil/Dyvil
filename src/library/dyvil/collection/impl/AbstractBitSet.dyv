@@ -3,6 +3,8 @@ package dyvil.collection.impl
 import java.util.{ Iterator, NoSuchElementException }
 import java.io.IOException
 
+using dyvil.math.MathUtils.ceil
+
 abstract class AbstractBitSet implements Set<int>
 {
 	protected const DEFAULT_CAPACITY: int = 10
@@ -16,7 +18,7 @@ abstract class AbstractBitSet implements Set<int>
 
 	public init(capacity: int)
 	{
-		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
+		this.words = new [long](ceil(capacity / 64))
 	}
 
 	public init(elements: [int]) : this(elements.size)

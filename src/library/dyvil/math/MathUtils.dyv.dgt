@@ -5,19 +5,19 @@ package dyvil.math
 
 using dyvil.Math
 
-abstract class MathUtils
+@BytecodeName("MathUtils")
+extension Math
 {
-	private init() {} // no instances
+	// --------------- min ---------------
 
-	// min
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static extension func min(this: Math, _ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
+		static func min(_ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
 
-		static extension func min(this: Math, _ values: T...) -> T
+		static func min(_ values: T...) -> T
 		{
 			var min = #if (FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
@@ -25,19 +25,19 @@ abstract class MathUtils
 			return min
 		}
 
-		@BytecodeName("min$_array")
-		inline static extension func min(this: Math, _ array: [T]) -> T = min(array...)
+		static func min(_ array: [T]) -> T inline @BytecodeName("min$_array") = min(array...)
 	}
 
-	// max
+	// --------------- max ---------------
+
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 		#let(WRAPPER = spec['WRAPPER'])
 		#let(FLOATING_POINT = Boolean.parseBoolean(spec['IS_FLOATING_POINT']))
 
-		static extension func max(this: Math, _ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
+		static func max(_ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
 
-		static extension func max(this: Math, _ values: T...) -> T
+		static func max(_ values: T...) -> T
 		{
 			var max = #if (FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
@@ -45,15 +45,16 @@ abstract class MathUtils
 			return max
 		}
 
-		@BytecodeName("max$_array")
-		inline static extension func max(this: Math, _ array: [T]) -> T = max(array...)
+
+		static func max(_ array: [T]) -> T inline @BytecodeName("max$_array") = max(array...)
 	}
 
-	// sum
+	// --------------- sum ---------------
+
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static extension func sum(this: Math, _ values: [T]) -> T
+		static func sum(_ values: [T]) -> T
 		{
 			var sum: T = 0
 			for (v <- values) sum += v
@@ -77,11 +78,12 @@ abstract class MathUtils
 		return sum
 	}
 
-	// product
+	// --------------- product ---------------
+
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static extension func product(this: Math, _ values: [T]) -> T
+		static func product(_ values: [T]) -> T
 		{
 			var product: T = 1
 			for (v <- values) product *= v
@@ -105,39 +107,41 @@ abstract class MathUtils
 		return product
 	}
 
-	// average
+	// --------------- average ---------------
+
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static extension func average(this: Math, _ values: [T]) -> double = sum(values) / (values.size as double)
+		static func average(_ values: [T]) -> double = sum(values) / (values.size as double)
 	}
 
-	// clamp
+	// --------------- clamp ---------------
+
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		infix func clamp(_ v: T, min: T, max: T) -> T
+		static func clamp(value: T, min: T, max: T) -> T
 		{
-			if (v < min) return min
-			if (v > max) return max
-			return v
+			if (value < min) return min
+			if (value > max) return max
+			return value
 		}
 	}
 
-	// interpolate
-	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
+	// --------------- interpolate ---------------
+
+	#for (spec <- LibraryGenConstants.FLOATING_POINT_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		infix func interpolate(_ v: double, min: T, max: T) -> T
+		static func interpolate(factor: T, min: T, max: T) -> T
 		{
-			if (v <= 0) return min
-			if (v >= 1) return max
-			return (min + (max - min) * v)#if (T != 'double') { as T}
-
+			if (factor <= 0) return min
+			if (factor >= 1) return max
+			return min + factor * (max - min)
 		}
 	}
 
-	// floor & ceil
+	// --------------- floor ---------------
 
 	static func floor(_ f: float) -> int
 	{
@@ -151,6 +155,8 @@ abstract class MathUtils
 		return d < l ? l - 1 : l
 	}
 
+	// --------------- ceil ---------------
+
 	static func ceil(_ f: float) -> int
 	{
 		let i = f as int
@@ -163,26 +169,9 @@ abstract class MathUtils
 		return d > l ? l + 1 : l
 	}
 
-	// factorial
+	// --------------- powers of two ---------------
 
-	postfix func !(_ lhs: long) -> long
-	{
-		var l = lhs
-		while (lhs > 1)
-		{
-			lhs -= 1
-			l *= lhs
-		}
-		return l
-	}
-
-	static extension func nPr(this: Math, n: long, r: long) -> long = n! _/ (n - r)!
-
-	static extension func nCr(this: Math, n: long, r: long) -> long = n! _/ (r! * (n - r)!)
-
-	// powers of two
-
-	static extension func nextPowerOf2(this: Math, _ v: int) -> int
+	static func nextPowerOf2(_ v: int) -> int
 	{
 		var j = v - 1
 		j |= j >> 1
@@ -193,12 +182,16 @@ abstract class MathUtils
 		return j + 1
 	}
 
-	static extension func isPowerOf2(this: Math, _ v: int) -> boolean = (v & -v) == v
+	static func isPowerOf2(_ v: int) -> boolean = (v & -v) == v
 
+	static func log2(_ v: int) -> int = isPowerOf2(v) ? DeBruijn[v] : DeBruijn[nextPowerOf2(v)] - 1
+}
+
+package private class DeBruijn
+{
 	private const deBruijnBits: [int] = [ 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31,
 		27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 ]
 
-	private static func deBruijn(v: int) -> int = deBruijnBits[(v * 125613361L >> 27) as int & 0x1F]
-
-	static extension func log2(this: Math, _ v: int) -> int = isPowerOf2(v) ? deBruijn(v) : deBruijn(nextPowerOf2(v)) - 1
+	package private static func subscript(v: int) -> int = deBruijnBits[(v * 125613361L >> 27) as int & 0x1F]
 }
+

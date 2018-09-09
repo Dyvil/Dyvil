@@ -1,0 +1,47 @@
+package dyvil.math
+
+using dyvil.math.BigIntegers
+
+#let(TYPES = [ 'long', 'BigInteger' ])
+
+@BytecodeName("Combinatorics")
+extension Math
+{
+	// --------------- Factorial ---------------
+
+	#for (T <- TYPES) {
+
+		static func factorial(of value: T) -> T
+		{
+			var result = value
+			while (value > 1)
+			{
+				value -= 1
+				result *= value
+			}
+			return result
+		}
+	}
+
+	// --------------- Permutations ---------------
+
+	#for (T <- TYPES) {
+
+		static func permutations(of n: T, k: T) -> T = n! _/ (n - k)!
+	}
+
+	// --------------- Combinations ---------------
+
+	#for (T <- TYPES) {
+
+		static func combinations(of n: T, k: T) -> T = n! _/ (k! * (n - k)!)
+	}
+}
+
+#for (T <- TYPES) {
+
+	extension T
+	{
+		postfix func !(_ lhs: T) -> T = Math.factorial(lhs)
+	}
+}
