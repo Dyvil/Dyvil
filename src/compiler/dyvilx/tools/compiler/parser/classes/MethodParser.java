@@ -118,6 +118,11 @@ public class MethodParser extends AbstractMemberParser
 			}
 			// Fallthrough
 		case BODY:
+			if (this.parseAttribute(pm, token))
+			{
+				return;
+			}
+
 			switch (type)
 			{
 			case BaseSymbols.OPEN_CURLY_BRACKET:

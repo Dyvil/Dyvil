@@ -18,6 +18,7 @@ public class Main
 			CaptureTest()
 			CaseClassTest()
 			ConstructorTest()
+			DeclarationTest()
 			DPFTest()
 			EnumTest()
 			ExtensionTest()

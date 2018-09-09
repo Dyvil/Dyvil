@@ -109,6 +109,11 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 			}
 			// Fallthrough
 		case VALUE:
+			if (this.parseAttribute(pm, token))
+			{
+				return;
+			}
+
 			if ((this.flags & NO_VALUES) == 0 && type == BaseSymbols.EQUALS)
 			{
 				// definitely a field

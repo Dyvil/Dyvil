@@ -7,7 +7,6 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
-import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.transform.Names;
@@ -92,12 +91,9 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 				this.mode = SEPARATOR;
 				this.target = INITIALIZER;
 				return;
-			case DyvilSymbols.AT:
-				this.parseAnnotation(pm, token);
-				return;
 			}
 
-			if (this.parseModifier(pm, token))
+			if (this.parseAttribute(pm, token))
 			{
 				return;
 			}
@@ -112,6 +108,11 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 			}
 			// Fallthrough
 		case SEPARATOR:
+			if (this.parseAttribute(pm, token))
+			{
+				return;
+			}
+
 			switch (type)
 			{
 			case BaseSymbols.COLON:
