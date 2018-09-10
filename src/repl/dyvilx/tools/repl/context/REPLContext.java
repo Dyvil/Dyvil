@@ -534,21 +534,9 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public String getFullName(Name subClass)
-	{
-		return CLASS_PACKAGE + '.' + subClass.qualified;
-	}
-
-	@Override
 	public String getInternalName()
 	{
 		return this.currentClass.getInternalName();
-	}
-
-	@Override
-	public String getInternalName(String subName)
-	{
-		return CLASS_PACKAGE + '/' + subName;
 	}
 
 	@Override

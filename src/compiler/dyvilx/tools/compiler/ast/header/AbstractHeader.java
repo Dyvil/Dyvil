@@ -425,29 +425,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public String getFullName(Name subClass)
-	{
-		if (subClass != this.name)
-		{
-			return this.pack.getFullName() + '.' + this.name.qualified + '.' + subClass.qualified;
-		}
-		return this.pack.getFullName() + '.' + subClass.qualified;
-	}
-
-	@Override
 	public String getInternalName()
 	{
 		return this.pack.getInternalName() + this.name;
-	}
-
-	@Override
-	public String getInternalName(String subName)
-	{
-		if (!subName.equals(this.name.qualified))
-		{
-			return this.pack.getInternalName() + this.name.qualified + '$' + subName;
-		}
-		return this.pack.getInternalName() + subName;
 	}
 
 	// --------------- Formatting ---------------
