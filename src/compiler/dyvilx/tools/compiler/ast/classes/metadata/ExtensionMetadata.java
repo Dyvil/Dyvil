@@ -82,7 +82,10 @@ public class ExtensionMetadata implements IClassMetadata
 
 		for (IField field : body.fields())
 		{
-			markers.add(Markers.semanticError(field.getPosition(), "extension.field.invalid"));
+			if (!field.hasModifier(Modifiers.PRIVATE | Modifiers.CONST))
+			{
+				markers.add(Markers.semanticError(field.getPosition(), "extension.field.invalid"));
+			}
 		}
 
 		for (IProperty property : body.properties())
