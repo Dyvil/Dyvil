@@ -37,9 +37,9 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.LambdaType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
@@ -775,6 +775,8 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		return value instanceof FieldAccess && ((FieldAccess) value).getField() == member;
 	}
 
+	// --------------- Expression Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -784,10 +786,6 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 			handleType = ClassFormat.H_INVOKESTATIC;
 			if (this.captureHelper != null)
 			{
-				if (this.captureHelper.isThisCaptured())
-				{
-					handleType = ClassFormat.H_INVOKESPECIAL;
-				}
 				this.captureHelper.writeCaptures(writer, this.lineNumber());
 			}
 		}
@@ -812,22 +810,28 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		}
 	}
 
+	// --------------- Descriptors ---------------
+
+	private void appendCaptures(StringBuilder builder)
+	{
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.appendThisCaptureType(builder);
+			this.captureHelper.appendCaptureTypes(builder);
+		}
+	}
+
 	/**
 	 * @return the descriptor that contains the captured instance and captured variables (if present) as the argument
 	 * types and the instantiated method type as the return type.
 	 */
 	private String getInvokeDescriptor()
 	{
-		final StringBuilder builder = new StringBuilder().append('(');
+		final StringBuilder builder = new StringBuilder();
 
-		if (this.captureHelper != null)
-		{
-			this.captureHelper.appendThisCaptureType(builder);
-			this.captureHelper.appendCaptureTypes(builder);
-		}
-
+		builder.append('(');
+		this.appendCaptures(builder);
 		builder.append(')');
-
 		this.type.appendExtendedName(builder);
 
 		return builder.toString();
@@ -839,11 +843,13 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 	 */
 	private String getLambdaDescriptor()
 	{
-		final StringBuilder builder = new StringBuilder().append('(');
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append('(');
 		this.parameters.appendDescriptor(builder);
 		builder.append(')');
-
 		this.returnType.appendExtendedName(builder);
+
 		return builder.toString();
 	}
 
@@ -858,21 +864,18 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 			return this.descriptor;
 		}
 
-		assert this.getHandleType() == 0;
+		final StringBuilder builder = new StringBuilder();
 
-		final StringBuilder builder = new StringBuilder().append('(');
-
-		if (this.captureHelper != null)
-		{
-			this.captureHelper.appendCaptureTypes(builder);
-		}
+		builder.append('(');
+		this.appendCaptures(builder);
 		this.parameters.appendDescriptor(builder);
 		builder.append(')');
-
 		this.returnType.appendExtendedName(builder);
 
 		return this.descriptor = builder.toString();
 	}
+
+	// --------------- Method Compilation ---------------
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
@@ -883,20 +886,22 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		}
 
 		final boolean thisCaptured = this.captureHelper != null && this.captureHelper.isThisCaptured();
-		final int modifiers = thisCaptured ? Modifiers.PRIVATE : Modifiers.PRIVATE | Modifiers.STATIC;
 
-		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name,
-		                                                                                  this.getTargetDescriptor(),
-		                                                                                  null, null));
-
-		int index = 0;
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
+			Modifiers.PRIVATE | Modifiers.STATIC, this.name, this.getTargetDescriptor(), null, null));
 
 		if (this.captureHelper != null)
 		{
+			final int index;
+
 			if (thisCaptured)
 			{
-				methodWriter.setLocalType(0, this.owner);
+				methodWriter.setLocalType(0, this.captureHelper.getThisType().getFrameType());
 				index = 1;
+			}
+			else
+			{
+				index = 0;
 			}
 
 			this.captureHelper.writeCaptureParameters(methodWriter, index);
@@ -910,6 +915,8 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 		this.value.writeExpression(methodWriter, this.returnType);
 		methodWriter.visitEnd(this.returnType);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
