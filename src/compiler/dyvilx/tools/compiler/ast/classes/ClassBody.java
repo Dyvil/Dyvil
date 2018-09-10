@@ -546,8 +546,8 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 			return;
 		}
 
-		// If it doesn't, check for abstract modifiers
-		if (method.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
+		// If it doesn't, check for abstract modifiers and extension classes
+		if (method.isAbstract() && !checkedClass.isAbstract() && !checkedClass.hasModifier(Modifiers.EXTENSION))
 		{
 			// Create an abstract method error
 			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract", checkedClass.getName(),
