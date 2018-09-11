@@ -19,17 +19,16 @@ import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import static dyvil.reflect.Modifiers.*;
-import static dyvil.reflect.Modifiers.STATIC;
 
 public interface IMethod extends ICallableMember, ITypeParametricMember, IContext
 {
+	// --------------- Attributes ---------------
+
 	@Override
 	default MemberKind getKind()
 	{
 		return MemberKind.METHOD;
 	}
-
-	// ------------------------------ Attributable Implementation ------------------------------
 
 	@Override
 	default int getJavaFlags()
@@ -86,18 +85,6 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 		ICallableMember.super.setDyvilFlags(dyvilFlags);
 	}
 
-	// --------------- Matching ---------------
-
-	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
-
-	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
-
-	IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver, ArgumentList arguments, GenericData genericData);
-
-	void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance, ArgumentList arguments, ITypeContext typeContext);
-
-	// Misc
-
 	boolean isImplicitConversion();
 
 	boolean isFunctional();
@@ -109,13 +96,37 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 		return false;
 	}
 
+	boolean hasTypeVariables();
+
+	// --------------- This Type ---------------
+
+	IType getReceiverType();
+
+	// --------------- Method Matching ---------------
+
+	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
+
+	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
+
+	// --------------- Call Checking ---------------
+
+	GenericData getGenericData(GenericData data, IValue instance, ArgumentList arguments);
+
+	IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver,
+		ArgumentList arguments, GenericData genericData);
+
+	void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
+		ArgumentList arguments, ITypeContext typeContext);
+
+	// --------------- Override Checking ---------------
+
 	/**
 	 * Checks if this method overrides the given {@code candidate} method.
 	 *
 	 * @param candidate
-	 * 		the potential super-method
+	 * 	the potential super-method
 	 * @param typeContext
-	 * 		the type context for type specialization
+	 * 	the type context for type specialization
 	 *
 	 * @return {@code true}, if this method overrides the given candidate
 	 */
@@ -125,31 +136,31 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 
 	// Generics
 
-	IType getReceiverType();
+	// --------------- Compilation ---------------
 
-	GenericData getGenericData(GenericData data, IValue instance, ArgumentList arguments);
-
-	boolean hasTypeVariables();
-
-	// Compilation
+	// - - - - - - - - Intrinsics - - - - - - - -
 
 	boolean isIntrinsic();
 
 	IntrinsicData getIntrinsicData();
 
+	// - - - - - - - - Invoke Opcode and Handle - - - - - - - -
+
 	int getInvokeOpcode();
 
 	Handle toHandle();
 
-	void writeCall(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-			throws BytecodeException;
+	// - - - - - - - - Call Compilation - - - - - - - -
 
-	void writeInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException;
+	void writeCall(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
+		IType targetType, int lineNumber) throws BytecodeException;
 
-	void writeJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException;
+	void writeInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
+		int lineNumber) throws BytecodeException;
 
-	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException;
+	void writeJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
+		int lineNumber) throws BytecodeException;
+
+	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
+		ITypeContext typeContext, int lineNumber) throws BytecodeException;
 }

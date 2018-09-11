@@ -152,6 +152,16 @@ public class TypeList implements Iterable<IType>, Consumer<IType>
 
 	// --------------- Compilation ---------------
 
+	public String[] getInternalTypeNames()
+	{
+		final String[] array = new String[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			array[i] = this.types[i].getInternalName();
+		}
+		return array;
+	}
+
 	public void appendDescriptors(StringBuilder buffer, int type)
 	{
 		for (int i = 0; i < this.size; i++)

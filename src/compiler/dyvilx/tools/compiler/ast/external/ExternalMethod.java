@@ -22,19 +22,25 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalCallableMember
 {
+	// =============== Constants ===============
+
 	private static final int RETURN_TYPE = 1 << 1;
 	private static final int PARAMETERS  = 1 << 2;
 	private static final int EXCEPTIONS  = 1 << 3;
 	private static final int THIS_TYPE   = 1 << 4;
 
+	// =============== Fields ===============
+
 	private byte resolved;
+
+	// =============== Constructors ===============
 
 	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature)
 	{
@@ -44,11 +50,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		this.descriptor = desc;
 	}
 
-	@Override
-	public IContext getExternalContext()
-	{
-		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
-	}
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Return Type - - - - - - - -
 
 	private void resolveReturnType()
 	{
@@ -60,6 +66,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		this.resolved |= RETURN_TYPE;
 		this.type = this.type.resolveType(null, this.getExternalContext());
 	}
+
+	@Override
+	public IType getType()
+	{
+		this.resolveReturnType();
+		return this.type;
+	}
+
+	// - - - - - - - - Parameters - - - - - - - -
 
 	private void resolveParameters()
 	{
@@ -83,39 +98,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 	}
 
-	private void resolveExceptions()
-	{
-		if (this.exceptions == null || (this.resolved & EXCEPTIONS) != 0)
-		{
-			return;
-		}
-
-		this.resolved |= EXCEPTIONS;
-
-		if (this.exceptions != null)
-		{
-			final IContext context = this.getExternalContext();
-			this.exceptions.resolveTypes(null, context);
-		}
-	}
-
 	@Override
-	public IType getType()
+	public ParameterList getParameters()
 	{
-		this.resolveReturnType();
-		return this.type;
-	}
-
-	@Override
-	public void setIntrinsicData(IntrinsicData intrinsicData)
-	{
-		this.intrinsicData = intrinsicData;
-	}
-
-	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
-	{
-		return new ExternalParameter(this, name, type, attributes);
+		this.resolveParameters();
+		return this.parameters;
 	}
 
 	@Override
@@ -125,21 +112,45 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public ParameterList getParameters()
+	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
-		this.resolveParameters();
-		return this.parameters;
+		return new ExternalParameter(this, name, type, attributes);
+	}
+
+	// - - - - - - - - This Type - - - - - - - -
+
+	private void resolveThisType()
+	{
+		if (this.thisType == null || (this.resolved & THIS_TYPE) != 0)
+		{
+			return;
+		}
+
+		this.resolved |= THIS_TYPE;
+
+		this.setThisType(this.thisType.resolveType(null, Package.rootPackage));
 	}
 
 	@Override
-	public IValue getValue()
+	public IType getThisType()
 	{
-		return null;
+		this.resolveThisType();
+		return super.getThisType();
 	}
 
-	@Override
-	public void setValue(IValue value)
+	// - - - - - - - - Exceptions - - - - - - - -
+
+	private void resolveExceptions()
 	{
+		if (this.exceptions == null || (this.resolved & EXCEPTIONS) != 0)
+		{
+			return;
+		}
+
+		this.resolved |= EXCEPTIONS;
+
+		final IContext context = this.getExternalContext();
+		this.exceptions.resolveTypes(null, context);
 	}
 
 	@Override
@@ -155,17 +166,25 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		return super.getExceptions();
 	}
 
+	// - - - - - - - - Value - - - - - - - -
+
 	@Override
-	public IType getThisType()
+	public IValue getValue()
 	{
-		if ((this.resolved & THIS_TYPE) == 0 && this.thisType != null)
-		{
-			this.resolved |= THIS_TYPE;
-			final IType type = this.thisType.resolveType(null, Package.rootPackage);
-			this.setThisType(type);
-			return type;
-		}
-		return super.getThisType();
+		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+	}
+
+	// --------------- Context ---------------
+
+	@Override
+	public IContext getExternalContext()
+	{
+		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
 
 	@Override
@@ -197,6 +216,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public void foldConstants()
 	{
+	}
+
+	// --------------- Compilation ---------------
+
+	@Override
+	public void setIntrinsicData(IntrinsicData intrinsicData)
+	{
+		this.intrinsicData = intrinsicData;
 	}
 
 	@Override

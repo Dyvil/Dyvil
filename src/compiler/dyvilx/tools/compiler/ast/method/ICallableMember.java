@@ -16,12 +16,20 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 
 public interface ICallableMember extends ClassMember, IOverloadable, IValueConsumer, Typed, IParametric
 {
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Value - - - - - - - -
+
 	IValue getValue();
 
 	@Override
 	void setValue(IValue value);
 
+	// - - - - - - - - Exceptions - - - - - - - -
+
 	TypeList getExceptions();
+
+	// - - - - - - - - Parameters - - - - - - - -
 
 	@Override
 	default boolean isVariadic()
@@ -35,9 +43,15 @@ public interface ICallableMember extends ClassMember, IOverloadable, IValueConsu
 		return new CodeParameter(this, position, name, type, attributes);
 	}
 
+	// --------------- Compilation ---------------
+
+	// - - - - - - - - Descriptor and Signature - - - - - - - -
+
 	String getDescriptor();
 
 	String getSignature();
+
+	// - - - - - - - - Exceptions - - - - - - - -
 
 	String[] getInternalExceptions();
 }

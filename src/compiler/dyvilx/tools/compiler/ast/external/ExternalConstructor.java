@@ -29,9 +29,15 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
+	// =============== Constants ===============
+
 	private static final int EXCEPTIONS = 1 << 2;
 
+	// =============== Fields ===============
+
 	private byte resolved;
+
+	// =============== Constructors ===============
 
 	public ExternalConstructor(IClass enclosingClass)
 	{
@@ -39,10 +45,25 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		this.type = enclosingClass.getThisType();
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Parameters - - - - - - - -
+
 	@Override
-	public void setIntrinsicData(IntrinsicData intrinsicData)
+	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
+		return new ExternalParameter(this, name, type, attributes);
 	}
+
+	@Override
+	public ParameterList getExternalParameterList()
+	{
+		return this.parameters;
+	}
+
+	// - - - - - - - - Initializer - - - - - - - -
 
 	@Override
 	public InitializerCall getInitializer()
@@ -55,22 +76,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 	}
 
-	@Override
-	public IValue getValue()
-	{
-		return null;
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-	}
-
-	@Override
-	public IContext getExternalContext()
-	{
-		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
-	}
+	// - - - - - - - - Exceptions - - - - - - - -
 
 	private void resolveExceptions()
 	{
@@ -98,17 +104,28 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		return super.getExceptions();
 	}
 
+	// - - - - - - - - Value - - - - - - - -
+
 	@Override
-	public IParameter createParameter(SourcePosition position, Name name, IType type, AttributeList attributes)
+	public IValue getValue()
 	{
-		return new ExternalParameter(this, name, type, attributes);
+		return null;
 	}
 
 	@Override
-	public ParameterList getExternalParameterList()
+	public void setValue(IValue value)
 	{
-		return this.parameters;
 	}
+
+	// --------------- Context ---------------
+
+	@Override
+	public IContext getExternalContext()
+	{
+		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
+	}
+
+	// --------------- Resolution ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -135,11 +152,11 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
-	public String[] getInternalExceptions()
+	public void setIntrinsicData(IntrinsicData intrinsicData)
 	{
-		this.resolveExceptions();
-		return super.getInternalExceptions();
 	}
 
 	@Override

@@ -17,9 +17,9 @@ import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
@@ -31,8 +31,13 @@ import java.io.IOException;
 
 public class CodeConstructor extends AbstractConstructor
 {
-	protected @Nullable IValue          value;
+	// =============== Fields ===============
+
 	protected @Nullable InitializerCall initializerCall;
+
+	protected @Nullable IValue value;
+
+	// =============== Constructors ===============
 
 	public CodeConstructor(IClass enclosingClass)
 	{
@@ -49,6 +54,12 @@ public class CodeConstructor extends AbstractConstructor
 		super(position, attributes);
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Initializer - - - - - - - -
+
 	@Override
 	public InitializerCall getInitializer()
 	{
@@ -61,6 +72,8 @@ public class CodeConstructor extends AbstractConstructor
 		this.initializerCall = initializer;
 	}
 
+	// - - - - - - - - Value - - - - - - - -
+
 	@Override
 	public IValue getValue()
 	{
@@ -72,6 +85,8 @@ public class CodeConstructor extends AbstractConstructor
 	{
 		this.value = value;
 	}
+
+	// --------------- Resolution ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -283,15 +298,18 @@ public class CodeConstructor extends AbstractConstructor
 		}
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int javaFlags = this.getJavaFlags();
 		final long dyvilFlags = this.getDyvilFlags();
 
-		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			javaFlags, "<init>", this.getDescriptor(), this.getSignature(),
-			this.getInternalExceptions()));
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(javaFlags, "<init>",
+		                                                                                  this.getDescriptor(),
+		                                                                                  this.getSignature(),
+		                                                                                  this.getInternalExceptions()));
 
 		// Write Modifiers and Annotations
 		ModifierUtil.writeDyvilModifiers(methodWriter, dyvilFlags);
@@ -338,10 +356,13 @@ public class CodeConstructor extends AbstractConstructor
 		this.parameters.writeLocals(methodWriter, start, end);
 	}
 
+	// --------------- Serialization ---------------
+
 	@Override
-	public void writeSignature(DataOutput out) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.parameters.writeSignature(out);
+		this.readAnnotations(in);
+		this.parameters = ParameterList.read(in);
 	}
 
 	@Override
@@ -359,9 +380,8 @@ public class CodeConstructor extends AbstractConstructor
 	}
 
 	@Override
-	public void read(DataInput in) throws IOException
+	public void writeSignature(DataOutput out) throws IOException
 	{
-		this.readAnnotations(in);
-		this.parameters = ParameterList.read(in);
+		this.parameters.writeSignature(out);
 	}
 }

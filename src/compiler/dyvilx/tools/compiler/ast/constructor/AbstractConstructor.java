@@ -28,8 +28,8 @@ import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.check.ModifierChecks;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Deprecation;
@@ -43,12 +43,17 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractConstructor extends AbstractMember implements IConstructor, IDefaultContext
 {
+	// =============== Fields ===============
+
 	protected @NonNull ParameterList parameters = new ParameterList(3);
 
 	protected @Nullable TypeList exceptions;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected IClass enclosingClass;
+
+	// =============== Constructors ===============
 
 	public AbstractConstructor(IClass enclosingClass)
 	{
@@ -67,11 +72,11 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		super(position, Names.init, Types.VOID, attributes);
 	}
 
-	@Override
-	public void setEnclosingClass(IClass enclosingClass)
-	{
-		this.enclosingClass = enclosingClass;
-	}
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Enclosing Class - - - - - - - -
 
 	@Override
 	public IClass getEnclosingClass()
@@ -79,12 +84,38 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return this.enclosingClass;
 	}
 
-	// Parameters
+	@Override
+	public void setEnclosingClass(IClass enclosingClass)
+	{
+		this.enclosingClass = enclosingClass;
+	}
+
+	// - - - - - - - - Parameters - - - - - - - -
 
 	@Override
 	public ParameterList getParameters()
 	{
 		return this.parameters;
+	}
+
+	// - - - - - - - - Exceptions - - - - - - - -
+
+	@Override
+	public TypeList getExceptions()
+	{
+		if (this.exceptions != null)
+		{
+			return this.exceptions;
+		}
+		return this.exceptions = new TypeList();
+	}
+
+	// - - - - - - - - Attributes - - - - - - - -
+
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.METHOD;
 	}
 
 	@Override
@@ -100,26 +131,14 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return false;
 	}
 
-	@Override
-	public ElementType getElementType()
-	{
-		return ElementType.METHOD;
-	}
+	// --------------- Context ---------------
+
+	// - - - - - - - - Header - - - - - - - -
 
 	@Override
-	public TypeList getExceptions()
+	public IHeaderUnit getHeader()
 	{
-		if (this.exceptions != null)
-		{
-			return this.exceptions;
-		}
-		return this.exceptions = new TypeList();
-	}
-
-	@Override
-	public boolean isThisAvailable()
-	{
-		return true;
+		return this.enclosingClass.getHeader();
 	}
 
 	@Override
@@ -128,10 +147,20 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return true;
 	}
 
+	// - - - - - - - - Return Type - - - - - - - -
+
 	@Override
-	public IHeaderUnit getHeader()
+	public IType getReturnType()
 	{
-		return this.enclosingClass.getHeader();
+		return Types.VOID;
+	}
+
+	// - - - - - - - - This - - - - - - - -
+
+	@Override
+	public boolean isThisAvailable()
+	{
+		return true;
 	}
 
 	@Override
@@ -146,6 +175,8 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return this.enclosingClass.getThisType();
 	}
 
+	// - - - - - - - - Fields - - - - - - - -
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -153,9 +184,18 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
+	public boolean isMember(IVariable variable)
 	{
+		return this.parameters.isParameter(variable);
 	}
+
+	@Override
+	public IDataMember capture(IVariable variable)
+	{
+		return variable;
+	}
+
+	// - - - - - - - - Exceptions - - - - - - - -
 
 	@Override
 	public byte checkException(IType type)
@@ -175,23 +215,7 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return FALSE;
 	}
 
-	@Override
-	public IType getReturnType()
-	{
-		return Types.VOID;
-	}
-
-	@Override
-	public boolean isMember(IVariable variable)
-	{
-		return this.parameters.isParameter(variable);
-	}
-
-	@Override
-	public IDataMember capture(IVariable variable)
-	{
-		return variable;
-	}
+	// --------------- Constructor Matching ---------------
 
 	@Override
 	public void checkMatch(MatchList<IConstructor> list, ArgumentList arguments)
@@ -242,9 +266,11 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs));
 	}
 
+	// --------------- Argument Checking ---------------
+
 	@Override
 	public IType checkArguments(MarkerList markers, SourcePosition position, IContext context, IType type,
-		                           ArgumentList arguments)
+		ArgumentList arguments)
 	{
 		final IClass theClass = this.enclosingClass;
 
@@ -318,6 +344,10 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		}
 	}
 
+	// --------------- Compilation ---------------
+
+	// - - - - - - - - Descriptor and Signature - - - - - - - -
+
 	@Override
 	public String getDescriptor()
 	{
@@ -343,27 +373,20 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		return buffer.toString();
 	}
 
+	// - - - - - - - - Exceptions - - - - - - - -
+
 	@Override
 	public String[] getInternalExceptions()
 	{
-		if (this.exceptions == null)
+		if (this.exceptions == null || this.exceptions.size() == 0)
 		{
 			return null;
 		}
 
-		final int count = this.exceptions.size();
-		if (count == 0)
-		{
-			return null;
-		}
-
-		final String[] array = new String[count];
-		for (int i = 0; i < count; i++)
-		{
-			array[i] = this.exceptions.get(i).getInternalName();
-		}
-		return array;
+		return this.getExceptions().getInternalTypeNames();
 	}
+
+	// - - - - - - - - Call Compilation - - - - - - - -
 
 	@Override
 	public void writeCall(MethodWriter writer, ArgumentList arguments, IType type, int lineNumber)
@@ -398,6 +421,8 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 			arguments.writeValue(i, this.parameters.get(i), writer);
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)

@@ -51,11 +51,11 @@ import java.util.Iterator;
 
 public class CodeMethod extends AbstractMethod
 {
-	// --------------------------------------------- Fields ---------------------------------------------
+	// =============== Fields ===============
 
 	protected IValue value;
 
-	// --------------------------------------------- Constructors ---------------------------------------------
+	// =============== Constructors ===============
 
 	public CodeMethod(IClass iclass)
 	{
@@ -82,9 +82,11 @@ public class CodeMethod extends AbstractMethod
 		super(position, name, type, attributes);
 	}
 
-	// --------------------------------------------- Getters and Setters ---------------------------------------------
+	// =============== Methods ===============
 
-	// ------------------------------ Value ------------------------------
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Value - - - - - - - -
 
 	@Override
 	public IValue getValue()
@@ -98,7 +100,7 @@ public class CodeMethod extends AbstractMethod
 		this.value = value;
 	}
 
-	// --------------------------------------------- Resolution Phases ---------------------------------------------
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -305,7 +307,7 @@ public class CodeMethod extends AbstractMethod
 		context.pop();
 	}
 
-	// ------------------------------ Duplicates ------------------------------
+	// --------------- Duplicates ---------------
 
 	private void checkDuplicates(MarkerList markers)
 	{
@@ -332,7 +334,7 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	// ------------------------------ Overrides ------------------------------
+	// --------------- Overrides ---------------
 
 	private void checkOverrideMethods(MarkerList markers)
 	{
@@ -485,7 +487,7 @@ public class CodeMethod extends AbstractMethod
 		                                   overrideMethod.getEnclosingClass().getFullName()));
 	}
 
-	// ------------------------------  ------------------------------
+	// ---------------  ---------------
 
 	@Override
 	public void foldConstants()
@@ -549,7 +551,7 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	// --------------------------------------------- Intrinsics ---------------------------------------------
+	// --------------- Intrinsics ---------------
 
 	@Override
 	public IntrinsicData getIntrinsicData()
@@ -572,7 +574,12 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	// --------------------------------------------- Compilation ---------------------------------------------
+	// --------------- Compilation ---------------
+
+	private boolean needsSignature()
+	{
+		return this.isTypeParametric() || this.type.needsSignature() || this.parameters.needsSignature();
+	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
@@ -779,11 +786,6 @@ public class CodeMethod extends AbstractMethod
 		thisParameter.getUpperBound().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
 	}
 
-	private boolean needsSignature()
-	{
-		return this.isTypeParametric() || this.type.needsSignature() || this.parameters.needsSignature();
-	}
-
 	protected void writeAnnotations(MethodWriter writer, long dyvilFlags)
 	{
 		this.attributes.write(writer);
@@ -829,15 +831,16 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	// --------------------------------------------- Serialization ---------------------------------------------
+	// --------------- Serialization ---------------
 
 	@Override
-	public void writeSignature(DataOutput out) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		out.writeUTF(this.name.qualified);
-		IType.writeType(this.type, out);
+		this.readAnnotations(in);
 
-		this.parameters.writeSignature(out);
+		this.name = Name.read(in);
+		this.type = IType.readType(in);
+		this.parameters = ParameterList.read(in);
 	}
 
 	@Override
@@ -860,12 +863,11 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void read(DataInput in) throws IOException
+	public void writeSignature(DataOutput out) throws IOException
 	{
-		this.readAnnotations(in);
+		out.writeUTF(this.name.qualified);
+		IType.writeType(this.type, out);
 
-		this.name = Name.read(in);
-		this.type = IType.readType(in);
-		this.parameters = ParameterList.read(in);
+		this.parameters.writeSignature(out);
 	}
 }
