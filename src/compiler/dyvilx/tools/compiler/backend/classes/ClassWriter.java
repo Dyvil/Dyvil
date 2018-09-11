@@ -84,7 +84,8 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 	{
 		final List<File> files = compiler.fileFinder.files;
 		final CompilerConfig config = compiler.config;
-		final File output = new File(config.getJarName());
+		final String fileName = config.getJarFileName();
+		final File output = new File(fileName);
 
 		FileUtils.tryCreate(output);
 
@@ -93,7 +94,7 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 		attributes.putValue("Name", config.getJarName());
 		attributes.putValue("Version", config.getJarVersion());
 		attributes.putValue("Vendor", config.getJarVendor());
-		attributes.putValue("Created-By", "Dyvil Compiler");
+		attributes.putValue("Created-By", "Dyvil Compiler " + DyvilCompiler.VERSION);
 		attributes.put(Attributes.Name.MAIN_CLASS, config.getMainType());
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 

@@ -3,11 +3,10 @@ package dyvilx.tools.compiler.config;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.io.FileUtils;
+import dyvil.lang.Strings;
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
-import dyvilx.tools.compiler.sources.FileFinder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,37 +14,216 @@ import java.util.regex.Pattern;
 
 public class CompilerConfig
 {
-	private DyvilCompiler compiler;
+	// =============== Fields ===============
+
+	private final DyvilCompiler compiler;
+
+	// --------------- Config Values ---------------
+
+	// - - - - - - - - Debug - - - - - - - -
+
+	private File logFile;
+
+	private boolean debug;
+	private boolean ansiColors;
+
+	// - - - - - - - - Sources - - - - - - - -
+
+	public final List<File> sourceDirs = new ArrayList<>();
+
+	public final List<Pattern> includePatterns = new ArrayList<>();
+	public final List<Pattern> excludePatterns = new ArrayList<>();
+
+	// - - - - - - - - Libraries - - - - - - - -
+
+	public final List<Library> libraries = new ArrayList<>();
+
+	// - - - - - - - - Compilation - - - - - - - -
+
+	private int constantFolding = 2;
+
+	private int maxConstantDepth = 10;
+
+	// - - - - - - - - Output - - - - - - - -
+
+	private File outputDir;
+
+	// - - - - - - - - Jar - - - - - - - -
 
 	private String jarName;
 	private String jarVendor;
 	private String jarVersion;
 	private String jarNameFormat = "%1$s-%2$s.jar";
 
-	private File logFile;
-
-	public final List<File>    sourceDirs = new ArrayList<>();
-	public final List<Pattern> include    = new ArrayList<>();
-	public final List<Pattern> exclude    = new ArrayList<>();
-
-	public final List<Library> libraries = new ArrayList<>();
-
-	private File outputDir;
+	// - - - - - - - - Test - - - - - - - -
 
 	private String mainType;
+
 	public final List<String> mainArgs = new ArrayList<>();
-	private      File         testDir  = new File(".");
 
-	private boolean debug;
-	private boolean ansiColors;
+	private File testDir = new File(".");
 
-	private int constantFolding = 2;
-
-	private int maxConstantDepth = 10;
+	// =============== Constructors ===============
 
 	public CompilerConfig(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Getters and Setters ---------------
+
+	// - - - - - - - - Debug - - - - - - - -
+
+	public File getLogFile()
+	{
+		return this.logFile;
+	}
+
+	public void setLogFile(File logFile)
+	{
+		this.logFile = logFile;
+	}
+
+	public boolean isDebug()
+	{
+		return this.debug;
+	}
+
+	public void setDebug(boolean debug)
+	{
+		this.debug = debug;
+	}
+
+	public boolean useAnsiColors()
+	{
+		return this.ansiColors;
+	}
+
+	public void setAnsiColors(boolean ansiColors)
+	{
+		this.ansiColors = ansiColors;
+	}
+
+	// - - - - - - - - Sources - - - - - - - -
+
+	public List<File> getSourceDirs()
+	{
+		return this.sourceDirs;
+	}
+
+	public List<Pattern> getIncludePatterns()
+	{
+		return this.includePatterns;
+	}
+
+	public List<Pattern> getExcludePatterns()
+	{
+		return this.excludePatterns;
+	}
+
+	public void include(String pattern)
+	{
+		this.includePatterns.add(FileUtils.antToRegex(pattern));
+	}
+
+	public void exclude(String pattern)
+	{
+		this.excludePatterns.add(FileUtils.antToRegex(pattern));
+	}
+
+	public boolean isIncluded(String name)
+	{
+		// All match
+		for (Pattern p : this.excludePatterns)
+		{
+			if (p.matcher(name).find())
+			{
+				return false;
+			}
+		}
+
+		if (this.includePatterns.isEmpty())
+		{
+			return true;
+		}
+
+		// Any match
+		for (Pattern p : this.includePatterns)
+		{
+			if (p.matcher(name).find())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// - - - - - - - - Libraries - - - - - - - -
+
+	public List<Library> getLibraries()
+	{
+		return this.libraries;
+	}
+
+	public void loadLibrary(String file)
+	{
+		try
+		{
+			this.libraries.add(Library.load(new File(file)));
+		}
+		catch (FileNotFoundException ex)
+		{
+			this.compiler.error(I18n.get("library.not_found", file), ex);
+		}
+	}
+
+	// - - - - - - - - Compilation - - - - - - - -
+
+	public int getConstantFolding()
+	{
+		return this.constantFolding;
+	}
+
+	public void setConstantFolding(int constantFolding)
+	{
+		this.constantFolding = constantFolding;
+	}
+
+	public int getMaxConstantDepth()
+	{
+		return this.maxConstantDepth;
+	}
+
+	public void setMaxConstantDepth(int maxConstantDepth)
+	{
+		this.maxConstantDepth = maxConstantDepth;
+	}
+
+	// - - - - - - - - Output - - - - - - - -
+
+	public File getOutputDir()
+	{
+		return this.outputDir;
+	}
+
+	public void setOutputDir(File outputDir)
+	{
+		this.outputDir = outputDir;
+	}
+
+	// - - - - - - - - Jar - - - - - - - -
+
+	public String getJarFileName()
+	{
+		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
+	}
+
+	public String getJarName()
+	{
+		return this.jarName;
 	}
 
 	public void setJarName(String jarName)
@@ -83,6 +261,8 @@ public class CompilerConfig
 		this.jarNameFormat = jarNameFormat;
 	}
 
+	// - - - - - - - - Test - - - - - - - -
+
 	public String getMainType()
 	{
 		return this.mainType;
@@ -103,128 +283,12 @@ public class CompilerConfig
 		return this.testDir;
 	}
 
-	public void setTestDir(String testDir)
+	public void setTestDir(File testDir)
 	{
-		this.testDir = new File(testDir);
+		this.testDir = testDir;
 	}
 
-	public File getOutputDir()
-	{
-		return this.outputDir;
-	}
-
-	public void setOutputDir(File outputDir)
-	{
-		this.outputDir = outputDir;
-	}
-
-	public File getLogFile()
-	{
-		return this.logFile;
-	}
-
-	public void setLogFile(File logFile)
-	{
-		this.logFile = logFile;
-	}
-
-	public void addLibraryFile(String file)
-	{
-		try
-		{
-			this.libraries.add(Library.load(new File(file)));
-		}
-		catch (FileNotFoundException ex)
-		{
-			this.compiler.error(I18n.get("library.not_found", file), ex);
-		}
-	}
-
-	public void includeFile(String pattern)
-	{
-		this.include.add(FileUtils.antToRegex(pattern));
-	}
-
-	public void excludeFile(String pattern)
-	{
-		this.exclude.add(FileUtils.antToRegex(pattern));
-	}
-
-	public boolean isDebug()
-	{
-		return this.debug;
-	}
-
-	public void setDebug(boolean debug)
-	{
-		this.debug = debug;
-	}
-
-	public boolean useAnsiColors()
-	{
-		return this.ansiColors;
-	}
-
-	public void setAnsiColors(boolean ansiColors)
-	{
-		this.ansiColors = ansiColors;
-	}
-
-	public int getConstantFolding()
-	{
-		return this.constantFolding;
-	}
-
-	public void setConstantFolding(int constantFolding)
-	{
-		this.constantFolding = constantFolding;
-	}
-
-	public int getMaxConstantDepth()
-	{
-		return this.maxConstantDepth;
-	}
-
-	public void setMaxConstantDepth(int maxConstantDepth)
-	{
-		this.maxConstantDepth = maxConstantDepth;
-	}
-
-	public boolean isIncluded(String name)
-	{
-		// All match
-		for (Pattern p : this.exclude)
-		{
-			if (p.matcher(name).find())
-			{
-				return false;
-			}
-		}
-
-		if (this.include.isEmpty())
-		{
-			return true;
-		}
-
-		// Any match
-		for (Pattern p : this.include)
-		{
-			if (p.matcher(name).find())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public void findUnits(FileFinder fileFinder)
-	{
-		for (File sourceDir : this.sourceDirs)
-		{
-			fileFinder.process(this.compiler, sourceDir, this.outputDir, Package.rootPackage);
-		}
-	}
+	// --------------- Dynamic Property Parsing ---------------
 
 	public boolean addProperty(String name, String value)
 	{
@@ -236,16 +300,16 @@ public class CompilerConfig
 		case "main_args":
 			this.mainArgs.add(value);
 			return true;
-		case "include":
 		case "includes":
-			this.includeFile(value);
+		case "include_patterns":
+			this.include(value);
 			return true;
-		case "exclude":
 		case "excludes":
-			this.excludeFile(value);
+		case "exclude_patterns":
+			this.exclude(value);
 			return true;
 		case "libraries":
-			this.addLibraryFile(value);
+			this.loadLibrary(value);
 			return true;
 		}
 		return false;
@@ -271,8 +335,15 @@ public class CompilerConfig
 			this.setLogFile(new File(value));
 			return true;
 		case "source_dir":
-		case "source_dirs": // deprecated
+			this.sourceDirs.clear();
 			this.sourceDirs.add(new File(value));
+			return true;
+		case "source_dirs":
+			this.sourceDirs.clear();
+			for (String path : Strings.split(value, ':'))
+			{
+				this.sourceDirs.add(new File(path));
+			}
 			return true;
 		case "output_dir":
 			this.setOutputDir(new File(value));
@@ -284,31 +355,30 @@ public class CompilerConfig
 			this.mainArgs.add(value);
 			return true;
 		case "test_dir":
-			this.setTestDir(value);
+			this.setTestDir(new File(value));
 			return true;
-		case "include":
-			this.includeFile(value);
+		case "include_patterns":
+			this.includePatterns.clear();
+			for (String pattern : Strings.split(value, ':'))
+			{
+				this.include(pattern);
+			}
 			return true;
 		case "exclude":
-			this.excludeFile(value);
+			this.excludePatterns.clear();
+			for (String pattern : Strings.split(value, ':'))
+			{
+				this.exclude(pattern);
+			}
 			return true;
-		case "libraries": // deprecated
-			this.addLibraryFile(value);
+		case "libraries":
+			this.libraries.clear();
+			for (String path : Strings.split(value, ':'))
+			{
+				this.loadLibrary(path);
+			}
 			return true;
 		}
 		return false;
-	}
-
-	public String getJarName()
-	{
-		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "CompilerConfig(jarName: " + this.getJarName() + ", sourceDirs: " + this.sourceDirs + ", outputDir: "
-		       + this.outputDir + ", libraries: " + this.libraries + ", include: " + this.include + ", exclude: "
-		       + this.exclude + ", mainType: " + this.mainType + ", mainArgs: " + this.mainArgs + ")";
 	}
 }
