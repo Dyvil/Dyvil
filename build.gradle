@@ -292,60 +292,117 @@ tasks.withType(JavaCompile).all {
 	it.options.fork = true
 }
 
+private void setupCompiler(Map args, JavaExec exec) {
+	String[] source_dirs = args['source_dirs']
+	String[] libraries = args['libraries']
+	String output_dir = args['output_dir']
+	String main_type = args['main_type']
+	String[] include_patterns = args['include_patterns']
+	String[] exclude_patterns = args['exclude_patterns']
+
+	exec.main = Constants.compilerMainClass
+	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
+
+	if (source_dirs) {
+		exec.args "source_dirs=${ source_dirs.join(':') }"
+
+		for (String src : source_dirs) {
+			exec.inputs.files fileTree(src) {
+				include Constants.dyvilFilters
+			}
+		}
+	}
+
+	if (include_patterns) {
+		exec.args "include_patterns=${ include_patterns.join(':') }"
+	}
+
+	if (exclude_patterns) {
+		exec.args "exclude_patterns=${ exclude_patterns.join(':') }"
+	}
+
+	if (libraries) {
+		exec.args "libraries=${ libraries.join(':') }"
+
+		for (String library : libraries) {
+			exec.inputs.files fileTree(library)
+		}
+	}
+
+	if (output_dir) {
+		exec.args "output_dir=$output_dir"
+
+		exec.outputs.dir output_dir
+	}
+
+	if (main_type) {
+		exec.args "main_type=$main_type"
+
+		exec.args 'test'
+	}
+
+	exec.args 'compile', '--ansi'
+}
+
+private void setupGenSrc(Map args, JavaExec exec) {
+	setupCompiler(args, exec)
+
+	String gensrc_dir = args['gensrc_dir']
+
+	exec.main = Constants.genSrcMainClass
+	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
+
+	if (gensrc_dir) {
+		exec.args "gensrc_dir=$gensrc_dir"
+		exec.args 'test'
+	}
+
+	// Outputs and Inputs
+	exec.outputs.dir gensrc_dir
+}
+
 task genLibrary(type: JavaExec) { JavaExec exec ->
-	runGenSrc(exec, 'config/genlib.dyc', [ 'src/library/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/dyvil/library-gen/", "$buildDir/gensrc/library/")
+	setupGenSrc(exec,
+			source_dirs: [ 'src/library/', 'src/gensrc-base/' ],
+			output_dir: "$buildDir/classes/dyvil/library-gen/",
+			gensrc_dir: "$buildDir/gensrc/library/",
+	)
 }
 
 task genDPF(type: JavaExec) { JavaExec exec ->
-	runGenSrc(exec, 'config/gendpf.dyc', [ 'src/dpf/', 'src/gensrc-base/' ] as String[], "$buildDir/classes/dyvil/dpf-gen/", "$buildDir/gensrc/dpf/")
+	setupGenSrc(exec,
+			source_dirs: [ 'src/dpf/', 'src/gensrc-base/' ],
+			output_dir: "$buildDir/classes/dyvil/dpf-gen/",
+			gensrc_dir: "$buildDir/gensrc/dpf/",
+	)
 }
 
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the previous version of the compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', "$buildDir/classes/dyvil/library", "$buildDir/src/dyvil/library/"
+	setupCompiler(exec,
+			source_dirs: [ "$buildDir/src/dyvil/library/" ],
+			libraries: [ ],
+			output_dir: "$buildDir/classes/dyvil/library",
+	)
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', "$buildDir/classes/dyvil/dpf", "$buildDir/src/dyvil/dpf"
+	setupCompiler(exec,
+			source_dirs: [ "$buildDir/src/dyvil/dpf" ],
+			libraries: [ "$buildDir/classes/dyvil/library/" ],
+			output_dir: "$buildDir/classes/dyvil/dpf",
+	)
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/test.dyc', "$buildDir/classes/dyvil/test", 'src/test/'
-}
-
-private void runCompiler(JavaExec exec, String config, String target, String... srcs)
-{
-	exec.main = Constants.compilerMainClass
-	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
-	exec.args = [ "@$config", 'compile', '--ansi' ]
-
-	// Outputs and Inputs
-	exec.outputs.dir target
-	for (String src : srcs)
-	{
-		exec.inputs.files fileTree(src) {
-			include Constants.dyvilFilters
-		}
-	}
-}
-
-private void runGenSrc(JavaExec exec, String config, String[] srcs, String target, String gensrc)
-{
-	exec.main = Constants.genSrcMainClass
-	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
-	exec.args = [ "@$config", 'compile', 'test', '--ansi' ]
-
-	// Outputs and Inputs
-	exec.outputs.dirs target, gensrc
-	exec.inputs.file(config)
-	for (String src : srcs)
-	{
-		exec.inputs.files fileTree(src) {
-			include Constants.genSrcFilters
-		}
-	}
+	setupCompiler(exec,
+			source_dirs: [ 'src/test/' ],
+			libraries: [ "$buildDir/classes/dyvil/library/", "$buildDir/classes/dyvil/dpf/" ],
+			output_dir: "$buildDir/classes/dyvil/test/",
+			exclude_patterns: [ 'dyvil/experimental/**' ],
+	)
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -361,7 +418,11 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 }
 
 task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
-	runGenSrc(exec, 'config/gentest.dyc', [ 'src/test/' ] as String[], "$buildDir/classes/test-gen/", "$buildDir/gensrc/test/")
+	setupGenSrc(exec,
+			source_dirs: [ 'src/test/' ],
+			output_dir: "$buildDir/classes/test-gen/",
+			gensrc_dir: "$buildDir/gensrc/test/",
+	)
 }
 
 test.dependsOn 'testDyvil', 'testGenSrc'
