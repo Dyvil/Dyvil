@@ -365,6 +365,7 @@ public class CompilerConfig
 		case "test_dir":
 			this.setTestDir(new File(value));
 			return true;
+		case "includes":
 		case "include_patterns":
 			this.includePatterns.clear();
 			for (String pattern : Strings.split(value, ':'))
@@ -372,7 +373,8 @@ public class CompilerConfig
 				this.include(pattern);
 			}
 			return true;
-		case "exclude":
+		case "excludes":
+		case "exclude_patterns":
 			this.excludePatterns.clear();
 			for (String pattern : Strings.split(value, ':'))
 			{
