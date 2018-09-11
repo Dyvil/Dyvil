@@ -2,52 +2,62 @@ package dyvil.math
 
 import java.math.BigDecimal
 
+@BytecodeName("BigDecimals$BigDecimalSyntax")
 extension BigDecimal
 {
-	implicit inline static func apply(_ i: long) -> BigDecimal = BigDecimal.valueOf(i)
+	// =============== Static Methods ===============
 
-	implicit inline static func apply(_ d: double) -> BigDecimal = BigDecimal.valueOf(d)
+	static func apply(_ i: long) implicit -> BigDecimal inline = BigDecimal.valueOf(i)
 
-	implicit inline static func apply(_ b: java.math.BigInteger) -> BigDecimal = new BigDecimal(b)
+	static func apply(_ d: double) implicit -> BigDecimal inline = BigDecimal.valueOf(d)
 
-	inline static func apply(_ s: String) -> BigDecimal = new BigDecimal(s)
+	static func apply(_ b: java.math.BigInteger) implicit -> BigDecimal inline = new BigDecimal(b)
 
-	// Additive Operators
+	static func apply(_ s: String) -> BigDecimal inline = new BigDecimal(s)
 
-	inline prefix func + (rhs: BigDecimal) -> BigDecimal = rhs
+	// =============== Operators ===============
 
-	inline infix func + (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.add(rhs)
+	// --------------- Unary Operators ---------------
 
-	inline prefix func - (rhs: BigDecimal) -> BigDecimal = rhs.negate()
+	prefix func + (rhs: BigDecimal) -> BigDecimal inline = rhs
 
-	inline infix func - (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.subtract(rhs)
+	prefix func - (rhs: BigDecimal) -> BigDecimal inline = rhs.negate()
 
-	// Multiplicative Operators
+	// --------------- Additive Operators ---------------
 
-	inline infix func * (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.multiply(rhs)
+	infix func + (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = lhs.add(rhs)
 
-	inline infix func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.divide(rhs, .HALF_EVEN)
+	infix func - (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = lhs.subtract(rhs)
 
-	inline infix func % (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.remainder(rhs)
+	// --------------- Multiplicative Operators ---------------
 
-	inline infix func **(lhs: BigDecimal, rhs: int) -> BigDecimal = PowImpl.pow(lhs, rhs)
+	infix func * (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = lhs.multiply(rhs)
 
-	inline infix func **(lhs: BigDecimal, rhs: double) -> BigDecimal = PowImpl.pow(lhs, rhs)
+	infix func / (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = lhs.divide(rhs, .HALF_EVEN)
 
-	inline infix func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = PowImpl.pow(lhs, rhs)
+	infix func % (lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = lhs.remainder(rhs)
+
+	infix func **(lhs: BigDecimal, rhs: int) -> BigDecimal inline = PowImpl.pow(lhs, rhs)
+
+	infix func **(lhs: BigDecimal, rhs: double) -> BigDecimal inline = PowImpl.pow(lhs, rhs)
+
+	infix func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = PowImpl.pow(lhs, rhs)
 }
 
+@BytecodeName("BigDecimals$LongSyntax")
 extension long
 {
-	inline func toBigDecimal() -> BigDecimal = BigDecimal(this)
+	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
+@BytecodeName("BigDecimals$DoubleSyntax")
 extension double
 {
-	inline func toBigDecimal() -> BigDecimal = BigDecimal(this)
+	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
+@BytecodeName("BigDecimals$BigIntegerSyntax")
 extension java.math.BigInteger
 {
-	inline func toBigDecimal() -> BigDecimal = BigDecimal(this)
+	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }

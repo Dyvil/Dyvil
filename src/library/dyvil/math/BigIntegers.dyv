@@ -4,52 +4,60 @@ import java.math.BigInteger
 
 type BigInt = BigInteger
 
+@BytecodeName("BigIntegers$BigIntegerSyntax")
 extension BigInt
 {
-	implicit inline static func apply(_ l: long) -> BigInt = BigInt.valueOf(l)
+	// =============== Static Methods ===============
 
-	inline static func apply(_ s: String) -> BigInt = new BigInt(s)
+	static func apply(_ l: long) implicit -> BigInt inline = BigInt.valueOf(l)
 
-	// Additive Operators
+	static func apply(_ s: String) -> BigInt inline = new BigInt(s)
 
-	inline prefix func + (rhs: BigInt) -> BigInt = rhs
+	// =============== Operators ===============
 
-	inline infix func + (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.add(rhs)
+	// --------------- Unary Operators ---------------
 
-	inline prefix func - (rhs: BigInt) -> BigInt = rhs.negate()
+	prefix func + (rhs: BigInt) -> BigInt inline = rhs
 
-	inline infix func - (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.subtract(rhs)
+	prefix func - (rhs: BigInt) -> BigInt inline = rhs.negate()
 
-	// Multiplicative Operators
+	// --------------- Additive Operators ---------------
 
-	inline infix func * (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.multiply(rhs)
+	infix func + (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.add(rhs)
+
+	infix func - (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.subtract(rhs)
+
+	// --------------- Multiplicative Operators ---------------
+
+	infix func * (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.multiply(rhs)
 
 	infix func / (lhs: BigInt, rhs: BigInt) -> java.math.BigDecimal = new java.math.BigDecimal(lhs).divide(new java.math.BigDecimal(rhs))
 
-	inline infix func _/ (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.divide(rhs)
+	infix func _/ (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.divide(rhs)
 
-	inline infix func % (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.remainder(rhs)
+	infix func % (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.remainder(rhs)
 
 	infix func /% (lhs: BigInt, rhs: BigInt) -> (BigInt, BigInt) = lhs.divideAndRemainder(rhs).{ ($0[0], $0[1]) }
 
-	inline infix func ** (lhs: BigInt, rhs: int) -> BigInt = lhs.pow(rhs)
+	infix func ** (lhs: BigInt, rhs: int) -> BigInt inline = lhs.pow(rhs)
 
-	// Bitwise Operators
+	// --------------- Bitwise Operators ---------------
 
 	prefix func ~ (rhs: BigInt) -> BigInt = rhs.xor(BigInt.valueOf(-1))
 
-	inline infix func & (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.and(rhs)
+	infix func & (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.and(rhs)
 
-	inline infix func | (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.or(rhs)
+	infix func | (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.or(rhs)
 
-	inline infix func ^ (lhs: BigInt, rhs: BigInt) -> BigInt = lhs.xor(rhs)
+	infix func ^ (lhs: BigInt, rhs: BigInt) -> BigInt inline = lhs.xor(rhs)
 
-	inline infix func << (lhs: BigInt, rhs: int) -> BigInt = lhs.shiftLeft(rhs)
+	infix func << (lhs: BigInt, rhs: int) -> BigInt inline = lhs.shiftLeft(rhs)
 
-	inline infix func >> (lhs: BigInt, rhs: int) -> BigInt = lhs.shiftRight(rhs)
+	infix func >> (lhs: BigInt, rhs: int) -> BigInt inline = lhs.shiftRight(rhs)
 }
 
+@BytecodeName("BigIntegers$LongSyntax")
 extension long
 {
-	inline func toBigInt() -> BigInt = BigInt(this)
+	func toBigInt() -> BigInt inline = BigInt(this)
 }
