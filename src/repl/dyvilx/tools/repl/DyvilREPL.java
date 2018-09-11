@@ -113,7 +113,7 @@ public final class DyvilREPL
 
 		Names.init();
 
-		this.baseInit(args);
+		this.processArguments(args);
 
 		if (this.compiler.config.isDebug())
 		{
@@ -144,10 +144,8 @@ public final class DyvilREPL
 		}
 	}
 
-	private void baseInit(String[] args)
+	private void processArguments(String[] args)
 	{
-		this.compiler.loadConfig(args);
-
 		for (String arg : args)
 		{
 			this.processArgument(arg);
@@ -156,9 +154,9 @@ public final class DyvilREPL
 
 	private void processArgument(String arg)
 	{
-		if (arg.startsWith("dumpDir="))
+		if (arg.startsWith("dump_dir="))
 		{
-			this.dumpDir = new File(arg.substring(8).trim());
+			this.dumpDir = new File(arg.substring(9).trim());
 			return;
 		}
 		if (arg.startsWith("load="))

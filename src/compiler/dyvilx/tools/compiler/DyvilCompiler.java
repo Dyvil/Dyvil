@@ -9,18 +9,16 @@ import dyvilx.tools.BasicTool;
 import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.config.ArgumentParser;
 import dyvilx.tools.compiler.config.CompilerConfig;
-import dyvilx.tools.compiler.config.ConfigParser;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
-import dyvilx.tools.compiler.phase.PrintPhase;
 import dyvilx.tools.compiler.sources.FileFinder;
 import dyvilx.tools.compiler.util.TestThread;
 import dyvilx.tools.compiler.util.Util;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -32,12 +30,10 @@ public class DyvilCompiler extends BasicTool
 	public static final String DYVIL_VERSION   = "$$version$$";
 	public static final String LIBRARY_VERSION = "$$libraryVersion$$";
 
-	public static final int OPTIMIZE_CONSTANT_FOLDING = 5;
+	public final Set<ICompilerPhase> phases = new TreeSet<>();
+	public final CompilerConfig      config = this.createConfig();
 
-	private final Set<ICompilerPhase> phases     = new TreeSet<>();
-	public final  CompilerConfig      config     = this.createConfig();
-
-	public final  FileFinder          fileFinder = new FileFinder();
+	public final FileFinder fileFinder = new FileFinder();
 
 	protected CompilerConfig createConfig()
 	{
@@ -111,8 +107,6 @@ public class DyvilCompiler extends BasicTool
 
 	public boolean baseInit(String[] args)
 	{
-		this.loadConfig(args);
-
 		// Sets up States from arguments
 		this.processArguments(args);
 
@@ -135,42 +129,6 @@ public class DyvilCompiler extends BasicTool
 		return false;
 	}
 
-	public void loadConfig(String[] args)
-	{
-		for (String arg : args)
-		{
-			if (arg.charAt(0) == '@')
-			{
-				this.loadConfigFile(arg.substring(1));
-			}
-		}
-	}
-
-	private void loadConfigFile(String source)
-	{
-		final File file = new File(source);
-		if (!file.exists())
-		{
-			this.error(I18n.get("config.not_found", source));
-			return;
-		}
-
-		try
-		{
-			final long startTime = System.nanoTime();
-
-			final String code = FileUtils.read(file);
-			ConfigParser.parse(code, this.config);
-
-			final long endTime = System.nanoTime();
-			this.log(I18n.get("config.loaded", source, Util.toTime(endTime - startTime)));
-		}
-		catch (IOException ex)
-		{
-			this.error(I18n.get("config.error", source), ex);
-		}
-	}
-
 	public void processArguments(String[] args)
 	{
 		for (String arg : args)
@@ -181,90 +139,7 @@ public class DyvilCompiler extends BasicTool
 
 	public void processArgument(String arg)
 	{
-		switch (arg)
-		{
-		case "compile":
-			this.phases.add(ICompilerPhase.TOKENIZE);
-			this.phases.add(ICompilerPhase.PARSE);
-			this.phases.add(ICompilerPhase.RESOLVE_HEADERS);
-			this.phases.add(ICompilerPhase.RESOLVE_TYPES);
-			this.phases.add(ICompilerPhase.RESOLVE);
-			this.phases.add(ICompilerPhase.CHECK_TYPES);
-			this.phases.add(ICompilerPhase.CHECK);
-			this.phases.add(ICompilerPhase.COMPILE);
-			this.phases.add(ICompilerPhase.CLEANUP);
-			return;
-		case "optimize":
-			this.phases.add(ICompilerPhase.FOLD_CONSTANTS);
-			this.config.setConstantFolding(OPTIMIZE_CONSTANT_FOLDING);
-			return;
-		case "jar":
-			this.phases.add(ICompilerPhase.CLEAN);
-			this.phases.add(ICompilerPhase.JAR);
-			return;
-		case "format":
-			this.phases.add(ICompilerPhase.TOKENIZE);
-			this.phases.add(ICompilerPhase.PARSE);
-			this.phases.add(ICompilerPhase.FORMAT);
-			return;
-		case "clean":
-			this.phases.add(ICompilerPhase.CLEAN);
-			return;
-		case "print":
-			this.phases.add(ICompilerPhase.PRINT);
-			return;
-		case "test":
-			this.phases.add(ICompilerPhase.TEST);
-			return;
-		case "--debug":
-			this.phases.add(ICompilerPhase.PRINT); // print after parse
-			this.phases.add(ICompilerPhase.TEST);
-			this.config.setDebug(true);
-			return;
-		case "--ansi":
-			this.config.setAnsiColors(true);
-			return;
-		}
-
-		if (arg.startsWith("-o"))
-		{
-			final String level = arg.substring(2);
-			try
-			{
-				this.phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				this.config.setConstantFolding(Integer.parseInt(level));
-			}
-			catch (Exception ignored)
-			{
-				this.warn(I18n.get("argument.optimisation.invalid", level));
-			}
-			return;
-		}
-		if (arg.charAt(0) == '@')
-		{
-			return;
-		}
-		if (arg.startsWith("print@"))
-		{
-			final String phase = arg.substring(6);
-
-			for (ICompilerPhase compilerPhase : this.phases)
-			{
-				if (compilerPhase.getName().equalsIgnoreCase(phase))
-				{
-					this.phases.add(new PrintPhase(compilerPhase));
-					return;
-				}
-			}
-
-			this.warn(I18n.get("argument.print.phase", phase));
-			return;
-		}
-
-		if (!ConfigParser.readProperty(this.config, arg))
-		{
-			this.warn(I18n.get("argument.invalid", arg));
-		}
+		ArgumentParser.parseArgument(arg, this);
 	}
 
 	public void loadLibraries()
@@ -295,14 +170,18 @@ public class DyvilCompiler extends BasicTool
 	{
 		final long startTime = System.nanoTime();
 
-		final List<File> sourceDir = this.config.sourceDirs;
+		final List<File> sourceDirs = this.config.sourceDirs;
 		final File outputDir = this.config.getOutputDir();
 
-		this.log(I18n.get("compilation.init", sourceDir, outputDir));
+		this.log(I18n.get("compilation.init", sourceDirs, outputDir));
 
 		// Scan for Packages and Compilation Units
 		this.setupFileFinder();
-		this.config.findUnits(this.fileFinder);
+
+		for (File sourceDir : sourceDirs)
+		{
+			this.fileFinder.process(this, sourceDir, outputDir, Package.rootPackage);
+		}
 
 		Package.init();
 

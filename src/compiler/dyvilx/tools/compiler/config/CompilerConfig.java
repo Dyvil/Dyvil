@@ -14,6 +14,14 @@ import java.util.regex.Pattern;
 
 public class CompilerConfig
 {
+	// =============== Constants ===============
+
+	public static final String DEFAULT_JAR_FILE_FORMAT = "%1$s-%2$s.jar";
+
+	public static final int DEFAULT_CONSTANT_FOLDING   = 2;
+	public static final int OPTIMIZE_CONSTANT_FOLDING  = 5;
+	public static final int DEFAULT_MAX_CONSTANT_DEPTH = 10;
+
 	// =============== Fields ===============
 
 	private final DyvilCompiler compiler;
@@ -40,9 +48,9 @@ public class CompilerConfig
 
 	// - - - - - - - - Compilation - - - - - - - -
 
-	private int constantFolding = 2;
+	private int constantFolding = DEFAULT_CONSTANT_FOLDING;
 
-	private int maxConstantDepth = 10;
+	private int maxConstantDepth = DEFAULT_MAX_CONSTANT_DEPTH;
 
 	// - - - - - - - - Output - - - - - - - -
 
@@ -53,7 +61,7 @@ public class CompilerConfig
 	private String jarName;
 	private String jarVendor;
 	private String jarVersion;
-	private String jarNameFormat = "%1$s-%2$s.jar";
+	private String jarNameFormat = DEFAULT_JAR_FILE_FORMAT;
 
 	// - - - - - - - - Test - - - - - - - -
 
