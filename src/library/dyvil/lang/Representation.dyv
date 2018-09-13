@@ -1,0 +1,169 @@
+package dyvil.lang
+
+import dyvilx.tools.parsing.lexer.StringLiterals
+import java.lang.reflect.Array
+
+using dyvil.lang.Strings._
+
+abstract class Representation
+{
+	// for Java interop
+	static func of(value: any!) -> String = value.representation
+
+	/**
+	 * Returns the representation of the argument, as calculated according to the following algorithm:
+	 *
+	 * - If the argument is `null`, the result is the string "null".
+	 * - If the argument is a primitive value (i.e. an instance of a primitive value class) or of type {@link String},
+	 *   the result is a string that, when used as Dyvil code, would produce that value.
+	 * - If the argument is of type {@link java.math.BigInteger} or {@link java.math.BigDecimal}, the result is
+	 *   `class-name(to-string)`, where `class-name` is one of the above class names and
+	 *   `to-string` is the result of a call to {@link Object#toString() toString} of the argument.
+	 * - If the argument is an array, the result is `[representation-0, ..., representation-(n-1)]`, where
+	 *   `representation-i` is the representation of the `i`-th element of the array, and `n` is the array length.
+	 * - Otherwise, the result is `class-name(field-name-1: field-value-1, ..., field-name-n: field-value-n)`, where
+	 *   `class-name` the fully qualified canonical name of the argument type, `field-name-i` is the name of the `i`-th
+	 *   field and `field-value-i` is the representation of the `i`-th fields value. This includes fields from all
+	 *   super-types of the argument type, but no `static` fields.
+	 *
+	 * Values that have already been formatted are displayed as `...` to avoid infinite recursion for arrays or classes
+	 * containing references to themselves or other types of cyclic references.
+	 */
+	static func reflect(value: any!) -> String = String.build(reflect(value, appendedTo: _))
+
+	static func reflect(value: any!, appendedTo builder: StringBuilder) -> void
+	{
+		if let value = value
+		{
+			reflectNonNull(value, value.dynamicClass, builder)
+		}
+		else
+		{
+			builder.append('null')
+		}
+	}
+
+	private static func reflectNonNull(value: any, valueClass: Class<_>, builder: StringBuilder) -> void
+	{
+		if (valueClass.isArray)
+		{
+			reflectArray(value, builder)
+			return
+		}
+
+		match (valueClass.getName())
+		{
+			case 'java.math.BigInteger' | 'java.math.BigDecimal' => builder.append(valueClass.getName()).append('("').append(value).append('")')
+
+			case 'java.lang.Boolean' | 'java.lang.Byte' | 'java.lang.Short' | 'java.lang.Integer' => builder.append(value)
+			case 'java.lang.Long'      => builder.append(value).append('L')
+			case 'java.lang.Float'     => builder.append(value).append('F')
+			case 'java.lang.Double'    => builder.append(value).append('D')
+			case 'java.lang.Character' => StringLiterals.appendCharLiteral(value.toString, builder)
+			case 'java.lang.String'    => StringLiterals.appendStringLiteral(value.toString, builder)
+
+			case _ => reflectFields(value, valueClass, builder)
+		}
+	}
+
+	private static func reflectArray(value: any, builder: StringBuilder) -> void
+	{
+		let size = Array.getLength(value)
+		if (size == 0)
+		{
+			builder.append('[]')
+			return
+		}
+
+		builder.append('[')
+		Array.get(value, 0).representation(appendedTo: builder)
+		for (i <- 1 ..< size)
+		{
+			builder.append(', ')
+			Array.get(value, i).representation(appendedTo: builder)
+		}
+		builder.append(']')
+	}
+
+	private static func reflectFields(value: any, valueClass: Class<_>, builder: StringBuilder) -> void
+	{
+		builder.append(valueClass.getCanonicalName()).append('(')
+
+		for (var currentType: Class<_>! = valueClass; currentType != null; currentType = currentType.getSuperclass())
+		{
+			for (field <- currentType!!.getDeclaredFields)
+			{
+				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) continue
+
+				builder.append(field.getName()).append(': ')
+
+				try
+				{
+					field.setAccessible(true)
+					field.get(value).representation(appendedTo: builder)
+					field.setAccessible(false)
+				}
+				catch (ex: Exception)
+				{
+					builder.append("<error>")
+				}
+
+				builder.append(', ')
+			}
+		}
+
+		// delete extra ', '
+		let length = builder.length
+		if (builder.charAt(length - 2) == ',')
+		{
+			builder.delete(length - 2, length)
+		}
+
+		builder.append(')')
+	}
+}
+
+/**
+ * The **CustomRepresentable** class provides a mechanism for getting the Dyvil code representation of a runtime object.
+ * A sub-class of `Representable` implements the {@link represent(to:)} method, which writes the representation
+ * to a {@link StringBuilder} object. The {@link representation()} method allows access to the representation string
+ * without having to create an extra `StringBuilder` object.
+ *
+ * This class also exposes extension methods to the {@link String} class. They allow the user to access the
+ * representation of an arbitrary object using the `String(representing: value)` syntax. Representation computation
+ * for arbitrary objects is described in the docs of the {@link String.apply(representing:)} method.
+ */
+interface CustomRepresentable
+{
+	/**
+	 * Returns the custom representation of this object.
+	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
+	 */
+	func representation() -> String = String.build(this.representation(appendedTo: _))
+
+	/**
+	 * Appends the representation of this object to the specified {@link StringBuilder}.
+	 */
+	func representation(appendedTo builder: StringBuilder) -> void
+}
+
+@BytecodeName("Representation$AnyRepresentation")
+extension any
+{
+	/**
+	 * Returns the representation of this object.
+	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
+	 */
+	func representation() -> String = String.build(this.representation(appendedTo: _))
+
+	/**
+	 * Appends the representation of this object to the specified {@link StringBuilder}.
+	 */
+	func representation(appendedTo builder: StringBuilder) -> void = Representation.reflect(this, appendedTo: builder)
+}
+
+@BytecodeName("Representation$StringSyntax")
+extension String
+{
+	static func apply(explicit representing value: any!) -> String = value.representation
+}
