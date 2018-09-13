@@ -127,7 +127,7 @@ public final class ExternalMethodVisitor implements MethodVisitor
 	@Override
 	public boolean visitCode()
 	{
-		if (this.method.hasModifier(Modifiers.INLINE))
+		if (InlineIntrinsicData.ENABLE_INLINE && this.method.hasModifier(Modifiers.INLINE))
 		{
 			this.intrinsicData = new InlineIntrinsicData((IMethod) this.method);
 			return true;

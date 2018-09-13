@@ -15,6 +15,8 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public class InlineIntrinsicData extends InstructionList implements IntrinsicData
 {
+	public static final boolean ENABLE_INLINE = false;
+
 	protected final IMethod method;
 
 	private boolean preProcessed;
