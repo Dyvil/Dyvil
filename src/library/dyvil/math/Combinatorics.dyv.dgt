@@ -38,10 +38,14 @@ extension Math
 	}
 }
 
-#for (T <- TYPES) {
+@BytecodeName("Combinatorics$LongSyntax")
+extension long
+{
+	postfix func !(_ lhs: long) -> long = Math.factorial(lhs)
+}
 
-	extension T
-	{
-		postfix func !(_ lhs: T) -> T = Math.factorial(lhs)
-	}
+@BytecodeName("Combinatorics$BigIntegerSyntax")
+extension BigInt
+{
+	postfix func !(_ lhs: BigInt) -> BigInt = Math.factorial(lhs)
 }
