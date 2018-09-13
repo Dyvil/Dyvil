@@ -134,9 +134,9 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 	public IParameter removeFirst()
 	{
 		final IParameter result = this.parameters[0];
-		System.arraycopy(this.parameters, 1, this.parameters, 0, this.size - 1);
-		this.parameters[this.size] = null;
 		this.size--;
+		System.arraycopy(this.parameters, 1, this.parameters, 0, this.size);
+		this.parameters[this.size] = null;
 		return result;
 	}
 
