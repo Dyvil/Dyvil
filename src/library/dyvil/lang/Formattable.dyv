@@ -15,6 +15,7 @@ interface Formattable
 	func toString(buffer: StringBuilder) -> void
 }
 
+@BytecodeName("Formattable$StringSyntax")
 extension String
 {
 	static func apply(formatting formattable: Formattable) -> String = Formattable.format(formattable)
