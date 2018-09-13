@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.external;
 
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypePath;
@@ -84,6 +85,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 
 		this.resolved |= PARAMETERS;
+
+		if (!this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
+		{
+			// for non-static extension methods, remove the first ('this') parameter
+			this.parameters.removeFirst();
+		}
 
 		if (this.typeParameters != null)
 		{
