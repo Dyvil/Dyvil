@@ -308,7 +308,8 @@ public class CompleteCommand implements ICommand
 		for (Candidate<IMethod> candidate : matchList)
 		{
 			final IMethod member = candidate.getMember();
-			if (member.hasModifier(Modifiers.INFIX) || member.getEnclosingClass() != type.getTheClass())
+			if (member.hasModifier(Modifiers.INFIX) || member.hasModifier(Modifiers.EXTENSION)
+			    || member.getEnclosingClass() != type.getTheClass())
 			{
 				checkMember(methods, member, start, true);
 			}
