@@ -1,0 +1,23 @@
+package dyvil.syntax
+
+import java.io.PrintStream
+
+@BytecodeName("CppIO$SystemSyntax")
+extension System
+{
+	// =============== Constant Functions ===============
+
+	func endl() -> String inline = System.lineSeparator
+}
+
+@BytecodeName("CppIO$PrintStreamSyntax")
+extension PrintStream
+{
+	// =============== Operators ===============
+
+	infix func << (_ stream: PrintStream, _ value: any!) -> PrintStream inline
+	{
+		stream.print(value)
+		return stream
+	}
+}

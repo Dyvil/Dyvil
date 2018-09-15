@@ -1,8 +1,0 @@
-package dyvil.util
-
-object AutoPrinter
-{
-	static func apply(f: AutoPrinter.() -> void) -> void = f(AutoPrinter)
-
-	func applyStatement(value: any!) -> void = print value
-}

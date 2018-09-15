@@ -3,90 +3,84 @@
 
 package dyvil.lang
 
-import dyvil.util.AutoPrinter
-import java.io.PrintStream
-
 import const java.lang.System.out
 import func dyvil.array.ObjectArray.arrayToString
 
 abstract class Output
 {
+	// =============== Contructors ===============
+
 	private init() {} // no instances
 
-	// C++ style output
+	// =============== Methods ===============
 
-	public const ENDL: String = System.lineSeparator
+	// --------------- println ---------------
 
-	infix inline func <<(stream: PrintStream, value: any) -> PrintStream = stream.{ print value; $0 }
+	static func println() -> void inline = out.println()
 
-	// println functions
-
-	static inline func println() -> void = out.println()
-
-	// print functions
+	// --------------- print ---------------
 
 	#for (spec <- LibraryGenConstants.BASIC_SPECS) {
 		#let(PRIMITIVE = spec['PRIMITIVE'])
 
-		static inline func print(value: PRIMITIVE) -> void = out.println(value)
+		static func print(value: PRIMITIVE) -> void inline = out.println(value)
 	}
 
-	static inline func print(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
+	static func print(value: String) -> void inline = out.println(value)
 
-	static inline func print(value: String) -> void = out.println(value)
+	static func print(value: any!) -> void inline = out.println(value)
 
-	static inline func print(value: any!) -> void = out.println(value)
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(PRIMITIVE = spec['PRIMITIVE'])
 
-	static inline func print(value: any!, explicit terminator: String) -> void
+		static func print(array: [PRIMITIVE]) -> void inline = out.println(array.toString)
+	}
+
+	static func print(array: [Object!]) -> void inline = out.println(array.toString)
+
+	static func print(value: any!, explicit terminator: String) inline -> void
 	{
 		out.print(value)
 		out.print(terminator)
 	}
 
-	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
-
-		static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
-	}
-
-	static inline func print(array: [Object!]) -> void = out.println(array.toString)
-
-	// print(All) functions
-
-	#let(DEFAULT_SEPARATOR = "' '")
-	#let(DEFAULT_TERMINATOR = 'ENDL')
+	// --------------- print(All) ---------------
 
 	@BytecodeName("printAll")
-	static inline func print(values: Object! ...) -> void
+	static func print(values: any! ...) -> void
 	{
-		print(values..., separator: DEFAULT_SEPARATOR, terminator: DEFAULT_TERMINATOR)
+		printAllImpl(values, ' ')
+		println
 	}
 
 	@BytecodeName("printAllWithSeparator")
-	static inline func print(values: Object! ..., explicit separator: String) -> void
+	static func print(values: any! ..., explicit separator: String) -> void
 	{
-		print(values..., separator: separator, terminator: DEFAULT_TERMINATOR)
+		printAllImpl(values, separator)
+		println
 	}
 
 	@BytecodeName("printAllWithTerminator")
-	static inline func print(values: Object! ..., explicit terminator: String) -> void
+	static func print(values: any! ..., explicit terminator: String) -> void
 	{
-		print(values..., separator: DEFAULT_SEPARATOR, terminator: terminator)
+		printAllImpl(values, ' ')
+		print terminator
 	}
 
 	@BytecodeName("printAll")
-	static func print(values: Object! ..., explicit separator: String, explicit terminator: String) -> void
+	static func print(values: any! ..., explicit separator: String, explicit terminator: String) -> void
 	{
-		if !values.isEmpty
-		{
-			out.print(values[0].arrayToString)
-			for i <- 1 ..< values.size
-			{
-				out.print(separator)
-				out.print(values[i].arrayToString)
-			}
-		}
+		printAllImpl(values, separator)
+		print terminator
+	}
 
-		out.print(terminator)
+	private static func printAllImpl(values: [any!], separator: String) -> void = if !values.isEmpty
+	{
+		out.print(values[0].arrayToString)
+		for i <- 1 ..< values.size
+		{
+			out.print(separator)
+			out.print(values[i].arrayToString)
+		}
 	}
 }
