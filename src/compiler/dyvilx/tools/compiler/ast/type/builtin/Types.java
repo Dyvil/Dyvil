@@ -65,7 +65,8 @@ public final class Types
 	public static final ClassType SERIALIZABLE      = new ClassType();
 	public static final ClassType ENUM              = new ClassType();
 
-	public static IClass PRIMITIVES_CLASS;
+	public static IHeaderUnit PRIMITIVES_HEADER;
+	public static IClass      PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
 	public static IClass NULL_CLASS;
@@ -103,6 +104,8 @@ public final class Types
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
 		BASE_CONTEXT = new CombiningContext(LANG_HEADER.getContext(), Package.rootPackage);
+
+		PRIMITIVES_HEADER = Package.dyvilLang.resolveHeader("Primitives");
 	}
 
 	public static void initTypes()
