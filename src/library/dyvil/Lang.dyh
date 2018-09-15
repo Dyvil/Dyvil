@@ -35,7 +35,6 @@ import java.lang._
 
 // ---------------------------------------- Using Declarations ----------------------------------------
 
-// Import the methods from former Predef classes
 using dyvil.lang.{
 	Primitives._
 	Objects._
@@ -46,6 +45,13 @@ using dyvil.lang.{
 	Types._
 	Output._
 	Assert._
+
+	// Primitive Extensions
+	Booleans._
+	Ints._
+	Longs._
+	Floats._
+	Doubles._
 }
 
 // ---------------------------------------- Type Aliases ----------------------------------------
