@@ -5,6 +5,8 @@ package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
 
+public header Primitives
+
 abstract class Primitives
 {
 	private const VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
