@@ -362,9 +362,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	{
 		for (IClass iclass : this.getClasses())
 		{
-			if (iclass.hasModifier(Modifiers.EXTENSION))
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
 			{
-				iclass.getMethodMatches(list, receiver, name, arguments);
+				iclass.getBody().getMethodMatches(list, receiver, name, arguments);
 			}
 		}
 	}
@@ -374,9 +374,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	{
 		for (IClass iclass : this.getClasses())
 		{
-			if (iclass.hasModifier(Modifiers.EXTENSION))
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
 			{
-				iclass.getImplicitMatches(list, value, targetType);
+				iclass.getBody().getImplicitMatches(list, value, targetType);
 			}
 		}
 	}
