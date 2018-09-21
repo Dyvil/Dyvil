@@ -574,6 +574,12 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, long flags)
 	{
+		// Write DyvilName annotation if it differs from the mangled name
+		if (!this.getInternalSimpleName().equals(this.name.qualified))
+		{
+			AnnotationUtil.writeDyvilName(writer, this.name.qualified);
+		}
+
 		ModifierUtil.writeDyvilModifiers(writer, flags);
 
 		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)

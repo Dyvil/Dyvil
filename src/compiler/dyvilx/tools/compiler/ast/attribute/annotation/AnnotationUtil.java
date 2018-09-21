@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.ast.attribute.annotation;
 
+import dyvilx.tools.asm.AnnotatableVisitor;
 import dyvilx.tools.asm.AnnotationVisitor;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
@@ -36,6 +37,13 @@ public final class AnnotationUtil
 	private AnnotationUtil()
 	{
 		// no instances
+	}
+
+	public static void writeDyvilName(AnnotatableVisitor visitor, String name)
+	{
+		final AnnotationVisitor annotationVisitor = visitor.visitAnnotation(AnnotationUtil.DYVIL_NAME, false);
+		annotationVisitor.visit("value", name);
+		annotationVisitor.visitEnd();
 	}
 
 	public static void writeDyvilType(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)

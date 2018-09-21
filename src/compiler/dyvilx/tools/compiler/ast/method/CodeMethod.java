@@ -791,12 +791,9 @@ public class CodeMethod extends AbstractMethod
 		this.attributes.write(writer);
 
 		// Write DyvilName annotation if it differs from the mangled name
-		final String qualifiedName = this.name.qualified;
-		if (!this.getInternalName().equals(qualifiedName))
+		if (!this.getInternalName().equals(this.name.qualified))
 		{
-			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.DYVIL_NAME, false);
-			annotationVisitor.visit("value", qualifiedName);
-			annotationVisitor.visitEnd();
+			AnnotationUtil.writeDyvilName(writer, this.name.qualified);
 		}
 
 		// Write receiver type signature
