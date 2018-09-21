@@ -221,7 +221,7 @@ public abstract class BinaryType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		AnnotationUtil.visitDyvilName(this, visitor, typeRef, typePath);
+		AnnotationUtil.writeDyvilType(this, visitor, typeRef, typePath);
 	}
 
 	@Override

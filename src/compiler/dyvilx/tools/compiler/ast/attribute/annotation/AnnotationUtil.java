@@ -38,12 +38,12 @@ public final class AnnotationUtil
 		// no instances
 	}
 
-	public static void visitDyvilName(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	public static void writeDyvilType(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		visitDyvilName(type, visitor, typeRef, TypePath.fromString(typePath));
+		writeDyvilType(type, visitor, typeRef, TypePath.fromString(typePath));
 	}
 
-	public static void visitDyvilName(IType type, TypeAnnotatableVisitor visitor, int typeRef, TypePath typePath)
+	public static void writeDyvilType(IType type, TypeAnnotatableVisitor visitor, int typeRef, TypePath typePath)
 	{
 		final AnnotationVisitor annotation = visitor.visitTypeAnnotation(typeRef, typePath, AnnotationUtil.DYVIL_TYPE,
 		                                                                 true);
