@@ -20,10 +20,7 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.annotation.AnnotationClassVisitor;
-import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
-import dyvilx.tools.compiler.backend.annotation.ClassParameterAnnotationVisitor;
-import dyvilx.tools.compiler.backend.annotation.DyvilModifiersVisitor;
+import dyvilx.tools.compiler.backend.annotation.*;
 import dyvilx.tools.compiler.backend.field.ExternalFieldVisitor;
 import dyvilx.tools.compiler.backend.method.ExternalMethodVisitor;
 
@@ -147,6 +144,8 @@ public class ExternalClassVisitor implements ClassVisitor
 	{
 		switch (type)
 		{
+		case AnnotationUtil.DYVIL_NAME:
+			return new DyvilNameVisitor(this.theClass);
 		case ModifierUtil.DYVIL_MODIFIERS:
 			return new DyvilModifiersVisitor(this.theClass);
 		case AnnotationUtil.CLASS_PARAMETERS:
