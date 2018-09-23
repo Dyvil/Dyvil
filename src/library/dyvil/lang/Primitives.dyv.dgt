@@ -4,158 +4,624 @@
 package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.specialized.{ IntRange, LongRange, FloatRange, DoubleRange }
 
-public header Primitives
-
+// here so the compiler is happy, will be removed soon
 abstract class Primitives
 {
-	private const VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
-
-	private init() {}
-
-	#let(LOAD_CALL = "LOAD_0, INVOKESTATIC, 0, 1, 2")
-
-	// --- Primitive <-> Wrapper Conversion Methods ---
-
-	// Void Conversions
-
-	static extension func apply(this: Void) -> Void = VOID_INSTANCE
+	static extension func apply(this: Void) -> Void = Void()
 
 	@Intrinsic([ /* NOOP */ ])
 	postfix func voidValue(_ v: Void) -> void {}
+}
 
-	@Intrinsic([ /* NOOP */ ])
-	implicit static func toVoid(value: Void!) -> void {}
+// *************** boolean primitive ***************
 
-	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
-		#let(TYPE_NAME = spec['TYPE_NAME'])
-		#let(PRIMITIVE = spec['PRIMITIVE'])
-		#let(WRAPPER = spec['WRAPPER'])
-		#let(DEST_CHAR = spec['DESC_CHAR'])
-		#let(DEFAULT_VALUE = spec['DEFAULT_VALUE'])
+@BytecodeName("Primitives$Boolean")
+extension boolean
+{
+	// =============== Operators ===============
 
-		// TYPE_NAME Conversions
+	// --------------- Unary Operators ---------------
 
-		@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-		implicit static extension func apply(this: WRAPPER, value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)!!
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_NOT)
+	prefix func !(rhs: boolean) -> boolean = !rhs
 
-		@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
-		  strings: [ "java/lang/WRAPPER", "#(PRIMITIVE)Value", "()DESC_CHAR" ])
-		implicit postfix func to#(TYPE_NAME)(wrapper: WRAPPER) -> PRIMITIVE = wrapper.#(PRIMITIVE)Value
+	// --------------- Relational Operators ---------------
 
-		@BytecodeName("nullableTo#(TYPE_NAME)")
-		postfix func to#(TYPE_NAME)(optional: WRAPPER?) -> PRIMITIVE = optional?.#(PRIMITIVE)Value ?? DEFAULT_VALUE
-	}
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func ==(lhs: boolean, rhs: boolean) -> boolean = lhs == rhs
 
-	// --- equals Methods ---
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
+	infix func !=(lhs: boolean, rhs: boolean) -> boolean = lhs != rhs
 
-	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
-		#let(PRIMITIVE = spec['PRIMITIVE'])
+	// --------------- Boolean Operators ---------------
 
-		// TYPE_NAME equals
+	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
+	infix func &(lhs: boolean, rhs: boolean) -> boolean = lhs & rhs
 
-		infix inline func equals(lhs: PRIMITIVE, rhs: PRIMITIVE) -> boolean = lhs == rhs
-	}
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_AND)
+	infix func &&(lhs: boolean, rhs: boolean) -> boolean = lhs && rhs
 
-	infix func compareTo(lhs: boolean, rhs: boolean) -> int = lhs == rhs ? 0 : lhs ? 1 : -1
+	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
+	infix func |(lhs: boolean, rhs: boolean) -> boolean = lhs | rhs
 
-	// --- toString Methods ---
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_OR)
+	infix func ||(lhs: boolean, rhs: boolean) -> boolean = lhs || rhs
 
-	// Boolean toString
+	@Deprecated(replacements: [ "!= (boolean, boolean): boolean" ])
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func ^(lhs: boolean, rhs: boolean) -> boolean = lhs != rhs
 
-	postfix func toString(value: boolean) -> String = value ? "true" : "false"
+	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
+	infix func ==>(lhs: boolean, rhs: boolean) -> boolean = !lhs || rhs
 
-	// Char toString
+	@Intrinsic([ LOAD_0, LOAD_1, BNOT, IOR ])
+	infix func <==(lhs: boolean, rhs: boolean) -> boolean = lhs || !rhs
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/String", "valueOf", "(C)Ljava/lang/String;" ])
-	infix func toString(value: char) -> String = String.valueOf(value)
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func <=>(lhs: boolean, rhs: boolean) -> boolean = lhs == rhs
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
-	infix func toDecimalString(value: char) -> String = value.toDecimalString
+	// =============== Methods ===============
 
-	// Int toString
+	// --------------- compare ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
-	infix func toString(value: int) -> String = value.toString
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Boolean", "compare", "(ZZ)I" ])
+	func compareTo(that: boolean) -> int = Boolean.compare(this, that)
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toBinaryString", "(I)Ljava/lang/String;" ])
-	infix func toBinaryString(value: int) -> String = value.toBinaryString
+	// --------------- equals ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toHexString", "(I)Ljava/lang/String;" ])
-	infix func toHexString(value: int) -> String = value.toHexString
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	func equals(that: boolean) -> boolean = this == that
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
-	infix func toOctalString(value: int) -> String = value.toOctalString
+	// --------------- hashCode ---------------
 
-	infix func toString(value: int, radix: int) -> String = radix match {
-		case  2 => return value.toBinaryString
-		case  8 => return value.toOctalString
-		case 10 => return value.toString
-		case 16 => return value.toHexString
-		case _  => return java.lang.Integer.toString(value, radix)
-	}
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Boolean", "hashCode", "(Z)I" ])
+	override func hashCode() -> int = Boolean.hashCode(this)
 
-	// Long toString
+	// --------------- toString ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
-	infix func toString(value: long) -> String = value.toString
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Boolean", "toString", "(Z)Ljava/lang/String;" ])
+	override func toString() -> String = Boolean.toString(this)
+}
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toHexString", "(J)Ljava/lang/String;" ])
-	infix func toHexString(value: long) -> String = value.toHexString
+// *************** byte primitive ***************
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toBinaryString", "(J)Ljava/lang/String;" ])
-	infix func toBinaryString(value: long) -> String = value.toBinaryString
+@BytecodeName("Primitives$Byte")
+extension byte
+{
+	// --------------- equals ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
-	infix func toOctalString(value: long) -> String = value.toOctalString
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	func equals(that: byte) -> boolean = this == that
+}
 
-	infix func toString(value: long, radix: int) -> String = radix match {
-		case  2 => return value.toBinaryString
-		case  8 => return value.toOctalString
-		case 10 => return value.toString
-		case 16 => return value.toHexString
-		case _  => return java.lang.Long.toString(value, radix)´
-	}
+// *************** short primitive ***************
 
-	// Float toString
+@BytecodeName("Primitives$Short")
+extension short
+{
+	// --------------- equals ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "toString", "(F)Ljava/lang/String;" ])
-	postfix func toString(value: float) -> String = value.toString
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	func equals(that: short) -> boolean = this == that
+}
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "toHexString", "(F)Ljava/lang/String;" ])
-	postfix func toHexString(value: float) -> String = value.toHexString
+// *************** char primitive ***************
 
-	// Double toString
+@BytecodeName("Primitives$Char")
+extension char
+{
+	// --------------- equals ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "toString", "(D)Ljava/lang/String;" ])
-	postfix func toString(value: double) -> String = value.toString
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	func equals(that: char) -> boolean = this == that
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "toHexString", "(D)Ljava/lang/String;" ])
-	postfix func toHexString(value: double) -> String = value.toHexString
+	// --------------- toString ---------------
 
-	// --- hashCode Methods ---
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/String", "valueOf", "(C)Ljava/lang/String;" ])
+	override func toString() -> String = String.valueOf(this)
 
-	// Boolean hashCode
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
+	func toDecimalString() -> String = Integer.toString(this)
+}
 
-	postfix func hashCode(value: boolean) -> int = value ? 1231 : 1237
+// *************** int primitive ***************
 
-	// Int hashCode
+@BytecodeName("Primitives$Int")
+extension int
+{
+	// =============== Methods ===============
+
+	// --------------- Unary Operators ---------------
 
 	@Intrinsic([ LOAD_0 ])
-	postfix func hashCode(value: int) -> int = value
+	prefix func +(rhs: int) -> int = rhs
 
-	// Long hashCode
+	@Intrinsic([ LOAD_0, INEG ])
+	prefix func -(rhs: int) -> int = -rhs
+
+	@Intrinsic([ LOAD_0, INOT ])
+    prefix func ~(rhs: int) -> int = ~rhs
+
+    // --------------- Relational Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func ==(lhs: int, rhs: int) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
+	infix func !=(lhs: int, rhs: int) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLT ])
+	infix func <(lhs: int, rhs: int) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLE ])
+	infix func <=(lhs: int, rhs: int) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGT ])
+	infix func >(lhs: int, rhs: int) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGE ])
+	infix func >=(lhs: int, rhs: int) -> boolean = lhs >= rhs
+
+	// --------------- Additive Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, IADD ])
+	infix func +(lhs: int, rhs: int) -> int = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISUB ])
+	infix func -(lhs: int, rhs: int) -> int = lhs - rhs
+
+	// --------------- Multiplicative Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
+	infix func *(lhs: int, rhs: int) -> int = lhs * rhs
+
+	infix func **(lhs: int, rhs: int) -> int = dyvil.math.PowImpl.pow(lhs, rhs) as int
+
+	// --------------- Division Operators ---------------
+
+	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
+	infix func /(lhs: int, rhs: int) -> float = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IREM ])
+	infix func %(lhs: int, rhs: int) -> int = lhs % rhs
+
+	// divmod
+	infix func /%(lhs: int, rhs: int) -> (int, int) = (lhs _/ rhs, lhs % rhs)
+
+	@Deprecated(replacements: ["_/ (int, int): int"])
+	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
+	infix func \(lhs: int, rhs: int) -> int = lhs _/ rhs
+
+	// floordiv
+	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
+	infix func _/(lhs: int, rhs: int) -> int = lhs _/ rhs
+
+	// --------------- Bitwise Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
+	infix func &(lhs: int, rhs: int) -> int = lhs & rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
+	infix func |(lhs: int, rhs: int) -> int = lhs | rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
+	infix func ^(lhs: int, rhs: int) -> int = lhs ^ rhs
+
+	// --------------- Shift Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHL ])
+	infix func <<(lhs: int, rhs: int) -> int = lhs << rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHR ])
+	infix func >>(lhs: int, rhs: int) -> int = lhs >> rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
+	infix func >>>(lhs: int, rhs: int) -> int = lhs >>> rhs
+
+	// --------------- Range Operators ---------------
+
+	inline infix func ..(lhs: int, rhs: int) -> IntRange = IntRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: int, rhs: int) -> IntRange = IntRange(lhs, toExclusive: rhs)
+
+	// --------------- Other Operators ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "abs", "(I)I" ])
+	static func |_|(lhs: int) -> int = Math.abs(lhs)
+
+	// =============== Methods ===============
+
+	// --------------- equals ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	func equals(that: int) -> boolean = this == that
+
+	// --------------- hashCode ---------------
+
+	@Intrinsic([ LOAD_0 ])
+	override func hashCode() -> int = this
+
+	// --------------- toString ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
+	override func toString() -> String = Int.toString(this)
+
+	func toString(radix: int) -> String = radix match {
+		case  2 => return this.toBinaryString
+		case  8 => return this.toOctalString
+		case 10 => return this.toString
+		case 16 => return this.toHexString
+		case  _ => return Int.toString(this, radix)
+	}
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Integer", "toBinaryString", "(I)Ljava/lang/String;" ])
+	func toBinaryString() -> String = Int.toBinaryString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Integer", "toHexString", "(I)Ljava/lang/String;" ])
+	func toHexString() -> String = Int.toHexString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
+	func toOctalString() -> String = Int.toOctalString(this)
+}
+
+// *************** long primitive ***************
+
+@BytecodeName("Primitives$Long")
+extension long
+{
+	// =============== Operators ===============
+
+	// --------------- Unary Operators ---------------
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: long) -> long = rhs
+
+	@Intrinsic([ LOAD_0, LNEG ])
+	prefix func -(rhs: long) -> long = -rhs
+
+	@Intrinsic([ LOAD_0, LNOT ])
+	prefix func ~(rhs: long) -> long = ~rhs
+
+	// --------------- Relational Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
+	infix func ==(lhs: long, rhs: long) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPNE ])
+	infix func !=(lhs: long, rhs: long) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPLT ])
+	infix func <(lhs: long, rhs: long) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPLE ])
+	infix func <=(lhs: long, rhs: long) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPGT ])
+	infix func >(lhs: long, rhs: long) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPGE ])
+	infix func >=(lhs: long, rhs: long) -> boolean = lhs >= rhs
+
+	// --------------- Additive Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LADD ])
+	infix func +(lhs: long, rhs: long) -> long = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LSUB ])
+	infix func -(lhs: long, rhs: long) -> long = lhs - rhs
+
+	// --------------- Multiplicative Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
+	infix func *(lhs: long, rhs: long) -> long = lhs * rhs
+
+	infix func **(lhs: long, rhs: int) -> long = dyvil.math.PowImpl.pow(lhs, rhs)
+
+	// --------------- Division Operators ---------------
+
+	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
+	infix func /(lhs: long, rhs: long) -> double = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LREM ])
+	infix func %(lhs: long, rhs: long) -> long = lhs % rhs
+
+	// divmod
+	infix func /%(lhs: long, rhs: long) -> (long, long) = (lhs _/ rhs, lhs % rhs)
+
+	@Deprecated(replacements: ["_/ (long, long): long"])
+	@Intrinsic([ LOAD_0, LOAD_1, LDIV ])
+	infix func \(lhs: long, rhs: long) -> long = lhs _/ rhs
+
+	// floordiv
+	@Intrinsic([ LOAD_0, LOAD_1, LDIV ])
+	infix func _/(lhs: long, rhs: long) -> long = lhs _/ rhs
+
+	// --------------- Bitwise Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LAND ])
+	infix func &(lhs: long, rhs: long) -> long = lhs & rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LOR ])
+	infix func |(lhs: long, rhs: long) -> long = lhs | rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LXOR ])
+	infix func ^(lhs: long, rhs: long) -> long = lhs ^ rhs
+
+	// --------------- Shift Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LSHL ])
+	infix func <<(lhs: long, rhs: int) -> long = lhs << rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LSHR ])
+	infix func >>(lhs: long, rhs: int) -> long = lhs >> rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LUSHR ])
+	infix func >>>(lhs: long, rhs: int) -> long = lhs >>> rhs
+
+	// --------------- Range Operators ---------------
+
+	inline infix func ..(lhs: long, rhs: long) -> LongRange = LongRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: long, rhs: long) -> LongRange = LongRange(lhs, toExclusive: rhs)
+
+	// --------------- Other Operators ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "abs", "(J)J" ])
+	static func |_|(lhs: long) -> long = Math.abs(lhs)
+
+	// =============== Methods ===============
+
+	// --------------- equals ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
+	func equals(that: long) -> boolean = this == that
+
+	// --------------- hashCode ---------------
 
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
-	postfix func hashCode(value: long) -> int = value.hashCode
+	override func hashCode() -> int = (this ^ (this >>> 32)) as int
 
-	// Float hashCode
+	// --------------- toString ---------------
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "hashCode", "(F)I" ])
-	postfix func hashCode(value: float) -> int = value.hashCode
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
+	override func toString() -> String = Long.toString(this)
 
-	// Double hashCode
+	func toString(radix: int) -> String = radix match {
+		case  2 => return this.toBinaryString
+		case  8 => return this.toOctalString
+		case 10 => return this.toString
+		case 16 => return this.toHexString
+		case  _ => return Long.toString(this, radix)
+	}
 
-	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "hashCode", "(D)I" ])
-	postfix func hashCode(value: double) -> int = value.hashCode
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Long", "toHexString", "(J)Ljava/lang/String;" ])
+	func toHexString() -> String = Long.toHexString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Long", "toBinaryString", "(J)Ljava/lang/String;" ])
+	func toBinaryString() -> String = Long.toBinaryString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
+	func toOctalString() -> String = Long.toOctalString(this)
+}
+
+// *************** float primitive ***************
+
+@BytecodeName("Primitives$Float")
+extension float
+{
+	// =============== Operators ===============
+
+	// --------------- Unary Operators ---------------
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: float) -> float = rhs
+
+	@Intrinsic([ LOAD_0, FNEG ])
+	prefix func -(rhs: float) -> float = -rhs
+
+	// --------------- Relational Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
+	infix func ==(lhs: float, rhs: float) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPNE ])
+	infix func !=(lhs: float, rhs: float) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPLT ])
+	infix func <(lhs: float, rhs: float) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPLE ])
+	infix func <=(lhs: float, rhs: float) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPGT ])
+	infix func >(lhs: float, rhs: float) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPGE ])
+	infix func >=(lhs: float, rhs: float) -> boolean = lhs >= rhs
+
+	// --------------- Additive Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, FADD ])
+	infix func +(lhs: float, rhs: float) -> float = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FSUB ])
+	infix func -(lhs: float, rhs: float) -> float = lhs - rhs
+
+	// --------------- Multiplicative Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
+	infix func *(lhs: float, rhs: float) -> float = lhs * rhs
+
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F ], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	infix func **(lhs: float, rhs: float) -> float = Math.pow(lhs, rhs) as float
+
+	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
+	infix func /(lhs: float, rhs: float) -> float = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
+	infix func %(lhs: float, rhs: float) -> float = lhs % rhs
+
+	// --------------- Range Operators ---------------
+
+	inline infix func ..(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, toExclusive: rhs)
+
+	// --------------- Other Operators ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "abs", "(F)F" ])
+	static func |_|(lhs: float) -> float = Math.abs(lhs)
+
+	// =============== Methods ===============
+
+	// --------------- equals ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
+	func equals(that: float) -> boolean = this == that
+
+	// --------------- hashCode ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Float", "hashCode", "(F)I" ])
+	override func hashCode() -> int = Float.hashCode(this)
+
+	// --------------- toString ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Float", "toString", "(F)Ljava/lang/String;" ])
+	override func toString() -> String = Float.toString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Float", "toHexString", "(F)Ljava/lang/String;" ])
+	func toHexString() -> String = Float.toHexString(this)
+}
+
+// *************** double primitive ***************
+
+@BytecodeName("Primitives$Double")
+extension double
+{
+	// =============== Operators ===============
+
+	// --------------- Unary Operators ---------------
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: double) -> double = rhs
+
+	@Intrinsic([ LOAD_0, DNEG ])
+	prefix func -(rhs: double) -> double = -rhs
+
+	// --------------- Relational Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
+	infix func ==(lhs: double, rhs: double) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPNE ])
+	infix func !=(lhs: double, rhs: double) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLT ])
+	infix func <(lhs: double, rhs: double) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLE ])
+	infix func <=(lhs: double, rhs: double) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGT ])
+	infix func >(lhs: double, rhs: double) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGE ])
+	infix func >=(lhs: double, rhs: double) -> boolean = lhs >= rhs
+
+	// --------------- Additive Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, DADD ])
+	infix func +(lhs: double, rhs: double) -> double = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DSUB ])
+	infix func -(lhs: double, rhs: double) -> double = lhs - rhs
+
+	// --------------- Multiplicative Operators ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
+	infix func *(lhs: double, rhs: double) -> double = lhs * rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	infix func **(lhs: double, rhs: double) -> double = Math.pow(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
+	infix func /(lhs: double, rhs: double) -> double = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
+	infix func %(lhs: double, rhs: double) -> double = lhs % rhs
+
+	// --------------- Range Operators ---------------
+
+	inline infix func ..(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, to: rhs)
+
+	inline infix func ..<(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, toExclusive: rhs)
+
+	// --------------- Other Operators ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "abs", "(D)D" ])
+	static func |_|(lhs: double) -> double = Math.abs(lhs)
+
+	// =============== Methods ===============
+
+	// --------------- equals ---------------
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
+	func equals(that: double) -> boolean = this == that
+
+	// --------------- hashCode ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Double", "hashCode", "(D)I" ])
+	override func hashCode() -> int = Double.hashCode(this)
+
+	// --------------- toString ---------------
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Double", "toString", "(D)Ljava/lang/String;" ])
+	override func toString() -> String = Double.toString(this)
+
+	@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Double", "toHexString", "(D)Ljava/lang/String;" ])
+	func toHexString() -> String = Double.toHexString(this)
+}
+
+// *************** Void wrapper ***************
+
+@BytecodeName("Primitives$VoidWrapper")
+extension Void
+{
+	// =============== Constants ===============
+
+	private const INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
+
+	// =============== Static Methods ===============
+
+	static func apply() -> Void = INSTANCE
+
+	// =============== Methods ===============
+
+	func value() -> void = ()
+}
+
+#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+	#let(PRIMITIVE = spec['PRIMITIVE'])
+	#let(WRAPPER = spec['WRAPPER'])
+	#let(DESC_CHAR = spec['DESC_CHAR'])
+
+	// *************** WRAPPER wrapper ***************
+
+	@BytecodeName("Primitives$#(WRAPPER)Wrapper")
+	extension WRAPPER
+	{
+		// =============== Static Methods ===============
+
+		@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
+		static func apply(value: PRIMITIVE) -> WRAPPER = WRAPPER.valueOf(value)!!
+
+		static func unapply(value: WRAPPER) -> Tupled<PRIMITIVE> = Tupled(this.value)
+
+		// =============== Methods ===============
+
+		@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/WRAPPER", "#(PRIMITIVE)Value", "()DESC_CHAR" ])
+		func value() -> PRIMITIVE = this.#(PRIMITIVE)Value
+	}
 }

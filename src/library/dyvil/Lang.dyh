@@ -45,26 +45,15 @@ using dyvil.lang.{
 	Types._
 	Output._
 	Assert._
-
-	// Primitive Extensions
-	Booleans._
-	Ints._
-	Longs._
-	Floats._
-	Doubles._
 }
 
 // ---------------------------------------- Type Aliases ----------------------------------------
 
-// Primitive Type Aliases
-type Void   = java.lang.Void
-type Byte   = java.lang.Byte
-type Short  = java.lang.Short
+// Primitive and Wrapper Type Aliases
+type bool   = boolean
+type Bool   = java.lang.Boolean
 type Char   = java.lang.Character
 type Int    = java.lang.Integer
-type Long   = java.lang.Long
-type Float  = java.lang.Float
-type Double = java.lang.Double
 
 // Special Type Aliases
 type Configure<T> = T.() -> void
