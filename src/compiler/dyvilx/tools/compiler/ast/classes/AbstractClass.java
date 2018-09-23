@@ -425,6 +425,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
+			// TODO perhaps this should continue going through the super types and interfaces, to collect ALL overriden methods?
 			return true;
 		}
 
@@ -458,11 +459,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
 		Set<IClass> checkedClasses)
 	{
-		if (checkedClasses.contains(this))
+		if (!checkedClasses.add(this))
 		{
+			// was already checked
 			return;
 		}
-		checkedClasses.add(this);
 
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
@@ -487,7 +488,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		if (this.superType != null)
 		{
 			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null && superClass != this)
+			if (superClass != null)
 			{
 				superClass
 					.checkMethods(markers, thisClass, this.superType.getConcreteType(typeContext), checkedClasses);
@@ -498,7 +499,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			for (IType type : this.interfaces)
 			{
 				final IClass iClass = type.getTheClass();
-				if (iClass != null && iClass != this)
+				if (iClass != null)
 				{
 					iClass.checkMethods(markers, thisClass, type.getConcreteType(typeContext), checkedClasses);
 				}

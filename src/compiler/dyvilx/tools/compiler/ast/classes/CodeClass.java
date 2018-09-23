@@ -209,7 +209,9 @@ public class CodeClass extends AbstractClass
 			this.typeParameters.checkTypes(markers, context);
 		}
 
-		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
+		final IdentityHashSet<IClass> checkedClasses = new IdentityHashSet<>();
+		checkedClasses.add(this);
+		this.checkSuperMethods(markers, this, this.getThisType(), checkedClasses);
 
 		this.parameters.checkTypes(markers, context);
 
