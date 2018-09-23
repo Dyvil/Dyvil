@@ -647,7 +647,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		this.parameters.writeLocals(methodWriter, start, end);
 
-		if (this.overrideMethods == null)
+		if (this.hasModifier(Modifiers.EXTENSION) || this.overrideMethods == null)
 		{
 			return;
 		}
