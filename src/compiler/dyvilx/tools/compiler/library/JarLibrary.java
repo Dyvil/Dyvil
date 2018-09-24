@@ -86,7 +86,7 @@ public final class JarLibrary extends Library
 	{
 		try
 		{
-			return Files.list(this.jarFileSystem.getPath(directory));
+			return Files.list(this.jarFileSystem.getPath('/' + directory));
 		}
 		catch (IOException e)
 		{
