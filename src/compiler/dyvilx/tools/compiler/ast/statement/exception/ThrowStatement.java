@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.statement.exception;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -11,18 +13,23 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public final class ThrowStatement extends AbstractValue implements IValueConsumer
+public class ThrowStatement extends AbstractValue implements IValueConsumer
 {
+	// =============== Static Final Fields ===============
+
 	private static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier("throw.type");
 
+	// =============== Fields ===============
+
 	protected IValue value;
+
+	// =============== Constructors ===============
 
 	public ThrowStatement(SourcePosition position)
 	{
@@ -34,6 +41,23 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 		this.position = position;
 		this.value = value;
 	}
+
+	// =============== Properties ===============
+
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Misc. Value Properties ---------------
 
 	@Override
 	public int valueTag()
@@ -48,21 +72,12 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	}
 
 	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
-	public IValue getValue()
-	{
-		return this.value;
-	}
-
-	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
+
+	// --------------- Type ---------------
 
 	@Override
 	public IType getType()
@@ -88,63 +103,99 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 		return IValue.SECONDARY_SUBTYPE_MATCH;
 	}
 
+	// --------------- Phases ---------------
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.value.resolveTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
+		else
+		{
+			markers.add(Markers.syntaxError(SourcePosition.after(this.position), "throw.expression"));
+		}
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.value = this.value.resolve(markers, context);
-		this.value = TypeChecker.convertValue(this.value, Types.THROWABLE, null, markers, context, MARKER_SUPPLIER);
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+			this.value = TypeChecker.convertValue(this.value, Types.THROWABLE, null, markers, context, MARKER_SUPPLIER);
+		}
 		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.value.check(markers, context);
-
-		IType exceptionType = this.value.getType();
-		if (IContext.isUnhandled(context, exceptionType))
+		if (this.value != null)
 		{
-			markers.add(Markers.semantic(this.value.getPosition(), "exception.unhandled", exceptionType.toString()));
+			this.value.check(markers, context);
+
+			IType exceptionType = this.value.getType();
+			if (IContext.isUnhandled(context, exceptionType))
+			{
+				markers
+					.add(Markers.semantic(this.value.getPosition(), "exception.unhandled", exceptionType.toString()));
+			}
 		}
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		this.value = this.value.foldConstants();
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
 		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.value = this.value.cleanup(compilableList, classCompilableList);
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(compilableList, classCompilableList);
+		}
 		return this;
 	}
+
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer, null);
+		if (this.value != null)
+		{
+			this.value.writeExpression(writer, null);
+		}
 		writer.visitInsn(Opcodes.ATHROW);
 	}
 
+	// --------------- Formatting ---------------
+
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		buffer.append("throw ");
-		this.value.toString(prefix, buffer);
+		buffer.append("throw");
+		if (this.value != null)
+		{
+			buffer.append(' ');
+			this.value.toString(indent, buffer);
+		}
 	}
 }
