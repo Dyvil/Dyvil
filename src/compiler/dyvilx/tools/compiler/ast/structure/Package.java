@@ -24,6 +24,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.InputStream;
+import java.util.stream.Stream;
 
 public class Package implements Named, IDefaultContext, IClassConsumer
 {
@@ -284,6 +285,27 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	}
 
 	// --------------- Classes ---------------
+
+	/**
+	 * Lists internal names (including slash-separated package) of all external classes (i.e. classes from libraries) in
+	 * this package. The classes are not loaded; the search is only file-based.
+	 * <p/>
+	 * The results are not guaranteed to match the exact case of the actual class names due to filesystem restrictions.
+	 *
+	 * @return the internal names of all classes in this package
+	 */
+	public Stream<String> listExternalClassNames()
+	{
+		final String internalName = this.getInternalName();
+		final List<Library> libraries = rootPackage.compiler.config.libraries;
+		return libraries.stream().flatMap(l -> l.listFileNames(internalName)).filter(p -> p.endsWith(".class"))
+		                .map(p -> p.substring(0, p.length() - ".class".length()));
+	}
+
+	public Iterable<IClass> getClasses()
+	{
+		return this.classes;
+	}
 
 	@Override
 	public void addClass(IClass theClass)
