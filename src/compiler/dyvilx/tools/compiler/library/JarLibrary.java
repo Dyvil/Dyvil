@@ -7,6 +7,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public final class JarLibrary extends Library
 {
@@ -51,15 +52,13 @@ public final class JarLibrary extends Library
 		}
 	}
 
-	// --------------- Packages ---------------
+	// --------------- Access ---------------
 
 	@Override
-	public boolean isSubPackage(String internal)
+	public boolean isSubPackage(String directory)
 	{
-		return Files.exists(this.jarFileSystem.getPath(internal), EMPTY_LINK_OPTIONS);
+		return Files.exists(this.jarFileSystem.getPath(directory), EMPTY_LINK_OPTIONS);
 	}
-
-	// --------------- Files ---------------
 
 	@Override
 	public InputStream getInputStream(String fileName)
@@ -77,6 +76,21 @@ public final class JarLibrary extends Library
 		catch (IOException ignored)
 		{
 			return null;
+		}
+	}
+
+	// --------------- Discovery ---------------
+
+	@Override
+	public Stream<Path> listPaths(String directory)
+	{
+		try
+		{
+			return Files.list(this.jarFileSystem.getPath(directory));
+		}
+		catch (IOException e)
+		{
+			return Stream.empty();
 		}
 	}
 }

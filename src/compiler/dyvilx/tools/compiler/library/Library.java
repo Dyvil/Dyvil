@@ -5,7 +5,10 @@ import dyvil.reflect.ReflectUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public abstract class Library
 {
@@ -106,13 +109,39 @@ public abstract class Library
 
 	public abstract void unloadLibrary();
 
-	// --------------- Packages ---------------
+	public abstract Stream<Path> listPaths(String directory);
 
-	public abstract boolean isSubPackage(String internal);
+	// --------------- Package Access ---------------
 
-	// --------------- Files ---------------
+	public abstract boolean isSubPackage(String directory);
+
+	// --------------- Package Discovery ---------------
+
+	public Stream<Path> listPackagePaths(String directory)
+	{
+		return this.listPaths(directory).filter(Files::isDirectory);
+	}
+
+	public Stream<String> listPackageNames(String directory)
+	{
+		return this.listPackagePaths(directory).map(p -> p.toFile().getName());
+	}
+
+	// --------------- File Access ---------------
 
 	public abstract InputStream getInputStream(String fileName);
+
+	// --------------- File Discovery ---------------
+
+	public Stream<Path> listFilePaths(String directory)
+	{
+		return this.listPaths(directory).filter(Files::isRegularFile);
+	}
+
+	public Stream<String> listFileNames(String directory)
+	{
+		return this.listFilePaths(directory).map(p -> p.toFile().getName());
+	}
 
 	// --------------- Formatting ---------------
 

@@ -1,9 +1,9 @@
 package dyvilx.tools.compiler.library;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public class FileLibrary extends Library
 {
@@ -36,9 +36,9 @@ public class FileLibrary extends Library
 	}
 
 	@Override
-	public boolean isSubPackage(String directoryName)
+	public boolean isSubPackage(String directory)
 	{
-		return this.getFile(directoryName).isDirectory();
+		return this.getFile(directory).isDirectory();
 	}
 
 	@Override
@@ -51,6 +51,21 @@ public class FileLibrary extends Library
 		catch (FileNotFoundException ignored)
 		{
 			return null;
+		}
+	}
+
+	// --------------- Discovery ---------------
+
+	@Override
+	public Stream<Path> listPaths(String directory)
+	{
+		try
+		{
+			return Files.list(this.file.toPath().resolve(directory)).filter(Files::isDirectory);
+		}
+		catch (IOException e)
+		{
+			return Stream.empty();
 		}
 	}
 }
