@@ -1,9 +1,6 @@
 package dyvilx.tools.compiler.library;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.ReflectUtils;
-import dyvilx.tools.compiler.ast.structure.Package;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,11 +9,41 @@ import java.nio.file.LinkOption;
 
 public abstract class Library
 {
+	// =============== Constants ===============
+
+	protected static final LinkOption[] EMPTY_LINK_OPTIONS = {};
+
+	// =============== Static Final Fields ===============
+
 	public static final File javaLibraryLocation;
 	public static final File dyvilLibraryLocation;
 
 	public static final Library dyvilLibrary;
 	public static final Library javaLibrary;
+
+	// =============== Static Initializers ===============
+
+	static
+	{
+		javaLibraryLocation = getFileLocation(java.lang.String.class);
+		dyvilLibraryLocation = getFileLocation(dyvil.reflect.Variance.class);
+
+		dyvilLibrary = tryLoad(dyvilLibraryLocation);
+		javaLibrary = tryLoad(javaLibraryLocation);
+	}
+
+	// =============== Fields ===============
+
+	protected final File file;
+
+	// =============== Constructors ===============
+
+	protected Library(File file)
+	{
+		this.file = file;
+	}
+
+	// =============== Static Methods ===============
 
 	private static File getFileLocation(Class<?> klass)
 	{
@@ -28,25 +55,6 @@ public abstract class Library
 		{
 			return null;
 		}
-	}
-
-	static
-	{
-		javaLibraryLocation = getFileLocation(java.lang.String.class);
-		dyvilLibraryLocation = getFileLocation(dyvil.reflect.Variance.class);
-
-		dyvilLibrary = tryLoad(dyvilLibraryLocation);
-		javaLibrary = tryLoad(javaLibraryLocation);
-	}
-
-	protected static final LinkOption[] emptyLinkOptions = {};
-
-	protected final File file;
-	protected final Map<String, Package> packages = new HashMap<>();
-
-	protected Library(File file)
-	{
-		this.file = file;
 	}
 
 	public static Library tryLoad(File file)
@@ -83,81 +91,34 @@ public abstract class Library
 		throw new FileNotFoundException(error);
 	}
 
-	public abstract void loadLibrary();
-
-	public abstract void unloadLibrary();
+	// =============== Properties ===============
 
 	public File getFile()
 	{
 		return this.file;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Loading and Unloading ---------------
+
+	public abstract void loadLibrary();
+
+	public abstract void unloadLibrary();
+
+	// --------------- Packages ---------------
+
 	public abstract boolean isSubPackage(String internal);
 
-	public Package resolvePackage(String internal)
-	{
-		Package pack = this.packages.get(internal);
-		if (pack != null)
-		{
-			return pack;
-		}
-
-		if (!this.isSubPackage(internal))
-		{
-			return null;
-		}
-
-		int currentIndex = internal.indexOf('/');
-		if (currentIndex < 0)
-		{
-			return Package.rootPackage.createSubPackage(internal);
-		}
-
-		String currentPart = internal.substring(0, currentIndex);
-		pack = Package.rootPackage.createSubPackage(currentPart);
-
-		if (pack == null)
-		{
-			return null;
-		}
-
-		do
-		{
-			int endIndex = internal.indexOf('/', currentIndex + 1);
-			if (endIndex < 0)
-			{
-				endIndex = internal.length();
-			}
-			if (endIndex - currentIndex <= 0)
-			{
-				break;
-			}
-
-			currentPart = internal.substring(currentIndex + 1, endIndex);
-			pack = pack.createSubPackage(currentPart);
-			if (pack == null)
-			{
-				return null;
-			}
-			currentIndex = endIndex;
-		}
-		while (true);
-
-		return pack;
-	}
+	// --------------- Files ---------------
 
 	public abstract InputStream getInputStream(String fileName);
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
 	{
 		return this.file.getAbsolutePath();
-	}
-
-	@Override
-	protected void finalize() throws Throwable
-	{
-		super.finalize();
-		this.unloadLibrary();
 	}
 }

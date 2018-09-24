@@ -10,12 +10,20 @@ import java.nio.file.Path;
 
 public final class JarLibrary extends Library
 {
+	// =============== Fields ===============
+
 	private FileSystem jarFileSystem;
+
+	// =============== Constructors ===============
 
 	public JarLibrary(File file)
 	{
 		super(file);
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Loading and Unloading ---------------
 
 	@Override
 	public void loadLibrary()
@@ -38,29 +46,33 @@ public final class JarLibrary extends Library
 		{
 			this.jarFileSystem.close();
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 		}
 	}
 
+	// --------------- Packages ---------------
+
 	@Override
 	public boolean isSubPackage(String internal)
 	{
-		return Files.exists(this.jarFileSystem.getPath(internal), emptyLinkOptions);
+		return Files.exists(this.jarFileSystem.getPath(internal), EMPTY_LINK_OPTIONS);
 	}
+
+	// --------------- Files ---------------
 
 	@Override
 	public InputStream getInputStream(String fileName)
 	{
 		final Path path = this.jarFileSystem.getPath(fileName);
-		if (!Files.exists(path, emptyLinkOptions))
+		if (!Files.exists(path, EMPTY_LINK_OPTIONS))
 		{
 			return null;
 		}
 
 		try
 		{
-			return Files.newInputStream(path, emptyLinkOptions);
+			return Files.newInputStream(path, EMPTY_LINK_OPTIONS);
 		}
 		catch (IOException ignored)
 		{
