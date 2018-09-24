@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -15,18 +16,19 @@ import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.ast.member.Named;
-import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 import dyvilx.tools.compiler.backend.ObjectFormat;
+import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.InputStream;
 
 public class Package implements Named, IDefaultContext, IClassConsumer
 {
+	// =============== Static Fields ===============
+
 	public static RootPackage rootPackage;
 
 	public static Package dyvil;
@@ -48,6 +50,8 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	public static Package javaLangAnnotation;
 	public static Package javaUtil;
 
+	// =============== Fields ===============
+
 	protected final Package parent;
 
 	protected Name   name;
@@ -57,6 +61,8 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	protected List<IClass>         classes     = new ArrayList<>();
 	protected List<IHeaderUnit>    headers     = new ArrayList<>();
 	protected Map<String, Package> subPackages = new HashMap<>();
+
+	// =============== Constructors ===============
 
 	protected Package()
 	{
@@ -79,6 +85,8 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 			this.internalName = parent.getInternalName() + name.qualified + '/';
 		}
 	}
+
+	// =============== Static Methods ===============
 
 	public static void initRoot(DyvilCompiler compiler)
 	{
@@ -114,7 +122,15 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		javaUtil = java.resolvePackage("util");
 	}
 
-	// Name
+	// =============== Properties ===============
+
+	// --------------- Name ---------------
+
+	@Override
+	public Name getName()
+	{
+		return this.name;
+	}
 
 	@Override
 	public void setName(Name name)
@@ -122,11 +138,7 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		this.name = name;
 	}
 
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
+	// --------------- Internal Name ---------------
 
 	public String getInternalName()
 	{
@@ -138,6 +150,8 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		this.internalName = internalName;
 	}
 
+	// --------------- Full Name ---------------
+
 	public String getFullName()
 	{
 		return this.fullName;
@@ -148,37 +162,15 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		this.fullName = fullName;
 	}
 
-	// Units
-
-	public void addHeader(IHeaderUnit unit)
-	{
-		this.headers.add(unit);
-	}
-
-	public void addSubPackage(Package pack)
-	{
-		this.subPackages.put(pack.name.qualified, pack);
-	}
+	// =============== Methods ===============
 
 	@Override
-	public void addClass(IClass theClass)
+	public DyvilCompiler getCompilationContext()
 	{
-		this.classes.add(theClass);
+		return rootPackage.compiler;
 	}
 
-	public Package createSubPackage(String name)
-	{
-		Package pack = this.subPackages.get(name);
-		if (pack != null)
-		{
-			return pack;
-		}
-
-		pack = new Package(this, Name.fromRaw(name));
-		this.subPackages.put(name, pack);
-		return pack;
-	}
-
+	// TODO move to PackageDeclaration
 	public void check(PackageDeclaration packageDecl, MarkerList markers)
 	{
 		if (packageDecl == null)
@@ -193,10 +185,24 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		}
 	}
 
-	@Override
-	public DyvilCompiler getCompilationContext()
+	// --------------- Sub-Packages ---------------
+
+	public void addSubPackage(Package pack)
 	{
-		return rootPackage.compiler;
+		this.subPackages.put(pack.name.qualified, pack);
+	}
+
+	public Package createSubPackage(String name)
+	{
+		Package pack = this.subPackages.get(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+
+		pack = new Package(this, Name.fromRaw(name));
+		this.subPackages.put(name, pack);
+		return pack;
 	}
 
 	@Override
@@ -225,9 +231,11 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		return null;
 	}
 
-	public IHeaderUnit resolveHeader(String name)
+	// --------------- Headers ---------------
+
+	public void addHeader(IHeaderUnit unit)
 	{
-		return this.resolveHeader(Name.fromRaw(name));
+		this.headers.add(unit);
 	}
 
 	@Override
@@ -241,6 +249,46 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 			}
 		}
 		return this.loadHeader(name);
+	}
+
+	public IHeaderUnit resolveHeader(String name)
+	{
+		return this.resolveHeader(Name.fromRaw(name));
+	}
+
+	private IHeaderUnit loadHeader(Name name)
+	{
+		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
+		for (Library library : rootPackage.compiler.config.libraries)
+		{
+			IHeaderUnit header = this.loadHeader(fileName, name, library);
+			if (header != null)
+			{
+				return header;
+			}
+		}
+
+		return null;
+	}
+
+	private IHeaderUnit loadHeader(String fileName, Name name, Library library)
+	{
+		InputStream inputStream = library.getInputStream(fileName);
+		if (inputStream != null)
+		{
+			final AbstractHeader header = new ExternalHeader(name, this);
+			this.headers.add(header);
+			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
+		}
+		return null;
+	}
+
+	// --------------- Classes ---------------
+
+	@Override
+	public void addClass(IClass theClass)
+	{
+		this.classes.add(theClass);
 	}
 
 	public IClass resolveClass(String name)
@@ -313,32 +361,7 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		return null;
 	}
 
-	private IHeaderUnit loadHeader(Name name)
-	{
-		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
-		for (Library library : rootPackage.compiler.config.libraries)
-		{
-			IHeaderUnit header = this.loadHeader(fileName, name, library);
-			if (header != null)
-			{
-				return header;
-			}
-		}
-
-		return null;
-	}
-
-	private IHeaderUnit loadHeader(String fileName, Name name, Library library)
-	{
-		InputStream inputStream = library.getInputStream(fileName);
-		if (inputStream != null)
-		{
-			final AbstractHeader header = new ExternalHeader(name, this);
-			this.headers.add(header);
-			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
-		}
-		return null;
-	}
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
