@@ -124,7 +124,7 @@ public abstract class Library
 
 	public Stream<String> listPackageNames(String directory)
 	{
-		return this.listPackagePaths(directory).map(p -> p.toFile().getName());
+		return this.listPackagePaths(directory).map(p -> p.getFileName().toString());
 	}
 
 	// --------------- File Access ---------------
@@ -140,7 +140,7 @@ public abstract class Library
 
 	public Stream<String> listFileNames(String directory)
 	{
-		return this.listFilePaths(directory).map(p -> p.toFile().getName());
+		return this.listFilePaths(directory).map(p -> p.getFileName().toString());
 	}
 
 	// --------------- Formatting ---------------
