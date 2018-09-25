@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.method;
 
 import dyvil.annotation.Reified;
-import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Name;
@@ -311,26 +310,19 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkDuplicates(MarkerList markers)
 	{
-		final Collection<IMethod> candidates = this.enclosingClass.allMethods();
-		if (candidates.isEmpty())
+		for (IMethod method : this.enclosingClass.allMethods())
 		{
-			return;
-		}
-
-		final String internalName = this.getInternalName();
-		final String descriptor = this.getDescriptor();
-		final int parameterCount = this.parameters.size();
-
-		for (IMethod method : candidates)
-		{
-			if (method != this // exclude this method
-			    && method.getParameters().size() == parameterCount // optimization
-			    && method.getInternalName().equals(internalName) && method.getDescriptor().equals(descriptor))
+			if (method == this // don't match with itself
+			    || this.parameters.size() != method.getParameters().size() // optimization
+			    || !this.getInternalName().equals(method.getInternalName()) // same bytecode name
+			    || !this.getDescriptor().equals(method.getDescriptor())) // same descriptor
 			{
-				final Marker marker = Markers.semanticError(this.position, "method.duplicate", this.name,
-				                                            this.internalName, descriptor);
-				markers.add(marker);
+				continue;
 			}
+
+			markers.add(Markers.semanticError(this.position, "method.duplicate.descriptor", this.name,
+			                                  this.internalName, this.getDescriptor()));
+			return;
 		}
 	}
 

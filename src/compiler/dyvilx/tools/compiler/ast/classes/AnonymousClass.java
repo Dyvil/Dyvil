@@ -21,6 +21,7 @@ import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
+import dyvilx.tools.parsing.marker.MarkerList;
 
 public class AnonymousClass extends CodeClass
 {
@@ -52,6 +53,13 @@ public class AnonymousClass extends CodeClass
 	public void setConstructor(IConstructor constructor)
 	{
 		this.constructor = constructor;
+	}
+
+	@Override
+	protected void checkDuplicate(MarkerList markers)
+	{
+		// don't check anonymous classes for duplicates, the user can't influence their descriptor anyway
+		// TODO make sure the descriptor is always unique
 	}
 
 	@Override

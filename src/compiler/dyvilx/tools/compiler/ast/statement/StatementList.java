@@ -503,7 +503,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			if (candidate.getName() == methodName // same name
 				    && candidate.getParameters().size() == parameterCount && candidate.getDescriptor().equals(desc))
 			{
-				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate", methodName, desc));
+				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate.descriptor", methodName, desc));
 			}
 		}
 

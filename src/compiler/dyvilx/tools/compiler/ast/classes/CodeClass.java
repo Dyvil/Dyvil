@@ -12,6 +12,7 @@ import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
@@ -295,6 +296,8 @@ public class CodeClass extends AbstractClass
 			}
 		}
 
+		this.checkDuplicate(markers);
+
 		this.metadata.check(markers, context);
 
 		if (this.body != null)
@@ -303,6 +306,57 @@ public class CodeClass extends AbstractClass
 		}
 
 		context.pop();
+	}
+
+	protected void checkDuplicate(MarkerList markers)
+	{
+		final String internalName = this.getInternalName();
+
+		if (this.enclosingClass != null)
+		{
+			for (IClass other : this.enclosingClass.getBody().getClasses())
+			{
+				if (this != other && internalName.equalsIgnoreCase(other.getInternalName()))
+				{
+					markers.add(Markers.semanticError(this.position, "class.descriptor.duplicate.nested", this.name,
+					                                  this.enclosingClass.getName(), internalName));
+					return;
+				}
+			}
+		}
+		if (this.enclosingHeader != null)
+		{
+			for (IClass other : this.enclosingHeader.getClasses())
+			{
+				if (this != other // don't match with itself
+				    && internalName.equalsIgnoreCase(other.getInternalName())) // same descriptor
+				{
+					markers.add(Markers.semanticError(this.position, "class.descriptor.duplicate.header", this.name,
+					                                  this.enclosingHeader.getName(), internalName));
+					return;
+				}
+			}
+		}
+		if (this.enclosingPackage != null)
+		{
+			for (IClass other : this.enclosingPackage.getClasses())
+			{
+				if (this != other // don't match with itself
+				    && !(other instanceof ExternalClass) // ignore external classes (catch them in the next loop)
+				    && internalName.equalsIgnoreCase(other.getInternalName())) // same descriptor
+				{
+					markers.add(Markers.semanticError(this.position, "class.descriptor.duplicate.package", this.name,
+					                                  this.enclosingPackage.getFullName(), internalName));
+					return;
+				}
+			}
+
+			this.enclosingPackage.listExternalClassNames().filter(internalName::equalsIgnoreCase).forEach(s -> {
+				markers.add(Markers.semanticWarning(this.position, "class.descriptor.duplicate.external", this.name,
+				                                    this.enclosingPackage.getFullName(), internalName));
+				// return;
+			});
+		}
 	}
 
 	public void checkFunctional(MarkerList markers)
