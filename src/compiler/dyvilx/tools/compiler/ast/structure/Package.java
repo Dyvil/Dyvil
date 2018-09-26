@@ -317,11 +317,6 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		this.classes.add(theClass);
 	}
 
-	public IClass resolveClass(String name)
-	{
-		return this.resolveClass(Name.fromRaw(name));
-	}
-
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -333,17 +328,8 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 			}
 		}
 
-		for (IHeaderUnit h : this.headers)
-		{
-			final IClass c;
-			// TODO Maybe remove the first check
-			if (h.getName() == name && (c = h.getClasses().get(name)) != null)
-			{
-				return c;
-			}
-		}
-
 		String qualifiedName = name.qualified;
+
 		// Check for inner / nested / anonymous classes
 		final int cashIndex = qualifiedName.lastIndexOf('$');
 		if (cashIndex < 0)
@@ -368,7 +354,7 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 
 	private IClass loadClass(Name name)
 	{
-		final IClass loaded = loadClass(this.getInternalName() + name.qualified + DyvilFileType.CLASS_EXTENSION, this);
+		final IClass loaded = this.loadClass(name.qualified);
 		if (loaded != null && loaded.getName() == name)
 		{
 			// found from the qualified name
@@ -380,6 +366,24 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		// return this.listExternalClassFiles().sequential().map(fileName -> loadClass(fileName, this)).filter(p -> p != null && p.getName() == name).findFirst().orElse(null);
 
 		return null;
+	}
+
+	public IClass resolveClass(String internalName)
+	{
+		for (IClass c : this.classes)
+		{
+			if (c.getInternalName().endsWith(internalName))
+			{
+				return c;
+			}
+		}
+
+		return this.loadClass(internalName);
+	}
+
+	private IClass loadClass(String internalName)
+	{
+		return loadClass(this.internalName + internalName + DyvilFileType.CLASS_EXTENSION, this);
 	}
 
 	public static IClass loadClass(String fileName, IClassConsumer consumer)
