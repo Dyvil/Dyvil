@@ -70,11 +70,11 @@ public class InfixCallChain extends OperatorStack<IValue> implements IValue
 	{
 		final Name name = operator.name;
 
-		if (name == Names.colon)
+		if (name == Names.$colon)
 		{
 			return new ColonOperator(operator.position, lhs, rhs);
 		}
-		if (name == Names.eq)
+		if (name == Names.$eq)
 		{
 			final IValue assignment = lhs.toAssignment(rhs, operator.position);
 			if (assignment != null)
@@ -90,7 +90,7 @@ public class InfixCallChain extends OperatorStack<IValue> implements IValue
 	protected IValue ternaryOp(IValue lhs, OperatorElement operator1, IValue center, OperatorElement operator2,
 		                          IValue rhs)
 	{
-		if (operator1.name == Names.qmark && operator2.name == Names.colon)
+		if (operator1.name == Names.$qmark && operator2.name == Names.$colon)
 		{
 			return new IfStatement(lhs, center, rhs);
 		}

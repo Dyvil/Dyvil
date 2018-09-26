@@ -20,11 +20,11 @@ public class InfixTypeChain extends OperatorStack<IType> implements IUnresolvedT
 	@Override
 	protected IType binaryOp(IType lhs, OperatorElement operator, IType rhs)
 	{
-		if (operator.name == Names.amp)
+		if (operator.name == Names.$amp)
 		{
 			return new IntersectionType(lhs, rhs);
 		}
-		if (operator.name == Names.bar)
+		if (operator.name == Names.$bar)
 		{
 			return new UnionType(lhs, rhs);
 		}

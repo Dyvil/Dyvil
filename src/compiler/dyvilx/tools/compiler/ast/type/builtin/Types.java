@@ -29,24 +29,24 @@ public final class Types
 	public static IHeaderUnit LANG_HEADER;
 	public static IContext    BASE_CONTEXT;
 
-	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
+	public static final PrimitiveType VOID    = new PrimitiveType(Names.void_, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
 	                                                              Opcodes.IALOAD, null);
-	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z',
+	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names.boolean_, PrimitiveType.BOOLEAN_CODE, 'Z',
 	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
-	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B',
+	public static final PrimitiveType BYTE    = new PrimitiveType(Names.byte_, PrimitiveType.BYTE_CODE, 'B',
 	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
-	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S',
+	public static final PrimitiveType SHORT   = new PrimitiveType(Names.short_, PrimitiveType.SHORT_CODE, 'S',
 	                                                              Opcodes.ILOAD, Opcodes.SALOAD, ClassFormat.SHORT);
-	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C',
+	public static final PrimitiveType CHAR    = new PrimitiveType(Names.char_, PrimitiveType.CHAR_CODE, 'C',
 	                                                              Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
-	public static final PrimitiveType INT     = new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I',
+	public static final PrimitiveType INT     = new PrimitiveType(Names.int_, PrimitiveType.INT_CODE, 'I',
 	                                                              Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
-	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J',
+	public static final PrimitiveType LONG    = new PrimitiveType(Names.long_, PrimitiveType.LONG_CODE, 'J',
 	                                                              Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
-	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F',
+	public static final PrimitiveType FLOAT   = new PrimitiveType(Names.float_, PrimitiveType.FLOAT_CODE, 'F',
 	                                                              Opcodes.FLOAD, Opcodes.FALOAD, ClassFormat.FLOAT);
-	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D',
+	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names.double_, PrimitiveType.DOUBLE_CODE, 'D',
 	                                                              Opcodes.DLOAD, Opcodes.DALOAD, ClassFormat.DOUBLE);
 
 	public static final UnknownType UNKNOWN = new UnknownType();

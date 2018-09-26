@@ -128,7 +128,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 			}
 			if (Tokens.isIdentifier(type))
 			{
-				if (token.nameValue() == Names.minus)
+				if (token.nameValue() == Names.$minus)
 				{
 					this.mode = NEGATIVE_NUMBER;
 					return;
@@ -226,7 +226,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 			if (Tokens.isIdentifier(type))
 			{
 				final Name name = token.nameValue();
-				if (name == Names.bar)
+				if (name == Names.$bar)
 				{
 					if (this.checkPrecedence(OPERATOR_OR))
 					{
@@ -240,7 +240,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 					return;
 				}
 
-				if (name == Names.amp)
+				if (name == Names.$amp)
 				{
 					if (this.checkPrecedence(OPERATOR_AND))
 					{

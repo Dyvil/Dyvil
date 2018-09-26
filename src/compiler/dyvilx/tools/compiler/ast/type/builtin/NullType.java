@@ -24,7 +24,7 @@ public class NullType implements IBuiltinType
 	@Override
 	public Name getName()
 	{
-		return Names._null;
+		return Names.null_;
 	}
 
 	@Override
