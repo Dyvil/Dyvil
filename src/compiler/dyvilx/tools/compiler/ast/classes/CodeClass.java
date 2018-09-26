@@ -351,11 +351,12 @@ public class CodeClass extends AbstractClass
 				}
 			}
 
-			this.enclosingPackage.listExternalClassNames().filter(internalName::equalsIgnoreCase).forEach(s -> {
+			if (this.enclosingPackage.listExternalClassDescriptors().anyMatch(internalName::equalsIgnoreCase))
+			{
 				markers.add(Markers.semanticWarning(this.position, "class.descriptor.duplicate.external", this.name,
 				                                    this.enclosingPackage.getFullName(), internalName));
-				// return;
-			});
+				return;
+			}
 		}
 	}
 

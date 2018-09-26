@@ -286,20 +286,24 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 
 	// --------------- Classes ---------------
 
+	public Stream<String> listExternalClassFileNames()
+	{
+		final String internalName = this.getInternalName();
+		final List<Library> libraries = rootPackage.compiler.config.libraries;
+		return libraries.stream().flatMap(l -> l.listFileNames(internalName)).filter(p -> p.endsWith(".class"));
+	}
+
 	/**
-	 * Lists internal names (including slash-separated package) of all external classes (i.e. classes from libraries) in
+	 * Lists descriptors (including slash-separated package) of all external classes (i.e. classes from libraries) in
 	 * this package. The classes are not loaded; the search is only file-based.
 	 * <p/>
 	 * The results are not guaranteed to match the exact case of the actual class names due to filesystem restrictions.
 	 *
 	 * @return the internal names of all classes in this package
 	 */
-	public Stream<String> listExternalClassNames()
+	public Stream<String> listExternalClassDescriptors()
 	{
-		final String internalName = this.getInternalName();
-		final List<Library> libraries = rootPackage.compiler.config.libraries;
-		return libraries.stream().flatMap(l -> l.listFileNames(internalName)).filter(p -> p.endsWith(".class"))
-		                .map(p -> p.substring(0, p.length() - ".class".length()));
+		return this.listExternalClassFileNames().map(p -> p.substring(0, p.length() - ".class".length()));
 	}
 
 	public Iterable<IClass> getClasses()
@@ -364,10 +368,21 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 
 	private IClass loadClass(Name name)
 	{
-		return loadClass(this.getInternalName() + name.qualified + DyvilFileType.CLASS_EXTENSION, name, this);
+		final IClass loaded = loadClass(this.getInternalName() + name.qualified + DyvilFileType.CLASS_EXTENSION, this);
+		if (loaded != null && loaded.getName() == name)
+		{
+			// found from the qualified name
+			return loaded;
+		}
+
+		// TODO when BytecodeName is supported on non-extension classes,
+		// we have to iterate all class files in this package until we find one with the correct name
+		// return this.listExternalClassFiles().sequential().map(fileName -> loadClass(fileName, this)).filter(p -> p != null && p.getName() == name).findFirst().orElse(null);
+
+		return null;
 	}
 
-	public static IClass loadClass(String fileName, Name name, IClassConsumer consumer)
+	public static IClass loadClass(String fileName, IClassConsumer consumer)
 	{
 		final DyvilCompiler compiler = rootPackage.compiler;
 		for (Library library : compiler.config.libraries)
@@ -375,7 +390,7 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 			final InputStream inputStream = library.getInputStream(fileName);
 			if (inputStream != null)
 			{
-				final ExternalClass externalClass = new ExternalClass(name);
+				final ExternalClass externalClass = new ExternalClass();
 				consumer.addClass(externalClass);
 				return ExternalClassVisitor.loadClass(compiler, externalClass, inputStream);
 			}

@@ -48,9 +48,8 @@ public final class ExternalClass extends AbstractClass
 	private byte                resolved;
 	private Map<String, String> innerTypes; // inner name -> full internal name
 
-	public ExternalClass(Name name)
+	public ExternalClass()
 	{
-		this.name = name;
 	}
 
 	@Override
@@ -325,7 +324,7 @@ public final class ExternalClass extends AbstractClass
 
 		// Resolve the class name and add it to the body
 		final String fileName = internal + DyvilFileType.CLASS_EXTENSION;
-		return Package.loadClass(fileName, name, this.body);
+		return Package.loadClass(fileName, this.body);
 	}
 
 	@Override
