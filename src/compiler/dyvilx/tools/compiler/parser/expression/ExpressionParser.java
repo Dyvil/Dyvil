@@ -163,7 +163,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				final IToken next = token.next();
 				final boolean optional;
-				if (next.type() == Tokens.SYMBOL_IDENTIFIER && next.nameValue() == Names.qmark && token.isNeighboring(next))
+				if (next.type() == Tokens.SYMBOL_IDENTIFIER && next.nameValue() == Names.$qmark
+				    && token.isNeighboring(next))
 				{
 					// EXPRESSION as?
 					optional = true;
@@ -228,10 +229,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 					return;
 				}
 
-				this.parseInfixAccess(pm, token, Names.colon, true);
+				this.parseInfixAccess(pm, token, Names.$colon, true);
 				return;
 			case BaseSymbols.EQUALS:
-				this.parseInfixAccess(pm, token, Names.eq, true);
+				this.parseInfixAccess(pm, token, Names.$eq, true);
 				return;
 			}
 

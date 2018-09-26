@@ -35,15 +35,15 @@ public class RangeForStatement extends ForEachStatement
 	public static boolean isRangeOperator(MethodCall methodCall)
 	{
 		final Name name = methodCall.getName();
-		return (name == Names.dotdot || name == Names.dotdotlt) // name is .. or ..<
-			       && methodCall.getReceiver() != null // has receiver
-			       && methodCall.getArguments().size() == 1 // has exactly one argument
+		return (name == Names.$dot$dot || name == Names.$dot$dot$lt) // name is .. or ..<
+		       && methodCall.getReceiver() != null // has receiver
+		       && methodCall.getArguments().size() == 1 // has exactly one argument
 			       ;//&& Types.isSuperType(LazyFields.RANGE, methodCall.getType()); // return type <: dyvil.collection.Range
 	}
 
 	public static boolean isHalfOpen(MethodCall rangeOperator)
 	{
-		return rangeOperator.getName() == Names.dotdotlt;
+		return rangeOperator.getName() == Names.$dot$dot$lt;
 	}
 
 	public static IValue getStartValue(MethodCall rangeOperator)

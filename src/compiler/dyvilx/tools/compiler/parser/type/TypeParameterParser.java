@@ -86,13 +86,13 @@ public final class TypeParameterParser extends AbstractMemberParser implements C
 			final Name name = token.nameValue();
 			if (Tokens.isIdentifier(token.next().type()))
 			{
-				if (name == Names.plus)
+				if (name == Names.$plus)
 				{
 					this.mode = NAME;
 					this.variance = Variance.COVARIANT;
 					return;
 				}
-				if (name == Names.minus)
+				if (name == Names.$minus)
 				{
 					this.mode = NAME;
 					this.variance = Variance.CONTRAVARIANT;
