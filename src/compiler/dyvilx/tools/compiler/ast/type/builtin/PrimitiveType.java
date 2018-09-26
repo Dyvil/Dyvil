@@ -26,8 +26,8 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Mutability;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.backend.ClassFormat;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -39,6 +39,8 @@ import static dyvil.reflect.Opcodes.*;
 
 public final class PrimitiveType implements IType
 {
+	// =============== Constants ===============
+
 	// Duplicate of this mapping is present in dyvil.reflect.types.PrimitiveType
 	public static final int VOID_CODE    = 0;
 	public static final int BOOLEAN_CODE = 1;
@@ -49,6 +51,8 @@ public final class PrimitiveType implements IType
 	public static final int LONG_CODE    = 6;
 	public static final int FLOAT_CODE   = 7;
 	public static final int DOUBLE_CODE  = 8;
+
+	// =============== Static Final Fields ===============
 
 	private static final long PROMOTION_BITS;
 
@@ -77,9 +81,11 @@ public final class PrimitiveType implements IType
 		// @formatter:on
 	}
 
-	protected final Name   name;
-	protected       IClass wrapperClass;
-	protected       IClass extClass;
+	// =============== Fields ===============
+
+	// --------------- Constructor Fields ---------------
+
+	protected final Name name;
 
 	private final int  typecode;
 	private final char typeChar;
@@ -88,12 +94,18 @@ public final class PrimitiveType implements IType
 	private final int    arrayOpcodeOffset;
 	private final Object frameType;
 
+	// --------------- Cache ---------------
+
+	protected IClass wrapperClass;
+
 	protected IMethod boxMethod;
 	protected IMethod unboxMethod;
 
 	private IClass arrayClass;
 	private IClass refClass;
 	private IType  simpleRefType;
+
+	// =============== Constructors ===============
 
 	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
@@ -104,6 +116,8 @@ public final class PrimitiveType implements IType
 		this.arrayOpcodeOffset = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
 	}
+
+	// =============== Static Methods ===============
 
 	public static IType getPrimitiveType(String internalClassName)
 	{
@@ -207,6 +221,18 @@ public final class PrimitiveType implements IType
 		}
 		return null;
 	}
+
+	private static long bitMask(int from, int to)
+	{
+		return 1L << ((from - 1) | ((to - 1) << 3));
+	}
+
+	private static boolean isPromotable(int from, int to)
+	{
+		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
+	}
+
+	// =============== Methods ===============
 
 	@Override
 	public int typeTag()
@@ -360,16 +386,6 @@ public final class PrimitiveType implements IType
 		return this.wrapperClass == type.getTheClass();
 	}
 
-	private static long bitMask(int from, int to)
-	{
-		return 1L << ((from - 1) | ((to - 1) << 3));
-	}
-
-	private static boolean isPromotable(int from, int to)
-	{
-		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
-	}
-
 	@Override
 	public boolean isSameClass(IType type)
 	{
@@ -458,15 +474,6 @@ public final class PrimitiveType implements IType
 			return;
 		}
 
-		if (this.extClass != null)
-		{
-			this.extClass.getMethodMatches(list, receiver, name, arguments);
-			if (list.hasCandidate())
-			{
-				return;
-			}
-		}
-
 		if (this.wrapperClass != null)
 		{
 			this.wrapperClass.getMethodMatches(list, receiver, name, arguments);
@@ -476,15 +483,6 @@ public final class PrimitiveType implements IType
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if (this.extClass != null)
-		{
-			this.extClass.getImplicitMatches(list, value, targetType);
-			if (list.hasCandidate())
-			{
-				return;
-			}
-		}
-
 		Types.PRIMITIVES_HEADER.getImplicitMatches(list, value, targetType);
 		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
 	}
@@ -852,16 +850,20 @@ public final class PrimitiveType implements IType
 		}
 	}
 
+	// --------------- Serialization ---------------
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+	}
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeByte(this.typecode);
 	}
 
-	@Override
-	public void read(DataInput in) throws IOException
-	{
-	}
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
@@ -874,6 +876,8 @@ public final class PrimitiveType implements IType
 	{
 		buffer.append(this.name);
 	}
+
+	// --------------- Equals and Hash Code ---------------
 
 	@Override
 	public boolean equals(Object obj)

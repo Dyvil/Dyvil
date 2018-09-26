@@ -112,23 +112,15 @@ public final class Types
 	{
 		VOID.wrapperClass = Package.javaLang.resolveClass("Void");
 		BOOLEAN.wrapperClass = Package.javaLang.resolveClass("Boolean");
-		BOOLEAN.extClass = Package.dyvilLang.resolveClass("Booleans");
 
 		INT.wrapperClass = Package.javaLang.resolveClass("Integer");
-		INT.extClass = Package.dyvilLang.resolveClass("Ints");
 		LONG.wrapperClass = Package.javaLang.resolveClass("Long");
-		LONG.extClass = Package.dyvilLang.resolveClass("Longs");
 		FLOAT.wrapperClass = Package.javaLang.resolveClass("Float");
-		FLOAT.extClass = Package.dyvilLang.resolveClass("Floats");
 		DOUBLE.wrapperClass = Package.javaLang.resolveClass("Double");
-		DOUBLE.extClass = Package.dyvilLang.resolveClass("Doubles");
 
 		BYTE.wrapperClass = Package.javaLang.resolveClass("Byte");
-		BYTE.extClass = INT.extClass;
 		SHORT.wrapperClass = Package.javaLang.resolveClass("Short");
-		SHORT.extClass = INT.extClass;
 		CHAR.wrapperClass = Package.javaLang.resolveClass("Character");
-		CHAR.extClass = INT.extClass;
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
