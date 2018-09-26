@@ -21,14 +21,14 @@ import java.lang.annotation._
 )
 {
 	// Compiler-Codes
-	const STRING_CONCAT = 1
-	const BOOLEAN_NOT   = 2
-	const BOOLEAN_AND   = 3
-	const BOOLEAN_OR    = 4
-	const ARRAY_SPREAD  = 6
+	const STRING_CONCAT : int = 1
+	const BOOLEAN_NOT   : int = 2
+	const BOOLEAN_AND   : int = 3
+	const BOOLEAN_OR    : int = 4
+	const ARRAY_SPREAD  : int = 6
 
-	const OPTIONAL_UNWRAP = 32
-	const FORCE_UNWRAP    = 33
-	const OPTIONAL_CHAIN  = 34
-	const NULL_COALESCING = 35
+	const OPTIONAL_UNWRAP : int = 32
+	const FORCE_UNWRAP    : int = 33
+	const OPTIONAL_CHAIN  : int = 34
+	const NULL_COALESCING : int = 35
 }
