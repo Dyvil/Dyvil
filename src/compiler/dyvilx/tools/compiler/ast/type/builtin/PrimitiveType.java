@@ -54,13 +54,13 @@ public final class PrimitiveType implements IType
 
 	// =============== Static Final Fields ===============
 
+	// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
+	// @formatter:off
+	/* insert / before /* to toggle
 	private static final long PROMOTION_BITS;
 
 	static
 	{
-		// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
-		// @formatter:off
-		/* toggle
 		long promoBits = 0L;
 		promoBits |= bitMask(BYTE_CODE, SHORT_CODE) | bitMask(BYTE_CODE, CHAR_CODE) | bitMask(BYTE_CODE, INT_CODE);
 		promoBits |= bitMask(SHORT_CODE, CHAR_CODE) | bitMask(SHORT_CODE, INT_CODE);
@@ -75,17 +75,18 @@ public final class PrimitiveType implements IType
 		promoBits |= bitMask(LONG_CODE, DOUBLE_CODE);
 		promoBits |= bitMask(FLOAT_CODE, DOUBLE_CODE);
 		PROMOTION_BITS = promoBits;
-		/*/
-		PROMOTION_BITS = 0x7E1E1E0E06020000L;
-		//*/
-		// @formatter:on
 	}
+	/*/
+	private static final long PROMOTION_BITS = 0x7E1E1E0E06020000L;
+	//*/
+	// @formatter:on
 
 	// =============== Fields ===============
 
 	// --------------- Constructor Fields ---------------
 
-	protected final Name name;
+	private final Name   name;
+	private final String wrapperClassDescriptor;
 
 	private final int  typecode;
 	private final char typeChar;
@@ -96,10 +97,10 @@ public final class PrimitiveType implements IType
 
 	// --------------- Cache ---------------
 
-	protected IClass wrapperClass;
+	private IClass wrapperClass;
 
-	protected IMethod boxMethod;
-	protected IMethod unboxMethod;
+	private IMethod boxMethod;
+	private IMethod unboxMethod;
 
 	private IClass arrayClass;
 	private IClass refClass;
@@ -107,9 +108,11 @@ public final class PrimitiveType implements IType
 
 	// =============== Constructors ===============
 
-	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
+	public PrimitiveType(Name name, String wrapperClassDescriptor, int typecode, char typeChar, int loadOpcode,
+		int aloadOpcode, Object frameType)
 	{
 		this.name = name;
+		this.wrapperClassDescriptor = wrapperClassDescriptor;
 		this.typecode = typecode;
 		this.typeChar = typeChar;
 		this.opcodeOffset = loadOpcode - Opcodes.ILOAD;
@@ -258,10 +261,20 @@ public final class PrimitiveType implements IType
 		return false;
 	}
 
+	public IClass getWrapperClass()
+	{
+		if (this.wrapperClass != null)
+		{
+			return this.wrapperClass;
+		}
+
+		return this.wrapperClass = Package.rootPackage.resolveInternalClass(this.wrapperClassDescriptor);
+	}
+
 	@Override
 	public final IType getObjectType()
 	{
-		return new ClassType(this.wrapperClass);
+		return new ClassType(this.getWrapperClass());
 	}
 
 	@Override
@@ -280,7 +293,7 @@ public final class PrimitiveType implements IType
 		case CHAR_CODE:
 			return "Char";
 		default:
-			return this.wrapperClass.getName().qualified;
+			return this.getWrapperClass().getName().qualified;
 		}
 	}
 
@@ -319,7 +332,7 @@ public final class PrimitiveType implements IType
 		{
 			return this.boxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("apply"));
 		}
-		return this.boxMethod = IContext.resolveMethod(this.wrapperClass, null, Names.valueOf,
+		return this.boxMethod = IContext.resolveMethod(this.getWrapperClass(), null, Names.valueOf,
 		                                               new ArgumentList(new DummyValue(this)));
 	}
 
@@ -334,7 +347,7 @@ public final class PrimitiveType implements IType
 		{
 			return this.unboxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("voidValue"));
 		}
-		return this.unboxMethod = this.wrapperClass.getBody().getMethod(Name.fromRaw(this.name + "Value"));
+		return this.unboxMethod = this.getWrapperClass().getBody().getMethod(Name.fromRaw(this.name + "Value"));
 	}
 
 	@Override
@@ -364,7 +377,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return this.wrapperClass;
+		return this.getWrapperClass();
 	}
 
 	@Override
@@ -376,14 +389,14 @@ public final class PrimitiveType implements IType
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		return this.wrapperClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(
+		return this.getWrapperClass() == subType.getTheClass() || subType.isPrimitive() && isPromotable(
 			subType.getTypecode(), this.typecode);
 	}
 
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.wrapperClass == type.getTheClass();
+		return this.getWrapperClass() == type.getTheClass();
 	}
 
 	@Override
@@ -395,7 +408,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.wrapperClass.resolveType(typeParameter, this);
+		return this.getWrapperClass().resolveType(typeParameter, this);
 	}
 
 	@Override
@@ -474,9 +487,9 @@ public final class PrimitiveType implements IType
 			return;
 		}
 
-		if (this.wrapperClass != null)
+		if (this.getWrapperClass() != null)
 		{
-			this.wrapperClass.getMethodMatches(list, receiver, name, arguments);
+			this.getWrapperClass().getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
@@ -501,7 +514,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public String getInternalName()
 	{
-		return this.wrapperClass.getInternalName();
+		return this.getWrapperClass().getInternalName();
 	}
 
 	@Override

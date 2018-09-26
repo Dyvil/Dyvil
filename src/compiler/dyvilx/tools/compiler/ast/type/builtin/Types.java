@@ -29,25 +29,34 @@ public final class Types
 	public static IHeaderUnit LANG_HEADER;
 	public static IContext    BASE_CONTEXT;
 
-	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
+	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, "java/lang/Void",
+	                                                              PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
 	                                                              Opcodes.IALOAD, null);
-	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z',
-	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
-	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B',
-	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
-	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S',
-	                                                              Opcodes.ILOAD, Opcodes.SALOAD, ClassFormat.SHORT);
-	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C',
-	                                                              Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
-	public static final PrimitiveType INT     = new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I',
-	                                                              Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
-	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J',
-	                                                              Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
-	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F',
-	                                                              Opcodes.FLOAD, Opcodes.FALOAD, ClassFormat.FLOAT);
-	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D',
-	                                                              Opcodes.DLOAD, Opcodes.DALOAD, ClassFormat.DOUBLE);
+	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, "java/lang/Boolean",
+	                                                              PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD,
+	                                                              Opcodes.BALOAD, ClassFormat.BOOLEAN);
+	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, "java/lang/Byte",
+	                                                              PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD,
+	                                                              Opcodes.BALOAD, ClassFormat.BOOLEAN);
+	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, "java/lang/Short",
+	                                                              PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD,
+	                                                              Opcodes.SALOAD, ClassFormat.SHORT);
+	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, "java/lang/Character",
+	                                                              PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD,
+	                                                              Opcodes.CALOAD, ClassFormat.CHAR);
+	public static final PrimitiveType INT     = new PrimitiveType(Names._int, "java/lang/Integer",
+	                                                              PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD,
+	                                                              Opcodes.IALOAD, ClassFormat.INT);
+	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, "java/lang/Long",
+	                                                              PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD,
+	                                                              Opcodes.LALOAD, ClassFormat.LONG);
+	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, "java/lang/Float",
+	                                                              PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD,
+	                                                              Opcodes.FALOAD, ClassFormat.FLOAT);
+	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, "java/lang/Double",
+	                                                              PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD,
+	                                                              Opcodes.DALOAD, ClassFormat.DOUBLE);
 
 	public static final UnknownType UNKNOWN = new UnknownType();
 	public static final NullType    NULL    = new NullType();
@@ -110,18 +119,6 @@ public final class Types
 
 	public static void initTypes()
 	{
-		VOID.wrapperClass = Package.javaLang.resolveClass("Void");
-		BOOLEAN.wrapperClass = Package.javaLang.resolveClass("Boolean");
-
-		INT.wrapperClass = Package.javaLang.resolveClass("Integer");
-		LONG.wrapperClass = Package.javaLang.resolveClass("Long");
-		FLOAT.wrapperClass = Package.javaLang.resolveClass("Float");
-		DOUBLE.wrapperClass = Package.javaLang.resolveClass("Double");
-
-		BYTE.wrapperClass = Package.javaLang.resolveClass("Byte");
-		SHORT.wrapperClass = Package.javaLang.resolveClass("Short");
-		CHAR.wrapperClass = Package.javaLang.resolveClass("Character");
-
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
 		NULL_CLASS = Package.dyvilLangInternal.resolveClass("Null");
