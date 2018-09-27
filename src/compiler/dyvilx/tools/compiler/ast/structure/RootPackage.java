@@ -5,15 +5,22 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
-	private final Map<String, IClass> classCache = new HashMap<>();
+	// =============== Fields ===============
 
 	public DyvilCompiler compiler;
+
+	// --------------- Cache ---------------
+
+	private final Map<String, ExternalClass> globalExternalClassCache = new HashMap<>();
+
+	// =============== Constructors ===============
 
 	public RootPackage(DyvilCompiler compiler)
 	{
@@ -24,6 +31,8 @@ public final class RootPackage extends Package
 		this.name = Name.fromRaw("");
 	}
 
+	// =============== Methods ===============
+
 	@Override
 	public void check(PackageDeclaration packageDecl, MarkerList markers)
 	{
@@ -33,44 +42,53 @@ public final class RootPackage extends Package
 		}
 	}
 
-	public Package resolveInternalPackage(String internal)
+	// --------------- External Resolution ---------------
+
+	public Package resolveGlobalPackage(String descriptor)
 	{
 		Package pack = this;
 		int nextIndex;
 		int startIndex = 0;
 
-		while ((nextIndex = internal.indexOf('/', startIndex)) >= 0)
+		while ((nextIndex = descriptor.indexOf('/', startIndex)) >= 0)
 		{
-			pack = pack.resolvePackage(internal.substring(startIndex, nextIndex));
+			pack = pack.resolvePackage(descriptor.substring(startIndex, nextIndex));
 			startIndex = nextIndex + 1;
 		}
 
-		return pack.resolvePackage(internal.substring(startIndex));
+		return pack.resolvePackage(descriptor.substring(startIndex));
 	}
 
-	public IClass resolveInternalClass(String internal)
+	public IClass resolveGlobalExternalClass(String descriptor)
 	{
-		IClass result = this.classCache.get(internal);
+		final ExternalClass cached = this.globalExternalClassCache.get(descriptor);
+		if (cached != null)
+		{
+			return cached;
+		}
+
+		Package pack = this;
+		int nextIndex;
+		int startIndex = 0;
+
+		while ((nextIndex = descriptor.indexOf('/', startIndex)) >= 0)
+		{
+			pack = pack.resolvePackage(descriptor.substring(startIndex, nextIndex));
+			startIndex = nextIndex + 1;
+		}
+
+		final ExternalClass result = pack.resolveExternalClass(descriptor.substring(startIndex));
 		if (result != null)
 		{
+			this.globalExternalClassCache.put(descriptor, result);
+
 			return result;
 		}
 
-		Package pack = this;
-		int nextIndex;
-		int startIndex = 0;
-
-		while ((nextIndex = internal.indexOf('/', startIndex)) >= 0)
-		{
-			pack = pack.resolvePackage(internal.substring(startIndex, nextIndex));
-			startIndex = nextIndex + 1;
-		}
-
-		result = pack.resolveClass(internal.substring(startIndex));
-		this.classCache.put(internal, result);
-
-		return result;
+		return null;
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()

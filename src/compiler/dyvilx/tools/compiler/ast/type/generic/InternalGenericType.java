@@ -101,7 +101,7 @@ public class InternalGenericType extends GenericType
 			return MapType.immutable(this.arguments.get(0), this.arguments.get(1));
 		}
 
-		final IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
+		final IClass iclass = Package.rootPackage.resolveGlobalExternalClass(this.internalName);
 		return new ClassGenericType(iclass, this.arguments);
 	}
 

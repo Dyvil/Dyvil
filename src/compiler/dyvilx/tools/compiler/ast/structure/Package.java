@@ -349,16 +349,16 @@ public class Package implements Named, IDefaultContext
 		return this.loadExternalClass(name);
 	}
 
-	public ExternalClass resolveExternalClass(String internalName)
+	public ExternalClass resolveExternalClass(String simpleDescriptor)
 	{
 		// try to resolve by external cache, using qualified name
-		final ExternalClass cachedExternalClass = this.externalClassCache.get(internalName);
+		final ExternalClass cachedExternalClass = this.externalClassCache.get(simpleDescriptor);
 		if (cachedExternalClass != null)
 		{
 			return cachedExternalClass;
 		}
 
-		final String slashInternalName = '/' + internalName;
+		final String slashInternalName = '/' + simpleDescriptor;
 
 		// try to resolve by external cache, without qualified name (slow)
 		for (ExternalClass c : this.externalClassCache.values())
@@ -370,14 +370,14 @@ public class Package implements Named, IDefaultContext
 		}
 
 		// Check for inner / nested / anonymous classes
-		final int cashIndex = internalName.lastIndexOf('$');
+		final int cashIndex = simpleDescriptor.lastIndexOf('$');
 		if (cashIndex < 0)
 		{
-			return this.loadExternalClass(internalName);
+			return this.loadExternalClass(simpleDescriptor);
 		}
 
-		final String outerName = internalName.substring(0, cashIndex);
-		final Name innerName = Name.from(internalName.substring(cashIndex + 1));
+		final String outerName = simpleDescriptor.substring(0, cashIndex);
+		final Name innerName = Name.from(simpleDescriptor.substring(cashIndex + 1));
 
 		final ExternalClass outerClass = this.resolveExternalClass(outerName);
 		final IClass innerClass;
@@ -390,7 +390,7 @@ public class Package implements Named, IDefaultContext
 
 		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
 		// different name than its enclosing compilation unit
-		return this.loadExternalClass(internalName);
+		return this.loadExternalClass(simpleDescriptor);
 	}
 
 	private ExternalClass loadExternalClass(Name name)
@@ -410,10 +410,10 @@ public class Package implements Named, IDefaultContext
 		return null;
 	}
 
-	private ExternalClass loadExternalClass(String internalName)
+	private ExternalClass loadExternalClass(String simpleDescriptor)
 	{
-		return loadExternalClass(this.internalName + internalName + DyvilFileType.CLASS_EXTENSION,
-		                         result -> this.externalClassCache.put(internalName, result));
+		return loadExternalClass(this.internalName + simpleDescriptor + DyvilFileType.CLASS_EXTENSION,
+		                         result -> this.externalClassCache.put(simpleDescriptor, result));
 	}
 
 	public static ExternalClass loadExternalClass(String fileName, Consumer<? super ExternalClass> consumer)

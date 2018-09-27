@@ -268,7 +268,7 @@ public final class PrimitiveType implements IType
 			return this.wrapperClass;
 		}
 
-		return this.wrapperClass = Package.rootPackage.resolveInternalClass(this.wrapperClassDescriptor);
+		return this.wrapperClass = Package.rootPackage.resolveGlobalExternalClass(this.wrapperClassDescriptor);
 	}
 
 	@Override

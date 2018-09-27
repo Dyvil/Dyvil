@@ -44,7 +44,7 @@ public class Template extends ClassUnit
 	public static class LazyTypes
 	{
 		public static final Package dyvilxToolsGensrc = Package.rootPackage
-			                                                .resolveInternalPackage("dyvilx/tools/gensrc");
+			                                                .resolveGlobalPackage("dyvilx/tools/gensrc");
 
 		public static final IType Writer       = Package.javaIO.resolveClass("Writer").getClassType();
 		public static final IType StringWriter = Package.javaIO.resolveClass("StringWriter").getClassType();

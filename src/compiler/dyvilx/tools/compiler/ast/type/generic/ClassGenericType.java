@@ -199,7 +199,7 @@ public class ClassGenericType extends GenericType
 	public void read(DataInput in) throws IOException
 	{
 		String internal = in.readUTF();
-		this.theClass = Package.rootPackage.resolveInternalClass(internal);
+		this.theClass = Package.rootPackage.resolveGlobalExternalClass(internal);
 		this.arguments.read(in);
 	}
 

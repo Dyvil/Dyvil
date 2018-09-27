@@ -170,7 +170,7 @@ public class ClassType implements IRawType
 	public void read(DataInput in) throws IOException
 	{
 		String internal = in.readUTF();
-		this.theClass = Package.rootPackage.resolveInternalClass(internal);
+		this.theClass = Package.rootPackage.resolveGlobalExternalClass(internal);
 	}
 
 	// Misc

@@ -150,7 +150,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 			break;
 		case Opcodes.INVOKESTATIC: // check the class
 		default:
-			final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
+			final IClass iclass = Package.rootPackage.resolveGlobalExternalClass(owner);
 			isInterface = iclass != null && iclass.isInterface();
 			break;
 		}

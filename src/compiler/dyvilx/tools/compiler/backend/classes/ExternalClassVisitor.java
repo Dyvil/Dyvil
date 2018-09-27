@@ -87,7 +87,7 @@ public class ExternalClassVisitor implements ClassVisitor
 		{
 			this.theClass.setName(Name.fromQualified(name.substring(index + 1)));
 			// Do not set 'fullName' here
-			this.theClass.setPackage(Package.rootPackage.resolveInternalPackage(name.substring(0, index)));
+			this.theClass.setPackage(Package.rootPackage.resolveGlobalPackage(name.substring(0, index)));
 		}
 
 		if (signature != null)

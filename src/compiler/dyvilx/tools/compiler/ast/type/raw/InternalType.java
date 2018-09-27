@@ -81,7 +81,7 @@ public class InternalType implements IRawType, IUnresolvedType
 			return ReferenceType.apply(Types.STRING);
 		}
 
-		final IClass resolvedClass = Package.rootPackage.resolveInternalClass(this.internalName);
+		final IClass resolvedClass = Package.rootPackage.resolveGlobalExternalClass(this.internalName);
 		if (resolvedClass == null)
 		{
 			return Types.UNKNOWN;
