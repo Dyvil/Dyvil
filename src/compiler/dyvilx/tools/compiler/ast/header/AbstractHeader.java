@@ -427,7 +427,11 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public String getInternalName()
 	{
-		return this.pack.getInternalName() + '/' + this.name.qualified;
+		if (this.pack != null && this.pack != Package.rootPackage)
+		{
+			return this.pack.getInternalName() + '/' + this.name.qualified;
+		}
+		return this.name.qualified;
 	}
 
 	// --------------- Formatting ---------------
