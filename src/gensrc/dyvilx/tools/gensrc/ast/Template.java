@@ -69,7 +69,7 @@ public class Template extends ClassUnit
 
 	public String getTemplateName()
 	{
-		return this.getPackage().getInternalName() + this.fileSource.file().getName();
+		return this.getPackage().getDirectory() + this.fileSource.file().getName();
 	}
 
 	// Resolution

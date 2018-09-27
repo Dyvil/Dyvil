@@ -79,12 +79,12 @@ public class Package implements Named, IDefaultContext
 		if (parent == null || parent == rootPackage)
 		{
 			this.fullName = name.qualified;
-			this.internalName = name.qualified + '/';
+			this.internalName = name.qualified;
 		}
 		else
 		{
 			this.fullName = parent.fullName + '.' + name.qualified;
-			this.internalName = parent.getInternalName() + name.qualified + '/';
+			this.internalName = parent.getInternalName() + '/' + name.qualified;
 		}
 	}
 
@@ -150,6 +150,11 @@ public class Package implements Named, IDefaultContext
 	public void setInternalName(String internalName)
 	{
 		this.internalName = internalName;
+	}
+
+	public String getDirectory()
+	{
+		return this.internalName + '/';
 	}
 
 	// --------------- Full Name ---------------
@@ -221,7 +226,7 @@ public class Package implements Named, IDefaultContext
 			return pack;
 		}
 
-		String internal = this.internalName + name;
+		String internal = this.getDirectory() + name;
 		for (Library library : rootPackage.compiler.config.libraries)
 		{
 			if (library.isSubPackage(internal))
@@ -265,7 +270,7 @@ public class Package implements Named, IDefaultContext
 
 	private IHeaderUnit loadHeader(Name name)
 	{
-		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
+		String fileName = this.getDirectory() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
 		for (Library library : rootPackage.compiler.config.libraries)
 		{
 			IHeaderUnit header = this.loadHeader(fileName, name, library);
@@ -294,9 +299,9 @@ public class Package implements Named, IDefaultContext
 
 	public Stream<String> listExternalClassFileNames()
 	{
-		final String internalName = this.getInternalName();
+		final String directory = this.getDirectory();
 		final List<Library> libraries = rootPackage.compiler.config.libraries;
-		return libraries.stream().flatMap(l -> l.listFileNames(internalName)).filter(p -> p.endsWith(".class"));
+		return libraries.stream().flatMap(l -> l.listFileNames(directory)).filter(p -> p.endsWith(".class"));
 	}
 
 	/**
@@ -412,7 +417,7 @@ public class Package implements Named, IDefaultContext
 
 	private ExternalClass loadExternalClass(String simpleDescriptor)
 	{
-		return loadExternalClass(this.internalName + simpleDescriptor + DyvilFileType.CLASS_EXTENSION,
+		return loadExternalClass(this.getDirectory() + simpleDescriptor + DyvilFileType.CLASS_EXTENSION,
 		                         result -> this.externalClassCache.put(simpleDescriptor, result));
 	}
 

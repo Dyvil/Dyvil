@@ -840,7 +840,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (this.enclosingPackage != null)
 		{
-			return this.enclosingPackage.getInternalName() + this.getInternalSimpleName();
+			return this.enclosingPackage.getInternalName() + '/' + this.getInternalSimpleName();
 		}
 		return this.getInternalSimpleName();
 	}
