@@ -324,7 +324,7 @@ public final class ExternalClass extends AbstractClass
 
 		// Resolve the class name and add it to the body
 		final String fileName = internal + DyvilFileType.CLASS_EXTENSION;
-		return Package.loadClass(fileName, this.body);
+		return Package.loadExternalClass(fileName, this.body::addClass);
 	}
 
 	@Override
