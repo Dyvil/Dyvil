@@ -11,7 +11,6 @@ import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.ClassBody;
-import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.external.*;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.parameter.ClassParameter;
@@ -38,7 +37,7 @@ public class ExternalClassVisitor implements ClassVisitor
 		this.theClass = theClass;
 	}
 
-	public static IClass loadClass(DyvilCompiler compiler, ExternalClass externalClass, InputStream inputStream)
+	public static ExternalClass loadClass(DyvilCompiler compiler, ExternalClass externalClass, InputStream inputStream)
 	{
 		try
 		{
