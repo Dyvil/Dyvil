@@ -26,7 +26,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
-public class Package implements Named, IDefaultContext, IClassConsumer
+public class Package implements Named, IDefaultContext
 {
 	// =============== Static Fields ===============
 
@@ -59,9 +59,10 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 	protected String fullName;
 	protected String internalName;
 
-	protected List<IClass>         classes     = new ArrayList<>();
-	protected List<IHeaderUnit>    headers     = new ArrayList<>();
-	protected Map<String, Package> subPackages = new HashMap<>();
+	protected List<IHeaderUnit> headers = new ArrayList<>();
+
+	protected Map<String, IClass>  externalClassCache = new HashMap<>();
+	protected Map<String, Package> subPackages        = new HashMap<>();
 
 	// =============== Constructors ===============
 
@@ -311,21 +312,28 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 		return this.listExternalClassFileNames().map(p -> p.substring(0, p.length() - ".class".length()));
 	}
 
-	public Iterable<IClass> getClasses()
-	{
-		return this.classes;
-	}
-
-	@Override
-	public void addClass(IClass theClass)
-	{
-		this.classes.add(theClass);
-	}
-
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IClass c : this.classes)
+		// try to resolve by name in a header
+		for (IHeaderUnit header : this.headers)
+		{
+			final IClass c = header.resolveClass(name);
+			if (c != null)
+			{
+				return c;
+			}
+		}
+
+		// try to resolve by external cache, using qualified name
+		final IClass cachedExternalClass = this.externalClassCache.get(name.qualified);
+		if (cachedExternalClass != null)
+		{
+			return cachedExternalClass;
+		}
+
+		// try to resolve by external cache, without qualified name (slow)
+		for (IClass c : this.externalClassCache.values())
 		{
 			if (c.getName() == name)
 			{
@@ -333,32 +341,12 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 			}
 		}
 
-		String qualifiedName = name.qualified;
-
-		// Check for inner / nested / anonymous classes
-		final int cashIndex = qualifiedName.lastIndexOf('$');
-		if (cashIndex < 0)
-		{
-			return this.loadClass(name);
-		}
-
-		final Name outerName = Name.fromRaw(qualifiedName.substring(0, cashIndex));
-		final Name innerName = Name.fromRaw(qualifiedName.substring(cashIndex + 1));
-
-		final IClass outerClass = this.resolveClass(outerName);
-		final IClass innerClass;
-		if (outerClass != null && (innerClass = outerClass.resolveClass(innerName)) != null)
-		{
-			return innerClass;
-		}
-
-		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
-		// different name than its enclosing compilation unit
 		return this.loadClass(name);
 	}
 
 	private IClass loadClass(Name name)
 	{
+		// resolve by qualified name, but without name splitting
 		final IClass loaded = this.loadClass(name.qualified);
 		if (loaded != null && loaded.getName() == name)
 		{
@@ -375,20 +363,64 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 
 	public IClass resolveClass(String internalName)
 	{
-		for (IClass c : this.classes)
+		// TODO use getSimpleInternalName
+		final String slashInternalName = '/' + internalName;
+
+		for (IHeaderUnit header : this.headers)
 		{
-			if (c.getInternalName().endsWith(internalName))
+			for (IClass iclass : header.getClasses())
+			{
+				if (iclass.getInternalName().endsWith(slashInternalName))
+				{
+					return iclass;
+				}
+			}
+		}
+
+		// try to resolve by external cache, using qualified name
+		final IClass cachedExternalClass = this.externalClassCache.get(internalName);
+		if (cachedExternalClass != null)
+		{
+			return cachedExternalClass;
+		}
+
+		// try to resolve by external cache, without qualified name (slow)
+		for (IClass c : this.externalClassCache.values())
+		{
+			if (c.getInternalName().endsWith(slashInternalName))
 			{
 				return c;
 			}
 		}
 
+		// Check for inner / nested / anonymous classes
+		final int cashIndex = internalName.lastIndexOf('$');
+		if (cashIndex < 0)
+		{
+			return this.loadClass(internalName);
+		}
+
+		final String outerName = internalName.substring(0, cashIndex);
+		final Name innerName = Name.from(internalName.substring(cashIndex + 1));
+
+		final IClass outerClass = this.resolveClass(outerName);
+		final IClass innerClass;
+
+		// FIXME add a resolveClass(String) overload
+		if (outerClass != null && (innerClass = outerClass.resolveClass(innerName)) != null)
+		{
+			return innerClass;
+		}
+
+		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
+		// different name than its enclosing compilation unit
 		return this.loadClass(internalName);
 	}
 
 	private IClass loadClass(String internalName)
 	{
-		return loadClass(this.internalName + internalName + DyvilFileType.CLASS_EXTENSION, this);
+		return loadClass(this.internalName + internalName + DyvilFileType.CLASS_EXTENSION,
+		                 result -> this.externalClassCache.put(internalName, result));
 	}
 
 	public static IClass loadClass(String fileName, IClassConsumer consumer)
