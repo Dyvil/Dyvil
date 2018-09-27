@@ -234,6 +234,11 @@ public class Package implements Named, IDefaultContext, IClassConsumer
 
 	// --------------- Headers ---------------
 
+	public Iterable<IHeaderUnit> getHeaders()
+	{
+		return this.headers;
+	}
+
 	public void addHeader(IHeaderUnit unit)
 	{
 		this.headers.add(unit);

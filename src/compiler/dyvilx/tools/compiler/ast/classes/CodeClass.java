@@ -12,7 +12,7 @@ import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.external.ExternalClass;
+import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
@@ -339,12 +339,22 @@ public class CodeClass extends AbstractClass
 		}
 		if (this.enclosingPackage != null)
 		{
-			for (IClass other : this.enclosingPackage.getClasses())
+			for (IHeaderUnit header : this.enclosingPackage.getHeaders())
 			{
-				if (this != other // don't match with itself
-				    && !(other instanceof ExternalClass) // ignore external classes (catch them in the next loop)
-				    && internalName.equalsIgnoreCase(other.getInternalName())) // same descriptor
+				if (header == this.enclosingHeader || header instanceof ExternalHeader)
 				{
+					// skip enclosing header and external headers
+					continue;
+				}
+
+				for (IClass other : header.getClasses())
+				{
+					if (this == other // don't match with itself
+					    || !internalName.equalsIgnoreCase(other.getInternalName())) // same descriptor
+					{
+						continue;
+					}
+
 					markers.add(Markers.semanticError(this.position, "class.descriptor.duplicate.package", this.name,
 					                                  this.enclosingPackage.getFullName(), internalName));
 					return;
