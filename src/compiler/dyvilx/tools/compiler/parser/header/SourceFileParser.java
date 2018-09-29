@@ -90,7 +90,7 @@ public class SourceFileParser extends AbstractMemberParser
 			switch (type)
 			{
 			case DyvilKeywords.IMPORT:
-				pm.pushParser(new ImportParser(this.importConsumer(token)));
+				pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.IMPORT_DECLARATION));
 				this.mode = SEPARATOR;
 				return;
 			case DyvilKeywords.USING:

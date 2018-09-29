@@ -29,7 +29,8 @@ public class KindedImport implements IImport
 	public static final int PARENT = PACKAGE | HEADER | CLASS;
 	public static final int ANY    = -1;
 
-	public static final int USING_DECLARATION = STATIC | INLINE | HEADER;
+	public static final int IMPORT_DECLARATION = CLASS | TYPE;
+	public static final int USING_DECLARATION  = STATIC | INLINE | HEADER;
 
 	// =============== Fields ===============
 
@@ -106,23 +107,18 @@ public class KindedImport implements IImport
 		return null; // never viewed by children as a parent
 	}
 
-	private int orMask(int mask)
-	{
-		return mask == ANY ? this.mask : this.mask | mask;
-	}
-
 	// --------------- Resolution ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		this.child.resolveTypes(markers, context, parentContext, this.orMask(mask));
+		this.child.resolveTypes(markers, context, parentContext, this.mask);
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		this.child.resolve(markers, context, parentContext, this.orMask(mask));
+		this.child.resolve(markers, context, parentContext, this.mask);
 	}
 
 	// --------------- Compilation ---------------
