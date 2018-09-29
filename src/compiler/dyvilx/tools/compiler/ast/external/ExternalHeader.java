@@ -90,7 +90,7 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 
 		for (String className : this.classNames)
 		{
-			final IClass iclass = Package.rootPackage.resolveGlobalExternalClass(className);
+			final IClass iclass = Package.rootPackage.resolveGlobalClass(className);
 			if (iclass != null)
 			{
 				this.addClass(iclass);

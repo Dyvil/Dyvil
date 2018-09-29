@@ -59,7 +59,7 @@ public final class RootPackage extends Package
 		return pack.resolvePackage(descriptor.substring(startIndex));
 	}
 
-	public IClass resolveGlobalExternalClass(String descriptor)
+	public IClass resolveGlobalClass(String descriptor)
 	{
 		final ExternalClass cached = this.globalExternalClassCache.get(descriptor);
 		if (cached != null)
@@ -77,15 +77,13 @@ public final class RootPackage extends Package
 			startIndex = nextIndex + 1;
 		}
 
-		final ExternalClass result = pack.resolveExternalClass(descriptor.substring(startIndex));
-		if (result != null)
+		final IClass result = pack.resolveClass(descriptor.substring(startIndex));
+		if (result instanceof ExternalClass)
 		{
-			this.globalExternalClassCache.put(descriptor, result);
-
-			return result;
+			this.globalExternalClassCache.put(descriptor, (ExternalClass) result);
 		}
 
-		return null;
+		return result;
 	}
 
 	// --------------- Formatting ---------------
