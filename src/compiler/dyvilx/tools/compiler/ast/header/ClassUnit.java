@@ -33,7 +33,7 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 		for (IClass iclass : this.classes)
 		{
 			if (iclass.hasModifier(Modifiers.EXTENSION) //
-			    || iclass.getInternalName().endsWith(iclass.getName().qualified))
+			    || !iclass.getInternalName().endsWith('/' + iclass.getName().qualified))
 			{
 				return true;
 			}
