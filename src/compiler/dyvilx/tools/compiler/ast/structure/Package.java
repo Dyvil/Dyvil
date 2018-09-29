@@ -317,11 +317,6 @@ public class Package implements Named, IDefaultContext
 		return this.listExternalClassFileNames().map(p -> p.substring(0, p.length() - ".class".length()));
 	}
 
-	public IClass resolveClass(String rawName)
-	{
-		return this.resolveClass(Name.fromRaw(rawName));
-	}
-
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -335,23 +330,38 @@ public class Package implements Named, IDefaultContext
 			}
 		}
 
-		// try to resolve by external cache, using qualified name
-		final IClass cachedExternalClass = this.externalClassCache.get(name.qualified);
-		if (cachedExternalClass != null)
+		// resolve by qualified name, but without name splitting
+		final ExternalClass loaded = this.resolveExternalClass(name.qualified);
+		if (loaded != null && loaded.getName() == name)
 		{
-			return cachedExternalClass;
+			// found from the qualified name
+			return loaded;
 		}
 
-		// try to resolve by external cache, without qualified name (slow)
-		for (IClass c : this.externalClassCache.values())
+		// TODO when BytecodeName is supported on non-extension classes,
+		// we have to iterate all class files in this package until we find one with the correct name
+		// return this.listExternalClassFiles().sequential().map(fileName -> loadClass(fileName, this)).filter(p -> p != null && p.getName() == name).findFirst().orElse(null);
+
+		return null;
+	}
+
+	public IClass resolveClass(String simpleDescriptor)
+	{
+		final Name rawName = Name.fromRaw(simpleDescriptor);
+
+		// try to resolve by name in a header
+		for (IHeaderUnit header : this.headers)
 		{
-			if (c.getName() == name)
+			final IClass c = header.resolveClass(rawName);
+			if (c != null)
 			{
 				return c;
 			}
 		}
 
-		return this.loadExternalClass(name);
+		// fall back to external resolution
+		// unlike resolveClass(Name), this does NOT check if the resulting class actually has that (Dyvil) name
+		return this.resolveExternalClass(simpleDescriptor);
 	}
 
 	public ExternalClass resolveExternalClass(String simpleDescriptor)
@@ -396,23 +406,6 @@ public class Package implements Named, IDefaultContext
 		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
 		// different name than its enclosing compilation unit
 		return this.loadExternalClass(simpleDescriptor);
-	}
-
-	private ExternalClass loadExternalClass(Name name)
-	{
-		// resolve by qualified name, but without name splitting
-		final ExternalClass loaded = this.loadExternalClass(name.qualified);
-		if (loaded != null && loaded.getName() == name)
-		{
-			// found from the qualified name
-			return loaded;
-		}
-
-		// TODO when BytecodeName is supported on non-extension classes,
-		// we have to iterate all class files in this package until we find one with the correct name
-		// return this.listExternalClassFiles().sequential().map(fileName -> loadClass(fileName, this)).filter(p -> p != null && p.getName() == name).findFirst().orElse(null);
-
-		return null;
 	}
 
 	private ExternalClass loadExternalClass(String simpleDescriptor)
