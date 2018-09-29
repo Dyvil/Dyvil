@@ -43,9 +43,11 @@ public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClass
 
 	// Header Declaration
 
-	void setHeaderDeclaration(HeaderDeclaration declaration);
+	boolean hasHeaderDeclaration();
 
 	HeaderDeclaration getHeaderDeclaration();
+
+	void setHeaderDeclaration(HeaderDeclaration declaration);
 
 	// Import
 

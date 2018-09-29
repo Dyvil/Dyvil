@@ -124,6 +124,12 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
+	public boolean hasHeaderDeclaration()
+	{
+		return this.headerDeclaration != null;
+	}
+
+	@Override
 	public HeaderDeclaration getHeaderDeclaration()
 	{
 		return this.headerDeclaration;
