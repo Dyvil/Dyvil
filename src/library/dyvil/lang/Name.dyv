@@ -1,6 +1,6 @@
 package dyvil.lang
 
-import dyvil.util.Qualifier.{ qualify, unqualify }
+import func dyvil.util.Qualifier.{ qualify, unqualify }
 
 import java.io.{ DataInput, DataOutput, IOException }
 

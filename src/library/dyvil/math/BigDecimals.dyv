@@ -1,5 +1,7 @@
 package dyvil.math
 
+public header BigDecimals
+
 import java.math.BigDecimal
 
 @BytecodeName("BigDecimals$BigDecimalSyntax")

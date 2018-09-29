@@ -7,21 +7,15 @@
 package dyvil.ref.unsafe
 
 import dyvil.ref.#(TYPE_NAME)Ref
-import dyvil.reflect.ReflectUtils.UNSAFE
+import const dyvil.reflect.ReflectUtils.UNSAFE
 
 import java.lang.reflect.Field
 
 #if (TYPE_NAME == 'Object') {
-	class UnsafeObjectRef<type T>(
-		protected let base: Object!
-		protected let offset: long
-	) implements ObjectRef<T>
+	class UnsafeObjectRef<type T>(protected let base: Object!, protected let offset: long) implements ObjectRef<T>
 }
 #else {
-	class Unsafe#(TYPE_NAME)Ref(
-		protected let base: Object!
-		protected let offset: long
-	) implements #(TYPE_NAME)Ref
+	class Unsafe#(TYPE_NAME)Ref(protected let base: Object!, protected let offset: long) implements #(TYPE_NAME)Ref
 }
 {
 	public init(staticField: Field) : this(UNSAFE.staticFieldBase(staticField), UNSAFE.staticFieldOffset(staticField))

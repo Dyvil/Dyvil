@@ -2,7 +2,7 @@
 // Timestamp: TIME_STAMP
 package dyvil.lang
 
-import dyvil.reflect.Opcodes.LOAD_0
+import const dyvil.reflect.Opcodes.LOAD_0
 
 public abstract class References
 {

@@ -1,5 +1,7 @@
 package dyvil.math
 
+public header BigIntegers
+
 import java.math.BigInteger
 
 type BigInt = BigInteger
