@@ -185,6 +185,10 @@ public class DyvilCompiler extends BasicTool
 
 		Package.init();
 
+		// sort compilation units by case insensitive absolute path to ensure consistency across filesystems
+		this.fileFinder.units.sort(
+			Comparator.comparing(unit -> unit.getFileSource().file().getAbsolutePath(), String.CASE_INSENSITIVE_ORDER));
+
 		final int fileCount = this.fileFinder.files.size();
 		final int unitCount = this.fileFinder.units.size();
 
