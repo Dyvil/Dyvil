@@ -21,6 +21,7 @@ import dyvilx.tools.compiler.util.Util;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Comparator;
 
 import static dyvilx.tools.compiler.sources.DyvilFileType.*;
 
@@ -210,20 +211,17 @@ public class DyvilCompiler extends BasicTool
 
 	public boolean applyPhases()
 	{
-		final int phases = this.phases.size();
-
-		// Apply states
-		if (this.config.isDebug())
+		if (!this.config.isDebug())
 		{
-			this.log(phases == 1 ?
-				         I18n.get("phase.applying.1", this.phases) :
-				         I18n.get("phase.applying.n", phases, this.phases));
-
 			for (ICompilerPhase phase : this.phases)
 			{
-				this.log(I18n.get("phase.applying", phase.getName()));
-				if (!this.applyPhaseDebug(phase))
+				try
 				{
+					phase.apply(this);
+				}
+				catch (Exception e)
+				{
+					this.error(I18n.get("phase.failed", phase.getName()), e);
 					return false;
 				}
 			}
@@ -231,52 +229,32 @@ public class DyvilCompiler extends BasicTool
 			return true;
 		}
 
+		final int nPhases = this.phases.size();
+		this.log(nPhases == 1 ?
+			         I18n.get("phase.applying.1", this.phases) :
+			         I18n.get("phase.applying.n", nPhases, this.phases));
+
 		for (ICompilerPhase phase : this.phases)
 		{
-			if (!this.applyPhase(phase))
+			this.log(I18n.get("phase.applying", phase.getName()));
+
+			try
 			{
+				final long startTime = System.nanoTime();
+
+				phase.apply(this);
+
+				final long endTime = System.nanoTime();
+				this.log(I18n.get("phase.completed", phase.getName(), Util.toTime(endTime - startTime)));
+			}
+			catch (Exception e)
+			{
+				this.error(I18n.get("phase.failed", phase.getName()), e);
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	private boolean applyPhase(ICompilerPhase phase)
-	{
-		try
-		{
-			phase.apply(this);
-
-			return true;
-		}
-		catch (Throwable t)
-		{
-			this.error(phase.getName(), "apply", t);
-
-			return false;
-		}
-	}
-
-	private boolean applyPhaseDebug(ICompilerPhase phase)
-	{
-		try
-		{
-			final long startTime = System.nanoTime();
-
-			phase.apply(this);
-
-			final long endTime = System.nanoTime();
-			this.log(I18n.get("phase.completed", phase.getName(), Util.toTime(endTime - startTime)));
-
-			return true;
-		}
-		catch (Throwable t)
-		{
-			this.log(I18n.get("phase.failed", phase.getName()));
-			this.error(phase.getName(), "apply", t);
-			return false;
-		}
 	}
 
 	public void test()
