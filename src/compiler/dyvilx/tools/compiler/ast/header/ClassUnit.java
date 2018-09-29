@@ -14,17 +14,28 @@ import java.io.File;
 
 public class ClassUnit extends SourceHeader implements IClassConsumer
 {
+	// =============== Constructors ===============
+
 	public ClassUnit(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Header Declaration ---------------
+
 	@Override
 	public boolean needsHeaderDeclaration()
 	{
+		// class units need an implicit header declaration if they contain at least one extension class or a class with
+		// a custom bytecode name, otherwise those classes cannot be resolved correctly by the external class resolution
+		// algorithms in the Package class.
+
 		for (IClass iclass : this.classes)
 		{
-			if (iclass.hasModifier(Modifiers.EXTENSION))
+			if (iclass.hasModifier(Modifiers.EXTENSION) //
+			    || iclass.getInternalName().endsWith(iclass.getName().qualified))
 			{
 				return true;
 			}
@@ -32,6 +43,8 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 
 		return false;
 	}
+
+	// --------------- Phases ---------------
 
 	@Override
 	public void parse()
