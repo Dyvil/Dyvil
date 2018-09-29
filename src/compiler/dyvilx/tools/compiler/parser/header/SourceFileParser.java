@@ -1,5 +1,6 @@
 package dyvilx.tools.compiler.parser.header;
 
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
@@ -128,17 +129,20 @@ public class SourceFileParser extends AbstractMemberParser
 				}
 
 				pm.skip();
-				if (this.unit.getHeaderDeclaration() != null)
+
+				if (this.unit.hasHeaderDeclaration() // extra check so we don't accidentally generate one
+				    && !this.unit.getHeaderDeclaration().hasModifier(Modifiers.GENERATED))
 				{
-					this.attributes = new AttributeList();
 					pm.report(token, "header.declaration.duplicate");
-					this.mode = SEPARATOR;
 					return;
 				}
+				else
+				{
+					final HeaderDeclaration declaration = new HeaderDeclaration(this.unit, next.raw(), next.nameValue(),
+					                                                            this.attributes);
+					this.unit.setHeaderDeclaration(declaration);
+				}
 
-				final HeaderDeclaration declaration = new HeaderDeclaration(this.unit, next.raw(), next.nameValue(),
-				                                                            this.attributes);
-				this.unit.setHeaderDeclaration(declaration);
 				this.attributes = new AttributeList(); // reset
 				this.mode = SEPARATOR;
 				return;
