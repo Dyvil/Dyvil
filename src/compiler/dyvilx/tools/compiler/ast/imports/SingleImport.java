@@ -214,26 +214,26 @@ public final class SingleImport extends Import implements IDefaultContext
 
 	private boolean checkInline(MarkerList markers, IContext context, IHeaderUnit header)
 	{
-		// Check if the Header has a Header Declaration
 		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
 		if (headerDeclaration == null)
 		{
-			return header.needsHeaderDeclaration();
+			markers.add(Markers.semanticError(this.position, "import.inline_header.invisible", header.getName()));
+			return false;
 		}
 
-		// Header Access Check
-		int accessLevel = headerDeclaration.getAccessLevel();
-		if ((accessLevel & Modifiers.INTERNAL) != 0)
+		int accessModifiers = headerDeclaration.getAccessLevel();
+
+		if ((accessModifiers & Modifiers.INTERNAL) != 0)
 		{
 			if (header instanceof ExternalHeader)
 			{
 				markers.add(Markers.semanticError(this.position, "import.inline_header.internal", header.getName()));
 				return false;
 			}
-			accessLevel &= 0b1111;
+			accessModifiers &= ~Modifiers.INTERNAL;
 		}
 
-		switch (accessLevel)
+		switch ((accessModifiers & Modifiers.VISIBILITY_MODIFIERS))
 		{
 		case Modifiers.PACKAGE:
 		case Modifiers.PROTECTED:
@@ -243,6 +243,7 @@ public final class SingleImport extends Import implements IDefaultContext
 			}
 			// Fallthrough
 		case Modifiers.PRIVATE:
+		case Modifiers.PRIVATE_PROTECTED:
 			markers.add(Markers.semanticError(this.position, "import.inline_header.invisible", header.getName()));
 			return false;
 		}
