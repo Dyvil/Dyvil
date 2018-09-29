@@ -108,12 +108,6 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	}
 
 	@Override
-	public boolean needsHeaderDeclaration()
-	{
-		return false;
-	}
-
-	@Override
 	public IContext getContext()
 	{
 		this.resolveImports();

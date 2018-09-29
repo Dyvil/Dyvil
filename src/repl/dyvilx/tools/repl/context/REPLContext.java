@@ -539,12 +539,6 @@ public class REPLContext extends AbstractHeader
 		return this.currentClass.getInternalName();
 	}
 
-	@Override
-	public boolean needsHeaderDeclaration()
-	{
-		return false;
-	}
-
 	// --------------- Header Compilation ---------------
 
 	@Override

@@ -20,8 +20,6 @@ import dyvilx.tools.parsing.ASTNode;
 
 public interface IHeaderUnit extends ASTNode, ObjectCompilable, IContext, IClassConsumer, ICompilableList, IOperatorMap, ITypeAliasMap
 {
-	boolean needsHeaderDeclaration();
-
 	@Override
 	DyvilCompiler getCompilationContext();
 

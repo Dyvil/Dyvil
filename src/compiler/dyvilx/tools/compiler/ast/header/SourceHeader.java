@@ -32,7 +32,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 {
 	// =============== Fields ===============
 
-	protected TokenList tokens;
+	protected TokenList  tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
 	public final FileSource fileSource;
@@ -52,9 +52,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		this.outputDirectory = output.getParentFile();
 	}
 
-	// =============== Methods ===============
-
-	// --------------- Getters and Setters ---------------
+	// =============== Properties ===============
 
 	@Override
 	public MarkerList getMarkers()
@@ -75,10 +73,29 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
-	public boolean needsHeaderDeclaration()
+	public HeaderDeclaration getHeaderDeclaration()
+	{
+		if (this.headerDeclaration == null)
+		{
+			final int modifiers = this.getDefaultHeaderDeclarationVisibility() | Modifiers.GENERATED;
+			final AttributeList attributes = AttributeList.of(modifiers);
+
+			return this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name, attributes);
+		}
+		return this.headerDeclaration;
+	}
+
+	protected boolean needsDefaultHeaderDeclaration()
 	{
 		return true;
 	}
+
+	protected int getDefaultHeaderDeclarationVisibility()
+	{
+		return Modifiers.PUBLIC;
+	}
+
+	// =============== Methods ===============
 
 	// --------------- Phases ---------------
 
@@ -138,12 +155,6 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void resolve()
 	{
-		if (this.headerDeclaration == null && this.needsHeaderDeclaration())
-		{
-			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
-			                                               AttributeList.of(Modifiers.PUBLIC));
-		}
-
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolve(this.markers, this);
@@ -163,9 +174,10 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		this.pack.check(this.packageDeclaration, this.markers);
 
-		if (this.headerDeclaration != null)
+		final HeaderDeclaration headerDeclaration = this.getHeaderDeclaration();
+		if (headerDeclaration != null)
 		{
-			this.headerDeclaration.check(this.markers);
+			headerDeclaration.check(this.markers);
 		}
 
 		this.classes.check(this.markers, this.getContext());
@@ -197,7 +209,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 			return;
 		}
 
-		if (this.headerDeclaration != null)
+		if (this.getHeaderDeclaration() != null)
 		{
 			final File file = new File(this.outputDirectory, this.name.qualified + DyvilFileType.OBJECT_EXTENSION);
 			ObjectFormat.write(this.compiler, file, this);

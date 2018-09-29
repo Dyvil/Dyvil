@@ -21,12 +21,10 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 		super(compiler, pack, input, output);
 	}
 
-	// =============== Methods ===============
-
-	// --------------- Header Declaration ---------------
+	// =============== Properties ===============
 
 	@Override
-	public boolean needsHeaderDeclaration()
+	protected boolean needsDefaultHeaderDeclaration()
 	{
 		// class units need an implicit header declaration if they contain at least one extension class or a class with
 		// a custom bytecode name, otherwise those classes cannot be resolved correctly by the external class resolution
@@ -43,6 +41,14 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 
 		return false;
 	}
+
+	@Override
+	protected int getDefaultHeaderDeclarationVisibility()
+	{
+		return Modifiers.PRIVATE;
+	}
+
+	// =============== Methods ===============
 
 	// --------------- Phases ---------------
 
