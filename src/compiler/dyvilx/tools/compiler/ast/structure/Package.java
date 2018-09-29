@@ -317,10 +317,8 @@ public class Package implements Named, IDefaultContext
 		return this.listExternalClassFileNames().map(p -> p.substring(0, p.length() - ".class".length()));
 	}
 
-	@Override
-	public IClass resolveClass(Name name)
+	private IClass resolveClassFromHeader(Name name)
 	{
-		// try to resolve by name in a header
 		for (IHeaderUnit header : this.headers)
 		{
 			final IClass c = header.resolveClass(name);
@@ -329,42 +327,63 @@ public class Package implements Named, IDefaultContext
 				return c;
 			}
 		}
+		return null;
+	}
 
-		// resolve by qualified name, but without name splitting
-		final ExternalClass loaded = this.resolveExternalClass(name.qualified);
-		if (loaded != null && loaded.getName() == name)
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		// try to resolve by name in a header
+		final IClass c = this.resolveClassFromHeader(name);
+		if (c != null)
 		{
-			// found from the qualified name
-			return loaded;
+			return c;
 		}
 
-		// TODO when BytecodeName is supported on non-extension classes,
-		// we have to iterate all class files in this package until we find one with the correct name
-		// return this.listExternalClassFiles().sequential().map(fileName -> loadClass(fileName, this)).filter(p -> p != null && p.getName() == name).findFirst().orElse(null);
+		// resolve by qualified name, but without name splitting
+		final ExternalClass external = this.resolveExternalClass(name.qualified);
 
-		return null;
+		// only return the class if the name matches
+		return external != null && external.getName() == name ? external : null;
 	}
 
 	public IClass resolveClass(String simpleDescriptor)
 	{
-		final Name rawName = Name.fromRaw(simpleDescriptor);
-
 		// try to resolve by name in a header
-		for (IHeaderUnit header : this.headers)
+		final IClass c = this.resolveClassFromHeader(Name.fromRaw(simpleDescriptor));
+		if (c != null)
 		{
-			final IClass c = header.resolveClass(rawName);
-			if (c != null)
-			{
-				return c;
-			}
+			return c;
 		}
 
-		// fall back to external resolution
-		// unlike resolveClass(Name), this does NOT check if the resulting class actually has that (Dyvil) name
+		// Check for inner / nested / anonymous classes
+		final int cashIndex = simpleDescriptor.lastIndexOf('$');
+		if (cashIndex >= 0)
+		{
+			final String outerName = simpleDescriptor.substring(0, cashIndex);
+			final IClass outerClass = this.resolveClass(outerName);
+
+			if (outerClass != null)
+			{
+				// can use raw because the it cannot contain any $ symbols
+				final Name innerName = Name.fromRaw(simpleDescriptor.substring(cashIndex + 1));
+				final IClass innerClass = outerClass.resolveClass(innerName);
+
+				if (innerClass != null)
+				{
+					return innerClass;
+				}
+			}
+
+			// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
+			// different name than its enclosing compilation unit
+			// fall back to external class resolution
+		}
+
 		return this.resolveExternalClass(simpleDescriptor);
 	}
 
-	public ExternalClass resolveExternalClass(String simpleDescriptor)
+	private ExternalClass resolveExternalClass(String simpleDescriptor)
 	{
 		// try to resolve by external cache, using qualified name
 		final ExternalClass cachedExternalClass = this.externalClassCache.get(simpleDescriptor);
@@ -373,43 +392,6 @@ public class Package implements Named, IDefaultContext
 			return cachedExternalClass;
 		}
 
-		final String slashInternalName = '/' + simpleDescriptor;
-
-		// try to resolve by external cache, without qualified name (slow)
-		for (ExternalClass c : this.externalClassCache.values())
-		{
-			if (c.getInternalName().endsWith(slashInternalName))
-			{
-				return c;
-			}
-		}
-
-		// Check for inner / nested / anonymous classes
-		final int cashIndex = simpleDescriptor.lastIndexOf('$');
-		if (cashIndex < 0)
-		{
-			return this.loadExternalClass(simpleDescriptor);
-		}
-
-		final String outerName = simpleDescriptor.substring(0, cashIndex);
-		final Name innerName = Name.from(simpleDescriptor.substring(cashIndex + 1));
-
-		final ExternalClass outerClass = this.resolveExternalClass(outerName);
-		final IClass innerClass;
-
-		// FIXME add a resolveClass(String) overload
-		if (outerClass != null && (innerClass = outerClass.resolveClass(innerName)) instanceof ExternalClass)
-		{
-			return (ExternalClass) innerClass;
-		}
-
-		// might be a class that is not nested but is prefixed with the file name, which happens when a class has a
-		// different name than its enclosing compilation unit
-		return this.loadExternalClass(simpleDescriptor);
-	}
-
-	private ExternalClass loadExternalClass(String simpleDescriptor)
-	{
 		return loadExternalClass(this.getDirectory() + simpleDescriptor + DyvilFileType.CLASS_EXTENSION,
 		                         result -> this.externalClassCache.put(simpleDescriptor, result));
 	}
