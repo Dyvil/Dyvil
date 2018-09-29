@@ -1,6 +1,6 @@
 package dyvil.tests
 
-import dyvil.Test
+using dyvil.Test
 
 public class OptionalTest
 {
