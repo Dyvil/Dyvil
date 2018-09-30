@@ -102,6 +102,15 @@ public class ExtensionMetadata implements IClassMetadata
 	}
 
 	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.theClass.isTypeParametric())
+		{
+			markers.add(Markers.semanticError(this.theClass.getPosition(), "extension.generic"));
+		}
+	}
+
+	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		this.theClass.setSuperType(Types.OBJECT);
