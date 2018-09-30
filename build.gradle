@@ -9,16 +9,15 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 // ---------------------------------------- Main Settings ----------------------------------------
 
-class Constants
-{
-	public static String version = '0.39.0'
-	public static String libraryVersion = '0.39.0'
-	public static String compilerVersion = '0.39.0'
-	public static String replVersion = '0.24.1'
-	public static String dpfVersion = '0.15.3'
-	public static String genSrcVersion = '0.9.1'
+class Constants {
+	public static String version = '0.40.0'
+	public static String libraryVersion = '0.40.0'
+	public static String compilerVersion = '0.40.0'
+	public static String replVersion = '0.25.0'
+	public static String dpfVersion = '0.15.4'
+	public static String genSrcVersion = '0.9.2'
 
-	public static final String devStage = 'delta'
+	public static final String devStage = 'epsilon'
 
 	public static final String replMainClass = 'dyvilx.tools.repl.Main'
 	public static final String compilerMainClass = 'dyvilx.tools.compiler.Main'
@@ -40,8 +39,7 @@ Map<String, String> env = System.getenv()
 String buildNum = env['TRAVIS_BUILD_NUMBER'] ?: env['DRONE_BUILD_NUMBER']
 boolean nightly
 
-if (buildNum)
-{
+if (buildNum) {
 	String info = "+nightly." + buildNum
 
 	Constants.version += info
@@ -554,14 +552,12 @@ task prepareRelease(type: Copy) {
 
 	from 'versions/'
 
-	if (nightly)
-	{
+	if (nightly) {
 		into 'versions'
 		include 'nightly-template.dyp'
 		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
 	}
-	else
-	{
+	else {
 		into "versions/$Constants.devStage"
 		include 'template.dyp'
 		rename 'template\\.dyp', "v${ Constants.version }.dyp"
@@ -587,8 +583,7 @@ task prepareRelease(type: Copy) {
 	}
 }
 
-if (nightly)
-{
+if (nightly) {
 	build.dependsOn 'prepareRelease'
 }
 

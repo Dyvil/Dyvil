@@ -1,5 +1,274 @@
-Dyvil v0.39.0
-=============
+# Dyvil v0.40.0
+
+## Dyvil Library v0.40.0
+
+- Added `Formattable.extension String`.
+- Added `using` declarations for the primitive extension classes to the `Lang` header.
+- Added extension classes for primitive types and wrappers to the `Primitives` header.
+- Added the `[T].inserted(at: int, value: T)` method.
+- Added the `bool` and `Bool` type aliases to the `Lang` header.
+- Added the `Formattable.extension String` class.
+- Added the `Formattable.format` method.
+- Added the `Modifiers.{JAVA,DYVIL}_MODIFIER_MASK` constants.
+- Added the EXTENSION_CLASS modifier to the `Modifiers` class.
+- Added type annotations to `Intrinsic` constants.
+- Changed the `EXTENSION_CLASS` constant in the `Modifiers` class to avoid clash with the `TRAIT` flag.
+- Changed the value of the `Modifiers.EXTENSION` constant.
+- Cleaned up the `BigDecimals` and `BigIntegers` headers.
+- Cleaned up the `Output` class.
+- Fixed incorrect an import declaration in the `OptionalTest` class.
+- Fixed incorrect import declarations in the `Name`, `References`, `BigIntegers`, `BigDecimals` and `Unsafe*Ref` classes.
+- Fixed unwanted recursion in the `Polynomial.toString()` and `Rational.toString()` implementations.
+- Improved the `Output.print(any!..., ...)` methods.
+- Made all methods with an explicit this type that is not the enclosing class `extension func`s.
+- Modernized the `Strings` header to make use of extensions.
+- Moved factorial, permutations and combinations from `MathUtils` to the new `Combinatorics` header.
+- Moved functionality from the `BigIntegerOperators` and `BigDecimalOperators` classes to the `BigIntegers` and `BigDecimals` headers and extensions.
+- Moved the `AutoPrinter` class to the `dyvil.syntax` package.
+- Moved the `Output.<<` operator to `dyvil.syntax.CppIO`.
+- Moved the `Output.print(AutoPrinter.()->void)` method to the `AutoPrinter` header.
+- Moved the functionality from the `dyvil/lang/{Booleans, Doubles, Floats, Ints, Longs}` classes to `Primitives`.
+- Removed imports for primitives from the `Lang` header.
+- Removed the `FUNCTIONAL` constant from the `Modifiers` class.
+- Removed the `Modifiers.EXTENSION_{FLAG,CLASS}` constants.
+- Removed the explicit header declaration from the `Primitives` class.
+- Replaced the `APPLY_T` and `APPLY_WITH_SIZE` macros in `Array.dyv.dgt` with the `APPLY` macro function.
+- Replaced the `MathUtils` with a `Math` extension class.
+- Replaced the `Representable` class with `Representation` and modernized the API.
+- The `DyvilModifiers` annotation now uses `long` for the value.
+- The `DyvilName` annotation can now be used on classes. #394
+- The `LiteralConvertible` class is now generated with GenSrc.
+- Updated and rearranged the `Modifiers` class.
+- Updated the `any.toString(StringBuilder)` method in the `Strings` class to adapt to new `extension` declaration.
+- Updated the `ObjectRange` and `Map` classes to qualify this expressions.
+
+## Dyvil Compiler v0.40.0
+
+- `AbstractClass` now automatically links enclosing class, header and package.
+- `DyvilName` annotations on external classes are now correctly decompiled. #394
+- Added a default implementation for the `Attributable.getAccessLevel` method.
+- Added a diagnostic error when a class descriptor clashes with that of a different class. #403
+- Added a diagnostic warning when a class descriptor clashes with that of class from an external library. #403
+- Added an error diagnostic for generic extension classes. #406
+- Added compiler support for using the `DyvilName` annotation on classes. #394
+- Added lazy class list resolution to the `ExternalHeader` class.
+- Added parser support for extension classes. #304
+- Added proper compilation and decompilation support for the `extension` method modifier. #395
+- Added some getters and setters to `AbstractClass` and `ExternalClass`.
+- Added support for accessing and compiling `this` in extension methods.
+- Added the `AbstractClass.enclosingPackage` and `.enclosingHeader` fields.
+- Added the `ArgumentList.copy(capacity: int)` method.
+- Added the `ArgumentList.getLabel(index: int)` method. #399
+- Added the `ArgumentList.getOrDefault` method.
+- Added the `Attributable.{get,set}{Java,Dyvil}Flags` methods.
+- Added the `AttributeList.removeFlag` method.
+- Added the `ClassList` class.
+- Added the `ExternalClass.listExternalClassFileNames` method.
+- Added the `IClass.allMethods` method.
+- Added the `IClass.getPackage` and `.setPackage` methods.
+- Added the `IClass.setTypeParameters` method.
+- Added the `IHeaderUnit.hasHeaderDeclaration` method and implemented it in `AbstractHeader`.
+- Added the `Library.list*Paths` and `.list*Names` methods for file and directory discovery.
+- Added the `Package.getClasses` method.
+- Added the `Package.getDirectory` method.
+- Added the `Package.getHeaders` method.
+- Added the `Package.listExternalClassNames` method to discover all external class names in a package.
+- Added the `Package.resolveExternalClass(String)` method.
+- Added the `ParameterList.removeFirst` method.
+- Added the `TypeList.getInternalTypeNames` method.
+- Added the `Util.getHeaderName` method.
+- Allow the `ArgumentList.labels` field to be `null` to improve memory footprint. #399
+- Changed the `ExternalClassVisitor.loadClass` return type from `IClass` to `ExternalClass`.
+- Changed the `Package.resolveClass(String)` method to delegate to `resolveClass(Name)`.
+- Changed the parameter type of `IContext.getAccessibleThis(IClass)` to `IType`.
+- Class Units containing Extension Classes now automatically generate compiled header files.
+- Classes with custom bytecode names now write a `DyvilName` annotation on compilation. #394
+- Cleaned up and simplified the `ArgumentListParser` class
+- Cleaned up the `AbstractClass` class.
+- Cleaned up the `AbstractHeader` class.
+- Cleaned up the `AbstractMember` class.
+- Cleaned up the `AbstractMethod` class.
+- Cleaned up the `ArgumentList` class.
+- Cleaned up the `Attributable` class.
+- Cleaned up the `CodeMethod` class.
+- Cleaned up the `CompilerConfig` class. #402
+- Cleaned up the `DyvilCompiler.applyPhases` method and related methods.
+- Cleaned up the `KindedImport` class.
+- Cleaned up the `LambdaExpr` class (partially).
+- Cleaned up the `Library`, `FileLibrary` and `JarLibrary` classes.
+- Cleaned up the `Names` class by renaming some constants and sorting them.
+- Cleaned up the `Package` class.
+- Cleaned up the `PrimitiveType` class.
+- Cleaned up the `RootPackage` class.
+- Cleaned up the `SequentialCompilerPhase` class.
+- Cleaned up the `SourceHeader` class.
+- Cleaned up the `ThrowStatement` class.
+- Cleaned up various classes and interfaces for method and constructor ASTs.
+- Cleanup up the `AnnotationExpr` class.
+- Cleanup up the `TypeList` class.
+- Compilation Units are now sorted before phases are applied, to ensure a consistent output across filesystems.
+- Compilation units containing classes with custom bytecode names now automatically generate compiled headers.
+- Compiled Header Files now store a list of class names.
+- Compiled Headers now store the full internal class name of all contained classes.
+- Disabled the behaviour of the `inline` modifier on external methods.
+- Explicit `this` type compatibility checks now work with `extension func`s and are done in `checkTypes`.
+- Extended declaration parsers to allow attributes within the declaration. #400
+- Extended the property body parser to allow attributes after after `get` and after the setter parameter name. #400
+- Extension Classes now allow `private const` fields.
+- Extension Classes now automatically add the `extension` flag to all methods. #304
+- Extension Classes now disallow fields and properties. #304
+- Extension Classes now suppress unimplemented abstract method errors.
+- Extension Methods no longer generate any bridge methods.
+- Extension Methods now require an explicit receiver type. #395
+- External Class Loading is now implemented in the `ExternalClassVisitor` class instead of `ExternalClass`.
+- Fixed a compiler error caused by throw statements without expressions. #392
+- Fixed an error in the `AbstractMethod.isAbstract` method.
+- Fixed an issue in `KindedImport` that would not format `inline` and `implicit` modifiers.
+- Fixed an issue in the `Package.resolveClass` method that would incorrectly return `null`.
+- Fixed an issue that caused internal class name resolution to fail for top-level classes with names different from the enclosing header.
+- Fixed an issue with class type formatting that would omit the `case` modifier.
+- Fixed errors in the `Package.resolveClass` implementation.
+- Implemented calling convention for `static extension func`s. #395
+- Implemented name mangling for extension classes. #304
+- Implemented special Java/Dyvil flag conversions as overridden methods.
+- Implicit header declarations are now created in the `getHeaderDeclaration` method.
+- Implicit header declarations now use the `GENERATED` modifier.
+- Implicit header declarations of class units are now `private` instead of `public`.
+- Implicit Search now also considers Extension Classes.
+- Improved `Package` class cache performance.
+- Improved diagnostics for inline imports referring to header units with `private protected` header declarations.
+- Improved diagnostics for inline imports referring to header units with implicit header declarations.
+- Improved external nested class resolution.
+- Improved internal and full name getters in the `AbstractClass` class.
+- Improved property argument parsing for list-like configurations. #402
+- Improved recursive override checking.
+- Improved the `ArgumentList.get(...)` and `.set(...)` implementations. #399
+- Improved the `ConstructorParser`, `FieldParser`, `MethodParser` and `MemberParser` classes.
+- Improved the `Package.resolveClass(internalName: String)` implementation; it now resolved by file name rather than symbolic name.
+- Improved the `Package.resolveClass(String)` implementation.
+- Improved the diagnostics for invalid break and continue statements.
+- Improved the duplicate method descriptor diagnostic implementation.
+- Improved the order in which class types and attributes are parsed in the `MemberParser` and `SourceFileParser` classes.
+- Improved the structure of the `backend` package.
+- Improved the way `ExtensionMetadata` stores its info. #304
+- Internal class names no longer use the enclosing header name. #401
+- Kinded imports no longer OR the mask of the enclosing context to their own, but overwrite it.
+- Match list ambiguity now checks if the two candidates have the same member, in which case the list is not considered ambiguous.
+- Method Resolution for Primitive Types now also looks into the `Primitives` Header.
+- Methods from Extension Classes declared in source units are now implicitly imported. #304
+- Modifier flags are now internally represented as `long`s.
+- Moved `AbstractHeader.read(DataInput)` to `ExternalHeader`.
+- Moved `AbstractHeader.write(DataOutput)` to `SourceHeader`.
+- Moved command-line argument parsing to the `ArgumentParser` class.
+- Moved nested class resolution code from the `Package.resolveExternalClass` method to `Package.resolveClass(String)`.
+- Moved the `AnnotationUtil.getEnumValue` method to `EnumValue.eval`.
+- Moved the `ClassFormat.readModifiers` method to `ModifierUtil`.
+- Moved the `Member.getAccessLevel` method to `Attributable`.
+- Moved the class list from `ClassUnit` to `AbstractHeader`.
+- Moved the class list phase implementation from `ClassUnit` to `SourceHeader`.
+- Moved the functionality from `ClassReader` to `ExternalClassVisitor` and removed the former.
+- Moved the methods for checking modifiers and visibility from `ModifierUtil` to `ModifierChecks`.
+- Primitive Wrapper Classes are now loaded lazily.
+- Pulled up the `NamedArgumentList` implementation into the `ArgumentList` class.
+- Refactored the methods for splitting Java and Dyvil modifiers in the `ModifierUtil` class.
+- Regular imports now use the `class type` mask instead of anything.
+- Reimplemented compilation of trait initializer calls. #396
+- Removed an optimization in `MatchList.getBestCandidate` that does not work when the same member is added twice.
+- Removed the `AnnotationUtil.getStringValue` method.
+- Removed the `ArgumentList.getArray` method.
+- Removed the `BackendUtil` class.
+- Removed the `CodeClass.unit` field and unnecessary overridden methods.
+- Removed the `ExternalClass.enclosingPackage` field and accessors.
+- Removed the `IClass.addMethods` method.
+- Removed the `IClassConsumer` interface from the `Package` class.
+- Removed the `IClassList` interface.
+- Removed the `ICompilationUnit.getOutputFile` method.
+- Removed the `IHeaderUnit.needsHeaderDeclaration` method.
+- Removed the `ITypeConsumer` class and replaced it with `Consumer<IType>`.
+- Removed the `MethodWriter.setThisType` and `Frame.setInstance` methods.
+- Removed the `ModifierUtil.getAttributes` method.
+- Removed the `ModifierUtil.get{Java,Dyvil}Flags` methods.
+- Removed the `ModifierUtil.{JAVA,DYVIL}_MODIFIER_MASK` constants.
+- Removed the `NamedArgumentList` class and replaced usages with `ArgumentList`. #399
+- Removed the `PrimitiveType.extClass` field as the former primitive extension classes no longer exist under their old names.
+- Renamed a few classes of the `backend` package.
+- Renamed all occurrences of `key`s and `name`s in `ArgumentList` to `label`. #399
+- Renamed the `AnnotationUtil.visitDyvilName` method to `writeDyvilType`.
+- Renamed the `ArgumentList.setName` method to `setLabel`. #399
+- Renamed the `arguments.duplicate.key` diagnostic to `arguments.duplicate.label` and improved its human-readable text. #399
+- Renamed the `IClassCompilable` interface to `ClassCompilable`.
+- Renamed the `IClassMember` interface to `ClassMember`.
+- Renamed the `IHeaderUnit.isHeader` method to `needsHeaderDeclaration`.
+- Renamed the `IMember` class to `Member`.
+- Renamed the `INamed` interface to `Named`.
+- Renamed the `IObjectCompilable` interface to `ObjectCompilable`.
+- Renamed the `IResolvable` interface to `Resolvable`.
+- Renamed the `ITyped` interface to `Typed`.
+- Renamed the `Member` class to `AbstractMember`.
+- Renamed the `ModifierVisitor` class to `DyvilModifierVisitor`.
+- Renamed the `Package.loadClass` method to `loadExternalClass` and changed the parameters.
+- Renamed the `RootPackage.resolveGlobalExternalClass` to `resolveGlobalClass` and changed it's behaviour to resolve source classes as well.
+- Renamed the `RootPackage.resolveInternalClass` method to `resolveGlobalExternalClass`.
+- Renamed the `RootPackage.resolveInternalPackage` method to `resolveGlobalPackage`.
+- Renamed the first parameter of `IValueList.add(Name, IValue)` to `label`.
+- Renamed the first parameter of `StatementList.add(Name, IValue)` to `label`.
+- Replaced usages of `MethodWriter.setThisType` with `MethodWriter.setLocalType`.
+- Restructured the `ArgumentList` class.
+- Restructured the `ArgumentList` class. #399
+- Simplified `ExternalClass` constructor and `Package.loadClass`.
+- Synthetic lambda body methods are now always static.
+- The `class.descriptor.duplicate.package` diagnostic now only checks source headers in the enclosing package.
+- The `DyvilModifierVisitor` now stores an `Attributable` and calls its `setDyvilFlags` method.
+- The `EXTENSION_CLASS` class type now resolved to the `ExtensionMetadata`. #304
+- The `Package.internalName` property no longer stores the trailing `/` character.
+- The `Package.loadClass` now checks if the name actually matches.
+- The `Package` class now only caches *external* classes.
+- The `SequentialCompilerPhase` implementation now catches exceptions on a per-unit basis.
+- The `Typed` interface no longer implements `ITypeConsumer`.
+- The assigned value no longer uses the argument label `=` in apply assignments.
+- The assigned value no longer uses the argument label `=` in subscript assignments.
+- The duplicate header declaration diagnostic no longer fails for units that would need an implicit header declaration.
+- This expression types are now resolved in `resolve` instead of `resolveTypes` to ensure extension classes have time to set explicit this types.
+- This Expressions with explicit type now require generic type arguments.
+- Updated `AttributeList` serialization to use `long` flags.
+- Updated constructors for the`External{ClassParameter,Constructor,Field,Method}`, `Field` and `ClassParameter` classes.
+- Updated implementations of `IContext.getAccessibleThis`.
+- Updated the `AbstractHeader` and `ClassBody` and related classes to use `ClassList`.
+- Updated the `AbstractHeader` class to use `getClasses()` instead of `classes`.
+- Updated the `CaptureHelper` and `FieldThis` classes to use `IType` instead of `IClass`.
+- Updated the `ClassBody.allProperties` and `.allMethods` methods.
+- Updated the calling convention for non-`static` `extension func`s. #395
+- Updated the compiler to support `long` in `DyvilModifiers`.
+- Updated the various classes to use the `EXTENSION` flag.
+- Updated This Expression Compilation to support primitive types.
+- Updated usages of `Package.getInternalName` to append extra `/`.
+- Updated usages of the `DyvilModifierVisitor` constructor.
+- Updated uses of the `FUNCTIONAL` modifier constant.
+
+## Dyvil REPL v0.25.0
+
+- `extension func`s are no longer made `static` automatically. #395
+- Implemented the `read(DataInput)` and `write(DataOutput)` methods in `REPLContext`.
+- Implemented the `REPLContext.needsHeaderDeclaration` method.
+- Improved command-line argument parsing in the REPL.
+- Methods from Extension Classes declared in the REPL are now implicitly imported. #304
+- Removed the `REPLContext.getFullName(Name)` and `.getInternalName(String)` methods.
+- Updated the `:complete` command to show extension methods.
+- Updated the `CompleteCommand` class to use `long` modifier flags.
+- Updated the `REPLContext.getInternalName` method to adapt to signature change.
+- Updated the `REPLContext` class to use the `AbstractHeader.classes` list.
+
+## Dyvil Property Format v0.15.4
+
+- Fixed unwanted recursion in the DPF AST `toString()` implementations.
+
+## Dyvil GenSrc v0.9.2
+
+- Fixed a `StackOverflowError` caused by call directives with no arguments and a block.
+- Removed the `Template.setNameFromFile` method.
+- Updated usages of `Package.getInternalName` in `Template.getTemplateName` to append extra `/`.
+
+# Dyvil v0.39.0
 
 - Added Circumfix Operators. #389
 
@@ -110,8 +379,7 @@ Dyvil v0.39.0
 - Added support for Call Directives with Blocks. #388
 - Moved the `GenSrcLexer.useSubLexer` method to the `Lexer` class.
 
-Dyvil v0.38.0
-=============
+# Dyvil v0.38.0
 
 ## Dyvil Library v0.38.0
 
@@ -188,8 +456,7 @@ Dyvil v0.38.0
 
 - Rewrote GenSrc to use the compiler API and compiled templates for source generation. #352
 
-Dyvil v0.37.0
-=============
+# Dyvil v0.37.0
 
 - Added the Optional Cast Operator `as?`. #360
 
@@ -264,8 +531,7 @@ Dyvil v0.37.0
 
 ## Dyvil GenSrc v0.8.0
 
-Dyvil v0.36.0
-=============
+# Dyvil v0.36.0
 
 - Added support for Default Constructor Attributes. #365
 - Added support for `override` class parameters. #366
@@ -390,8 +656,7 @@ Dyvil v0.36.0
 
 - Updated the `StringValue` and `GenSrcLexer` classes to adapt to library API changes.
 
-Dyvil v0.35.0
-=============
+# Dyvil v0.35.0
 
 - Added Multi-Binding If Statements. #358
 
@@ -434,8 +699,7 @@ Dyvil v0.35.0
 
 ## Dyvil GenSrc v0.7.0
 
-Dyvil v0.34.0
-=============
+# Dyvil v0.34.0
 
 - Added support for implicit parameter values. #353
 - Added support for Optional Binding in If Statements. #356
@@ -498,8 +762,7 @@ Dyvil v0.34.0
 
 - Renamed the `dyvil.tools` package to `dyvilx.tools`.
 
-Dyvil v0.33.0
-=============
+# Dyvil v0.33.0
 
 - Added support for Enums. #86
 - Added support for External Parameter Labels. #349
@@ -604,8 +867,7 @@ Dyvil v0.33.0
 - Added missing Localizations.
 - Fixed an error caused by unresolved specs in Import directives.
 
-Dyvil v0.32.0
-=============
+# Dyvil v0.32.0
 
 ## Dyvil Library v0.32.0
 
@@ -706,8 +968,7 @@ Dyvil v0.32.0
 - Updated the `LiteralText` and `ProcessedText` classes.
 - Updated the `Template` class to use the new parser.
 
-Dyvil v0.31.0
-=============
+# Dyvil v0.31.0
 
 - Dropped support for the `nil` literal. #337
 - Fixed an issue that made prefix increment and decrement operators unusable. #339
@@ -797,8 +1058,7 @@ Dyvil v0.31.0
 
 - It is now possible to register and resolve from multiple source roots.
 
-Dyvil v0.30.0
-=============
+# Dyvil v0.30.0
 
 - Added Enum Access Expressions. #329
 - Added support for the Optional Chaining operators `?.` and `??`. #328
@@ -892,8 +1152,7 @@ Dyvil v0.30.0
 
 - Fixed a compilation error in the `Template` class.
 
-Dyvil v0.29.0
-=============
+# Dyvil v0.29.0
 
 - Added the `explicit` keyword and parameter modifier. #325
 - Added the `private protected` visibility modifier. #145
@@ -1042,8 +1301,7 @@ Dyvil v0.29.0
 - Updated the `GenSrc` class to use the `BasicTool` class.
 - Updated the template loader and parser to use the `FileSource` class from the `parsing` library.
 
-Dyvil v0.28.0
-=============
+# Dyvil v0.28.0
 
 - Added support for Optional and Implicitly Unwrapped Optional Types. #298
 - Added the bottom type `none`. #310
@@ -1179,8 +1437,7 @@ Dyvil v0.28.0
 - Removed the `ForReplacementMap` class.
 - Updated `#define`, `#undefine` and `#import` to operate on file-level scope. #315
 
-Dyvil v0.27.1
-=============
+# Dyvil v0.27.1
 
 ## Dyvil Library v0.27.1
 
@@ -1207,8 +1464,7 @@ Dyvil v0.27.1
 
 ## Dyvil GenSrc v0.2.0
 
-Dyvil v0.27.0
-=============
+# Dyvil v0.27.0
 
 - Upper Type Parameter Bounds can now be specified after `:` instead of `extends`.
 - Removed the `include` keyword. #299
@@ -1314,8 +1570,7 @@ Dyvil v0.27.0
 - Templates without specializations now use a default one based on their filename.
 - The `#foreach` directive now uses `,` as the separator.
 
-Dyvil v0.26.0
-=============
+# Dyvil v0.26.0
 
 - Added support for infix, prefix and postfix type operators. #303
 
@@ -1404,8 +1659,7 @@ Dyvil v0.26.0
 
 ## Dyvil Property Format v0.6.4
 
-Dyvil v0.25.0
-=============
+# Dyvil v0.25.0
 
 - Added support for `import inline`. #299
 - Added support for the new `import` + declaration kind syntax. #299
@@ -1521,8 +1775,7 @@ Dyvil v0.25.0
 
 - Bump DPF version number because of binary changes.
 
-Dyvil v0.24.0
-=============
+# Dyvil v0.24.0
 
 - Added support for virtual dispatch for static methods called on type variable types. #296
 - Added the `struct` and `template` keywords.
@@ -1641,8 +1894,7 @@ Dyvil v0.24.0
 -  Updated references to the former `*Convertible` classes in Dyvil source code.
 -  Updated usages of `Name` API methods.
 
-Dyvil v0.23.0
-=============
+# Dyvil v0.23.0
 
 - Added a new Statement Label syntax using the `label` keyword. #295
 - Added the `**` exponentiation operator.
@@ -1775,8 +2027,7 @@ Dyvil v0.23.0
 
 - Adapted the DPF implementations to API changes in the library and compiler.
 
-Dyvil v0.22.0
-=============
+# Dyvil v0.22.0
 
 - Added Verbatim Char Literals. #263
 - Class and Type Operators can now use Angle Brackets around their type. #275
@@ -1926,8 +2177,7 @@ Dyvil v0.22.0
 - Fixed the DPF compilation tasks being executed in incorrect order.
 - Removed the `Value.toPropertyValue(any)` extension method.
 
-Dyvil v0.21.1
-=============
+# Dyvil v0.21.1
 
 ## Dyvil Library v0.21.1
 
@@ -1949,8 +2199,7 @@ Dyvil v0.21.1
 
 ## Dyvil Property Format v0.5.0
 
-Dyvil v0.21.0
-=============
+# Dyvil v0.21.0
 
 - Class Declarations can now declare their Type Parameters in Angle Brackets. #180
 - Closure Lambda Expressions in Statement Lists can now define an explicit Return Type. #253
@@ -2066,8 +2315,7 @@ Dyvil v0.21.0
 
 - Removed the `FlatMapConverter.parse(String, ...)` methods.
 
-Dyvil v0.20.0
-=============
+# Dyvil v0.20.0
 
 - Apply and Named Method Calls can now define custom Reference Methods, similar to `subscript_&`. #240
 - Extension Lambda Types can now be declared with any type as the receiver type.
@@ -2226,8 +2474,7 @@ Dyvil v0.20.0
 
 ## Dyvil Property Format v0.4.1
 
-Dyvil v0.19.0
-=============
+# Dyvil v0.19.0
 
 - Array Literals now infer an Immutable Array Type.
 - Class-Level Fields and Properties can now be declared with the `var` keyword. #220
@@ -2448,8 +2695,7 @@ Dyvil v0.19.0
 
 ## Dyvil Property Format v0.4.1
 
-Dyvil v0.18.0
-=============
+# Dyvil v0.18.0
 
 - Enabled Nested Methods and removed the error that was produced upon their declaration. #48
 - Variables in Statement Lists and For(Each) Statements can now be declared using the `var` keyword instead of `auto`. #208
@@ -2538,8 +2784,7 @@ Dyvil v0.18.0
 - Improved Syntax Error Reporting in the REPL for some inputs.
 - Improved the way Result Classes are generated for `void` statements in the REPL.
 
-Dyvil v0.17.1
-=============
+# Dyvil v0.17.1
 
 ## Dyvil Library v0.17.1
 
@@ -2570,8 +2815,7 @@ Dyvil v0.17.1
 
 ## Dyvil Property Format v0.4.1
 
-Dyvil v0.17.0
-=============
+# Dyvil v0.17.0
 
 - Added a Colon Operator as syntactic sugar for Tuples. #194
 - Added a Syntax Warning for Initializer Calls using the `new` keyword.
@@ -2691,8 +2935,7 @@ Dyvil v0.17.0
 
 - Updated all DPF classes for primitive changes.
 
-Dyvil v0.16.1
-=============
+# Dyvil v0.16.1
 
 ## Dyvil Library v0.16.1
 
@@ -2724,8 +2967,7 @@ Dyvil v0.16.1
 
 ## Dyvil Property Format v0.4.0
 
-Dyvil v0.16.0
-=============
+# Dyvil v0.16.0
 
 - Added Initializer Blocks. #118
 - Added the `init` keyword.
@@ -2837,8 +3079,7 @@ Dyvil v0.16.0
 - Moved the `dyvil.tools.dpf.Parser` class to `dyvil.tools.dpf.converter.string`.
 - Moved the `dyvil.tools.util.Printer` class to `dyvil.tools.dpf.converter.string`.
 
-Dyvil v0.15.0
-=============
+# Dyvil v0.15.0
 
 - Added Property Initializers. #178
 - Added Reified Method Type Parameters. #131
@@ -2893,8 +3134,7 @@ Dyvil v0.15.0
 
 ## Dyvil Property Format v0.3.2
 
-Dyvil v0.14.1
-=============
+# Dyvil v0.14.1
 
 ## Dyvil Library v0.14.0
 
@@ -2930,8 +3170,7 @@ Dyvil v0.14.1
 
 ## Dyvil Property Format v0.3.2
 
-Dyvil v0.14.0
-=============
+# Dyvil v0.14.0
 
 - Added Traits. #160
 - Added Super Type Arguments. #165
@@ -2972,8 +3211,7 @@ Dyvil v0.14.0
 
 ## Dyvil Property Format v0.3.2
 
-Dyvil v0.13.0
-=============
+# Dyvil v0.13.0
 
 - Added extension Lambda Parameters for Closures with Implicit Values.
 - Closures in the context of an Extension Lambda Type now provide an implicit value pointing to the first parameter of the resulting Lambda Expression.
@@ -3035,8 +3273,7 @@ Dyvil v0.13.0
 
 ## Dyvil Property Format v0.3.2
 
-Dyvil v0.12.0
-=============
+# Dyvil v0.12.0
 
 - Added Reference Types.
 - Added Variable, Field and Array References.
@@ -3124,8 +3361,7 @@ Dyvil v0.12.0
 
 - Fixed the accept method implementation for DPF String Interpolations.
 
-Dyvil v0.11.1
-=============
+# Dyvil v0.11.1
 
 ## Dyvil Library v0.11.1
 
@@ -3163,8 +3399,7 @@ Dyvil v0.11.1
 - Added `converter.StringInterpolation.toString()` implementation.
 - Fixed `FlatMapConverter` working incorrectly for nested and qualified nodes.
 
-Dyvil v0.11.0
-=============
+# Dyvil v0.11.0
 
 - Added support for prefix and postfix `++` and `--` operators. #140
 - Added support for prefixing method names with the `operator` keyword. #146
@@ -3213,8 +3448,7 @@ Dyvil v0.11.0
 
 - Added the FlatMapConverter, a DPF Visitor that converts the tree into a flat Map structure.
 
-Dyvil v0.10.1
-=============
+# Dyvil v0.10.1
 
 ## Dyvil Library v0.10.0
 
@@ -3243,8 +3477,7 @@ Dyvil v0.10.1
 
 ## Dyvil Property Format v0.2.1
 
-Dyvil v0.10.0
-=============
+# Dyvil v0.10.0
 
 - Added Partially Applied Functions using Wildcard Values in Methods.
 - Added Qualified Types using the `package.package.TypeName` syntax.
@@ -3338,8 +3571,7 @@ Dyvil v0.10.0
 
 ## Dyvil Property Format v0.2.1
 
-Dyvil v0.9.0
-============
+# Dyvil v0.9.0
 
 - Added the `where` keyword.
 - Added support for Literal Strings, prefixed with an `@` sign.
@@ -3435,8 +3667,7 @@ Dyvil v0.9.0
 
 - Made commas in DPF Maps optional.
 
-Dyvil v0.8.0
-============
+# Dyvil v0.8.0
 
 ## Dyvil Library v0.7.0
 
@@ -3486,8 +3717,7 @@ Dyvil v0.8.0
 - Renamed `dyvil.tools.dpf.ast.DPFFile` to RootNode.
 - Renamed `dyvil.tools.dpf.DPFParser` to Parser.
 
-Dyvil v0.7.0
-============
+# Dyvil v0.7.0
 
 - Added support for String Interpolation in Double-Quoted String Literals without `@` symbols.
 - Single-Quoted Char Literals can now be used as String Literals.
@@ -3521,8 +3751,7 @@ Dyvil v0.7.0
 - Added a basic AST implementation.
 - Added a basic Printer.
 
-Dyvil v0.6.0
-============
+# Dyvil v0.6.0
 
 - Added support for the new infix operator behavior with compound assignments.
 - Improved Apply Syntax to work without parenthesis.
@@ -3592,8 +3821,7 @@ Dyvil v0.6.0
 - Fixed an error that was caused by semantically invalid method definitions in the REPL.
 - Removed the Semicolon after REPL variables.
 
-Dyvil v0.5.0
-============
+# Dyvil v0.5.0
 
 - Added special type treatment for the names `Tuple` and `Function`.
 - Added prefix and postfix operator precedence.
@@ -3636,8 +3864,7 @@ Dyvil v0.5.0
 - Improved synthetic REPL variable names. They now have more meaningful names that are directly based on the type of the variable.
 - Improved REPL result computation in anonymous classes to support `return` statements.
 
-Dyvil v0.4.0
-============
+# Dyvil v0.4.0
 
 - Added support for Unicode identifiers and symbols.
 - Added Map Expressions and Map Types.
@@ -3677,8 +3904,7 @@ Dyvil v0.4.0
 - Fixed REPL Variable assignment working incorrectly.
 - Fixed Anonymous Classes with unresolved constructors being reported as such twice within the REPL.
 
-Dyvil v0.3.0
-============
+# Dyvil v0.3.0
 
 ## Dyvil Library v0.2.0
 
@@ -3712,9 +3938,7 @@ Dyvil v0.3.0
 
 ## Dyvil REPL v0.1.1
 
-
-Dyvil v0.2.0
-============
+# Dyvil v0.2.0
 
 - Added support for Type (Use) Annotations.
 
@@ -3742,8 +3966,7 @@ Dyvil v0.2.0
 - Added support for multi-line input.
 - Fixed commands being handled incorrectly.
 
-Dyvil v0.1.0-ALPHA
-==================
+# Dyvil v0.1.0-ALPHA
 
 - Alpha Test Release
 
