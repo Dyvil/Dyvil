@@ -1,5 +1,8 @@
 # Dyvil v0.40.0
 
+- Added extension classes. #304
+- Added support for mixed attribute declarations. #400
+
 ## Dyvil Library v0.40.0
 
 - Added `Formattable.extension String`.
@@ -231,7 +234,7 @@
 - This expression types are now resolved in `resolve` instead of `resolveTypes` to ensure extension classes have time to set explicit this types.
 - This Expressions with explicit type now require generic type arguments.
 - Updated `AttributeList` serialization to use `long` flags.
-- Updated constructors for the`External{ClassParameter,Constructor,Field,Method}`, `Field` and `ClassParameter` classes.
+- Updated constructors for the `External{ClassParameter,Constructor,Field,Method}`, `Field` and `ClassParameter` classes.
 - Updated implementations of `IContext.getAccessibleThis`.
 - Updated the `AbstractHeader` and `ClassBody` and related classes to use `ClassList`.
 - Updated the `AbstractHeader` class to use `getClasses()` instead of `classes`.
