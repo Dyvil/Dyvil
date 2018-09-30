@@ -75,7 +75,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public HeaderDeclaration getHeaderDeclaration()
 	{
-		if (this.headerDeclaration == null)
+		if (this.headerDeclaration == null && this.needsDefaultHeaderDeclaration())
 		{
 			final int modifiers = this.getDefaultHeaderDeclarationVisibility() | Modifiers.GENERATED;
 			final AttributeList attributes = AttributeList.of(modifiers);
