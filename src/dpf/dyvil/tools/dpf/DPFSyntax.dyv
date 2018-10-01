@@ -48,7 +48,7 @@ public class DPFSyntax
 		for (element <- parameters) element match
 		{
 			case let v: Value => builder.add(Parameter(v))
-			case let p: (Name, Value) => builder.add(Parameter(p._1, p._2))
+			case (let n: Name, let v: Value) => builder.add(Parameter(n, v))
 		}
 
 		return builder
