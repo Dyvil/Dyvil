@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -15,12 +16,12 @@ import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class ParameterList implements Iterable<IParameter>, Resolvable
@@ -86,10 +87,10 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 		return this.parameters;
 	}
 
-	public void setParameters(IParameter[] parameters, int parameterCount)
+	public void clear()
 	{
-		this.parameters = parameters;
-		this.size = parameterCount;
+		this.size = 0;
+		Arrays.fill(this.parameters, null);
 	}
 
 	public void add(IParameter parameter)
@@ -451,6 +452,7 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 
 	public void copyTo(ParameterList other)
 	{
-		other.setParameters(this.getParameters(), this.size());
+		other.parameters = this.getParameters();
+		other.size = this.size();
 	}
 }
