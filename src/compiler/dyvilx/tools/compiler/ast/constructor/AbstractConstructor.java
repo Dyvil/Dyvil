@@ -346,6 +346,12 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 
 	// --------------- Compilation ---------------
 
+	@Override
+	public String getInternalName()
+	{
+		return "<init>";
+	}
+
 	// - - - - - - - - Descriptor and Signature - - - - - - - -
 
 	@Override
