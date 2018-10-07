@@ -46,7 +46,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IValueConsumer, IParametric
+public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IValueConsumer, IParametric
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",

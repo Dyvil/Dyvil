@@ -10,7 +10,7 @@ public class LambdaTest
 	public interface MyFunction<P, R>
 	{
 		func apply(par: P) -> R
-		
+
 		func andThen<A>(other: MyFunction<R, A>) -> MyFunction<P, A> = x => other(this(x))
 	}
 
@@ -79,18 +79,31 @@ public class LambdaTest
 	static func closures() -> Test = test "Closures" {
 		let result = List<String>()
 
+		// capturing
 		let function1: -> void = function { result += "a" }
+
+		// non-capturing
 		let function2: -> String = function { "b" }
 
+		// capturing another closure
 		repeatClosure(3) { result += function2() }
 
-		with("c") { result += $0 }
+		// named
+		with("c") { it => result += it }
 
 		function1()
 
-		let expected = List("b", "b", "b", "c", "a")
+		result =?= List("b", "b", "b", "c", "a")
 
-		result =?= expected
+		test "Issue #408" {
+			func test(s: String, f: String -> void) -> void = f(s)
+
+			test("abc") { print $0 } // ok (trailing closure, no explicit parameter names)
+
+			test("abc", { name => print name }) // ok (explicit parameter names, no trailing closure)
+
+			test("abc") { name => print name } // was "error - test(String) cannot be resolved"
+		}
 	}
 
 	static func partialFunctions() -> Test = test "Partial Functions" {
