@@ -1,8 +1,0 @@
-package dyvil.tools.dpf.model.value
-
-import dyvil.tools.dpf.visitor.ValueVisitor
-
-public interface Value
-{
-	func accept(visitor: ValueVisitor) -> void
-}

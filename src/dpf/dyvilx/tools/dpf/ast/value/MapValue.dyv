@@ -1,0 +1,98 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.dpf.visitor.{ MapVisitor, ValueVisitor }
+import dyvilx.tools.parsing.ASTNode
+
+import java.util.function.BiFunction
+
+@LiteralConvertible.FromMap
+case class MapValue(protected let entries: Map<Value, Value> { public get })
+	implements Value, MapVisitor, Expandable
+{
+	static final func apply(entries: (Value, Value)...) -> MapValue = MapValue(MutableMap(entries...))
+
+	// Visitor
+
+	protected var tempKey: Value!
+
+	override func visitKey() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void = this<MapValue>.tempKey = value
+	}
+
+	override func visitValue() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void
+		{
+			let map = this<MapValue>
+			map.entries.put(map.tempKey, value)
+			map.tempKey = null
+		}
+	}
+
+	override func accept(visitor: ValueVisitor) -> void
+	{
+		let mapVisitor = visitor.visitMap()
+
+		for (entry <- this.entries)
+		{
+			entry.getKey().accept(mapVisitor.visitKey())
+			entry.getValue().accept(mapVisitor.visitValue())
+		}
+
+		mapVisitor.visitEnd()
+	}
+
+	// Expandable
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> MapValue
+	{
+		let entryBiFunction: BiFunction<Value, Value, Entry<+Value, +Value>>
+			= (k, v) => (
+				Value.wrap(Expandable.expand(k, mappings, mutate)),
+				Value.wrap(Expandable.expand(v, mappings, mutate))
+			)
+
+		if (mutate)
+		{
+			this.entries.mapEntries(entryBiFunction)
+			return this
+		}
+
+		return new MapValue(this.entries.entryMapped(entryBiFunction))
+	}
+
+	// String
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		let size = this.entries.size
+		if (size <= 0)
+		{
+			buffer.append('{}')
+			return
+		}
+
+		let keys: [Value] = this.entries.toKeyArray(class Value)
+		let values: [Value] = this.entries.toValueArray(class Value)
+
+		let innerIndent = indent + '\t'
+
+		buffer.append('{\n').append(innerIndent)
+		keys[0].toString(innerIndent, buffer)
+		buffer.append(' : ')
+		values[0].toString(innerIndent, buffer)
+
+		for (i <- 1 ..< size)
+		{
+			buffer.append(',\n').append(innerIndent)
+			keys[i].toString(innerIndent, buffer)
+			buffer.append(' : ')
+			values[i].toString(innerIndent, buffer)
+		}
+
+		buffer.append('\n').append(indent).append('}')
+	}
+}

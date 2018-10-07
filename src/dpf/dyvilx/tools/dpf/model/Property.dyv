@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model
+
+import dyvilx.tools.dpf.model.value.Value
+
+public interface Property extends NodeElement
+{
+	override func name() -> Name
+
+	func value() -> Value
+}

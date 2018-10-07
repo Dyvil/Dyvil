@@ -1,0 +1,35 @@
+package dyvilx.tools.dpf.converter
+
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.visitor.{ StringInterpolationVisitor, ValueVisitor }
+
+class StringInterpolation implements StringInterpolationVisitor, Expandable
+{
+	let strings: List<String> = new mutable.ArrayList<String>
+	let values: List<Object!> = new mutable.ArrayList<Object!>
+
+	override func visitStringPart(string: String) -> void = this.strings.add(string)
+
+	override func visitValue() -> ValueVisitor = new DyvilValueVisitor
+	{
+		override func visitObject(o: Object!) -> void = this<StringInterpolation>.values.add(o)
+	}
+
+	override func visitEnd() -> void {}
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
+	{
+		let builder = new StringBuilder(this.strings[0])
+
+		for (i <- 0 ..< this.values.size)
+		{
+			let o = Expandable.expand(this.values[i], mappings, mutate)
+			builder.append(o)
+			builder.append(this.strings[i + 1])
+		}
+
+		return builder.toString()
+	}
+
+	override func toString() -> String = "StringInterpolation(\(this.strings), \(this.values.toString))"
+}

@@ -1,0 +1,27 @@
+package dyvilx.tools.dpf.visitor
+
+
+public interface ValueVisitor
+{
+	func visitInt(value: int) -> void
+
+	func visitLong(value: long) -> void
+
+	func visitFloat(value: float) -> void
+
+	func visitDouble(value: double) -> void
+
+	func visitString(value: String) -> void
+
+	func visitName(value: Name) -> void
+
+	func visitStringInterpolation() -> StringInterpolationVisitor
+
+	func visitValueAccess(name: Name) -> ValueVisitor
+
+	func visitList() -> ListVisitor
+
+	func visitMap() -> MapVisitor
+
+	func visitBuilder(name: Name) -> BuilderVisitor
+}

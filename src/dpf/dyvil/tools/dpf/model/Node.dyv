@@ -1,8 +1,0 @@
-package dyvil.tools.dpf.model
-
-import dyvil.tools.dpf.visitor.NodeVisitor
-
-public interface Node extends NodeElement, NodeVisitor
-{
-	override func name() -> Name
-}

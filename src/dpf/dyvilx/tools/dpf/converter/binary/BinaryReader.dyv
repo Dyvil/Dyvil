@@ -1,0 +1,164 @@
+package dyvilx.tools.dpf.converter.binary
+
+import dyvilx.tools.dpf.visitor._
+
+import java.io.DataInput
+import java.io.IOException
+
+using dyvilx.tools.dpf.converter.binary.BinaryConstants._
+
+class BinaryReader(private let dataInput: DataInput)
+{
+	func readValue(visitor: ValueVisitor) -> void throws IOException = this.readValue(this.dataInput.readByte(), visitor)
+
+	private func readValue(tag: int, visitor: ValueVisitor) -> void throws IOException
+	{
+		match (tag)
+		{
+			case BOOLEAN | BYTE | SHORT | CHAR | INT {
+				visitor.visitInt(this.dataInput.readInt())
+				return
+			}
+			case LONG {
+				visitor.visitLong(this.dataInput.readLong())
+				return
+			}
+			case FLOAT {
+				visitor.visitFloat(this.dataInput.readFloat())
+				return
+			}
+			case DOUBLE {
+				visitor.visitDouble(this.dataInput.readDouble())
+				return
+			}
+			case STRING {
+				visitor.visitString(this.dataInput.readUTF())
+				return
+			}
+			case STRING_INTERPOLATION {
+				this.readStringInterpolation(visitor.visitStringInterpolation())
+				return
+			}
+			case NAME {
+				visitor.visitName(Name.read(this.dataInput))
+				return
+			}
+			case NAME_ACCESS {
+				this.readValue(visitor.visitValueAccess(Name.read(this.dataInput)))
+				return
+			}
+			case BUILDER {
+				this.readBuilder(visitor.visitBuilder(Name.read(this.dataInput)))
+				return
+			}
+			case LIST {
+				this.readList(visitor.visitList())
+				return
+			}
+			case MAP {
+				this.readMap(visitor.visitMap())
+				return
+			}
+		}
+	}
+
+	private func readStringInterpolation(visitor: StringInterpolationVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			visitor.visitStringPart(this.dataInput.readUTF())
+			let tag = this.dataInput.readByte()
+			if (tag == END)
+			{
+				visitor.visitEnd()
+				return
+			}
+			this.readValue(tag, visitor.visitValue())
+		}
+	}
+
+	private func readList(visitor: ListVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			let tag = this.dataInput.readByte()
+			if (tag == END)
+			{
+				visitor.visitEnd()
+				return
+			}
+			this.readValue(tag, visitor.visitElement())
+		}
+	}
+
+	private func readMap(visitor: MapVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			let tag = this.dataInput.readByte()
+			if (tag == END)
+			{
+				visitor.visitEnd()
+				return
+			}
+
+			this.readValue(tag, visitor.visitKey())
+			this.readValue(visitor.visitValue())
+		}
+	}
+
+	private func readBuilder(visitor: BuilderVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			let paramName = Name.read(this.dataInput)
+			let tag = this.dataInput.readByte()
+
+			if (tag == END)
+			{
+				this.readNodes(visitor.visitNode())
+				visitor.visitEnd()
+				this.dataInput.readByte() // consume the builder end 0
+				return
+			}
+
+			this.readValue(tag, visitor.visitParameter(paramName))
+		}
+	}
+
+	func readNodes(visitor: NodeVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			let tag = this.dataInput.readByte()
+			if (tag == END)
+			{
+				visitor.visitEnd()
+				return
+			}
+			this.readNode(tag, visitor)
+		}
+	}
+
+	func readNode(visitor: NodeVisitor) -> void throws IOException = this.readNode(this.dataInput.readByte(), visitor)
+
+	private func readNode(tag: int, visitor: NodeVisitor) -> void throws IOException
+	{
+		match (tag)
+		{
+			case NODE {
+				this.readNodes(visitor.visitNode(Name.read(this.dataInput)))
+				//           ^ note the s
+				return
+			}
+			case NODE_ACCESS {
+				this.readNode(visitor.visitNodeAccess(Name.read(this.dataInput)))
+				return
+			}
+			case PROPERTY {
+				this.readValue(visitor.visitProperty(Name.read(this.dataInput)))
+				return
+			}
+		}
+	}
+}

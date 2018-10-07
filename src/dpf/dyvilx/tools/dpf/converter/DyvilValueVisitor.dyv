@@ -1,0 +1,94 @@
+package dyvilx.tools.dpf.converter
+
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvil.collection.mutable.HashMap
+import dyvilx.tools.dpf.visitor._
+
+/**
+ * An abstract {@link ValueVisitor} that converts nodes to Dyvil and Java objects / wrappers according to the following
+ * table:
+ * <p>
+ * <table summary="" border="1"> <th>Value Type</th><th>Object Type</th> <tr><td>int</td><td>dyvil.lang.Int</td></tr>
+ * <tr><td>long</td><td>dyvil.lang.Long</td></tr> <tr><td>float</td><td>dyvil.lang.Float</td></tr>
+ * <tr><td>double</td><td>dyvil.lang.String</td></tr> <tr><td>String</td><td>java.lang.String</td></tr>
+ * <tr><td>Identifier (Access)</td><td>dyvilx.tools.dpf.converter.NameAccess</td></tr>
+ * <tr><td>List</td><td>dyvil.collection.List</td></tr> <tr><td>Map</td><td>dyvil.collection.Map</td></tr>
+ * <tr><td>String Interpolation</td><td>dyvilx.tools.dpf.converter.StringInterpolation</td></tr>
+ * <tr><td>Builder</td><td>-none-</td></tr> </table>
+ */
+abstract class DyvilValueVisitor implements ValueVisitor
+{
+	protected func visitObject(o: Object!) -> void
+
+	override func visitInt(value: int) -> void = this.visitObject(value)
+
+	override func visitLong(value: long) -> void = this.visitObject(value)
+
+	override func visitFloat(value: float) -> void = this.visitObject(value)
+
+	override func visitDouble(value: double) -> void = this.visitObject(value)
+
+	override func visitString(value: String) -> void = this.visitObject(value)
+
+	override func visitName(value: Name) -> void = value.qualified match
+	{
+		case "true" => this.visitObject(true)
+		case "false" => this.visitObject(false)
+		case "null" => this.visitObject(null)
+		case let s => this.visitObject(NameAccess(s))
+	}
+
+	override func visitList() -> ListVisitor
+	{
+		let list = new ArrayList<Object!>
+		return new ListVisitor
+		{
+			override func visitElement() -> ValueVisitor = new DyvilValueVisitor()
+			{
+				protected override func visitObject(o: Object!) -> void = list.add(o)
+			}
+
+			override func visitEnd() -> void = this<DyvilValueVisitor>.visitObject(list)
+		}
+	}
+
+	override func visitMap() -> MapVisitor
+	{
+		let map = new HashMap<Object, Object>
+		return new MapVisitor
+		{
+			protected var key: Object!
+
+			override func visitKey() -> ValueVisitor = new DyvilValueVisitor
+			{
+				protected override func visitObject(o: Object!) -> void = key = o
+			}
+
+			override func visitValue() -> ValueVisitor = new DyvilValueVisitor
+			{
+				protected override func visitObject(o: Object!) -> void = map.put(key, o)
+			}
+
+			override func visitEnd() -> void = this<DyvilValueVisitor>.visitObject(map)
+		}
+	}
+
+	override func visitStringInterpolation() -> StringInterpolationVisitor
+	{
+		let interpolation = new StringInterpolation
+		this.visitObject(interpolation)
+		return interpolation
+	}
+
+	// FIXME
+	override func visitBuilder(name: Name) -> BuilderVisitor = IgnoreVisitor
+
+	override func visitValueAccess(name: Name) -> ValueVisitor
+	{
+		let access = NameAccess(name.qualified)
+		this.visitObject(access)
+		return access
+	}
+}

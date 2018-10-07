@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.visitor
+
+interface MapVisitor
+{
+	func visitKey() -> ValueVisitor
+
+	func visitValue() -> ValueVisitor
+
+	func visitEnd() -> void {}
+}

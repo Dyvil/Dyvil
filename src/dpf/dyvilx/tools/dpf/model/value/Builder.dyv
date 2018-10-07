@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model.value
+
+import package dyvilx.tools.dpf.model
+
+public interface Builder extends Value, model.Expandable, dyvilx.tools.dpf.visitor.BuilderVisitor
+{
+	func name() -> Name
+
+	func node() -> model.Node?
+}

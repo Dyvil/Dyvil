@@ -1,0 +1,109 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.dpf.visitor.StringInterpolationVisitor
+import dyvilx.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvilx.tools.parsing.lexer.StringLiterals
+
+public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
+{
+	var strings: List<String> = unsafeInit<List<String>>
+	var values:  List<Value>  = unsafeInit<List<Value>>
+
+	public init()
+	{
+		this.strings = new ArrayList<String>
+		this.values = new ArrayList<Value>
+	}
+
+	public init(strings: [String], values: [Value])
+	{
+		this.strings = new ArrayList(strings)
+		this.values = new ArrayList(values)
+	}
+
+	public init(strings: [String], values: [any])
+	{
+		this.strings = new ArrayList(strings)
+		this.values = new ArrayList<Value>(values.size)
+
+		for (o <- values)
+		{
+			this.values.add(Value.wrap(o))
+		}
+	}
+
+	override func visitStringPart(string: String) -> void = this.strings.add(string)
+
+	override func visitValue(value: Value) -> void = this.values.add(value)
+
+	override func visitValue() -> ValueVisitor = this
+
+	override func visitEnd() -> void {}
+
+	override func accept(visitor: ValueVisitor) -> void
+	{
+		let stringVisitor = visitor.visitStringInterpolation()
+
+		stringVisitor.visitStringPart(this.strings[0])
+		for (i <- 0 ..< this.values.size)
+		{
+			this.values[i].accept(stringVisitor.visitValue())
+			stringVisitor.visitStringPart(this.strings[i + 1])
+		}
+		stringVisitor.visitEnd()
+	}
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
+	{
+		let builder = new StringBuilder
+
+		var index = 0
+		for (value <- this.values)
+		{
+			builder.append(this.strings[index])
+			index += 1
+
+			match (Expandable.expand(value, mappings, mutate))
+			{
+				case var s: String => builder.append(s)
+				case var c: Constant if c.isConstant => c.appendString(builder)
+				case _ as Value => return this
+				case var o => builder.append(o)
+			}
+		}
+
+		// Add the last String
+		builder.append(this.strings[index])
+
+		return builder.toString
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		buffer.append('"')
+		StringLiterals.appendStringLiteralBody(this.strings[0], buffer)
+
+		for (i <- 0 ..< this.values.size)
+		{
+			buffer.append("\\(")
+			this.values[i].toString(indent, buffer)
+			buffer.append(')')
+			StringLiterals.appendStringLiteralBody(this.strings[i + 1], buffer)
+		}
+		buffer.append('"')
+	}
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is StringInterpolation && this.equals(obj as StringInterpolation)
+
+	func equals(that: StringInterpolation) -> boolean = this === that || this.strings == that.strings && this.values == that.values
+
+	override func hashCode() -> int = 31 * this.strings.hashCode + this.values.hashCode
+}

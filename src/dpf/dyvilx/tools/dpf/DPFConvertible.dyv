@@ -1,0 +1,8 @@
+package dyvilx.tools.dpf
+
+import dyvilx.tools.dpf.ast.value.Value
+
+public interface DPFConvertible
+{
+	func toPropertyValue() -> Value
+}

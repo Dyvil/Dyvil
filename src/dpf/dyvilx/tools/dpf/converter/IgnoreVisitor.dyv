@@ -1,0 +1,49 @@
+package dyvilx.tools.dpf.converter
+
+import dyvilx.tools.dpf.visitor._
+
+object IgnoreVisitor
+	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
+{
+	override func visitParameter(name: Name!) -> ValueVisitor = this
+
+	override func visitNode() -> NodeVisitor = this
+
+	override func visitElement() -> ValueVisitor = this
+
+	override func visitKey() -> ValueVisitor = this
+
+	override func visitStringPart(string: String) -> void { }
+
+	override func visitValue() -> ValueVisitor = this
+
+	override func visitNode(name: Name) -> NodeVisitor = this
+
+	override func visitProperty(name: Name) -> ValueVisitor = this
+
+	override func visitNodeAccess(name: Name) -> NodeVisitor = this
+
+	override func visitEnd() -> void { }
+
+	override func visitInt(value: int) -> void { }
+
+	override func visitLong(value: long) -> void { }
+
+	override func visitFloat(value: float) -> void { }
+
+	override func visitDouble(value: double) -> void { }
+
+	override func visitString(value: String) -> void { }
+
+	override func visitName(value: Name) -> void { }
+
+	override func visitStringInterpolation() -> StringInterpolationVisitor = this
+
+	override func visitValueAccess(name: Name) -> ValueVisitor = this
+
+	override func visitList() -> ListVisitor = this
+
+	override func visitMap() -> MapVisitor = this
+
+	override func visitBuilder(name: Name) -> BuilderVisitor = this
+}

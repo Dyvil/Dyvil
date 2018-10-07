@@ -1,0 +1,28 @@
+package dyvilx.tools.dpf.ast
+
+import dyvil.collection.Map
+import dyvilx.tools.dpf.visitor.NodeVisitor
+
+public class RootNode extends Node
+{
+	public init() : super(Name('root'))
+
+	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor)
+
+	override func expand(mappings: [String: Object], mutate: boolean) -> RootNode
+	{
+		if (mutate)
+		{
+			this.expandChildren(mappings)
+			return this
+		}
+		else
+		{
+			let node = new RootNode()
+			this.expand(node, mappings)
+			return node
+		}
+	}
+
+	override func toString(indent: String, buffer: StringBuilder) -> void = this.bodyToString(indent, buffer)
+}

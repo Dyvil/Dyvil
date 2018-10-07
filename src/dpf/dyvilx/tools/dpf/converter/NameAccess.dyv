@@ -1,0 +1,29 @@
+package dyvilx.tools.dpf.converter
+
+import dyvil.collection.Map
+import dyvilx.tools.dpf.model.Expandable
+
+class NameAccess
+(
+	var value: Object? { private set; public get }
+	let name:  String
+)
+extends DyvilValueVisitor implements Expandable
+{
+	static func apply(name: String) -> NameAccess = new NameAccess(null, name)
+
+	static func apply(value: Object, name: String) -> NameAccess = new NameAccess(value, name)
+
+	protected override func visitObject(o: Object!) -> void = this.value = o
+
+	override func expand(mappings: [String:Object], mutate: boolean) -> Object = mappings[this.toString] ?? this
+
+	override func toString() -> String
+	{
+		if (this.value == null)
+		{
+			return this.name
+		}
+		return "\(this.value).\(this.name)"
+	}
+}

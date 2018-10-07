@@ -6,13 +6,13 @@ using dyvil.Test
 
 import dyvil.collection.mutable.TreeMap
 
-import dyvil.tools.dpf.ast._
-import dyvil.tools.dpf.ast.value.Value
-import dyvil.tools.dpf.model._
-import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
+import dyvilx.tools.dpf.ast._
+import dyvilx.tools.dpf.ast.value.Value
+import dyvilx.tools.dpf.model._
+import dyvilx.tools.dpf.converter.{ binary._, string._, flatmap._ }
 
-using dyvil.tools.dpf.DPFSyntax._
-import dyvil.tools.dpf.DPFConvertible
+using dyvilx.tools.dpf.DPFSyntax._
+import dyvilx.tools.dpf.DPFConvertible
 
 class DPFTest
 {

@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model
+
+import dyvilx.tools.dpf.visitor.NodeVisitor
+
+public interface NodeAccess extends NodeElement, NodeVisitor
+{
+	override func name() -> Name
+
+	func element() -> NodeElement
+}
