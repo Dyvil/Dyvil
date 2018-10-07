@@ -83,8 +83,8 @@ public class ApplyAccess extends AbstractCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		// Merge Applied Statement Lists if a non-curried method version is
-		// available. Doesn't works with multiple applied statement lists.
+		// Merge trailing closures if a non-curried method version is
+		// available. Doesn't works with multiple trailing closures.
 		// with(x...) { statements }
 		// -> with(x..., { statements })
 		if (this.arguments.size() == 1 && this.receiver instanceof ICall)
@@ -94,11 +94,10 @@ public class ApplyAccess extends AbstractCall
 
 			if (argument instanceof Closure)
 			{
-				argument = argument.resolve(markers, context);
-
-				final ArgumentList oldArgs = call.getArguments();
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
+
+				final ArgumentList oldArgs = call.getArguments();
 
 				call.setArguments(oldArgs.appended(null, argument));
 
