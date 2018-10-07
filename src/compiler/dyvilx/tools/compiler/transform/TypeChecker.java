@@ -107,7 +107,7 @@ public final class TypeChecker
 			return null;
 		}
 
-		return new LiteralConversion(value, converter);
+		return LiteralConversion.converting(value, type, converter, markers, context, typeContext);
 	}
 
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)

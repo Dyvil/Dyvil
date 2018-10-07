@@ -127,6 +127,15 @@ public class LiteralConversion extends AbstractCall
 		}
 	}
 
+	// =============== Static Methods ===============
+
+	public static IValue converting(IValue literal, IType type, IMethod method, MarkerList markers, IContext context,
+		ITypeContext typeContext)
+	{
+		return new LiteralConversion(literal, method).checkArguments(markers, context, method)
+		                                             .withType(type, typeContext, markers, context);
+	}
+
 	// =============== Properties ===============
 
 	@Override
