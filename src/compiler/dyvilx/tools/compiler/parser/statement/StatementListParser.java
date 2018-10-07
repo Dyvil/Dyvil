@@ -101,7 +101,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			final IToken lambdaArrow = this.findLambdaArrow(next);
 			if (lambdaArrow != null)
 			{
-				this.lambdaExpr = new LambdaExpr(lambdaArrow.raw());
+				this.lambdaExpr = this.closure ? new Closure(lambdaArrow.raw()) : new LambdaExpr(lambdaArrow.raw());
 				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
 
 				if (next == lambdaArrow)
@@ -128,8 +128,18 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
-			// { ...
-			this.statementList = this.closure ? new Closure(token) : new StatementList(token);
+			if (this.closure)
+			{
+				// ... { ...
+				this.lambdaExpr = new Closure(token.raw());
+				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
+			}
+			else
+			{
+				// { ...
+				this.statementList = new StatementList(token);
+			}
+
 			this.mode = EXPRESSION;
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{

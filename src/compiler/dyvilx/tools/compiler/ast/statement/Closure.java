@@ -1,40 +1,35 @@
 package dyvilx.tools.compiler.ast.statement;
 
-import dyvilx.tools.compiler.ast.context.IImplicitContext;
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LambdaExpr;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.LambdaType;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class Closure extends StatementList
+public class Closure extends LambdaExpr
 {
-	private boolean resolved;
-	private IValue  implicitValue;
-
-	public Closure()
-	{
-	}
+	// =============== Constructors ===============
 
 	public Closure(SourcePosition position)
 	{
-		this.position = position;
+		super(position);
 	}
 
-	@Override
-	public boolean isResolved()
+	// =============== Properties ===============
+
+	private boolean areParametersInferred()
 	{
-		return true;
+		return this.getMethod() != null || !this.parameters.isEmpty();
 	}
 
 	@Override
@@ -43,76 +38,78 @@ public class Closure extends StatementList
 		return true;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Lambda Expression Types and Parameter Inference ---------------
+
+	// Type checking for closures differs from the super implementation in that it does not allow assigning closures
+	// to java.lang.Object
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getFunctionalMethod() != null;
+		return this.areParametersInferred() ? super.isType(type) : type.getFunctionalMethod() != null;
 	}
 
 	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		return this.isType(type) ? 1 : 0;
+		return this.isType(type) ? IValue.EXACT_MATCH : IValue.MISMATCH;
 	}
 
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.resolved)
+		if (!this.areParametersInferred())
 		{
-			return super.withType(type, typeContext, markers, context);
+			final IMethod functionalMethod = type.getFunctionalMethod();
+			if (functionalMethod == null)
+			{
+				return null;
+			}
+
+			final ParameterList parameterList = functionalMethod.getParameters();
+			final int parameterCount = parameterList.size();
+
+			for (int i = 0; i < parameterCount; i++)
+			{
+				this.parameters.add(new CodeParameter(null, this.position, Name.fromRaw("$" + i), Types.UNKNOWN));
+			}
 		}
 
-		final IMethod functionalMethod = type.getFunctionalMethod();
-		if (functionalMethod == null)
-		{
-			return null;
-		}
-
-		final ParameterList parameterList = functionalMethod.getParameters();
-		final int parameterCount = parameterList.size();
-		final IParameter[] parameters = new IParameter[parameterCount];
-
-		for (int i = 0; i < parameterCount; i++)
-		{
-			parameters[i] = new CodeParameter(null, this.position, Name.fromRaw("$" + i), Types.UNKNOWN);
-		}
-
-		final LambdaType functionType = type.extract(LambdaType.class);
-		if (functionType != null && functionType.isExtension() && parameterCount > 0)
-		{
-			this.implicitValue = new FieldAccess(parameters[0]);
-		}
-
-		final LambdaExpr lambdaExpr = new LambdaExpr(this.position, parameters, parameterCount);
-		lambdaExpr.setValue(this);
-
-		this.resolved = true;
-
-		context = context.push(this);
-		final IValue typedLambda = lambdaExpr.withType(type, typeContext, markers, context);
-		context.pop();
-
-		return typedLambda;
+		return super.withType(type, typeContext, markers, context);
 	}
 
-	@Override
-	public IValue resolveImplicit(IType type)
-	{
-		return type == null ? this.implicitValue : super.resolveImplicit(type);
-	}
+	// --------------- Resolution Phase ---------------
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.resolved)
+		if (!this.areParametersInferred())
 		{
-			this.returnType = null;
-			return super.resolve(markers, context);
+			// as if we would "delayResolve" in the super method
+			return this;
 		}
 
-		this.returnType = Types.UNKNOWN;
-		// Do this in withType
-		return this;
+		return super.resolve(markers, context);
+	}
+
+	// --------------- Implicit Value for Extension Function Types ---------------
+
+	@Override
+	public IValue resolveImplicit(IType type)
+	{
+		if (type != null)
+		{
+			return super.resolveImplicit(type);
+		}
+
+		final LambdaType lambdaType = this.getType().extract(LambdaType.class);
+		if (lambdaType != null && lambdaType.isExtension())
+		{
+			return new FieldAccess(this.parameters.get(0));
+		}
+
+		return null;
 	}
 }
