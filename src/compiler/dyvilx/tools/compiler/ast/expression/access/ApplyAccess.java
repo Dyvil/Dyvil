@@ -94,11 +94,12 @@ public class ApplyAccess extends AbstractCall
 
 			if (Closure.isTrailingClosure(argument))
 			{
+				argument = argument.resolve(markers, context);
+
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 
 				final ArgumentList oldArgs = call.getArguments();
-
 				call.setArguments(oldArgs.appended(null, argument));
 
 				final IValue resolvedCall = call.resolveCall(markers, context, false);
