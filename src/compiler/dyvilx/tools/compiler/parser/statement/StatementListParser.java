@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.NestedMethod;
-import dyvilx.tools.compiler.ast.statement.Closure;
+import dyvilx.tools.compiler.ast.expression.Closure;
 import dyvilx.tools.compiler.ast.statement.MemberStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.statement.VariableStatement;

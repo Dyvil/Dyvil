@@ -4,7 +4,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.statement.Closure;
+import dyvilx.tools.compiler.ast.expression.Closure;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvil.lang.Name;
