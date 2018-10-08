@@ -23,6 +23,13 @@ public class Closure extends LambdaExpr
 		super(position);
 	}
 
+	// =============== Static Methods ===============
+
+	public static boolean isTrailingClosure(IValue argument)
+	{
+		return argument instanceof Closure;
+	}
+
 	// =============== Properties ===============
 
 	private boolean areParametersInferred()

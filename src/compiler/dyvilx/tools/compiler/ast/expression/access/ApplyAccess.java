@@ -92,7 +92,7 @@ public class ApplyAccess extends AbstractCall
 			final ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirst();
 
-			if (argument instanceof Closure)
+			if (Closure.isTrailingClosure(argument))
 			{
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
