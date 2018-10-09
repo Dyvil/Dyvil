@@ -55,12 +55,13 @@ public class DPFSyntax
 	}
 
 	/**
-	 * Builder node
+	 * Builder with node
 	 *
-	 * "Builder"(...) { ... }
+	 * "Name"("value", "label": "value") { ... }
 	 */
-	infix func apply(builder: Builder, configure: Configure<Node>) -> Builder
+	infix func apply(name: Name, parameters: (Value | (Name, Value))..., node configure: Configure<Node>) -> Builder
 	{
+		let builder = name(parameters...)
 		configure(builder.visitNode())
 		return builder
 	}
