@@ -456,9 +456,8 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		final ParameterList parameters = this.getParameters();
 
 		final int parameterStartIndex;
-		final int argumentStartIndex;
+		final int matchStartIndex;
 		final int argumentCount;
-		final int parameterCount = parameters.size();
 
 		final int[] matchValues;
 		final IType[] matchTypes;
@@ -484,7 +483,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			argumentCount = arguments.size();
 			matchValues = new int[argumentCount];
 			matchTypes = new IType[argumentCount];
-			argumentStartIndex = 0;
+			matchStartIndex = 0;
 			parameterStartIndex = 0;
 		}
 		else if (mod != 0 && receiver.isClassAccess())
@@ -505,7 +504,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 			parameterStartIndex = 0;
 			argumentCount = arguments.size();
-			argumentStartIndex = 1;
+			matchStartIndex = 1;
 			matchValues = new int[1 + argumentCount];
 			matchTypes = new IType[1 + argumentCount];
 			matchValues[0] = 1;
@@ -547,35 +546,51 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			}
 
 			argumentCount = arguments.size();
-			argumentStartIndex = 1;
+			matchStartIndex = 1;
 			matchValues = new int[1 + argumentCount];
 			matchTypes = new IType[1 + argumentCount];
 			matchValues[0] = receiverMatch;
 			matchTypes[0] = receiverType;
 		}
 
-		final int parametersLeft = parameterCount - parameterStartIndex;
-		if (argumentCount > parametersLeft && !this.isVariadic())
+		checkMatch(this, list, parameters, parameterStartIndex, arguments, matchValues, matchTypes, matchStartIndex,
+		           invalid);
+	}
+
+	public static <T extends IOverloadable> void checkMatch( //
+		T member, MatchList<T> list, // member info
+		ParameterList parameters, int parameterStartIndex, // parameters
+		ArgumentList arguments, // arguments
+		int[] matchValues, IType[] matchTypes, int matchStartIndex, // match values
+		boolean invalid)
+	{
+		final int parametersLeft = parameters.size() - parameterStartIndex;
+		if (arguments.size() > parametersLeft && !member.isVariadic())
 		{
 			return;
 		}
 
 		int defaults = 0;
 		int varargs = 0;
-		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
+		for (int parameterIndex = 0, argumentIndex = 0; parameterIndex < parametersLeft; parameterIndex++)
 		{
-			final IParameter parameter = parameters.get(parameterStartIndex + argumentIndex);
-			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex,
-			                                                parameter, list);
-			switch (partialVarargs)
+			final IParameter parameter = parameters.get(parameterStartIndex + parameterIndex);
+
+			final int result = arguments.checkMatch(matchValues, matchTypes, matchStartIndex, argumentIndex, parameter,
+			                                        list);
+			switch (result)
 			{
 			case ArgumentList.MISMATCH:
 				return;
-			case ArgumentList.DEFAULT:
+			case ArgumentList.DEFAULT_MATCH:
 				defaults++;
 				continue;
+			case ArgumentList.REGULAR_MATCH:
+				argumentIndex++;
+				continue;
 			default:
-				varargs += partialVarargs;
+				varargs += result;
+				argumentIndex += result;
 			}
 		}
 
@@ -586,7 +601,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 				return; // Mismatch
 			}
 		}
-		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs, invalid));
+		list.add(new Candidate<>(member, matchValues, matchTypes, defaults, varargs, invalid));
 	}
 
 	@Override

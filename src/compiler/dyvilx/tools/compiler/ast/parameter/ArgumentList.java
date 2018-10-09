@@ -38,8 +38,9 @@ public class ArgumentList implements Resolvable, IValueList
 
 	private static final int DEFAULT_CAPACITY = 3;
 
-	public static final int MISMATCH = -1;
-	public static final int DEFAULT  = -2;
+	public static final int REGULAR_MATCH = -1;
+	public static final int DEFAULT_MATCH = -2;
+	public static final int MISMATCH      = -3;
 
 	// =============== Fields ===============
 
@@ -192,11 +193,11 @@ public class ArgumentList implements Resolvable, IValueList
 			return this.size;
 		}
 
-		for (; startIndex < this.size; startIndex++)
+		for (int index = startIndex; index < this.size; index++)
 		{
-			if (this.labels[startIndex] != null)
+			if (this.labels[index] != null)
 			{
-				return startIndex;
+				return index;
 			}
 		}
 
@@ -594,7 +595,7 @@ public class ArgumentList implements Resolvable, IValueList
 		if (!param.isVarargs())
 		{
 			return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
-			                  param.getCovariantType(), implicitContext) ? 0 : MISMATCH;
+			                  param.getCovariantType(), implicitContext) ? REGULAR_MATCH : MISMATCH;
 		}
 
 		if (this == EMPTY)
@@ -610,7 +611,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 	protected static int checkDefault(IParameter param)
 	{
-		return param.isDefault() || param.isImplicit() ? DEFAULT : MISMATCH;
+		return param.isDefault() || param.isImplicit() ? DEFAULT_MATCH : MISMATCH;
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
@@ -644,7 +645,7 @@ public class ArgumentList implements Resolvable, IValueList
 		if (argument.checkVarargs(false))
 		{
 			return checkMatch_(matchValues, matchTypes, matchIndex, argument, paramType, implicitContext) ?
-				       0 :
+				       REGULAR_MATCH :
 				       MISMATCH;
 		}
 
