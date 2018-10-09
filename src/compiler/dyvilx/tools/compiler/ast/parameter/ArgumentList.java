@@ -2,7 +2,9 @@ package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -511,24 +513,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		for (int i = 0; i < this.size; i++)
 		{
-			final Name label = this.labels[i];
-			final IValue value = this.values[i];
-
-			value.resolveTypes(markers, context);
-
-			if (label == null)
-			{
-				continue;
-			}
-
-			for (int j = 0; j < i; j++)
-			{
-				if (this.labels[j] == label)
-				{
-					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.label", label));
-					break;
-				}
-			}
+			this.values[i].resolveTypes(markers, context);
 		}
 	}
 
@@ -553,6 +538,19 @@ public class ArgumentList implements Resolvable, IValueList
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.labels != null)
+		{
+			final Set<Name> labelSet = new IdentityHashSet<>(this.size);
+			for (int i = 0; i < this.size; i++)
+			{
+				final Name label = this.labels[i];
+				if (label != null && !labelSet.add(label))
+				{
+					markers.add(Markers.semanticError(this.values[i].getPosition(), "arguments.duplicate.label", label));
+				}
+			}
+		}
+
 		for (int i = 0; i < this.size; i++)
 		{
 			this.values[i].check(markers, context);
