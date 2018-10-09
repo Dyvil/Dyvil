@@ -78,7 +78,14 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 			this.label = null;
 			if (token.next().type() == BaseSymbols.COLON)
 			{
-				if (Tokens.isIdentifier(type))
+				if (type == BaseSymbols.UNDERSCORE)
+				{
+					// _ : ...
+					this.label = ArgumentList.FENCE;
+					pm.skip();
+					return;
+				}
+				else if (Tokens.isIdentifier(type))
 				{
 					this.label = token.nameValue();
 					pm.skip();
@@ -91,8 +98,12 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 					return;
 				}
 			}
-
-			this.mode = VALUE;
+			else if (type == Tokens.SYMBOL_IDENTIFIER && token.nameValue().unqualified.equals("_:"))
+			{
+				// _: ...
+				this.label = ArgumentList.FENCE;
+				return;
+			}
 			// Fallthrough
 		case VALUE:
 			this.mode = SEPARATOR;

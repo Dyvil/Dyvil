@@ -38,6 +38,8 @@ public class ArgumentList implements Resolvable, IValueList
 
 	private static final int DEFAULT_CAPACITY = 3;
 
+	public static final Name FENCE = Name.fromRaw("_");
+
 	public static final int REGULAR_MATCH = -1;
 	public static final int DEFAULT_MATCH = -2;
 	public static final int MISMATCH      = -3;
@@ -176,7 +178,7 @@ public class ArgumentList implements Resolvable, IValueList
 		// Require that no argument labels exists before or at the index
 		for (int i = 0; i <= index; i++)
 		{
-			if (this.labels[i] != null)
+			if (this.labels[i] != null && this.labels[i] != FENCE)
 			{
 				return -1;
 			}
@@ -545,7 +547,7 @@ public class ArgumentList implements Resolvable, IValueList
 			for (int i = 0; i < this.size; i++)
 			{
 				final Name label = this.labels[i];
-				if (label != null && !labelSet.add(label))
+				if (label != null && label != FENCE && !labelSet.add(label))
 				{
 					markers.add(Markers.semanticError(this.values[i].getPosition(), "arguments.duplicate.label", label));
 				}
@@ -586,7 +588,7 @@ public class ArgumentList implements Resolvable, IValueList
 		{
 			return param.isVarargs() && this != EMPTY ? 0 : checkDefault(param);
 		}
-		if (this.getLabel(argumentIndex) == null && param.hasModifier(Modifiers.EXPLICIT))
+		if (this.getLabel(argumentIndex) != param.getLabel() && param.hasModifier(Modifiers.EXPLICIT))
 		{
 			// explicit parameters require an argument label
 			return checkDefault(param);
@@ -840,7 +842,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.labels[i] != null)
+			if (this.labels[i] != null && this.labels[i] != FENCE)
 			{
 				return false;
 			}

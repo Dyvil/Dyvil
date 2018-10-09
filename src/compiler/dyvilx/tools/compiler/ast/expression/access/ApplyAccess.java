@@ -100,7 +100,7 @@ public class ApplyAccess extends AbstractCall
 				call.resolveArguments(markers, context);
 
 				final ArgumentList oldArgs = call.getArguments();
-				call.setArguments(oldArgs.appended(null, argument));
+				call.setArguments(oldArgs.appended(ArgumentList.FENCE, argument));
 
 				final IValue resolvedCall = call.resolveCall(markers, context, false);
 				if (resolvedCall != null)
