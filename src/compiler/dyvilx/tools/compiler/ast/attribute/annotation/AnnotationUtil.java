@@ -10,6 +10,8 @@ public final class AnnotationUtil
 {
 	public static final String RECEIVER_TYPE = "Ldyvil/annotation/internal/ReceiverType;";
 
+	public static final String JAVA_NAME_INTERNAL = "dyvil/annotation/JavaName";
+
 	public static final String DYVIL_NAME_INTERNAL = "dyvil/annotation/internal/DyvilName";
 	public static final String DYVIL_NAME          = "L" + DYVIL_NAME_INTERNAL + ";";
 

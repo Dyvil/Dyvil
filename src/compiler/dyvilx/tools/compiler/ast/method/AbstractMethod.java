@@ -216,6 +216,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			this.attributes.addFlag(Modifiers.INTRINSIC);
 			return false;
 		case AnnotationUtil.DYVIL_NAME_INTERNAL:
+		case AnnotationUtil.JAVA_NAME_INTERNAL:
 			if (annotation == null)
 			{
 				return false;

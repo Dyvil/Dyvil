@@ -193,6 +193,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.attributes.addFlag(Modifiers.DEPRECATED);
 			return false;
 		case AnnotationUtil.DYVIL_NAME_INTERNAL:
+		case AnnotationUtil.JAVA_NAME_INTERNAL:
 			if (annotation == null)
 			{
 				return false;
