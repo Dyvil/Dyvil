@@ -172,7 +172,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void check()
 	{
-		this.pack.check(this.packageDeclaration, this.markers);
+		PackageDeclaration.check(this.packageDeclaration, this.markers, this.pack);
 
 		final HeaderDeclaration headerDeclaration = this.getHeaderDeclaration();
 		if (headerDeclaration != null)

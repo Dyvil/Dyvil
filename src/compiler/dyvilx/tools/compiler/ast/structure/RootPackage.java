@@ -6,9 +6,6 @@ import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.external.ExternalClass;
-import dyvilx.tools.compiler.ast.header.PackageDeclaration;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
@@ -32,15 +29,6 @@ public final class RootPackage extends Package
 	}
 
 	// =============== Methods ===============
-
-	@Override
-	public void check(PackageDeclaration packageDecl, MarkerList markers)
-	{
-		if (packageDecl != null)
-		{
-			markers.add(Markers.semantic(packageDecl.getPosition(), "package.default"));
-		}
-	}
 
 	// --------------- External Resolution ---------------
 

@@ -5,7 +5,6 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -13,14 +12,11 @@ import dyvilx.tools.compiler.ast.external.ExternalClass;
 import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.header.AbstractHeader;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
-import dyvilx.tools.compiler.ast.header.PackageDeclaration;
 import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.backend.ObjectFormat;
 import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;
-import dyvilx.tools.compiler.util.Markers;
-import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -175,21 +171,6 @@ public class Package implements Named, IDefaultContext
 	public DyvilCompiler getCompilationContext()
 	{
 		return rootPackage.compiler;
-	}
-
-	// TODO move to PackageDeclaration
-	public void check(PackageDeclaration packageDecl, MarkerList markers)
-	{
-		if (packageDecl == null)
-		{
-			markers.add(Markers.semantic(SourcePosition.ORIGIN, "package.missing"));
-			return;
-		}
-
-		if (!this.fullName.equals(packageDecl.getPackage()))
-		{
-			markers.add(Markers.semantic(packageDecl.getPosition(), "package.invalid", this.fullName));
-		}
 	}
 
 	// --------------- Sub-Packages ---------------
