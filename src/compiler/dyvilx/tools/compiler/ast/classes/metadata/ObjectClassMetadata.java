@@ -90,7 +90,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		final IType classType = this.theClass.getClassType();
 		final Field field = new Field(this.theClass, Names.instance, classType, AttributeList.of(flags));
-		final ConstructorCall call = new ConstructorCall(this.theClass.position(), classType, ArgumentList.EMPTY);
+		final ConstructorCall call = new ConstructorCall(this.theClass.getPosition(), classType, ArgumentList.EMPTY);
 		field.setValue(call);
 		return field;
 	}
@@ -111,7 +111,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 				continue;
 			}
 
-			markers.add(Markers.semanticError(ctor.position(), "class.object.constructor", this.theClass.getName()));
+			markers.add(Markers.semanticError(ctor.getPosition(), "class.object.constructor", this.theClass.getName()));
 		}
 	}
 

@@ -101,7 +101,7 @@ public class EnumClassMetadata extends ClassMetadata
 		if (initializer == null)
 		{
 			final ArgumentList arguments = new ArgumentList(new FieldAccess(nameParam), new FieldAccess(ordParam));
-			final SourcePosition position = constructor.position();
+			final SourcePosition position = constructor.getPosition();
 			final InitializerCall init = new InitializerCall(position, true, arguments, this.theClass.getSuperType(),
 			                                                 enumConstructor);
 			constructor.setInitializer(init);
@@ -116,7 +116,7 @@ public class EnumClassMetadata extends ClassMetadata
 
 	private Field createValuesField()
 	{
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final ArrayType type = new ArrayType(this.theClass.getClassType(), Mutability.IMMUTABLE);
 		final AttributeList attributes = AttributeList.of(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC);
 		final Field field = new Field(this.theClass, position, Names.$VALUES, type, attributes);
@@ -148,7 +148,7 @@ public class EnumClassMetadata extends ClassMetadata
 	{
 		// public static func values() -> [final EnumType]
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final ArrayType type = new ArrayType(this.theClass.getClassType());
 		final AttributeList attributes = AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC);
 		final CodeMethod method = new CodeMethod(this.theClass, Names.values, type, attributes);
@@ -170,7 +170,7 @@ public class EnumClassMetadata extends ClassMetadata
 		// @BytecodeName("valueOf")
 		// public static func from(ordinal: int) -> EnumType
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final IType type = this.theClass.getClassType();
 		final CodeMethod method = new CodeMethod(this.theClass, Name.fromRaw("from"), type,
 		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
@@ -196,7 +196,7 @@ public class EnumClassMetadata extends ClassMetadata
 		// @BytecodeName("valueOf")
 		// public static func from(name: String) -> EnumType
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final IType type = this.theClass.getClassType();
 		final CodeMethod method = new CodeMethod(this.theClass, Name.fromRaw("from"), type,
 		                                         AttributeList.of(Modifiers.PUBLIC | Modifiers.STATIC));
