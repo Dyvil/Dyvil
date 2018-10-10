@@ -7,7 +7,7 @@ object AutoPrinter
 	func applyStatement(value: any!) -> void = print value
 }
 
-@BytecodeName("AutoPrinter$OutputSyntax")
+@JavaName("AutoPrinter$OutputSyntax")
 extension Output
 {
 	static func print(closure: AutoPrinter.() -> void) -> void inline = closure(AutoPrinter)

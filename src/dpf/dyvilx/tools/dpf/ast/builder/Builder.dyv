@@ -24,13 +24,13 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	public init(name: Name) : this(name, new mutable.ArrayList<Parameter>, null)
 
-	@BytecodeName("withNode")
+	@JavaName("withNode")
 	func with(node: Node) -> Builder { this.node = node; this }
 
-	@BytecodeName("withParameter")
+	@JavaName("withParameter")
 	func with(parameter: Parameter) -> Builder { this.add(parameter); this }
 
-	@BytecodeName("addParameter")
+	@JavaName("addParameter")
 	func add(parameter: Parameter) -> void = this.parameters.add(parameter)
 
 	override func visitParameter(name: Name!) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }

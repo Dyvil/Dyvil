@@ -4,7 +4,7 @@ import java.io.File
 
 interface Specialization
 {
-	var file: File! { @BytecodeName("file") get }
+	var file: File! { @JavaName("file") get }
 
 	func subscript(key: String) -> String!
 }

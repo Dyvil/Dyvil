@@ -55,12 +55,12 @@ final class Objects
 	infix func ===(lhs: any!, rhs: any!) -> boolean = lhs === rhs
 
 	@OverloadPriority
-	@BytecodeName("$eq$eq$eq_null")
+	@JavaName("$eq$eq$eq_null")
 	@Intrinsic([ LOAD_0, IS_NULL ])
 	infix func ===(lhs: any!, rhs: null) -> boolean = lhs === null
 
 	@OverloadPriority
-	@BytecodeName("null_$eq$eq$eq")
+	@JavaName("null_$eq$eq$eq")
 	@Intrinsic([ LOAD_1, IS_NULL ])
 	infix func ===(lhs: null, rhs: any!) -> boolean = rhs === null
 
@@ -70,12 +70,12 @@ final class Objects
 	infix func !==(lhs: any!, rhs: any!) -> boolean = lhs !== rhs
 
 	@OverloadPriority
-	@BytecodeName("$bang$eq$eq_null")
+	@JavaName("$bang$eq$eq_null")
 	@Intrinsic([ LOAD_0, IS_NONNULL ])
 	infix func !==(lhs: any!, rhs: null) -> boolean = lhs !== null
 
 	@OverloadPriority
-	@BytecodeName("null_$bang$eq$eq")
+	@JavaName("null_$bang$eq$eq")
 	@Intrinsic([ LOAD_1, IS_NONNULL ])
 	infix func !==(lhs: null, rhs: any!) -> boolean = rhs !== null
 

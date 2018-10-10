@@ -147,7 +147,7 @@ interface CustomRepresentable
 	func representation(appendedTo builder: StringBuilder) -> void
 }
 
-@BytecodeName("Representation$AnyRepresentation")
+@JavaName("Representation$AnyRepresentation")
 extension any
 {
 	/**
@@ -162,7 +162,7 @@ extension any
 	func representation(appendedTo builder: StringBuilder) -> void = Representation.reflect(this, appendedTo: builder)
 }
 
-@BytecodeName("Representation$StringSyntax")
+@JavaName("Representation$StringSyntax")
 extension String
 {
 	static func apply(explicit representing value: any!) -> String = value.representation

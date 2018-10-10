@@ -25,7 +25,7 @@ final class Optionals
 
 	@OverloadPriority(-1)
 	@Deprecated('The optional chain operator should not be used with a non-optional left-hand operand')
-	@BytecodeName('$qmark_1')
+	@JavaName('$qmark_1')
 	@Intrinsic([ LOAD_0 ])
 	postfix func ? <type T: any>(lhs: T) -> T = lhs
 
@@ -40,7 +40,7 @@ final class Optionals
 
 	@OverloadPriority(-1)
 	@Deprecated('The optional unwrap operator should not be used with a non-optional left-hand operand')
-	@BytecodeName('$bang_1')
+	@JavaName('$bang_1')
 	@Intrinsic([ LOAD_0 ])
 	postfix func ! <type T: any>(lhs: T) -> T = lhs
 
@@ -55,7 +55,7 @@ final class Optionals
 
 	@OverloadPriority(-1)
 	@Deprecated('The optional force unwrap operator should not be used with a non-optional left-hand operand')
-	@BytecodeName('$bang$bang_1')
+	@JavaName('$bang$bang_1')
 	@Intrinsic([ LOAD_0 ])
 	postfix func !! <type T: any>(lhs: T) -> T = lhs
 
@@ -69,7 +69,7 @@ final class Optionals
 
 	@OverloadPriority(-1)
 	@Deprecated('The null coalescing operator should not be used with a non-optional left-hand operand')
-	@BytecodeName('$qmark$qmark_1')
+	@JavaName('$qmark$qmark_1')
 	@Intrinsic([ LOAD_0 ])
 	infix func ?? <type T: any, type U>(lhs: T, rhs: U) -> T = lhs
 
@@ -86,22 +86,22 @@ final class Optionals
 	// Equality with null operands
 
 	@OverloadPriority
-	@BytecodeName("$eq$eq_null")
+	@JavaName("$eq$eq_null")
 	@Intrinsic([ LOAD_0, IS_NULL ])
 	infix func ==(lhs: any!, rhs: null) -> boolean = lhs == null
 
 	@OverloadPriority
-	@BytecodeName("null_$eq$eq")
+	@JavaName("null_$eq$eq")
 	@Intrinsic([ LOAD_1, IS_NULL ])
 	infix func ==(lhs: null, rhs: any!) -> boolean = rhs == null
 
 	@OverloadPriority
-	@BytecodeName("$bang$eq_null")
+	@JavaName("$bang$eq_null")
 	@Intrinsic([ LOAD_0, IS_NONNULL ])
 	infix func !=(lhs: any!, rhs: null) -> boolean = lhs != null
 
 	@OverloadPriority
-	@BytecodeName("null_$bang$eq")
+	@JavaName("null_$bang$eq")
 	@Intrinsic([ LOAD_1, IS_NONNULL ])
 	infix func !=(lhs: null, rhs: any!) -> boolean = rhs != null
 

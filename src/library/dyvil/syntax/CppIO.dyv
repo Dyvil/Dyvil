@@ -2,7 +2,7 @@ package dyvil.syntax
 
 import java.io.PrintStream
 
-@BytecodeName("CppIO$SystemSyntax")
+@JavaName("CppIO$SystemSyntax")
 extension System
 {
 	// =============== Constant Functions ===============
@@ -10,7 +10,7 @@ extension System
 	func endl() -> String inline = System.lineSeparator
 }
 
-@BytecodeName("CppIO$PrintStreamSyntax")
+@JavaName("CppIO$PrintStreamSyntax")
 extension PrintStream
 {
 	// =============== Operators ===============

@@ -15,11 +15,11 @@ import dyvil.lang.LiteralConvertible
 @Immutable
 interface #(TYPE_NAME)Range extends Range<PRIMITIVE>
 {
-	@BytecodeName("closed")
+	@JavaName("closed")
 	override static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range
 		= new dyvil.collection.range.closed.#(TYPE_NAME)Range(from, to)
 
-	@BytecodeName("halfOpen")
+	@JavaName("halfOpen")
 	override static func apply(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> #(TYPE_NAME)Range
 		= new dyvil.collection.range.halfopen.#(TYPE_NAME)Range(from, toExclusive)
 

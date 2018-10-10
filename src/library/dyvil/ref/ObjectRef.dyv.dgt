@@ -22,7 +22,7 @@ interface ObjectRef<T>
 		#let(TYPE_NAME = spec['TYPE_NAME'])
 		#let(WRAPPER = spec['WRAPPER'])
 
-		@BytecodeName("unbox#(TYPE_NAME)")
+		@JavaName("unbox#(TYPE_NAME)")
 		static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(ref)
 	}
 }

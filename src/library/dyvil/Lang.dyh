@@ -58,7 +58,7 @@ type Int    = java.lang.Integer
 // Special Type Aliases
 type Configure<T> = T.() -> void
 type Optional<T>  = T?
-type BytecodeName = dyvil.annotation.`internal`.DyvilName
+type BytecodeName = dyvil.annotation.JavaName // deprecated
 type Type<T>      = dyvil.reflect.types.Type<T>
 
 // ---------------------------------------- Operator Definitions ----------------------------------------

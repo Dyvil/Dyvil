@@ -16,7 +16,7 @@ import java.util.function.{ Consumer, Function, Predicate }
 @Immutable
 interface Range<+T> extends Queryable<T>, Serializable
 {
-	@BytecodeName("empty")
+	@JavaName("empty")
 	static func apply<T>() -> Range<T> = EmptyRange.instance
 
 	// Primitive Factory Methods
@@ -25,20 +25,20 @@ interface Range<+T> extends Queryable<T>, Serializable
 		#let(PRIMITIVE = spec['PRIMITIVE'])
 		#if (Boolean.parseBoolean(spec['HAS_RANGE_CLASS'])) {
 
-			@BytecodeName("closed")
+			@JavaName("closed")
 			static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range = #(TYPE_NAME)Range(from, to: to)
 
-			@BytecodeName("halfOpen")
+			@JavaName("halfOpen")
 			static func apply(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> #(TYPE_NAME)Range
 				= #(TYPE_NAME)Range(from, toExclusive: toExclusive)
 		}
 	}
 
-	@BytecodeName("closed")
+	@JavaName("closed")
 	static func apply<T extends Rangeable<T>>(from: T, to: T) -> Range<T>
 		= new dyvil.collection.range.closed.ObjectRange<T>(from, to)
 
-	@BytecodeName("halfOpen")
+	@JavaName("halfOpen")
 	static func apply<T extends Rangeable<T>>(from: T, explicit toExclusive: T) -> Range<T>
 		= new dyvil.collection.range.halfopen.ObjectRange<T>(from, toExclusive)
 

@@ -10,7 +10,7 @@ public class TypeTest
 
 	static case class MyList<T>(elements: T...)
 	{
-		@BytecodeName("sum_doubles")
+		@JavaName("sum_doubles")
 		public func sum(this: MyList<double>) -> double
 		{
 			var result = 0D
@@ -18,7 +18,7 @@ public class TypeTest
 			return result
 		}
 
-		@BytecodeName("sum_ints")
+		@JavaName("sum_ints")
 		public func sum(this: MyList<int>) -> int
 		{
 			var result = 0

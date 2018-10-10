@@ -17,13 +17,13 @@ public class Node(
 	var properties: List<Property> = new ArrayList<Property>
 	var nodeAccesses: List<NodeAccess> = new ArrayList<NodeAccess>
 
-	@BytecodeName("addNode")
+	@JavaName("addNode")
 	func add(node: Node) -> void = this.nodes.add(node)
 
-	@BytecodeName("addNodeAccess")
+	@JavaName("addNodeAccess")
 	func add(nodeAccess: NodeAccess) -> void = this.nodeAccesses.add(nodeAccess)
 
-	@BytecodeName("addProperty")
+	@JavaName("addProperty")
 	func add(property: Property) -> void = this.properties.add(property)
 
 	override func visitNode(name: Name) -> NodeVisitor

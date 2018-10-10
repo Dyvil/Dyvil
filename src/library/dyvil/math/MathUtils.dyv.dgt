@@ -5,7 +5,7 @@ package dyvil.math
 
 using dyvil.Math
 
-@BytecodeName("MathUtils")
+@JavaName("MathUtils")
 extension Math
 {
 	// --------------- min ---------------
@@ -25,7 +25,7 @@ extension Math
 			return min
 		}
 
-		static func min(_ array: [T]) -> T inline @BytecodeName("min$_array") = min(array...)
+		static func min(_ array: [T]) -> T inline @JavaName("min$_array") = min(array...)
 	}
 
 	// --------------- max ---------------
@@ -46,7 +46,7 @@ extension Math
 		}
 
 
-		static func max(_ array: [T]) -> T inline @BytecodeName("max$_array") = max(array...)
+		static func max(_ array: [T]) -> T inline @JavaName("max$_array") = max(array...)
 	}
 
 	// --------------- sum ---------------

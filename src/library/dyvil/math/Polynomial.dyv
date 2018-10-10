@@ -16,7 +16,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	public const _x: Polynomial = new Polynomial([0, 1])
 
-	@BytecodeName("apply0")
+	@JavaName("apply0")
 	static func apply(coefficient: double) -> Polynomial = Polynomial(coefficient, degree: 0)
 
 	static func apply(coefficients: double...) -> Polynomial

@@ -17,7 +17,7 @@ abstract class Primitives
 
 // *************** boolean primitive ***************
 
-@BytecodeName("Primitives$Boolean")
+@JavaName("Primitives$Boolean")
 extension boolean
 {
 	// =============== Operators ===============
@@ -87,7 +87,7 @@ extension boolean
 
 // *************** byte primitive ***************
 
-@BytecodeName("Primitives$Byte")
+@JavaName("Primitives$Byte")
 extension byte
 {
 	// --------------- equals ---------------
@@ -98,7 +98,7 @@ extension byte
 
 // *************** short primitive ***************
 
-@BytecodeName("Primitives$Short")
+@JavaName("Primitives$Short")
 extension short
 {
 	// --------------- equals ---------------
@@ -109,7 +109,7 @@ extension short
 
 // *************** char primitive ***************
 
-@BytecodeName("Primitives$Char")
+@JavaName("Primitives$Char")
 extension char
 {
 	// --------------- equals ---------------
@@ -128,7 +128,7 @@ extension char
 
 // *************** int primitive ***************
 
-@BytecodeName("Primitives$Int")
+@JavaName("Primitives$Int")
 extension int
 {
 	// =============== Methods ===============
@@ -268,7 +268,7 @@ extension int
 
 // *************** long primitive ***************
 
-@BytecodeName("Primitives$Long")
+@JavaName("Primitives$Long")
 extension long
 {
 	// =============== Operators ===============
@@ -408,7 +408,7 @@ extension long
 
 // *************** float primitive ***************
 
-@BytecodeName("Primitives$Float")
+@JavaName("Primitives$Float")
 extension float
 {
 	// =============== Operators ===============
@@ -497,7 +497,7 @@ extension float
 
 // *************** double primitive ***************
 
-@BytecodeName("Primitives$Double")
+@JavaName("Primitives$Double")
 extension double
 {
 	// =============== Operators ===============
@@ -586,7 +586,7 @@ extension double
 
 // *************** Void wrapper ***************
 
-@BytecodeName("Primitives$VoidWrapper")
+@JavaName("Primitives$VoidWrapper")
 extension Void
 {
 	// =============== Constants ===============
@@ -609,7 +609,7 @@ extension Void
 
 	// *************** WRAPPER wrapper ***************
 
-	@BytecodeName("Primitives$#(WRAPPER)Wrapper")
+	@JavaName("Primitives$#(WRAPPER)Wrapper")
 	extension WRAPPER
 	{
 		// =============== Static Methods ===============

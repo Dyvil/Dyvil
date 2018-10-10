@@ -36,10 +36,10 @@ class OverloadTest
 	@AutoMangled
 	static func g(strings: List<String>) -> String = "g(List<String>)"
 
-	@BytecodeName("g_intSet")
+	@JavaName("g_intSet")
 	static func g<type T: Set<int>>(ints: T) -> String = "g(Set<int>)"
 
-	@BytecodeName("g_stringSet")
+	@JavaName("g_stringSet")
 	static func g<type T: Set<String>>(strings: T) -> String = "g(Set<String>)"
 
 	// ----------------- h section -----------------

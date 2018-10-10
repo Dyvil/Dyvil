@@ -14,10 +14,10 @@ public class OperatorTest
 		circumfix()
 	}
 
-	@BytecodeName('preinc')
+	@JavaName('preinc')
 	prefix func ++(i: int) -> int = i
 
-	@BytecodeName('postinc')
+	@JavaName('postinc')
 	postfix func ++(i: int) -> int = i
 
 	static func unary() -> Test = test "Unary" {
@@ -81,16 +81,16 @@ public class OperatorTest
 		s3 =?= "(+++(a))+++"
 	}
 
-	@BytecodeName("plusPre")
+	@JavaName("plusPre")
 	prefix func +++(i: int) -> int = i - 1
 
-	@BytecodeName("plusPost")
+	@JavaName("plusPost")
 	postfix func +++(i: int) -> int = i + 1
 
-	@BytecodeName("plusPre")
+	@JavaName("plusPre")
 	prefix func +++(s: String) -> String = "+++(\(s))"
 
-	@BytecodeName("plusPost")
+	@JavaName("plusPost")
 	postfix func +++(s: String) -> String = "(\(s))+++"
 
 	static func +++_+++(s: String) -> String = "+++(\(s))+++"
