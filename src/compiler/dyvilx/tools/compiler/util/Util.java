@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.util;
 
 import dyvil.lang.Name;
-import dyvil.string.CharUtils;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
@@ -67,7 +66,7 @@ public final class Util
 	}
 
 	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext,
-		                                               StringBuilder stringBuilder)
+		StringBuilder stringBuilder)
 	{
 		stringBuilder.append("init");
 		constructor.getParameters().signatureToString(stringBuilder, typeContext);
@@ -154,40 +153,23 @@ public final class Util
 
 	// region Name transformations
 
-	public static String getAdder(String methodName)
+	private static String capitalizeAndPrepend(String prefix, String string)
 	{
-		StringBuilder builder = new StringBuilder("add");
-		int len = methodName.length() - 1;
-		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(methodName.charAt(i));
-		}
-		return builder.toString();
-	}
-
-	public static String getSetter(String methodName)
-	{
-		StringBuilder builder = new StringBuilder("set");
-		int len = methodName.length();
-		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(methodName.charAt(i));
-		}
+		final int length = string.length();
+		final StringBuilder builder = new StringBuilder(length + prefix.length() + 1).append(prefix);
+		builder.appendCodePoint(Character.toUpperCase(string.codePointAt(0)));
+		builder.append(string, Character.charCount(Character.toUpperCase(string.codePointAt(0))), length);
 		return builder.toString();
 	}
 
 	public static String getGetter(String methodName)
 	{
-		StringBuilder builder = new StringBuilder("get");
-		int len = methodName.length();
-		builder.append(CharUtils.toUpperCase(methodName.charAt(0)));
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(methodName.charAt(i));
-		}
-		return builder.toString();
+		return capitalizeAndPrepend("get", methodName);
+	}
+
+	public static String getSetter(String methodName)
+	{
+		return capitalizeAndPrepend("set", methodName);
 	}
 
 	public static boolean hasEq(Name name)
