@@ -1,0 +1,6 @@
+package dyvil.annotation
+
+import java.lang.annotation._
+
+@Target([ .METHOD, .TYPE ])
+@interface JavaName(let value: String)
