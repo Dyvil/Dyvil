@@ -2,9 +2,9 @@ package dyvil.source
 
 interface Source
 {
-	var lineCount: int { get }
+	var lineCount: int { @BytecodeName("lineCount") get }
 
-	var text: String { get }
+	var text: String { @BytecodeName("text") get }
 
 	func line(at index: int) -> String!
 }

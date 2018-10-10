@@ -5,7 +5,7 @@ import dyvilx.tools.gensrc._
 import java.io.{ IOException, File }
 import java.util.Properties
 
-class PropertySpec(let file: File { override get }, private let properties: Properties) implements Specialization
+class PropertySpec(let file: File { @BytecodeName("file") override get }, private let properties: Properties) implements Specialization
 {
 	protected var parent: Specialization!
 

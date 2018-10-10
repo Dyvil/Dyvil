@@ -4,9 +4,9 @@ interface RingCompatible<type T: RingCompatible<T>>
 {
 	// Constants
 
-	static func _0 -> T
+	static var _0: T { get }
 
-	static func _1 -> T
+	static var _1: T { get }
 
 	// Unary Operators
 

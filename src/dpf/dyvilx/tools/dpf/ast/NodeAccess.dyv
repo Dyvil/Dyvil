@@ -8,17 +8,13 @@ import dyvilx.tools.parsing.ASTNode
 public class NodeAccess
 (
 	protected let name: Name { public override get }
+	protected var _element: NodeElement!
 )
 implements dyvilx.tools.dpf.model.NodeAccess, NodeElement
 {
-	protected var element: NodeElement! = null
+	var element: NodeElement { override get: this._element!; set: this._element = newValue }
 
-	public init(name: Name, element: NodeElement) : this(name)
-	{
-		this.element = element
-	}
-
-	override func element() -> NodeElement = this.element!
+	public init(name: Name) : this(name, null)
 
 	override func visitNode(name: Name) -> NodeVisitor
 	{

@@ -2,7 +2,7 @@ package dyvilx.tools.dpf.ast.value
 
 interface Constant extends Value
 {
-	func isConstant() -> boolean = true
+	var isConstant: boolean { get: true }
 
 	func toObject() -> Object
 

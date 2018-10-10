@@ -4,5 +4,5 @@ import dyvilx.tools.dpf.visitor.NodeVisitor
 
 public interface Node extends NodeElement, NodeVisitor
 {
-	override func name() -> Name
+	override var name: Name { get }
 }

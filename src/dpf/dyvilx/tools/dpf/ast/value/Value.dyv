@@ -52,9 +52,7 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
 
 	// Override Methods
 
-	override func getPosition() -> SourcePosition! = null
-
-	override func setPosition(position: SourcePosition!) -> void { }
+	override var position: SourcePosition! { get: null; set {} }
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 

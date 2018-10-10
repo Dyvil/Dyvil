@@ -4,7 +4,7 @@ import dyvilx.tools.dpf.visitor.NodeVisitor
 
 public interface NodeElement extends Expandable
 {
-	func name() -> Name!
+	var name: Name! { get }
 
 	func accept(visitor: NodeVisitor) -> void
 }

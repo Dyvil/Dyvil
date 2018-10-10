@@ -6,7 +6,5 @@ import dyvilx.tools.parsing.ASTNode
 
 interface NodeElement extends ASTNode, dyvilx.tools.dpf.model.NodeElement
 {
-	override func getPosition() -> SourcePosition! = null
-
-	override func setPosition(position: SourcePosition!) {}
+	override var position: SourcePosition! { get: null; set {} }
 }

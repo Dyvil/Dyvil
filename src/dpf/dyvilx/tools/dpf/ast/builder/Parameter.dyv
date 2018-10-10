@@ -19,18 +19,13 @@ extends DPFValueVisitor implements ASTNode, Expandable
 
 	static func apply(value: Value) -> Parameter = new Parameter(null, value)
 
-	public init(name: Name?)
-	{
-		this.name = name
-	}
+	public init(name: Name?) : this(name, null)
 
 	// Accessors
 
 	protected override func visitValue(value: Value) -> void = this.value = value
 
-	public override func getPosition() -> SourcePosition! = null
-
-	public override func setPosition(position: SourcePosition!) -> void { }
+	override var position: SourcePosition! { get: null; set {} }
 
 	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter
 	{

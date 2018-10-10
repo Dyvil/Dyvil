@@ -9,9 +9,9 @@ abstract class GroupImplicits
 
 	implicit object IntGroup implements GroupAddNegate<int>, GroupMultiply<int>
 	{
-		override func _0() -> int = 0
+		override var _0: int { get: 0 }
 
-		override func _1() -> int = 1
+		override var _1: int { get: 1 }
 
 		override func add(lhs: int, rhs: int) -> int = lhs + rhs
 
@@ -26,9 +26,9 @@ abstract class GroupImplicits
 
 	implicit object LongGroup implements GroupAddNegate<long>, GroupMultiply<long>
 	{
-		override func _0() -> long = 0
+		override var _0: long { get: 0 }
 
-		override func _1() -> long = 1
+		override var _1: long { get: 1 }
 
 		override func add(lhs: long, rhs: long) -> long = lhs + rhs
 
@@ -43,9 +43,9 @@ abstract class GroupImplicits
 
 	implicit object BigIntegerGroup implements GroupAddNegate<BigInteger>, GroupMultiply<BigInteger>
 	{
-		override func _0() -> BigInteger = BigInteger.valueOf(0)
+		override var _0: BigInteger { get: BigInteger.valueOf(0) }
 
-		override func _1() -> BigInteger = BigInteger.valueOf(1)
+		override var _1: BigInteger { get: BigInteger.valueOf(1) }
 
 		override func add(lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.add(rhs)
 
@@ -60,9 +60,9 @@ abstract class GroupImplicits
 
 	implicit object DoubleRing implements Ring<double>
 	{
-		override func _0() -> double = 0
+		override var _0: double { get: 0 }
 
-		override func _1() -> double = 1
+		override var _1: double { get: 1 }
 
 		override func add(lhs: double, rhs: double) -> double = lhs + rhs
 
@@ -81,9 +81,9 @@ abstract class GroupImplicits
 
 	implicit object FloatRing implements Ring<float>
 	{
-		override func _0() -> float = 0
+		override var _0: float { get: 0 }
 
-		override func _1() -> float = 1
+		override var _1: float { get: 1 }
 
 		override func add(lhs: float, rhs: float) -> float = lhs + rhs
 
@@ -102,9 +102,9 @@ abstract class GroupImplicits
 
 	implicit object BigDecimalRing implements Ring<BigDecimal>
 	{
-		override func _0() -> BigDecimal = BigDecimal.ZERO
+		override var _0: BigDecimal { get: BigDecimal.ZERO }
 
-		override func _1() -> BigDecimal = BigDecimal.ONE
+		override var _1: BigDecimal { get: BigDecimal.ONE }
 
 		override func add(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal = lhs.add(rhs)
 
@@ -123,7 +123,7 @@ abstract class GroupImplicits
 
 	implicit object StringGroup implements GroupAdd<String>
 	{
-		override func _0() -> String = ""
+		override var _0: String { get: "" }
 
 		override func add(lhs: String, rhs: String) -> String = lhs ++ rhs
 	}

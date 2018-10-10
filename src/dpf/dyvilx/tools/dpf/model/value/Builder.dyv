@@ -4,7 +4,7 @@ import package dyvilx.tools.dpf.model
 
 public interface Builder extends Value, model.Expandable, dyvilx.tools.dpf.visitor.BuilderVisitor
 {
-	func name() -> Name
+	var name: Name { get }
 
-	func node() -> model.Node?
+	var node: model.Node? { get }
 }

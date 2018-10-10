@@ -8,6 +8,14 @@ import dyvil.math.group.RingCompatible
 @LiteralConvertible.FromDouble
 class Polynomial private (coefficients: [double]) implements RingCompatible<Polynomial>, Formattable, (double -> double)
 {
+	// Constants
+
+	public const _0: Polynomial = new Polynomial([]) { override get }
+
+	public const _1: Polynomial = new Polynomial([1]) { override get }
+
+	public const _x: Polynomial = new Polynomial([0, 1])
+
 	@BytecodeName("apply0")
 	static func apply(coefficient: double) -> Polynomial = Polynomial(coefficient, degree: 0)
 
@@ -34,7 +42,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		return new Polynomial(array)
 	}
 
-	func degree() -> int = this.coefficients.size - 1
+	var degree: int { get: this.coefficients.size - 1 }
 
 	func subscript(index: int) = this.coefficients[index]
 
@@ -52,7 +60,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		return sum
 	}
 
-	func derivative() -> Polynomial
+	func differentiate() -> Polynomial
 	{
 		// derivative of a polynomial of degree 0 or -1 is the zero polynomial
 		if (this.degree <= 0) return _0
@@ -66,7 +74,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		return new Polynomial(newCoeff) // no trimming necessary
 	}
 
-	func integral() -> Polynomial
+	func integrate() -> Polynomial
 	{
 		if (this.isZero) return _0
 
@@ -78,14 +86,6 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		}
 		return new Polynomial(newCoeff) // no trimming necessary
 	}
-
-	// Constants
-
-	public const _0: Polynomial = new Polynomial([]) { override get }
-
-	public const _1: Polynomial = new Polynomial([1]) { override get }
-
-	public const _x: Polynomial = new Polynomial([0, 1])
 
 	// Unary Operators
 

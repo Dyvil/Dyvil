@@ -7,6 +7,12 @@ import dyvil.math.group.RingCompatible
 class Rational private (let numerator: long { public get }, let denominator: long { public get })
 	implements RingCompatible<Rational>, Formattable, Comparable<Rational>
 {
+	// Constants
+
+	public const _0: Rational = 0 { override get }
+
+	public const _1: Rational = 1 { override get }
+
 	static func gcd(a: long, b: long) -> long
 	{
 		while (b != 0)
@@ -59,12 +65,6 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 		return Rational(sign * mant, 1L << -exp)
 	}
-
-	// Constants
-
-	public const _0: Rational = 0 { override get }
-
-	public const _1: Rational = 1 { override get }
 
 	// Unary Operators
 

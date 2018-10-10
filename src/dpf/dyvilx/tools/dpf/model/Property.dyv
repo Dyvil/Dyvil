@@ -4,7 +4,7 @@ import dyvilx.tools.dpf.model.value.Value
 
 public interface Property extends NodeElement
 {
-	override func name() -> Name
+	var name: Name { get }
 
-	func value() -> Value
+	var value: Value { get }
 }

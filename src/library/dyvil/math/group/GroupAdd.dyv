@@ -2,13 +2,13 @@ package dyvil.math.group
 
 interface GroupAdd<T>
 {
-	abstract func _0() -> T
+	abstract var _0: T { get }
 
 	abstract func add(lhs: T, rhs: T) -> T
 
 	implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupAdd<R> = new GroupAdd<R>()
 	{
-		override func _0() -> R = R._0
+		override var _0: R { get: R._0 }
 
 		override func add(lhs: R, rhs: R) -> R = R.`+`(lhs, rhs)
 	}

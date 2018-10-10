@@ -2,7 +2,7 @@ package dyvil.math.group
 
 interface GroupMultiply<T>
 {
-	abstract func _1() -> T
+	abstract var _1: T { get }
 
 	abstract func multiply(lhs: T, rhs: T) -> T
 
@@ -26,7 +26,7 @@ interface GroupMultiply<T>
 
 	implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiply<R> = new GroupMultiply<R>()
 	{
-		override func _1() -> R = R._1
+		override var _1: R { get: R._1 }
 
 		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
 

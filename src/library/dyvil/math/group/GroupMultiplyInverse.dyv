@@ -21,7 +21,7 @@ interface GroupMultiplyInverse<T> extends GroupMultiply<T>
 
 	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiplyInverse<R> = new GroupMultiplyInverse<R>()
 	{
-		override func _1() -> R = R._1
+		override var _1: R { get: R._1 }
 
 		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
 

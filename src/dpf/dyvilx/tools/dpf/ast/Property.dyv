@@ -10,13 +10,13 @@ import dyvil.source.position.SourcePosition
 public class Property
 (
 	protected let name:  Name   { public override get }
-	protected var value: Value!
+	protected var _value: Value!
 )
 extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement
 {
-	public init(name: Name) : this(name, null)
+	var value: Value { override get: this._value!; set: this._value = newValue }
 
-	override func value() -> Value = this.value!
+	public init(name: Name) : this(name, null)
 
 	protected override func visitValue(value: Value) -> void = this.value = value
 
