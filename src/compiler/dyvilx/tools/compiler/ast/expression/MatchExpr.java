@@ -8,7 +8,6 @@ import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.consumer.ICaseConsumer;
 import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -19,8 +18,8 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
@@ -28,7 +27,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
 
-public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
+public final class MatchExpr implements IValue, IValueConsumer
 {
 	public static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.value.type.incompatible");
@@ -89,7 +88,6 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		this.matchedValue = value;
 	}
 
-	@Override
 	public void addCase(MatchCase matchCase)
 	{
 		int index = this.caseCount++;

@@ -12,6 +12,8 @@ import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_ST
 
 public class MatchExpressionParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int MATCH          = 0;
 	private static final int EXPRESSION     = 1;
 	private static final int SINGLE_CASE    = 2;
@@ -19,7 +21,11 @@ public class MatchExpressionParser extends Parser
 	private static final int CASE           = 8;
 	private static final int CASE_SEPARATOR = 16;
 
+	// =============== Fields ===============
+
 	protected MatchExpr matchExpression;
+
+	// =============== Constructors ===============
 
 	public MatchExpressionParser(MatchExpr matchExpression)
 	{
@@ -36,6 +42,8 @@ public class MatchExpressionParser extends Parser
 			this.mode = SINGLE_CASE;
 		}
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -66,7 +74,7 @@ public class MatchExpressionParser extends Parser
 		case SINGLE_CASE:
 			if (type == DyvilKeywords.CASE)
 			{
-				pm.pushParser(new CaseParser(this.matchExpression), true);
+				pm.pushParser(new CaseParser(this.matchExpression::addCase), true);
 				this.mode = END;
 				return;
 			}
@@ -76,7 +84,7 @@ public class MatchExpressionParser extends Parser
 				return;
 			}
 			this.mode = CASE_SEPARATOR;
-			pm.pushParser(new CaseParser(this.matchExpression));
+			pm.pushParser(new CaseParser(this.matchExpression::addCase));
 			return;
 		case CASE:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
@@ -90,7 +98,7 @@ public class MatchExpressionParser extends Parser
 			}
 
 			this.mode = CASE_SEPARATOR;
-			pm.pushParser(new CaseParser(this.matchExpression), true);
+			pm.pushParser(new CaseParser(this.matchExpression::addCase), true);
 			return;
 		case CASE_SEPARATOR:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)

@@ -1,35 +1,42 @@
 package dyvilx.tools.compiler.parser.pattern;
 
-import dyvilx.tools.compiler.ast.consumer.ICaseConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.MatchCase;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.parser.statement.StatementListParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.*;
 
-public class CaseParser extends Parser implements IValueConsumer
+public class CaseParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int CASE      = 0;
 	private static final int CONDITION = 1;
 	private static final int ACTION    = 2;
 
-	protected final ICaseConsumer caseConsumer;
+	// =============== Fields ===============
+
+	protected final Consumer<MatchCase> consumer;
 
 	private MatchCase matchCase;
 
-	public CaseParser(ICaseConsumer caseConsumer)
+	// =============== Constructors ===============
+
+	public CaseParser(Consumer<MatchCase> consumer)
 	{
-		this.caseConsumer = caseConsumer;
+		this.consumer = consumer;
 		// this.mode = CASE
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -56,7 +63,8 @@ public class CaseParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
-				pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
+				pm.pushParser(new ExpressionParser(this.matchCase::setCondition)
+					              .withFlags(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
 				return;
 			}
 			// Fallthrough
@@ -64,10 +72,10 @@ public class CaseParser extends Parser implements IValueConsumer
 			this.mode = END;
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.pushParser(new StatementListParser(this), true);
+				pm.pushParser(new StatementListParser(this.matchCase::setAction), true);
 				return;
 			}
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this.matchCase::setAction));
 			if (type != BaseSymbols.COLON && type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.reparse();
@@ -76,20 +84,7 @@ public class CaseParser extends Parser implements IValueConsumer
 			return;
 		case END:
 			pm.popParser(true);
-			this.caseConsumer.addCase(this.matchCase);
-		}
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case ACTION:
-			this.matchCase.setCondition(value);
-			return;
-		case END:
-			this.matchCase.setAction(value);
+			this.consumer.accept(this.matchCase);
 		}
 	}
 }
