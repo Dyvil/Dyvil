@@ -2,11 +2,11 @@ package dyvilx.tools.compiler.parser.header;
 
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.expression.operator.Operator;
 import dyvilx.tools.compiler.ast.header.HeaderDeclaration;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.header.PackageDeclaration;
+import dyvilx.tools.compiler.ast.imports.IImport;
 import dyvilx.tools.compiler.ast.imports.ImportDeclaration;
 import dyvilx.tools.compiler.ast.imports.KindedImport;
 import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
@@ -19,6 +19,8 @@ import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
+
+import java.util.function.Consumer;
 
 public class SourceFileParser extends AbstractMemberParser
 {
@@ -188,7 +190,7 @@ public class SourceFileParser extends AbstractMemberParser
 		return false;
 	}
 
-	private IImportConsumer importConsumer(IToken token)
+	private Consumer<IImport> importConsumer(IToken token)
 	{
 		return im -> {
 			final ImportDeclaration declaration = new ImportDeclaration(token.raw());
