@@ -5,8 +5,10 @@ import dyvilx.tools.gensrc._
 import java.io.{ IOException, File }
 import java.util.Properties
 
-class PropertySpec(let file: File { @JavaName("file") override get }, private let properties: Properties) implements Specialization
+class PropertySpec(let file: File { override get }, private let properties: Properties) implements Specialization
 {
+	// --------------- Parent Spec ---------------
+
 	protected var parent: Specialization!
 
 	protected func resolveParent() -> Specialization!
@@ -32,17 +34,13 @@ class PropertySpec(let file: File { @JavaName("file") override get }, private le
 		return DefaultSpec
 	}
 
-	protected func getOwn(key: String) -> String! = this.properties.getProperty(key)
+	// --------------- Key Resolution ---------------
 
-	override func subscript(key: String) -> String!
-	{
-		if let own = this.getOwn(key)
-		{
-			return own
-		}
+	protected func getOwn(key: String) -> String? = this.properties.getProperty(key)
 
-		return this.resolveParent()[key]
-	}
+	override func subscript(key: String) -> String! = this.getOwn(key) ?? this.resolveParent()[key]
+
+	// --------------- Formatting ---------------
 
 	override func toString() -> String = this.file.toString
 }

@@ -5,49 +5,48 @@ import java.io.{ File, IOException, Writer, FileWriter }
 import dyvilx.tools.gensrc.spec.DefaultSpec
 using dyvilx.tools.gensrc.Builtins._
 
-// name = pack/age/name/TemplateName.ext.dgt
-//        ^^^^^^^^^ file name ^^^^^^^^^^
-//        ^ pathprefix ^
 abstract class Template(let name: String)
 {
-	var outputDir: File = new File('.')
-	{
-		public get
-		public set
-	}
+	var outputDir: File = new File('.') { public get; public set }
 
-	// Paths
+	// --------------- Name Components and Paths ---------------
 
-	static func getPathPrefix(name: String) -> String
-	{
-		let index = name.lastIndexOf('/')
-		return index < 0 ? "" : name.substring(0, index + 1)
-	}
+	// Relation between name components:
+	// name:       pack/age/name/TemplateName.ext.dgt
+	// fileName:   pack/age/name/TemplateName.ext
+	// pathPrefix: pack/age/name/
 
-	static func getFileName(name: String) -> String
+	var pathPrefix: String { get: {
+		let index = this.name.lastIndexOf('/')
+		return index < 0 ? "" : this.name.substring(0, index + 1)
+	}}
+
+	var fileName: String { get: getFileName(this.name) }
+
+	private static func getFileName(name: String) -> String
 	{
 		let index = name.lastIndexOf('.')
 		return index < 0 ? name : name.substring(0, index)
 	}
 
-	// Spec Resolution
+	// --------------- Specializations ---------------
 
 	let specs: List<Specialization> = new mutable.ArrayList<Specialization>()
 
-	static func nameMatches(templateName: String, specName: String)
+	static func nameMatches(templateName: String, specName: String) -> boolean
 	{
 		// specName = src/pack/age/name/TemplateName.ext-SpecID.dgs
 		//                ^^^^^^^^^ file name ^^^^^^^^^^
 		return specName.contains(getFileName(templateName))
 	}
 
-	func addSpec(name: String) -> void
+	func addSpec(named specName: String) -> void
 	{
-		if (!nameMatches(this.name, name)) return
+		if (!nameMatches(this.name, specName)) return
 
 		try
 		{
-			this.specs.add(Builtins.spec(name))
+			this.specs.add(Builtins.spec(specName))
 		}
 		catch (ex: IOException)
 		{
@@ -67,6 +66,8 @@ abstract class Template(let name: String)
 
 		return Builtins.spec(name)
 	}
+
+	// --------------- Main Implementation ---------------
 
 	func mainImpl(args: [String]) -> void
 	{
@@ -89,6 +90,8 @@ abstract class Template(let name: String)
 
 		this.generate()
 	}
+
+	// --------------- Code Generation ---------------
 
 	func generate() -> int
 	{
@@ -131,7 +134,7 @@ abstract class Template(let name: String)
 	{
 		if (let enabled = spec['@enabled'], !Boolean.parseBoolean(enabled)) return false
 
-		let fileName = if (let prop = spec['@fileName']) { getPathPrefix(this.name) ++ prop } else getFileName(this.name)
+		let fileName = if (let prop = spec['@fileName']) { this.pathPrefix ++ prop } else this.fileName
 		let outputFile = new File(this.outputDir, fileName)
 		outputFile.getParentFile().mkdirs()
 
