@@ -1,10 +1,8 @@
 package dyvilx.tools.compiler.parser.statement;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.statement.loop.WhileStatement;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -13,20 +11,28 @@ import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
-public final class WhileStatementParser extends Parser implements IValueConsumer
+public class WhileStatementParser extends Parser
 {
-	protected static final int WHILE         = 0;
-	protected static final int CONDITION     = 1;
-	protected static final int SEPARATOR     = 2;
-	protected static final int BLOCK         = 3;
+	// =============== Constants ===============
 
-	protected WhileStatement statement;
+	protected static final int WHILE     = 0;
+	protected static final int CONDITION = 1;
+	protected static final int SEPARATOR = 2;
+	protected static final int ACTION    = 3;
+
+	// =============== Fields ===============
+
+	protected final WhileStatement statement;
+
+	// =============== Constructors ===============
 
 	public WhileStatementParser(WhileStatement statement)
 	{
 		this.statement = statement;
 		this.mode = CONDITION;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -35,16 +41,16 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case WHILE:
-			this.mode = CONDITION;
-			if (type == DyvilKeywords.SYNCHRONIZED)
+			if (type != DyvilKeywords.WHILE)
 			{
+				pm.report(token, "while.while_keyword");
 				return;
 			}
 
-			pm.report(token, "while.while_keyword");
-			// Fallthrough
+			this.mode = CONDITION;
+			return;
 		case CONDITION:
-			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
+			pm.pushParser(new ExpressionParser(this.statement::setCondition).withFlags(IGNORE_STATEMENT), true);
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
@@ -59,33 +65,20 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 			}
 
 			this.mode = END;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			// pm.report(token, "while.separator");
 			return;
-		case BLOCK:
+		case ACTION:
 			if (BaseSymbols.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;
 			}
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = END;
 			return;
 		case END:
 			pm.popParser(true);
-		}
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case SEPARATOR:
-			this.statement.setCondition(value);
-			return;
-		case END:
-			this.statement.setAction(value);
 		}
 	}
 }

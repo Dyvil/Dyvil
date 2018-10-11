@@ -1,10 +1,8 @@
 package dyvilx.tools.compiler.parser.statement;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.statement.SyncStatement;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -13,20 +11,28 @@ import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
-public class SyncStatementParser extends Parser implements IValueConsumer
+public class SyncStatementParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int SYNCHRONIZED = 0;
 	private static final int LOCK         = 1;
 	private static final int SEPARATOR    = 2;
 	private static final int ACTION       = 3;
 
-	protected SyncStatement statement;
+	// =============== Fields ===============
+
+	protected final SyncStatement statement;
+
+	// =============== Constructors ===============
 
 	public SyncStatementParser(SyncStatement statement)
 	{
 		this.statement = statement;
 		this.mode = LOCK;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -35,16 +41,16 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case SYNCHRONIZED:
-			this.mode = LOCK;
-			if (type == DyvilKeywords.SYNCHRONIZED)
+			if (type != DyvilKeywords.SYNCHRONIZED)
 			{
+				pm.report(token, "sync.synchronized");
 				return;
 			}
 
-			pm.report(token, "sync.synchronized");
-			// Fallthrough
+			this.mode = LOCK;
+			return;
 		case LOCK:
-			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT));
+			pm.pushParser(new ExpressionParser(this.statement::setLock).withFlags(IGNORE_STATEMENT));
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
@@ -59,7 +65,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			}
 
 			this.mode = END;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			// pm.report(token, "sync.separator");
 			return;
 		case ACTION:
@@ -69,24 +75,11 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = END;
 			return;
 		case END:
 			pm.popParser(true);
-		}
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case SEPARATOR:
-			this.statement.setLock(value);
-			return;
-		case END:
-			this.statement.setAction(value);
 		}
 	}
 }

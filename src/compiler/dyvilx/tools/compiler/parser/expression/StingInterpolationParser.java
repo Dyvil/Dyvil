@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.parser.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.StringInterpolationExpr;
 import dyvilx.tools.compiler.ast.expression.constant.StringValue;
 import dyvilx.tools.parsing.IParserManager;
@@ -9,15 +7,21 @@ import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class StingInterpolationParser extends Parser implements IValueConsumer
+public class StingInterpolationParser extends Parser
 {
-	protected StringInterpolationExpr value;
-	
+	// =============== Fields ===============
+
+	protected final StringInterpolationExpr value;
+
+	// =============== Constructors ===============
+
 	public StingInterpolationParser(StringInterpolationExpr value)
 	{
 		this.value = value;
 	}
-	
+
+	// =============== Methods ===============
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -34,7 +38,7 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 				return;
 			}
 			this.value.append(new StringValue(token.raw(), token.stringValue()));
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this.value::append));
 			return;
 		}
 		case Tokens.STRING_END:
@@ -44,11 +48,5 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 		}
 		pm.reparse();
 		pm.report(token, "stringinterpolation.part");
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value.append(value);
 	}
 }
