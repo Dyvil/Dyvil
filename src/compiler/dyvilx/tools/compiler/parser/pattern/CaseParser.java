@@ -49,7 +49,7 @@ public class CaseParser extends Parser
 			{
 				this.matchCase = new MatchCase();
 				this.mode = CONDITION;
-				pm.pushParser(new PatternParser(this.matchCase));
+				pm.pushParser(new PatternParser(this.matchCase::setPattern));
 				return;
 			}
 			if (BaseSymbols.isTerminator(type))

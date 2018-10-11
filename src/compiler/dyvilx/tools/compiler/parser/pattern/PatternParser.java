@@ -1,11 +1,13 @@
 package dyvilx.tools.compiler.parser.pattern;
 
 import dyvil.lang.Name;
-import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvilx.tools.compiler.ast.pattern.BindingPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.pattern.constant.*;
+import dyvilx.tools.compiler.ast.pattern.object.EnumPattern;
+import dyvilx.tools.compiler.ast.pattern.object.ObjectPattern;
+import dyvilx.tools.compiler.ast.pattern.object.TuplePattern;
 import dyvilx.tools.compiler.ast.pattern.object.UnapplyPattern;
 import dyvilx.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvilx.tools.compiler.ast.pattern.operator.OrPattern;
@@ -24,8 +26,10 @@ import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
 
-public class PatternParser extends Parser implements Consumer<IType>
+public class PatternParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int PATTERN         = 0;
 	private static final int NEGATIVE_NUMBER = 1;
 	private static final int ENUM_IDENTIFIER = 2;
@@ -36,25 +40,37 @@ public class PatternParser extends Parser implements Consumer<IType>
 	private static final int OPERATOR_OR  = 1;
 	private static final int OPERATOR_AND = 2;
 
-	protected IPatternConsumer consumer;
+	// =============== Fields ===============
+
+	protected final Consumer<Pattern> consumer;
 
 	private Pattern pattern;
 
 	private int   operator;
 	private IType type;
 
-	public PatternParser(IPatternConsumer consumer)
+	// =============== Constructors ===============
+
+	public PatternParser(Consumer<Pattern> consumer)
 	{
-		this.consumer = consumer;
-		this.mode = PATTERN;
+		this(consumer, 0);
 	}
 
-	protected PatternParser(IPatternConsumer consumer, int operator)
+	protected PatternParser(Consumer<Pattern> consumer, int operator)
 	{
 		this.consumer = consumer;
 		this.operator = operator;
-		this.mode = PATTERN;
+		// this.mode = PATTERN;
 	}
+
+	// =============== Properties ===============
+
+	private void setType(IType type)
+	{
+		this.type = type;
+	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -117,10 +133,10 @@ public class PatternParser extends Parser implements Consumer<IType>
 				this.mode = END;
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
-				final dyvilx.tools.compiler.ast.pattern.object.TuplePattern tuplePattern = new dyvilx.tools.compiler.ast.pattern.object.TuplePattern(token);
+				final TuplePattern tuplePattern = new TuplePattern(token);
 				this.pattern = tuplePattern;
 				this.mode = TUPLE_END;
-				pm.pushParser(new PatternListParser(tuplePattern));
+				pm.pushParser(new PatternListParser(tuplePattern::add));
 				return;
 			case BaseSymbols.DOT:
 				this.mode = ENUM_IDENTIFIER;
@@ -135,7 +151,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 				}
 
 				this.mode = TYPE_END;
-				pm.pushParser(new TypeParser(this).withFlags(TypeParser.NAMED_ONLY), true);
+				pm.pushParser(new TypeParser(this::setType).withFlags(TypeParser.NAMED_ONLY), true);
 				return;
 			}
 
@@ -173,7 +189,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 		case ENUM_IDENTIFIER:
 			if (Tokens.isIdentifier(type))
 			{
-				this.pattern = new dyvilx.tools.compiler.ast.pattern.object.EnumPattern(token.raw(), token.nameValue());
+				this.pattern = new EnumPattern(token.raw(), token.nameValue());
 				this.mode = END;
 				return;
 			}
@@ -185,8 +201,8 @@ public class PatternParser extends Parser implements Consumer<IType>
 			{
 				// TYPE ( ...
 				// => Unapply pattern
-				final dyvilx.tools.compiler.ast.pattern.object.UnapplyPattern unapplyPattern = new UnapplyPattern(token, this.type);
-				pm.pushParser(new PatternListParser(unapplyPattern));
+				final UnapplyPattern unapplyPattern = new UnapplyPattern(token, this.type);
+				pm.pushParser(new PatternListParser(unapplyPattern::add));
 				this.pattern = unapplyPattern;
 				this.mode = CASE_CLASS_END;
 				return;
@@ -194,7 +210,7 @@ public class PatternParser extends Parser implements Consumer<IType>
 
 			// TYPE
 			// => Object Pattern
-			this.pattern = new dyvilx.tools.compiler.ast.pattern.object.ObjectPattern(this.type.getPosition(), this.type);
+			this.pattern = new ObjectPattern(this.type.getPosition(), this.type);
 			this.mode = END;
 			pm.reparse();
 			return;
@@ -264,18 +280,13 @@ public class PatternParser extends Parser implements Consumer<IType>
 		pm.popParser(true);
 		if (this.pattern != null)
 		{
-			this.consumer.setPattern(this.pattern);
+			this.consumer.accept(this.pattern);
 		}
+		// TODO check if non-optional / dummy pattern
 	}
 
 	private boolean checkPrecedence(int operator)
 	{
 		return this.operator != 0 && this.operator > operator;
-	}
-
-	@Override
-	public void accept(IType type)
-	{
-		this.type = type;
 	}
 }
