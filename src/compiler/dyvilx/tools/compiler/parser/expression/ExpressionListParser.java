@@ -1,10 +1,12 @@
 package dyvilx.tools.compiler.parser.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
+
+import java.util.function.Consumer;
 
 public class ExpressionListParser extends Parser
 {
@@ -15,11 +17,11 @@ public class ExpressionListParser extends Parser
 
 	// =============== Fields ===============
 
-	protected IValueConsumer consumer;
+	protected Consumer<IValue> consumer;
 
 	// =============== Constructors ===============
 
-	public ExpressionListParser(IValueConsumer consumer)
+	public ExpressionListParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
 		this.mode = EXPRESSION;

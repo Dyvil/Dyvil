@@ -1,31 +1,40 @@
 package dyvilx.tools.compiler.parser.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.SuperExpr;
 import dyvilx.tools.compiler.ast.expression.ThisExpr;
-import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public class ThisSuperParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int THIS_SUPER = 0;
 	private static final int TYPE       = 1;
 	private static final int TYPE_END   = 2;
 
-	protected IValueConsumer valueConsumer;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	private IValue value;
 
-	public ThisSuperParser(IValueConsumer valueConsumer)
+	// =============== Constructors ===============
+
+	public ThisSuperParser(Consumer<IValue> consumer)
 	{
-		this.valueConsumer = valueConsumer;
+		this.consumer = consumer;
 
 		// this.mode = THIS_SUPER;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -58,12 +67,12 @@ public class ThisSuperParser extends Parser
 				return;
 			}
 
-			this.valueConsumer.setValue(this.value);
+			this.consumer.accept(this.value);
 			pm.popParser(true);
 			return;
 		case TYPE_END:
 			pm.popParser();
-			this.valueConsumer.setValue(this.value);
+			this.consumer.accept(this.value);
 
 			if (!TypeParser.isGenericEnd(token, type))
 			{

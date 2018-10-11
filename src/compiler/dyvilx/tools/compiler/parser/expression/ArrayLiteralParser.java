@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.parser.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.MapExpr;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.parsing.IParserManager;
@@ -9,24 +9,41 @@ import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public class ArrayLiteralParser extends Parser
 {
+	// =============== Constants ===============
+
 	protected static final int OPEN_BRACKET = 1;
 	protected static final int SEPARATOR    = 2;
 	protected static final int COLON        = 4;
 
-	protected IValueConsumer consumer;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	private IToken startPosition;
 
 	private ArgumentList keys = new ArgumentList();
 	private ArgumentList values;
 
-	public ArrayLiteralParser(IValueConsumer consumer)
+	// =============== Constructors ===============
+
+	public ArrayLiteralParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
 		this.mode = OPEN_BRACKET;
 	}
+
+	// =============== Static Methods ===============
+
+	private static ExpressionParser expressionParser(ArgumentList list)
+	{
+		return new ExpressionParser(list::add).withFlags(ExpressionParser.IGNORE_COLON);
+	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -35,7 +52,7 @@ public class ArrayLiteralParser extends Parser
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			pm.pushParser(this.newExpressionParser(this.keys));
+			pm.pushParser(expressionParser(this.keys));
 			this.mode = SEPARATOR | COLON;
 			this.startPosition = token;
 
@@ -50,7 +67,7 @@ public class ArrayLiteralParser extends Parser
 			{
 				this.mode = SEPARATOR;
 				this.values = new ArgumentList(this.keys.size());
-				pm.pushParser(this.newExpressionParser(this.values));
+				pm.pushParser(expressionParser(this.values));
 				return;
 			}
 			// Fallthrough
@@ -63,7 +80,7 @@ public class ArrayLiteralParser extends Parser
 			}
 
 			this.mode = this.values != null ? COLON : SEPARATOR;
-			pm.pushParser(this.newExpressionParser(this.keys));
+			pm.pushParser(expressionParser(this.keys));
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.report(token, "array.separator");
@@ -78,7 +95,7 @@ public class ArrayLiteralParser extends Parser
 			}
 
 			this.mode = SEPARATOR;
-			pm.pushParser(this.newExpressionParser(this.values));
+			pm.pushParser(expressionParser(this.values));
 			if (type != BaseSymbols.COLON)
 			{
 				pm.reparse();
@@ -89,21 +106,16 @@ public class ArrayLiteralParser extends Parser
 		}
 	}
 
-	private ExpressionParser newExpressionParser(ArgumentList list)
-	{
-		return new ExpressionParser(list::add).withFlags(ExpressionParser.IGNORE_COLON);
-	}
-
 	private void end(IToken token)
 	{
 		if (this.values != null)
 		{
 			final MapExpr map = new MapExpr(this.startPosition.to(token), this.keys, this.values);
-			this.consumer.setValue(map);
+			this.consumer.accept(map);
 			return;
 		}
 
 		final ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.keys);
-		this.consumer.setValue(array);
+		this.consumer.accept(array);
 	}
 }

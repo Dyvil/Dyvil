@@ -4,7 +4,6 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
@@ -22,11 +21,15 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
 
-public class ForStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
+public class ForStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
+	// =============== Constants ===============
+
 	private static final int FOR                = 0;
 	private static final int FOR_START          = 1;
 	private static final int VARIABLE           = 1 << 1;
@@ -37,28 +40,39 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 	private static final int FOR_EACH_END       = 1 << 6;
 	private static final int STATEMENT          = 1 << 7;
 
-	protected IValueConsumer field;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	private   SourcePosition position;
 	private   IVariable      variable;
-	private   IValue         update;
 	private   IValue         condition;
+	private   IValue         update;
 	protected IForStatement  forStatement;
 
 	private boolean parenthesis;
 
-	public ForStatementParser(IValueConsumer field)
+	// =============== Constructors ===============
+
+	public ForStatementParser(Consumer<IValue> consumer)
 	{
-		this.field = field;
+		this.consumer = consumer;
 		// this.mode = FOR;
 	}
 
-	public ForStatementParser(IValueConsumer field, SourcePosition position)
+	// =============== Properties ===============
+
+	private void setCondition(IValue condition)
 	{
-		this.field = field;
-		this.position = position;
-		this.mode = FOR_START;
+		this.condition = condition;
 	}
+
+	private void setUpdate(IValue update)
+	{
+		this.update = update;
+	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -68,6 +82,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 		{
 		case FOR:
 			this.mode = FOR_START;
+			this.position = token.raw();
 			if (type != DyvilKeywords.FOR)
 			{
 				pm.reparse();
@@ -87,7 +102,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			{
 				// for (; ...
 				// => No variable declaration, parse Condition next
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this::setCondition));
 				this.mode = CONDITION_END;
 				return;
 			}
@@ -124,7 +139,8 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			this.mode = CONDITION_END;
 			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				// parse condition
+				pm.pushParser(new ExpressionParser(this::setCondition));
 				return;
 			}
 			if (type != BaseSymbols.SEMICOLON)
@@ -144,7 +160,8 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 
 			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				final ExpressionParser parser = new ExpressionParser(this);
+				// parse update
+				final ExpressionParser parser = new ExpressionParser(this::setUpdate);
 				if (!this.parenthesis)
 				{
 					parser.addFlags(IGNORE_COLON | IGNORE_CLOSURE);
@@ -165,15 +182,15 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			if (BaseSymbols.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
-				this.field.setValue(this.forStatement);
+				this.consumer.accept(this.forStatement);
 				return;
 			}
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.forStatement::setAction), true);
 			this.mode = END;
 			return;
 		case END:
 			pm.popParser(true);
-			this.field.setValue(this.forStatement);
+			this.consumer.accept(this.forStatement);
 		}
 	}
 
@@ -198,37 +215,15 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			// Fallthrough
 		case Tokens.EOF:
 			pm.popParser();
-			this.field.setValue(this.forStatement);
+			this.consumer.accept(this.forStatement);
 			return;
 		case BaseSymbols.OPEN_CURLY_BRACKET:
-			pm.pushParser(new StatementListParser(this), true);
+			pm.pushParser(new StatementListParser(this.forStatement::setAction), true);
 			this.mode = END;
 			return;
 		}
 
 		pm.report(token, "for.separator");
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case VARIABLE_END:
-			this.variable.setValue(value);
-			return;
-		case CONDITION_END:
-			this.condition = value;
-			return;
-		case FOR_EACH_END:
-			this.variable.setValue(value);
-			return;
-		case FOR_END:
-			this.update = value;
-			return;
-		case END:
-			this.forStatement.setAction(value);
-		}
 	}
 
 	@Override

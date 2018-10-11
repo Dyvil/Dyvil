@@ -4,7 +4,6 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
@@ -21,10 +20,14 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
 public class IfStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
+	// =============== Constants ===============
+
 	protected static final int IF             = 0;
 	protected static final int OPEN_PAREN     = 1;
 	protected static final int CONDITION_PART = 2;
@@ -33,17 +36,23 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 	protected static final int THEN           = 5;
 	protected static final int ELSE           = 6;
 
-	protected final IValueConsumer consumer;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	protected IfStatement statement;
 	protected IVariable   lastVariable;
 	protected boolean     parentheses;
 
-	public IfStatementParser(IValueConsumer consumer)
+	// =============== Constructors ===============
+
+	public IfStatementParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
-		this.mode = IF;
+		// this.mode = IF;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -155,14 +164,14 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		return condition != null && condition != BooleanValue.TRUE;
 	}
 
-	private ExpressionParser expressionParser(IValueConsumer consumer)
+	private ExpressionParser expressionParser(Consumer<IValue> consumer)
 	{
 		return new ExpressionParser(consumer).withFlags(this.parentheses ? 0 : IGNORE_STATEMENT);
 	}
 
 	private void end(IParserManager pm)
 	{
-		this.consumer.setValue(this.statement);
+		this.consumer.accept(this.statement);
 		pm.popParser(true);
 	}
 

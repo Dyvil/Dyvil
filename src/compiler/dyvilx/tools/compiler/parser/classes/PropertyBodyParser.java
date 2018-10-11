@@ -2,7 +2,6 @@ package dyvilx.tools.compiler.parser.classes;
 
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -15,9 +14,14 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class PropertyBodyParser extends AbstractMemberParser implements IValueConsumer
+import java.util.function.Consumer;
+
+public class PropertyBodyParser extends AbstractMemberParser
 {
-	// Modes
+	// =============== Constants ===============
+
+	// --------------- Parser Modes ---------------
+
 	private static final int OPEN_BRACE            = 0;
 	private static final int TAG                   = 1;
 	private static final int SEPARATOR             = 2;
@@ -25,23 +29,28 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 	private static final int SETTER_PARAMETER_NAME = 4;
 	private static final int SETTER_PARAMETER_END  = 5;
 
-	// Targets
+	// --------------- Target IDs ---------------
+
 	private static final byte GETTER      = 0;
 	private static final byte SETTER      = 1;
 	private static final byte INITIALIZER = 2;
 
-	// --------------------------------------------------
+	// =============== Fields ===============
 
 	protected IProperty property;
 
 	// Metadata
 	private byte target;
 
+	// =============== Constructors ===============
+
 	public PropertyBodyParser(IProperty property)
 	{
 		this.property = property;
 		// this.mode = OPEN_BRACE;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -116,10 +125,10 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 			switch (type)
 			{
 			case BaseSymbols.COLON:
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this.bodyConsumer()));
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
-				pm.pushParser(new StatementListParser(this), true);
+				pm.pushParser(new StatementListParser(this.bodyConsumer()), true);
 				return;
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				pm.popParser();
@@ -157,19 +166,17 @@ public class PropertyBodyParser extends AbstractMemberParser implements IValueCo
 		this.attributes = new AttributeList();
 	}
 
-	@Override
-	public void setValue(IValue value)
+	private Consumer<IValue> bodyConsumer()
 	{
 		switch (this.target)
 		{
 		case GETTER:
-			this.property.initGetter().setValue(value);
-			return;
+			return this.property.initGetter()::setValue;
 		case SETTER:
-			this.property.initSetter().setValue(value);
-			return;
+			return this.property.initSetter()::setValue;
 		case INITIALIZER:
-			this.property.setInitializer(value);
+			return this.property::setInitializer;
 		}
+		return null;
 	}
 }
