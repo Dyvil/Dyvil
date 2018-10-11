@@ -1,9 +1,6 @@
 package dyvilx.tools.compiler.parser.expression;
 
 import dyvil.lang.Name;
-import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
@@ -11,7 +8,9 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public class ArgumentListParser extends Parser implements IValueConsumer
+import java.util.function.Consumer;
+
+public class ArgumentListParser extends Parser
 {
 	// =============== Constants ===============
 
@@ -23,7 +22,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 
 	// --------------- Constructor Fields ---------------
 
-	private final IArgumentsConsumer consumer;
+	private final Consumer<ArgumentList> consumer;
 
 	// --------------- Temporary Fields ---------------
 
@@ -33,7 +32,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 
 	// =============== Constructors ===============
 
-	public ArgumentListParser(IArgumentsConsumer consumer)
+	public ArgumentListParser(Consumer<ArgumentList> consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = NAME
@@ -41,20 +40,20 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 
 	// =============== Static Methods ===============
 
-	public static void parseArguments(IParserManager pm, IToken next, IArgumentsConsumer consumer)
+	public static void parseArguments(IParserManager pm, IToken next, Consumer<ArgumentList> consumer)
 	{
 		final int nextType = next.type();
 
 		if (BaseSymbols.isCloseBracket(nextType))
 		{
-			consumer.setArguments(ArgumentList.empty());
+			consumer.accept(ArgumentList.empty());
 			return;
 		}
 
 		pm.pushParser(new ArgumentListParser(consumer));
 	}
 
-	// =============== Instance Methods ===============
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -107,7 +106,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 			// Fallthrough
 		case VALUE:
 			this.mode = SEPARATOR;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(value -> this.arguments.add(this.label, value)), true);
 			return;
 		case SEPARATOR:
 			this.mode = NAME;
@@ -119,16 +118,9 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		}
 	}
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.arguments.add(this.label, value);
-		this.label = null;
-	}
-
 	private void end(IParserManager pm)
 	{
-		this.consumer.setArguments(this.arguments);
+		this.consumer.accept(this.arguments);
 
 		pm.popParser(true);
 	}

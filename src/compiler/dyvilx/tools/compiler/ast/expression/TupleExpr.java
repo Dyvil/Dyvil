@@ -8,7 +8,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
@@ -21,12 +20,12 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.TupleType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class TupleExpr implements IValue, IArgumentsConsumer
+public class TupleExpr implements IValue
 {
 	public static final class LazyFields
 	{
@@ -87,10 +86,9 @@ public class TupleExpr implements IValue, IArgumentsConsumer
 		return this.values;
 	}
 
-	@Override
-	public void setArguments(ArgumentList arguments)
+	public void setValues(ArgumentList values)
 	{
-		this.values = arguments;
+		this.values = values;
 	}
 
 	@Override

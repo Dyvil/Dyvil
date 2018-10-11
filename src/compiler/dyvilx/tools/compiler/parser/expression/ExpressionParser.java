@@ -206,7 +206,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// e.g. this[1], array[0]
 
 				final SubscriptAccess subscriptAccess = new SubscriptAccess(token, this.value);
-				ArgumentListParser.parseArguments(pm, token.next(), subscriptAccess);
+				ArgumentListParser.parseArguments(pm, token.next(), subscriptAccess::setArguments);
 				this.value = subscriptAccess;
 				this.mode = SUBSCRIPT_END;
 				return;
@@ -217,7 +217,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// e.g. 1("a"), this("stuff"), "myString"(2)
 
 				final ApplyAccess applyAccess = new ApplyAccess(this.value.getPosition(), this.value);
-				ArgumentListParser.parseArguments(pm, token.next(), applyAccess);
+				ArgumentListParser.parseArguments(pm, token.next(), applyAccess::setArguments);
 
 				this.value = applyAccess;
 				this.mode = PARAMETERS_END;
@@ -343,7 +343,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.skip();
-				ArgumentListParser.parseArguments(pm, next.next(), (ICall) this.value);
+				ArgumentListParser.parseArguments(pm, next.next(), ((ICall) this.value)::setArguments);
 				this.mode = PARAMETERS_END;
 				return;
 			}
@@ -473,7 +473,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// IDENTIFIER (
 			final MethodCall call = new MethodCall(token.raw(), this.value, name);
-			ArgumentListParser.parseArguments(pm, next.next(), call);
+			ArgumentListParser.parseArguments(pm, next.next(), call::setArguments);
 			this.value = call;
 
 			this.mode = PARAMETERS_END;
@@ -486,7 +486,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			final FieldAccess fieldAccess = new FieldAccess(token.raw(), this.value, name);
 			final SubscriptAccess subscriptAccess = new SubscriptAccess(next.raw(), fieldAccess);
-			ArgumentListParser.parseArguments(pm, next.next(), subscriptAccess);
+			ArgumentListParser.parseArguments(pm, next.next(), subscriptAccess::setArguments);
 
 			this.value = subscriptAccess;
 			this.mode = SUBSCRIPT_END;

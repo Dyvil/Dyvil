@@ -139,7 +139,7 @@ public class ConstructorParser extends AbstractMemberParser
 		case INIT_ARGUMENTS:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ArgumentListParser(this.member.getInitializer()));
+				pm.pushParser(new ArgumentListParser(this.member.getInitializer()::setArguments));
 				this.mode = INIT_END;
 				return;
 			}

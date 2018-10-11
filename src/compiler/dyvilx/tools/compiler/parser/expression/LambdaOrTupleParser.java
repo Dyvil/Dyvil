@@ -88,7 +88,7 @@ public class LambdaOrTupleParser extends Parser
 		case TUPLE:
 			// ( ... )
 			final TupleLikeExpr tupleExpr = new TupleLikeExpr(token);
-			pm.pushParser(new ArgumentListParser(tupleExpr));
+			pm.pushParser(new ArgumentListParser(tupleExpr::setValues));
 			this.value = tupleExpr;
 			this.mode = TUPLE_END;
 			return;

@@ -67,7 +67,7 @@ public class ConstructorCallParser extends Parser
 			{
 				// new ... (
 				this.mode = CONSTRUCTOR_PARAMETERS_END;
-				ArgumentListParser.parseArguments(pm, token.next(), this.call);
+				ArgumentListParser.parseArguments(pm, token.next(), this.call::setArguments);
 				return;
 			}
 			// Fallthrough

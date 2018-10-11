@@ -45,7 +45,7 @@ public class CallDirectiveParser extends Parser
 		case OPEN_PAREN:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ArgumentListParser(this.directive));
+				pm.pushParser(new ArgumentListParser(this.directive::setArguments));
 				this.mode = CLOSE_PAREN;
 				return;
 			}

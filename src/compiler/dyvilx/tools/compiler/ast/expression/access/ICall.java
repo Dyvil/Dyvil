@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.expression.access;
 import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -19,7 +18,7 @@ import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ICall extends IValue, IArgumentsConsumer
+public interface ICall extends IValue
 {
 	default IValue getReceiver()
 	{
@@ -30,7 +29,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 	{
 	}
 
-	@Override
 	void setArguments(ArgumentList arguments);
 
 	ArgumentList getArguments();

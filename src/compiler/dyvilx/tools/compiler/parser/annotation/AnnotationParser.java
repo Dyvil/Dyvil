@@ -44,7 +44,7 @@ public class AnnotationParser extends Parser
 
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				ArgumentListParser.parseArguments(pm, token.next(), this.annotation);
+				ArgumentListParser.parseArguments(pm, token.next(), this.annotation::setArguments);
 				this.mode = PARAMETERS_END;
 				return;
 			}
