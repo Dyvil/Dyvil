@@ -22,7 +22,7 @@ public class ArgumentListParser extends Parser
 
 	// --------------- Constructor Fields ---------------
 
-	private final Consumer<ArgumentList> consumer;
+	protected final Consumer<ArgumentList> consumer;
 
 	// --------------- Temporary Fields ---------------
 
@@ -61,12 +61,8 @@ public class ArgumentListParser extends Parser
 		final int type = token.type();
 		if (BaseSymbols.isCloseBracket(type) || type == Tokens.EOF)
 		{
-			if (this.label != null)
-			{
-				pm.report(token, "arguments.expression");
-			}
-
-			this.end(pm);
+			this.consumer.accept(this.arguments);
+			pm.popParser(true);
 			return;
 		}
 
@@ -109,19 +105,21 @@ public class ArgumentListParser extends Parser
 			pm.pushParser(new ExpressionParser(value -> this.arguments.add(this.label, value)), true);
 			return;
 		case SEPARATOR:
-			this.mode = NAME;
-			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
+			switch (type)
 			{
-				pm.reparse();
-				pm.report(token, "arguments.separator");
+			case BaseSymbols.SEMICOLON:
+				if (!token.isInferred())
+				{
+					pm.report(token, "argument_list.separator");
+				}
+				// Fallthrough
+			case BaseSymbols.COMMA:
+				this.mode = NAME;
+				return;
+			default:
+				pm.report(token, "argument_list.separator");
+				return;
 			}
 		}
-	}
-
-	private void end(IParserManager pm)
-	{
-		this.consumer.accept(this.arguments);
-
-		pm.popParser(true);
 	}
 }
