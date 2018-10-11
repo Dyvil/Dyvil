@@ -184,6 +184,6 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 			break;
 		}
 		}
-		return new AnnotationReader(null, annotation);
+		return new AnnotationReader(annotation);
 	}
 }

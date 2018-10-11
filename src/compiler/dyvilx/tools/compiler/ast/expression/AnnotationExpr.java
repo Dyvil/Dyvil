@@ -18,9 +18,7 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import java.util.function.Consumer;
-
-public class AnnotationExpr implements IValue, Consumer<Annotation>
+public class AnnotationExpr implements IValue
 {
 	// --------------- Constants ---------------
 
@@ -53,14 +51,6 @@ public class AnnotationExpr implements IValue, Consumer<Annotation>
 	public void setAnnotation(Annotation annotation)
 	{
 		this.annotation = annotation;
-	}
-
-	// ------------------------------ Consumer<Annotation> Implementation ------------------------------
-
-	@Override
-	public void accept(Annotation annotation)
-	{
-		this.setAnnotation(annotation);
 	}
 
 	// ------------------------------ Positioned Implementation ------------------------------

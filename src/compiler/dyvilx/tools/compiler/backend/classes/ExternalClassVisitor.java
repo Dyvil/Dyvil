@@ -155,7 +155,7 @@ public class ExternalClassVisitor implements ClassVisitor
 		if (!this.theClass.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(ClassFormat.internalToType(internal));
-			return new AnnotationReader(this.theClass.annotationConsumer(), annotation);
+			return new AnnotationReader(annotation, this.theClass.annotationConsumer());
 		}
 		return null;
 	}
@@ -200,7 +200,7 @@ public class ExternalClassVisitor implements ClassVisitor
 			break;
 		}
 		}
-		return new AnnotationReader(null, annotation);
+		return new AnnotationReader(annotation);
 	}
 
 	// --------------- Members ---------------

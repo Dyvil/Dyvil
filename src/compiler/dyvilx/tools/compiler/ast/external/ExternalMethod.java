@@ -283,6 +283,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			break;
 		}
 		}
-		return new AnnotationReader(null, annotation);
+		return new AnnotationReader(annotation);
 	}
 }

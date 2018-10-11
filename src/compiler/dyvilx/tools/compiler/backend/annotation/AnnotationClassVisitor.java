@@ -19,7 +19,7 @@ public class AnnotationClassVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotationDefault()
 	{
-		return new ValueAnnotationVisitor(this.parameter);
+		return new AnnotationValueReader(this.parameter::setValue);
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class AnnotationClassVisitor implements MethodVisitor
 		if (!this.parameter.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.parameter.annotationConsumer(), annotation);
+			return new AnnotationReader(annotation, this.parameter.annotationConsumer());
 		}
 		return null;
 	}
