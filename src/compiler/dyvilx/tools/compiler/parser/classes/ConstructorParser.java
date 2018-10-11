@@ -107,11 +107,11 @@ public class ConstructorParser extends AbstractMemberParser
 			switch (type)
 			{
 			case BaseSymbols.OPEN_CURLY_BRACKET:
-				pm.pushParser(new StatementListParser(this.member), true);
+				pm.pushParser(new StatementListParser(this.member::setValue), true);
 				this.mode = END;
 				return;
 			case BaseSymbols.EQUALS:
-				pm.pushParser(new ExpressionParser(this.member));
+				pm.pushParser(new ExpressionParser(this.member::setValue));
 				this.mode = END;
 				return;
 			}

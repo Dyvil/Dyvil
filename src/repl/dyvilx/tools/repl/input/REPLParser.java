@@ -62,7 +62,7 @@ public class REPLParser extends Parser
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this.context));
+			pm.pushParser(new ExpressionParser(this.context::addValue));
 			return;
 		case SEPARATOR:
 			this.mode = ELEMENT;

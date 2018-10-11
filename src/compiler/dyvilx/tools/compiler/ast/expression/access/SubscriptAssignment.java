@@ -1,14 +1,13 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
-import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
 
-public class SubscriptAssignment extends AbstractCall implements IValueConsumer
+public class SubscriptAssignment extends AbstractCall
 {
 	public SubscriptAssignment(SourcePosition position, IValue receiver, ArgumentList arguments)
 	{
@@ -40,12 +39,6 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	protected Name getReferenceName()
 	{
 		return null;
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		this.arguments = this.arguments.appended(Names.newValue, value);
 	}
 
 	@Override

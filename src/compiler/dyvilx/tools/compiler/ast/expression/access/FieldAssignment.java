@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.expression.access;
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -14,15 +13,15 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class FieldAssignment extends AbstractFieldAccess implements IValueConsumer
+public class FieldAssignment extends AbstractFieldAccess
 {
 	protected IValue value;
 
@@ -103,15 +102,14 @@ public class FieldAssignment extends AbstractFieldAccess implements IValueConsum
 		return this.value.getTypeMatch(type, implicitContext);
 	}
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	public void setValue(IValue value)
+	{
+		this.value = value;
 	}
 
 	@Override

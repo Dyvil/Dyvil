@@ -8,7 +8,6 @@ import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.context.ILabelContext;
@@ -27,7 +26,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
 
-public final class MatchExpr implements IValue, IValueConsumer
+public final class MatchExpr implements IValue
 {
 	public static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.value.type.incompatible");
@@ -82,7 +81,6 @@ public final class MatchExpr implements IValue, IValueConsumer
 		return this.matchedValue;
 	}
 
-	@Override
 	public void setValue(IValue value)
 	{
 		this.matchedValue = value;

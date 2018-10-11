@@ -4,17 +4,16 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.IParametric;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.TypeList;
+import dyvilx.tools.compiler.ast.type.Typed;
 
-public interface ICallableMember extends ClassMember, IOverloadable, IValueConsumer, Typed, IParametric
+public interface ICallableMember extends ClassMember, IOverloadable, Typed, IParametric
 {
 	// --------------- Getters and Setters ---------------
 
@@ -22,7 +21,6 @@ public interface ICallableMember extends ClassMember, IOverloadable, IValueConsu
 
 	IValue getValue();
 
-	@Override
 	void setValue(IValue value);
 
 	// - - - - - - - - Exceptions - - - - - - - -

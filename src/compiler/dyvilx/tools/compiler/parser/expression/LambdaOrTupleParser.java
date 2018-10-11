@@ -137,7 +137,7 @@ public class LambdaOrTupleParser extends Parser
 			}
 			// Fallthrough
 		case RETURN_ARROW:
-			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)));
+			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)::setValue));
 			this.mode = END;
 			if (type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{

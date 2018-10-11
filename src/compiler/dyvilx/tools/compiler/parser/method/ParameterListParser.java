@@ -228,7 +228,7 @@ public final class ParameterListParser extends Parser implements Consumer<IType>
 			if (type == BaseSymbols.EQUALS)
 			{
 				this.mode = PROPERTY;
-				pm.pushParser(new ExpressionParser(this.parameter));
+				pm.pushParser(new ExpressionParser(this.parameter::setValue));
 				return;
 			}
 			// Fallthrough

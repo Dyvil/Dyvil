@@ -83,7 +83,7 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		case VARIABLE_VALUE:
 			if (type == BaseSymbols.EQUALS)
 			{
-				pm.pushParser(this.expressionParser(this.lastVariable));
+				pm.pushParser(this.expressionParser(this.lastVariable::setValue));
 				this.mode = SEPARATOR;
 				return;
 			}

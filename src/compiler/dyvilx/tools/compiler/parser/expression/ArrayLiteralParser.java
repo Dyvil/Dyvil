@@ -14,20 +14,20 @@ public class ArrayLiteralParser extends Parser
 	protected static final int OPEN_BRACKET = 1;
 	protected static final int SEPARATOR    = 2;
 	protected static final int COLON        = 4;
-	
+
 	protected IValueConsumer consumer;
 
 	private IToken startPosition;
 
 	private ArgumentList keys = new ArgumentList();
 	private ArgumentList values;
-	
+
 	public ArrayLiteralParser(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = OPEN_BRACKET;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -38,7 +38,7 @@ public class ArrayLiteralParser extends Parser
 			pm.pushParser(this.newExpressionParser(this.keys));
 			this.mode = SEPARATOR | COLON;
 			this.startPosition = token;
-			
+
 			if (type != BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.reparse();
@@ -61,7 +61,7 @@ public class ArrayLiteralParser extends Parser
 				this.end(token);
 				return;
 			}
-			
+
 			this.mode = this.values != null ? COLON : SEPARATOR;
 			pm.pushParser(this.newExpressionParser(this.keys));
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
@@ -76,7 +76,7 @@ public class ArrayLiteralParser extends Parser
 				this.end(token);
 				return;
 			}
-			
+
 			this.mode = SEPARATOR;
 			pm.pushParser(this.newExpressionParser(this.values));
 			if (type != BaseSymbols.COLON)
@@ -91,9 +91,9 @@ public class ArrayLiteralParser extends Parser
 
 	private ExpressionParser newExpressionParser(ArgumentList list)
 	{
-		return new ExpressionParser(list).withFlags(ExpressionParser.IGNORE_COLON);
+		return new ExpressionParser(list::add).withFlags(ExpressionParser.IGNORE_COLON);
 	}
-	
+
 	private void end(IToken token)
 	{
 		if (this.values != null)
@@ -102,7 +102,7 @@ public class ArrayLiteralParser extends Parser
 			this.consumer.setValue(map);
 			return;
 		}
-		
+
 		final ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.keys);
 		this.consumer.setValue(array);
 	}

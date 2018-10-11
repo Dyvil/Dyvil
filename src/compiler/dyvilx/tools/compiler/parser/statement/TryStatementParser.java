@@ -92,7 +92,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
-			pm.pushParser(new ExpressionParser(this.catchBlock));
+			pm.pushParser(new ExpressionParser(this.catchBlock::setAction));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
@@ -110,7 +110,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.mode = CATCH;
-				pm.pushParser(new StatementListParser(this.catchBlock), true);
+				pm.pushParser(new StatementListParser(this.catchBlock::setAction), true);
 				return;
 			}
 

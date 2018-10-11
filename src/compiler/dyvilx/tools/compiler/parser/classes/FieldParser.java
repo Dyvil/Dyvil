@@ -121,12 +121,12 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 				if ((this.flags & NO_PROPERTIES) != 0)
 				{
 					this.mode = END;
-					pm.pushParser(new ExpressionParser(field));
+					pm.pushParser(new ExpressionParser(field::setValue));
 				}
 				else
 				{
 					this.mode = PROPERTY;
-					pm.pushParser(new ExpressionParser(field).withFlags(ExpressionParser.IGNORE_CLOSURE));
+					pm.pushParser(new ExpressionParser(field::setValue).withFlags(ExpressionParser.IGNORE_CLOSURE));
 				}
 				return;
 			}

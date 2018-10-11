@@ -676,7 +676,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			final ArgumentList arguments = new ArgumentList(1);
 			call.setArguments(arguments);
-			pm.pushParser(new ExpressionParser(arguments).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
+			pm.pushParser(new ExpressionParser(arguments::add).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
 			return;
 		}
 
@@ -688,7 +688,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		final ArgumentList arguments = new ArgumentList(1);
 		call.setArguments(arguments);
-		pm.pushParser(new StatementListParser(arguments, true));
+		pm.pushParser(new StatementListParser(arguments::add, true));
 	}
 
 	private boolean parseValue(IParserManager pm, IToken token, int type)
@@ -851,7 +851,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			ReturnStatement returnStatement = new ReturnStatement(token.raw());
 			this.value = returnStatement;
 
-			pm.pushParser(new ExpressionParser(returnStatement));
+			pm.pushParser(new ExpressionParser(returnStatement::setValue));
 			this.mode = END;
 			return true;
 		}
@@ -1008,7 +1008,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			final ThrowStatement throwStatement = new ThrowStatement(token.raw());
 			this.value = throwStatement;
 
-			pm.pushParser(new ExpressionParser(throwStatement));
+			pm.pushParser(new ExpressionParser(throwStatement::setValue));
 			this.mode = END;
 			return true;
 		}

@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.statement.exception;
 
-import dyvilx.tools.compiler.phase.Resolvable;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -11,12 +10,12 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class CatchBlock implements Resolvable, IDefaultContext, IValueConsumer
+public class CatchBlock implements Resolvable, IDefaultContext
 {
 	public IValue action;
 
@@ -26,18 +25,12 @@ public class CatchBlock implements Resolvable, IDefaultContext, IValueConsumer
 	{
 	}
 
-	public void setAction(IValue value)
-	{
-		this.action = value;
-	}
-
 	public IValue getAction()
 	{
 		return this.action;
 	}
 
-	@Override
-	public void setValue(IValue value)
+	public void setAction(IValue value)
 	{
 		this.action = value;
 	}

@@ -16,7 +16,6 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -45,7 +44,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 
 public class REPLContext extends AbstractHeader
-	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
+	implements IDefaultContext, IMemberConsumer<REPLVariable>
 {
 	private static final String CLASS_PACKAGE = "replgen";
 	public static final  String CLASS_PREFIX  = "Result";
@@ -269,8 +268,7 @@ public class REPLContext extends AbstractHeader
 		}
 	}
 
-	@Override
-	public void setValue(IValue value)
+	public void addValue(IValue value)
 	{
 		final Name name = Name.fromRaw("res" + this.resultIndex++);
 		final REPLVariable field = new REPLVariable(this, name, value);

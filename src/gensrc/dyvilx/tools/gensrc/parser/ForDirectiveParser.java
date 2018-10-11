@@ -86,7 +86,7 @@ public class ForDirectiveParser extends Parser
 				pm.report(token, "for.arrow_left");
 			}
 
-			pm.pushParser(new ExpressionParser(this.directive.getVariable()));
+			pm.pushParser(new ExpressionParser(this.directive.getVariable()::setValue));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:

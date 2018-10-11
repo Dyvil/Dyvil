@@ -126,11 +126,11 @@ public class MethodParser extends AbstractMemberParser
 			switch (type)
 			{
 			case BaseSymbols.OPEN_CURLY_BRACKET:
-				pm.pushParser(new StatementListParser(this.method), true);
+				pm.pushParser(new StatementListParser(this.method::setValue), true);
 				this.mode = END;
 				return;
 			case BaseSymbols.EQUALS:
-				pm.pushParser(new ExpressionParser(this.method));
+				pm.pushParser(new ExpressionParser(this.method::setValue));
 				this.mode = END;
 				return;
 			}

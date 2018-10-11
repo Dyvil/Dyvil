@@ -103,7 +103,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			{
 			case DyvilSymbols.ARROW_LEFT:
 				this.mode = FOR_EACH_END;
-				final ExpressionParser parser = new ExpressionParser(this.variable);
+				final ExpressionParser parser = new ExpressionParser(this.variable::setValue);
 				if (!this.parenthesis)
 				{
 					parser.addFlags(IGNORE_COLON | IGNORE_CLOSURE);
@@ -112,7 +112,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				return;
 			case BaseSymbols.EQUALS:
 				this.mode = VARIABLE_END;
-				pm.pushParser(new ExpressionParser(this.variable));
+				pm.pushParser(new ExpressionParser(this.variable::setValue));
 				return;
 			}
 
