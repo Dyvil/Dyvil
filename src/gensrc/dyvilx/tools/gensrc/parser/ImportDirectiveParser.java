@@ -59,7 +59,7 @@ public class ImportDirectiveParser extends Parser
 				return;
 			}
 
-			pm.pushParser(new ImportParser(this.declaration, this.mask));
+			pm.pushParser(new ImportParser(this.declaration::setImport, this.mask));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
