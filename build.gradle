@@ -290,7 +290,7 @@ tasks.withType(JavaCompile).all {
 	it.options.fork = true
 }
 
-private void setupCompiler(Map args, JavaExec exec) {
+private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] source_dirs = args['source_dirs']
 	String[] libraries = args['libraries']
 	String output_dir = args['output_dir']
@@ -306,7 +306,7 @@ private void setupCompiler(Map args, JavaExec exec) {
 
 		for (String src : source_dirs) {
 			exec.inputs.files fileTree(src) {
-				include Constants.dyvilFilters
+				include fileFilters
 			}
 		}
 	}
@@ -342,8 +342,12 @@ private void setupCompiler(Map args, JavaExec exec) {
 	exec.args 'compile', '--ansi'
 }
 
+private void setupCompiler(Map args, JavaExec exec) {
+	setupCompiler(args, exec, Constants.dyvilFilters)
+}
+
 private void setupGenSrc(Map args, JavaExec exec) {
-	setupCompiler(args, exec)
+	setupCompiler(args, exec, Constants.genSrcFilters)
 
 	String gensrc_dir = args['gensrc_dir']
 
