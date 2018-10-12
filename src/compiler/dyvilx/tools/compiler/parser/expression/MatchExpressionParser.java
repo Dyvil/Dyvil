@@ -31,7 +31,7 @@ public class MatchExpressionParser extends Parser
 	{
 		this.matchExpression = matchExpression;
 
-		if (matchExpression.getValue() == null)
+		if (matchExpression.getMatchedValue() == null)
 		{
 			// match ... { ... }
 			this.mode = EXPRESSION;
@@ -62,7 +62,7 @@ public class MatchExpressionParser extends Parser
 			// Fallthrough
 		case EXPRESSION:
 			this.mode = EXPRESSION_END;
-			pm.pushParser(new ExpressionParser(this.matchExpression::setValue).withFlags(IGNORE_STATEMENT), true);
+			pm.pushParser(new ExpressionParser(this.matchExpression::setMatchedValue).withFlags(IGNORE_STATEMENT), true);
 			return;
 		case EXPRESSION_END:
 			if (type == BaseSymbols.COLON)

@@ -1,7 +1,9 @@
 package dyvilx.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Formattable;
 import dyvil.math.MathUtils;
@@ -26,19 +28,26 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
 
-public final class MatchExpr implements IValue
+public class MatchExpr implements IValue
 {
+	// =============== Constants ===============
+
 	public static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.value.type.incompatible");
 
-	protected IValue matchedValue;
-	protected MatchCase[] cases = new MatchCase[3];
-	protected int caseCount;
+	// =============== Fields ===============
 
-	// Metadata
+	protected IValue      matchedValue;
+	protected MatchCase[] cases = new MatchCase[3];
+	protected int         caseCount;
+
+	// --------------- Metadata ---------------
+
 	protected SourcePosition position;
 	private   boolean        exhaustive;
 	private   IType          returnType;
+
+	// =============== Constructors ===============
 
 	public MatchExpr(SourcePosition position)
 	{
@@ -58,6 +67,18 @@ public final class MatchExpr implements IValue
 		this.caseCount = cases.length;
 	}
 
+	// =============== Properties ===============
+
+	public IValue getMatchedValue()
+	{
+		return this.matchedValue;
+	}
+
+	public void setMatchedValue(IValue value)
+	{
+		this.matchedValue = value;
+	}
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -70,20 +91,26 @@ public final class MatchExpr implements IValue
 		this.position = position;
 	}
 
-	@Override
-	public int valueTag()
+	// =============== Methods ===============
+
+	// --------------- Match Cases ---------------
+
+	public Iterable<MatchCase> cases()
 	{
-		return MATCH;
+		return () -> new ArrayIterator<>(this.cases, 0, this.caseCount);
 	}
 
-	public IValue getValue()
+	public MatchCase getCase(int index)
 	{
-		return this.matchedValue;
+		return index >= 0 && index < this.caseCount ? this.cases[index] : null;
 	}
 
-	public void setValue(IValue value)
+	public void setCase(int index, MatchCase matchCase)
 	{
-		this.matchedValue = value;
+		if (index >= 0 && index < this.caseCount)
+		{
+			this.cases[index] = matchCase;
+		}
 	}
 
 	public void addCase(MatchCase matchCase)
@@ -96,6 +123,14 @@ public final class MatchExpr implements IValue
 			this.cases = temp;
 		}
 		this.cases[index] = matchCase;
+	}
+
+	// --------------- General Expression Info ---------------
+
+	@Override
+	public int valueTag()
+	{
+		return MATCH;
 	}
 
 	@Override
@@ -127,6 +162,8 @@ public final class MatchExpr implements IValue
 		return true;
 	}
 
+	// --------------- Types ---------------
+
 	@Override
 	public IType getType()
 	{
@@ -155,26 +192,6 @@ public final class MatchExpr implements IValue
 		}
 
 		return this.returnType = (result == null ? Types.VOID : result);
-	}
-
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.caseCount; i++)
-		{
-			final MatchCase matchCase = this.cases[i];
-			final IValue action = matchCase.action;
-
-			if (action == null)
-			{
-				continue;
-			}
-
-			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context, MARKER_SUPPLIER);
-		}
-
-		this.returnType = type;
-		return this;
 	}
 
 	@Override
@@ -229,12 +246,31 @@ public final class MatchExpr implements IValue
 	}
 
 	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			final MatchCase matchCase = this.cases[i];
+			final IValue action = matchCase.action;
+
+			if (action == null)
+			{
+				continue;
+			}
+
+			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context, MARKER_SUPPLIER);
+		}
+
+		this.returnType = type;
+		return this;
+	}
+
+	// --------------- Resolution Phases ---------------
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.matchedValue != null)
-		{
-			this.matchedValue.resolveTypes(markers, context);
-		}
+		this.matchedValue.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].resolveTypes(markers, context);
@@ -257,24 +293,16 @@ public final class MatchExpr implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IType type;
-		if (this.matchedValue != null)
-		{
-			this.matchedValue = this.matchedValue.resolve(markers, context);
-			type = this.matchedValue.getType();
+		this.matchedValue = this.matchedValue.resolve(markers, context);
 
-			this.matchedValue = this.matchedValue.withType(type, type, markers, context);
-		}
-		else
-		{
-			type = Types.ANY;
-			markers.add(Markers.semantic(this.position, "match.invalid"));
-		}
+		final IType type = this.matchedValue.getType();
+		this.matchedValue = this.matchedValue.withType(type, type, markers, context);
 
+		boolean exhaustive = false;
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			MatchCase c = this.cases[i];
-			if (this.exhaustive)
+			final MatchCase c = this.cases[i];
+			if (exhaustive)
 			{
 				markers.add(Markers.semantic(c.getPattern().getPosition(), "pattern.dead"));
 			}
@@ -282,20 +310,21 @@ public final class MatchExpr implements IValue
 			c.resolve(markers, type, context);
 			if (c.pattern != null && c.isExhaustive())
 			{
-				this.exhaustive = true;
+				exhaustive = true;
 			}
 		}
+
+		this.exhaustive = exhaustive;
 
 		return this;
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.matchedValue != null)
-		{
-			this.matchedValue.checkTypes(markers, context);
-		}
+		this.matchedValue.checkTypes(markers, context);
 
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -306,10 +335,7 @@ public final class MatchExpr implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.matchedValue != null)
-		{
-			this.matchedValue.check(markers, context);
-		}
+		this.matchedValue.check(markers, context);
 
 		final Set<Object> values = new HashSet<>(this.caseCount);
 		for (int i = 0; i < this.caseCount; i++)
@@ -332,13 +358,12 @@ public final class MatchExpr implements IValue
 		}
 	}
 
+	// --------------- Compilation Phases ---------------
+
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.matchedValue != null)
-		{
-			this.matchedValue = this.matchedValue.foldConstants();
-		}
+		this.matchedValue = this.matchedValue.foldConstants();
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].foldConstants();
@@ -349,16 +374,15 @@ public final class MatchExpr implements IValue
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.matchedValue != null)
-		{
-			this.matchedValue = this.matchedValue.cleanup(compilableList, classCompilableList);
-		}
+		this.matchedValue = this.matchedValue.cleanup(compilableList, classCompilableList);
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}
+
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
@@ -754,7 +778,7 @@ public final class MatchExpr implements IValue
 	 * Generates a {@code lookupswitch} instruction
 	 */
 	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel,
-		                              int cases) throws BytecodeException
+		int cases) throws BytecodeException
 	{
 		if (cases <= 0)
 		{
@@ -782,7 +806,7 @@ public final class MatchExpr implements IValue
 	 * Generates a {@code tableswitch} instruction
 	 */
 	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low,
-		                             int high) throws BytecodeException
+		int high) throws BytecodeException
 	{
 		assert defaultLabel != null;
 
@@ -799,6 +823,8 @@ public final class MatchExpr implements IValue
 		writer.visitTableSwitchInsn(low, high, defaultLabel, handlers);
 	}
 
+	// --------------- Formatting ---------------
+
 	@Override
 	public String toString()
 	{
@@ -806,32 +832,32 @@ public final class MatchExpr implements IValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		this.matchedValue.toString(prefix, buffer);
+		this.matchedValue.toString(indent, buffer);
 		if (this.caseCount == 1 && Formatting.getBoolean("match.convert_single"))
 		{
 			buffer.append(" match ");
-			this.cases[0].toString(prefix, buffer);
+			this.cases[0].toString(indent, buffer);
 			return;
 		}
 
 		if (Formatting.getBoolean("match.newline_after"))
 		{
-			buffer.append(" match\n").append(prefix).append("{\n");
+			buffer.append(" match\n").append(indent).append("{\n");
 		}
 		else
 		{
 			buffer.append(" match {\n");
 		}
 
-		String casePrefix = Formatting.getIndent("match.indent", prefix);
+		String casePrefix = Formatting.getIndent("match.indent", indent);
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			buffer.append(casePrefix);
 			this.cases[i].toString(casePrefix, buffer);
 			buffer.append('\n');
 		}
-		buffer.append(prefix).append('}');
+		buffer.append(indent).append('}');
 	}
 }
