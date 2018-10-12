@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.parser.pattern;
 
 import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.pattern.BindingPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
@@ -26,7 +27,7 @@ import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
 
-public class PatternParser extends Parser
+public class PatternParser extends Parser implements Consumer<IType>
 {
 	// =============== Constants ===============
 
@@ -63,14 +64,13 @@ public class PatternParser extends Parser
 		// this.mode = PATTERN;
 	}
 
-	// =============== Properties ===============
+	// =============== Methods ===============
 
-	private void setType(IType type)
+	@Override
+	public void accept(IType type)
 	{
 		this.type = type;
 	}
-
-	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -141,6 +141,12 @@ public class PatternParser extends Parser
 			case BaseSymbols.DOT:
 				this.mode = ENUM_IDENTIFIER;
 				return;
+				// Error cases
+			case BaseSymbols.COLON:
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+			case DyvilKeywords.IF:
+				this.end(pm, token);
+				return;
 			}
 			if (Tokens.isIdentifier(type))
 			{
@@ -151,14 +157,10 @@ public class PatternParser extends Parser
 				}
 
 				this.mode = TYPE_END;
-				pm.pushParser(new TypeParser(this::setType).withFlags(TypeParser.NAMED_ONLY), true);
+				pm.pushParser(new TypeParser(this).withFlags(TypeParser.NAMED_ONLY), true);
 				return;
 			}
 
-			if (BaseSymbols.isTerminator(type))
-			{
-				pm.popParser(true);
-			}
 			pm.report(Markers.syntaxError(token, "pattern.invalid", token.toString()));
 			return;
 		case NEGATIVE_NUMBER:
@@ -246,7 +248,7 @@ public class PatternParser extends Parser
 				{
 					if (this.checkPrecedence(OPERATOR_OR))
 					{
-						this.endPattern(pm);
+						this.end(pm, token);
 						return;
 					}
 
@@ -260,7 +262,7 @@ public class PatternParser extends Parser
 				{
 					if (this.checkPrecedence(OPERATOR_AND))
 					{
-						this.endPattern(pm);
+						this.end(pm, token);
 						return;
 					}
 
@@ -271,18 +273,22 @@ public class PatternParser extends Parser
 				}
 			}
 
-			this.endPattern(pm);
+			this.end(pm, token);
 		}
 	}
 
-	private void endPattern(IParserManager pm)
+	private void end(IParserManager pm, IToken token)
 	{
-		pm.popParser(true);
 		if (this.pattern != null)
 		{
 			this.consumer.accept(this.pattern);
 		}
-		// TODO check if non-optional / dummy pattern
+		else
+		{
+			pm.report(Markers.syntaxError(token, "pattern.expected", token));
+			this.consumer.accept(new WildcardPattern(SourcePosition.after(token.prev())));
+		}
+		pm.popParser(true);
 	}
 
 	private boolean checkPrecedence(int operator)

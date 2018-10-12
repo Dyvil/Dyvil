@@ -19,8 +19,9 @@ public class CaseParser extends Parser
 	// =============== Constants ===============
 
 	private static final int CASE      = 0;
-	private static final int CONDITION = 1;
-	private static final int ACTION    = 2;
+	private static final int PATTERN   = 1;
+	private static final int CONDITION = 2;
+	private static final int ACTION    = 3;
 
 	// =============== Fields ===============
 
@@ -48,8 +49,7 @@ public class CaseParser extends Parser
 			if (type == DyvilKeywords.CASE)
 			{
 				this.matchCase = new MatchCase();
-				this.mode = CONDITION;
-				pm.pushParser(new PatternParser(this.matchCase::setPattern));
+				this.mode = PATTERN;
 				return;
 			}
 			if (BaseSymbols.isTerminator(type))
@@ -58,6 +58,10 @@ public class CaseParser extends Parser
 				return;
 			}
 			pm.report(token, "match.case");
+			return;
+		case PATTERN:
+			pm.pushParser(new PatternParser(this.matchCase::setPattern), true);
+			this.mode = CONDITION;
 			return;
 		case CONDITION:
 			if (type == DyvilKeywords.IF)
