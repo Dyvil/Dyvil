@@ -7,6 +7,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.constant.IConstantValue;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -16,6 +17,8 @@ import java.util.function.Supplier;
 
 public class DummyValue implements IConstantValue
 {
+	public static final DummyValue INSTANCE = new DummyValue(Types.UNKNOWN);
+
 	private final @NonNull Supplier<IType> type;
 
 	private final @Nullable BiConsumer<MethodWriter, IType> writer;
@@ -47,7 +50,7 @@ public class DummyValue implements IConstantValue
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return this != INSTANCE;
 	}
 
 	@Override

@@ -204,7 +204,7 @@ public final class StatementListParser extends Parser implements IMemberConsumer
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this::addStatement));
+			pm.pushParser(new ExpressionParser(this::addStatement).withFlags(ExpressionParser.OPTIONAL));
 			return;
 		case LABEL_NAME:
 			if (Tokens.isIdentifier(type))
