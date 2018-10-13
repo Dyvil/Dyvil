@@ -95,14 +95,20 @@ public class LambdaTest
 
 		result =?= List("b", "b", "b", "c", "a")
 
-		test "Issue #408" {
+		test "#408 + #415" {
+			// #408 "Trailing closure syntax does not work with explicit closure parameter names"
+			// #415 "Implicit Receivers are not captured correctly"
+
+			// This code differs from the example code in that the closures don't print, but add tests.
+			// The use of a captured variable as an implicit receiver failed the verifier before issue #415 was fixed
+
 			func test(s: String, f: String -> void) -> void = f(s)
 
-			test("abc") { print $0 } // ok (trailing closure, no explicit parameter names)
+			test("abc") { $0 =?= "abc" } // ok (trailing closure, no explicit parameter names)
 
-			test("abc", { name => print name }) // ok (explicit parameter names, no trailing closure)
+			test("abc", { name => name =?= "abc" }) // ok (explicit parameter names, no trailing closure)
 
-			test("abc") { name => print name } // was "error - test(String) cannot be resolved"
+			test("abc") { name => name =?= "abc" } // was "error - test(String) cannot be resolved"
 		}
 	}
 
