@@ -11,10 +11,14 @@ import dyvil.util.MarkerLevel;
 
 public abstract class Marker implements Comparable<Marker>
 {
+	// =============== Fields ===============
+
 	protected final SourcePosition position;
 
 	private final String       message;
 	private       List<String> info;
+
+	// =============== Constructors ===============
 
 	public Marker(SourcePosition position, String message)
 	{
@@ -27,6 +31,8 @@ public abstract class Marker implements Comparable<Marker>
 		this.position = position;
 	}
 
+	// =============== Properties ===============
+
 	public SourcePosition getPosition()
 	{
 		return this.position;
@@ -36,6 +42,18 @@ public abstract class Marker implements Comparable<Marker>
 	{
 		return this.message;
 	}
+
+	public abstract MarkerLevel getLevel();
+
+	public abstract String getColor();
+
+	public abstract boolean isError();
+
+	public abstract boolean isWarning();
+
+	// =============== Methods ===============
+
+	// --------------- Info ---------------
 
 	public void addInfo(String info)
 	{
@@ -53,13 +71,7 @@ public abstract class Marker implements Comparable<Marker>
 		this.addInfo(builder.toString());
 	}
 
-	public abstract MarkerLevel getLevel();
-
-	public abstract String getColor();
-
-	public abstract boolean isError();
-
-	public abstract boolean isWarning();
+	// --------------- Comparison ---------------
 
 	@Override
 	public int compareTo(@NonNull Marker o)
@@ -105,6 +117,8 @@ public abstract class Marker implements Comparable<Marker>
 		return this.info != null ? this.info.equals(that.info) : that.info == null;
 	}
 
+	// --------------- Hashing ---------------
+
 	@Override
 	public int hashCode()
 	{
@@ -114,6 +128,8 @@ public abstract class Marker implements Comparable<Marker>
 		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
 		return result;
 	}
+
+	// --------------- Formatting ---------------
 
 	public void log(Source source, String indent, StringBuilder buffer, boolean colors)
 	{
@@ -154,7 +170,7 @@ public abstract class Marker implements Comparable<Marker>
 	}
 
 	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn, boolean colors,
-		                       String colorString)
+		String colorString)
 	{
 		final int limit = Math.min(startColumn, line.length());
 
@@ -171,22 +187,23 @@ public abstract class Marker implements Comparable<Marker>
 			}
 		}
 
-		if (startColumn < endColumn)
+		if (colors)
 		{
-			if (colors)
-			{
-				buf.append(colorString);
-			}
-			for (int i = startColumn; i < endColumn; i++)
-			{
-				buf.append('^');
-			}
-			if (colors)
-			{
-				buf.append(Console.ANSI_RESET);
-			}
-
-			buf.append('\n');
+			buf.append(colorString);
 		}
+		for (int i = startColumn; i < endColumn; i++)
+		{
+			buf.append('^');
+		}
+		if (startColumn == endColumn)
+		{
+			buf.append('^');
+		}
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
+		}
+
+		buf.append('\n');
 	}
 }
