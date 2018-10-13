@@ -422,7 +422,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		final IValue implicitValue = context.resolveImplicit(null);
 		if (implicitValue != null)
 		{
-			final IValue call = resolveApplyStatement(markers, context, arguments, implicitValue);
+			final IValue call = resolveApplyStatement(markers, context, arguments, implicitValue.resolve(markers, context));
 			if (call != null)
 			{
 				return call;

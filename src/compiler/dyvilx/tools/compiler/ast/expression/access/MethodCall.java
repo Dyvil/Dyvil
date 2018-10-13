@@ -183,19 +183,20 @@ public class MethodCall extends AbstractCall implements Named
 
 	protected IValue resolveImplicitCall(MarkerList markers, IContext context)
 	{
-		final IValue implicit = context.resolveImplicit(null);
-		if (implicit == null)
+		IValue implicitValue = context.resolveImplicit(null);
+		if (implicitValue == null)
 		{
 			return null;
 		}
+		implicitValue = implicitValue.resolve(markers, context);
 
-		final IMethod method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
+		final IMethod method = ICall.resolveMethod(context, implicitValue, this.name, this.arguments);
 		if (method == null)
 		{
 			return null;
 		}
 
-		this.receiver = implicit;
+		this.receiver = implicitValue;
 		return this.checkArguments(markers, context, method);
 	}
 
