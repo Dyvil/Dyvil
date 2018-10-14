@@ -402,7 +402,16 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.classes.get(name);
+		// iterate backwards to use youngest definition
+		for (int i = this.classes.size() - 1; i >= 0; i--)
+		{
+			final IClass iclass = this.classes.get(i);
+			if (iclass.getName() == name)
+			{
+				return iclass;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -458,13 +467,8 @@ public class REPLContext extends AbstractHeader
 			method.checkMatch(list, receiver, name, arguments);
 		}
 
-		for (IClass iclass : this.classes)
-		{
-			if (iclass.hasModifier(Modifiers.EXTENSION))
-			{
-				iclass.getMethodMatches(list, receiver, name, arguments);
-			}
-		}
+		// here normal order is ok, since all extension classes are considered
+		this.classes.getExtensionMethodMatches(list, receiver, name, arguments);
 
 		if (name == null)
 		{
