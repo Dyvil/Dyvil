@@ -6,15 +6,6 @@ package dyvil.lang
 using   dyvil.reflect.Opcodes._
 import  dyvil.collection.range.specialized.{ IntRange, LongRange, FloatRange, DoubleRange }
 
-// here so the compiler is happy, will be removed soon
-abstract class Primitives
-{
-	static extension func apply(this: Void) -> Void = Void()
-
-	@Intrinsic([ /* NOOP */ ])
-	postfix func voidValue(_ v: Void) -> void {}
-}
-
 // *************** boolean primitive ***************
 
 @JavaName("Primitives$Boolean")
@@ -599,6 +590,7 @@ extension Void
 
 	// =============== Methods ===============
 
+	@Intrinsic([ /* NOOP */ ])
 	func value() -> void = ()
 }
 
