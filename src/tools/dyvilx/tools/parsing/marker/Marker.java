@@ -9,6 +9,9 @@ import dyvil.source.Source;
 import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public abstract class Marker implements Comparable<Marker>
 {
 	// =============== Fields ===============
@@ -60,20 +63,22 @@ public abstract class Marker implements Comparable<Marker>
 
 	// --------------- Info ---------------
 
+	public List<String> getInfo()
+	{
+		return this.info != null ? this.info : (this.info = new ArrayList<>(2));
+	}
+
 	public void addInfo(String info)
 	{
-		if (this.info == null)
-		{
-			this.info = new ArrayList<>(2);
-		}
-		this.info.add(info);
+		this.getInfo().add(info);
 	}
 
 	public void addError(Throwable throwable)
 	{
+		// TODO optimize / avoid unnecessary temp objects
 		final StringBuilder builder = new StringBuilder();
 		throwable.printStackTrace(new AppendablePrintStream(builder));
-		this.addInfo(builder.toString());
+		this.getInfo().addAll(Arrays.asList(builder.toString().split("\n")));
 	}
 
 	// --------------- Comparison ---------------
@@ -100,26 +105,13 @@ public abstract class Marker implements Comparable<Marker>
 		return this == obj || obj instanceof Marker && this.equals((Marker) obj);
 	}
 
-	public boolean equals(Marker that)
+	public boolean equals(@NonNull Marker that)
 	{
-		if (this == that)
-		{
-			return true;
-		}
-		if (!this.position.equals(that.position))
-		{
-			return false;
-		}
-		if (this.getLevel() != that.getLevel())
-		{
-			return false;
-		}
-		if (!this.message.equals(that.message))
-		{
-			return false;
-		}
-		//
-		return this.info != null ? this.info.equals(that.info) : that.info == null;
+		return this == that || //
+		       this.position.equals(that.position) //
+		       && this.getLevel() == that.getLevel() //
+		       && this.message.equals(that.message) //
+		       && Objects.equals(this.info, that.info);
 	}
 
 	// --------------- Hashing ---------------
@@ -128,9 +120,9 @@ public abstract class Marker implements Comparable<Marker>
 	public int hashCode()
 	{
 		int result = this.position.hashCode();
-		result = 31 * result + (this.getLevel().hashCode());
-		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
-		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
+		result = 31 * result + this.getLevel().hashCode();
+		result = 31 * result + this.message.hashCode();
+		result = 31 * result + Objects.hashCode(this.info);
 		return result;
 	}
 
