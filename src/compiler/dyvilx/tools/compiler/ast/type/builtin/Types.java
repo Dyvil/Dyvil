@@ -75,7 +75,6 @@ public final class Types
 	public static final ClassType ENUM              = new ClassType();
 
 	public static IHeaderUnit PRIMITIVES_HEADER;
-	public static IClass      PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
 	public static IClass NULL_CLASS;
@@ -119,8 +118,6 @@ public final class Types
 
 	public static void initTypes()
 	{
-		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
-
 		NULL_CLASS = Package.dyvilLangInternal.resolveClass("Null");
 		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");

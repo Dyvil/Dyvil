@@ -483,7 +483,6 @@ public final class PrimitiveType implements IType
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		Types.PRIMITIVES_HEADER.getMethodMatches(list, receiver, name, arguments);
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 		if (list.hasCandidate())
 		{
 			return;
@@ -499,7 +498,6 @@ public final class PrimitiveType implements IType
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		Types.PRIMITIVES_HEADER.getImplicitMatches(list, value, targetType);
-		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
