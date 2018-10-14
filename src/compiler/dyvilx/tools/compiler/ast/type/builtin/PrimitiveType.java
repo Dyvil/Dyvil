@@ -330,7 +330,8 @@ public final class PrimitiveType implements IType
 		}
 		if (this == Types.VOID)
 		{
-			return this.boxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("apply"));
+			return this.boxMethod = Package.dyvilLang.resolveClass("Primitives$VoidWrapper").getBody()
+			                                         .getMethod(Names.apply);
 		}
 		return this.boxMethod = IContext.resolveMethod(this.getWrapperClass(), null, Names.valueOf,
 		                                               new ArgumentList(new DummyValue(this)));
@@ -345,7 +346,8 @@ public final class PrimitiveType implements IType
 		}
 		if (this == Types.VOID)
 		{
-			return this.unboxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("voidValue"));
+			return this.unboxMethod = Package.dyvilLang.resolveClass("Primitives$VoidWrapper").getBody()
+			                                           .getMethod(Names.value);
 		}
 		return this.unboxMethod = this.getWrapperClass().getBody().getMethod(Name.fromRaw(this.name + "Value"));
 	}
