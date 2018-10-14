@@ -3,22 +3,16 @@ package dyvil.collection
 import java.util.Iterator
 import dyvil.collection.iterator._
 
-class Iterators
+@JavaName("Iterators")
+extension Iterator
 {
-	static extension func apply<type E>(this: Iterator) -> Iterator<E>
-	{
-		return EmptyIterator<E>()
-	}
+	static func apply<type E>() -> Iterator<E> = EmptyIterator<E>()
 
-	static extension func apply<type E>(this: Iterator, element: E) -> Iterator<E>
-	{
-		return SingletonIterator(element)
-	}
+	static func apply<type E>(element: E) -> Iterator<E> = SingletonIterator<E>(element)
 
-	static extension func apply<type E>(this: Iterator, elements: E...) -> Iterator<E>
-	{
-		return ArrayIterator(elements)
-	}
+	static func apply<type E>(elements: E...) -> Iterator<E> = ArrayIterator<E>(elements)
+
+	// TODO convert to proper extension funcs when generic extension classes are implemented
 
 	infix func map<type E, type R>(_ base: Iterator<+E>, by mapper: E -> R) -> Iterator<+R>
 	{
