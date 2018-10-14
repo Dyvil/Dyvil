@@ -366,25 +366,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (IClass iclass : this.getClasses())
-		{
-			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
-			{
-				iclass.getBody().getMethodMatches(list, receiver, name, arguments);
-			}
-		}
+		this.getClasses().getExtensionMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (IClass iclass : this.getClasses())
-		{
-			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
-			{
-				iclass.getBody().getImplicitMatches(list, value, targetType);
-			}
-		}
+		this.getClasses().getExtensionImplicitMatches(list, value, targetType);
 	}
 
 	@Override

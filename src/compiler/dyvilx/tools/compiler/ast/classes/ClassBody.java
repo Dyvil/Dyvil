@@ -424,6 +424,8 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
+		this.classes.getExtensionMethodMatches(list, receiver, name, arguments);
+
 		if (name == null)
 		{
 			for (IMethod method : this.methods())
@@ -460,6 +462,8 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
+		this.classes.getExtensionImplicitMatches(list, value, targetType);
+
 		for (IMethod method : this.getImplicitMethodCache())
 		{
 			method.checkImplicitMatch(list, value, targetType);

@@ -4,9 +4,15 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.MatchList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -96,6 +102,33 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 		return new ArrayIterator<>(this.classes, 0, this.size);
 	}
 
+	// --------------- Context Resolution ---------------
+
+	public void getExtensionMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		for (IClass iclass : this)
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
+			{
+				// only uses the body to avoid infinite recursion with PrimitiveType
+				// (and because extension classes can only define extension methods in the body anyway)
+				iclass.getBody().getMethodMatches(list, receiver, name, arguments);
+			}
+		}
+	}
+
+	public void getExtensionImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (IClass iclass : this)
+		{
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
+			{
+				// s.a. for body rationale
+				iclass.getBody().getImplicitMatches(list, value, targetType);
+			}
+		}
+	}
+
 	// --------------- Resolution Phases ---------------
 
 	@Override
@@ -116,6 +149,8 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 		}
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -133,6 +168,8 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 			this.classes[i].check(markers, context);
 		}
 	}
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	public void foldConstants()
