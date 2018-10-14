@@ -215,13 +215,13 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
 	{
 		final Marker marker;
-		if (matches == null || !matches.isAmbigous()) // isAmbiguous returns false for empty lists
-		{
-			marker = Markers.semanticError(this.position, "method.access.resolve", this.getName());
-		}
-		else
+		if (matches != null && matches.isAmbigous())
 		{
 			marker = Markers.semanticError(this.position, "method.access.ambiguous", this.getName());
+		}
+		else // isAmbiguous returns false for empty lists
+		{
+			marker = Markers.semanticError(this.position, "method.access.resolve", this.getName());
 		}
 
 		this.addArgumentInfo(marker);
@@ -244,37 +244,22 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 
 	private void addCandidates(MatchList<IMethod> matches, Marker marker)
 	{
-		if (matches.isEmpty())
+		if (matches == null || matches.isEmpty())
 		{
 			return;
 		}
 
-		// Duplicate in ConstructorCall.addCandidates
-
 		marker.addInfo(Markers.getSemantic("method.access.candidates"));
 
-		final Candidate<IMethod> first = matches.getCandidate(0);
-		this.addCandidateInfo(marker, first);
-
-		for (int i = 1, count = matches.size(); i < count; i++)
+		for (Candidate<IMethod> candidate : matches.getAmbiguousCandidates())
 		{
-			final Candidate<IMethod> candidate = matches.getCandidate(i);
-			if (!candidate.equals(first)) // only print the candidates with the same ranking as the first
-			{
-				break;
-			}
+			final IMethod member = candidate.getMember();
+			final StringBuilder builder = new StringBuilder().append('\t');
 
-			this.addCandidateInfo(marker, candidate);
+			builder.append(member.getReceiverType()).append(member.isStatic() ? '.' : '#');
+			Util.methodSignatureToString(member, this.genericData, builder);
+			marker.addInfo(builder.toString());
 		}
-	}
-
-	private void addCandidateInfo(Marker marker, Candidate<IMethod> candidate)
-	{
-		final StringBuilder builder = new StringBuilder().append('\t');
-		final IMethod member = candidate.getMember();
-		builder.append(member.getReceiverType()).append(member.isStatic() ? '.' : '#');
-		Util.methodSignatureToString(member, this.genericData, builder);
-		marker.addInfo(builder.toString());
 	}
 
 	// every resolveCall implementation calls this

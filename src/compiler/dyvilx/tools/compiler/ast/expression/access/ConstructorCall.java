@@ -239,17 +239,17 @@ public class ConstructorCall implements ICall
 		                                   IType type, ArgumentList arguments)
 	{
 		final Marker marker;
-		if (list == null || !list.isAmbigous())
-		{
-			marker = Markers.semanticError(position, "constructor.access.resolve", type.toString());
-			addArgumentInfo(marker, arguments);
-		}
-		else
+		if (list != null && list.isAmbigous())
 		{
 			marker = Markers.semanticError(position, "constructor.access.ambiguous", type.toString());
-			addArgumentInfo(marker, arguments);
-			addCandidates(list, marker);
 		}
+		else // isAmbiguous returns false for empty lists
+		{
+			marker = Markers.semanticError(position, "constructor.access.resolve", type.toString());
+		}
+
+		addArgumentInfo(marker, arguments);
+		addCandidates(list, marker);
 
 		markers.add(marker);
 	}
@@ -264,30 +264,19 @@ public class ConstructorCall implements ICall
 
 	protected static void addCandidates(MatchList<IConstructor> matches, Marker marker)
 	{
-		// Duplicate in AbstractCall.addCandidates
+		if (matches == null || matches.isEmpty())
+		{
+			return;
+		}
 
 		marker.addInfo(Markers.getSemantic("method.access.candidates"));
 
-		final Candidate<IConstructor> first = matches.getCandidate(0);
-		addCandidateInfo(marker, first);
-
-		for (int i = 1, count = matches.size(); i < count; i++)
+		for (Candidate<IConstructor> candidate : matches.getAmbiguousCandidates())
 		{
-			final Candidate<IConstructor> candidate = matches.getCandidate(i);
-			if (!candidate.equals(first))
-			{
-				break;
-			}
-
-			addCandidateInfo(marker, candidate);
+			final StringBuilder builder = new StringBuilder().append('\t');
+			Util.constructorSignatureToString(candidate.getMember(), null, builder);
+			marker.addInfo(builder.toString());
 		}
-	}
-
-	protected static void addCandidateInfo(Marker marker, Candidate<IConstructor> candidate)
-	{
-		final StringBuilder sb = new StringBuilder().append('\t');
-		Util.constructorSignatureToString(candidate.getMember(), null, sb);
-		marker.addInfo(sb.toString());
 	}
 
 	public void checkArguments(MarkerList markers, IContext context, IConstructor constructor)
