@@ -501,6 +501,9 @@ public class REPLContext extends AbstractHeader
 		{
 			method.checkImplicitMatch(list, value, targetType);
 		}
+
+		// here normal order is ok, since all extension classes are considered
+		this.classes.getExtensionImplicitMatches(list, value, targetType);
 	}
 
 	@Override
