@@ -47,6 +47,11 @@ public abstract class Marker implements Comparable<Marker>
 
 	public abstract String getColor();
 
+	public boolean isIgnored()
+	{
+		return false;
+	}
+
 	public abstract boolean isError();
 
 	public abstract boolean isWarning();
@@ -131,7 +136,7 @@ public abstract class Marker implements Comparable<Marker>
 
 	// --------------- Formatting ---------------
 
-	public void log(Source source, String indent, StringBuilder buffer, boolean colors)
+	public final void log(Source source, String indent, StringBuilder buffer, boolean colors)
 	{
 		final String type = BaseMarkers.INSTANCE.getString("marker_level." + this.getLevel().name().toLowerCase());
 
