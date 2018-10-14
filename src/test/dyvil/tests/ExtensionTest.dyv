@@ -24,7 +24,10 @@ public class ExtensionTest
 
 	static class D extends C
 
-	extension func custom(this: A) -> String = "fallback"
+	extension A
+	{
+		func custom() -> String = "fallback"
+	}
 
 	static func sourceFallback() -> Test = test "Source Fallback" {
 		let a = new A
@@ -49,9 +52,12 @@ public class ExtensionTest
 
 	// --------------- Extension of non-Source Class ---------------
 
-	static extension func empty(this: String) -> String = ""
+	extension String
+	{
+		static func empty() -> String = ""
 
-	extension func size(this: String) -> int = this.length
+		func size() -> int = this.length
+	}
 
 	static func nonSource() -> Test = test "Non-Source" {
 		String.empty =?= ""
