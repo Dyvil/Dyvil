@@ -42,6 +42,7 @@ import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.util.function.BiConsumer;
 
 public class REPLContext extends AbstractHeader
 	implements IDefaultContext, IMemberConsumer<REPLVariable>
@@ -216,15 +217,6 @@ public class REPLContext extends AbstractHeader
 
 	private void processMethod(IMethod method)
 	{
-		int methods = this.methods.size();
-		for (int i = 0; i < methods; i++)
-		{
-			if (this.methods.get(i).overrides(method, null))
-			{
-				this.methods.set(i, method);
-				return;
-			}
-		}
 		this.methods.add(method);
 	}
 
@@ -462,18 +454,27 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (IMethod method : this.methods)
-		{
-			method.checkMatch(list, receiver, name, arguments);
-		}
-
-		// here normal order is ok, since all extension classes are considered
-		this.classes.getExtensionMethodMatches(list, receiver, name, arguments);
-
 		if (name == null)
 		{
+			for (IMethod method : this.methods)
+			{
+				method.checkMatch(list, receiver, null, arguments);
+			}
+
+			this.classes.getExtensionMethodMatches(list, receiver, null, arguments);
 			return;
 		}
+
+		// *************** Method Definitions ***************
+
+		this.resolveNewestFirst(list, (method, tempList) -> method.checkMatch(tempList, receiver, name, arguments));
+
+		// *************** Extension Methods ***************
+
+		// here normal resolution is ok, since all extension classes are considered
+		this.classes.getExtensionMethodMatches(list, receiver, name, arguments);
+
+		// *************** Properties ***************
 
 		final Name removeEq = Util.removeEq(name);
 
@@ -482,6 +483,8 @@ public class REPLContext extends AbstractHeader
 		{
 			property.checkMatch(list, receiver, name, arguments);
 		}
+
+		// *************** Field Properties ***************
 
 		final IField field = this.fields.get(removeEq);
 		if (field != null)
@@ -497,13 +500,27 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (IMethod method : this.methods)
-		{
-			method.checkImplicitMatch(list, value, targetType);
-		}
+		this.resolveNewestFirst(list, (method, tempList) -> method.checkImplicitMatch(tempList, value, targetType));
 
 		// here normal order is ok, since all extension classes are considered
 		this.classes.getExtensionImplicitMatches(list, value, targetType);
+	}
+
+	private void resolveNewestFirst(MatchList<IMethod> list, BiConsumer<IMethod, MatchList<IMethod>> consumer)
+	{
+		final MatchList<IMethod> tempList = list.emptyCopy();
+
+		// iterate backwards to have youngest definition first
+		for (int i = this.methods.size() - 1; i >= 0; i--)
+		{
+			consumer.accept(this.methods.get(i), tempList);
+		}
+
+		if (!tempList.isEmpty())
+		{
+			// getCandidate(0) instead of getBestCandidate to ignore ambiguous results
+			list.add(tempList.getCandidate(0));
+		}
 	}
 
 	@Override
