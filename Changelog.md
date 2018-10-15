@@ -1,3 +1,129 @@
+------------------------------------------------------------------------------------------------------------------------
+
+# Dyvil v0.41.0
+
+- Added varargs fences. #412
+
+## Dyvil Library v0.41.0
+
+- Added `JavaName` annotations to `Iterators` functions.
+- Added the `dyvil.annotation.JavaName` annotation class. #405
+- Added the `EXTENSION` flag to the `CLASS_TYPE_MODIFIERS` constant.
+- Added the `Marker.getInfo` method.
+- Added the `Marker.isIgnored` property.
+- Cleaned up GenSrc classes in the Library module.
+- Cleaned up the `Iterators` class.
+- Converted the `dyvil.collection.Iterators` class to an extension class.
+- Fixed an issue that caused lines with ignored markers to be displayed, but without the marker.
+- Fixed markers with zero-width positions (at EOF) being printed incorrectly. #421
+- Ignored `Marker`s are no longer added to `MarkerList`s.
+- Improved the `Marker.addError` method to display stack traces more nicely.
+- Improved the `Marker.equals` and `.hashCode` implementations.
+- Removed the `Primitives` class.
+- Renamed the `Iterators.filter` method to `filtered`.
+- Renamed the `Iterators.map` method to `mapped`.
+- Replaced functions in various classes with properties.
+- Replaced usages of `BytecodeName` with `JavaName`.
+- Updated some properties to retain their pre-#414 bytecode name.
+- Updated the lang header to make `BytecodeName` refer to `JavaName`.
+
+## Dyvil Compiler v0.41.0
+
+- Added a syntax error diagnostic for expected patterns. #420
+- Added a syntax error diagnostic for missing expressions. #418
+- Added parser and method matching support for varargs fences. #412
+- Added support for the `JavaName` annotation. #405
+- Added the `ClassBody.resolveImplicit{Field,Value}` methods.
+- Added the `ClassList.objectClasses`, `.objectClassInstanceFields` and `.resolveImplicitObjectInstanceField` methods.
+- Added the `Closure.isTrailingClosure` method.
+- Added the `DummyValue.INSTANCE` constant.
+- Added the `MatchList.getAmbiguousCandidates` method.
+- Added the `OPTIONAL` flag to the `ExpressionParser` class.
+- Added the `ParameterList.clear` method.
+- Cleaned up Implicit Field resolution in the `ClassBody` class.
+- Cleaned up the `AnnotationReader` and `AnnotationValueReader` class.
+- Cleaned up the `BraceAccessExpr` class.
+- Cleaned up the `ExpressionListParser`, `TypeListParser` and `TypeParser` classes.
+- Cleaned up the `ImportParser` and `ImportDeclaration` classes.
+- Cleaned up the `LiteralConversion` class.
+- Cleaned up the `MatchCase` class.
+- Cleaned up the `MatchExpr` class.
+- Cleaned up the `MatchExpressionParser` and `CaseParser` classes.
+- Cleaned up the `MatchList` class.
+- Cleaned up the `PackageDeclaration` class.
+- Cleaned up the `PatternParser` and `PatternListParser` classes.
+- Cleaned up the `{Repeat,Sync,Try,While}StatementParser` and `StringInterpolationParser` classes and removed `IValueConsumer` dependency. #419
+- Cleaned up the remaining `*Parser` that depended on `IValueConsumer`. #419
+- Dropped support for the `DyvilName` annotation in Dyvil source code. #416
+- Fixed a possible NPE in the `ArrayType.get{Method,Implicit}Matches` implementations. #404
+- Fixed an issue that omitted stack map frame required by the JVM in Match Expressions. #430
+- Fixed an issue where implicit conversions would not be resolved correctly. #410
+- Fixed an issue where trailing closures with explicit parameters would not merged into the previous argument list. #408
+- Fixed extension method resolution not considering extension classes in class bodies. #423
+- Fixed implicit receivers not being resolved and captured. #415
+- Fixed lambda expressions with constructor references causing a verification error. #411
+- Fixed the `AbstractConstructor.getInternalName` method incorrectly returning `init` instead of `<init>`.
+- Improved method matching for varargs argument lists by correctly counting varargs lengths.
+- Improved package declaration diagnostic messages.
+- Improved the `AbstractCall.reportResolve` and `ConstructorCall.reportResolve` implementations.
+- Improved the `AnnotationReader` constructors and updated usages.
+- Improved the `ClassList.getExtension{Method,Implicit}Matches` methods.
+- Improved the diagnostic for duplicate argument list labels by using an `IdentityHashSet` and moving it to the `check` phase.
+- Made the `CaseParser` and `PatternParser` implementations more robust against syntax errors.
+- Made the `Closure` class a subclass of the `LambdaExpr` class.
+- Made the `LambdaExpr` class not final.
+- Moved code for package declaration diagnostics from `Package` to `PackageDeclaration`.
+- Moved the `Closure` class from the `ast.statement` package to `ast.expression`.
+- Properties now use standard Java names with `get` and `set` prefix as the bytecode name. #414
+- Refactored method and constructor matching into one implementation for both.
+- Removed the `Consumer<Annotation>` super-interface from the `AnnotationExpr` class.
+- Removed the `IArgumentsConsumer` class.
+- Removed the `ICaseConsumer` class.
+- Removed the `IImportConsumer` class.
+- Removed the `IPatternConsumer` class.
+- Removed the `IValueConsumer` class. #419
+- Removed the `ParameterList.setParameter` method.
+- Removed the `Types.PRIMITIVES_CLASS` field.
+- Removed the `ValueAnnotationVisitor` class.
+- Renamed the `TupleExpr.setArguments` method to `setValues`.
+- Replaced calls to `Positioned.position` with `getPosition`.
+- Replaced usages of `IArgumentsConsumer` with `Consumer<ArgumentList>`.
+- The `AnnotationValueReader` class now uses `Consumer<IValue>` instead of `IValueConsumer`.
+- The `ApplyAccess` implementation for trailing closure merging no longer manually resolved the trailing closure expression.
+- The Type Parser now properly reports when it couldn't parse a type. #373, #407, #417
+- The warning for non-static nested classes is no longer shown for extension classes. #424
+- Updated many AST classes to remove the `IValueConsumer` super-interface.
+- Updated parses classes to use lambdas in place of `IValueConsumer` objects.
+- Updated the `ArrayLiteralParser` class to be more robust against syntax errors.
+- Void box and unbox operations now use the methods in `Primitives.extension Void` instead of `Primitives`.
+
+## Dyvil REPL v0.26.0
+
+- Cleaned up the `REPLContext.resolveImplicit` implementation.
+- Fixed an issue that caused Implicit Conversions in Extension Classes defined in the REPL being unavailable. #426
+- Improved the `CompleteCommand.findConversions` implementation.
+- Removed the `:rename` command. #427
+- Renamed the `REPLContext.setValue` method to `addValue`.
+- The REPL now resolves the method ambiguities by newest first. #413
+- The REPL now returns the youngest class definition when multiple definitions share a name. #425
+
+## Dyvil Property Format v0.16.0
+
+- Improved the `DPFSyntax.apply(...) -> Builder` method implementation.
+- Moved DPF classes from the `dyvil.tools.dpf` package to `dyvilx.tools.dpf`. #409
+- Moved the `DPF` header from the `dyvil` package to `dyvilx.tools`. #409
+- Replaced functions in various classes with properties.
+- Replaced usages of `BytecodeName` with `JavaName`.
+- Updated the `DPFSyntax` class to disallow builders with multiple nodes.
+
+## Dyvil GenSrc v0.9.3
+
+- Updated the `CallDirectiveParser` implementation to adapt to compiler API changes.
+- Updated the `ForDirectiveParser` implementation to adapt to compiler API changes.
+- Updated the `ImportDirectiveParser` implementation to adapt to compiler API changes.
+
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.40.0
 
 - Added extension classes. #304
@@ -271,6 +397,8 @@
 - Removed the `Template.setNameFromFile` method.
 - Updated usages of `Package.getInternalName` in `Template.getTemplateName` to append extra `/`.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.39.0
 
 - Added Circumfix Operators. #389
@@ -382,6 +510,8 @@
 - Added support for Call Directives with Blocks. #388
 - Moved the `GenSrcLexer.useSubLexer` method to the `Lexer` class.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.38.0
 
 ## Dyvil Library v0.38.0
@@ -459,6 +589,8 @@
 
 - Rewrote GenSrc to use the compiler API and compiled templates for source generation. #352
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.37.0
 
 - Added the Optional Cast Operator `as?`. #360
@@ -533,6 +665,8 @@
 - Updated some Dyvil files to use the Optional Cast Operator.
 
 ## Dyvil GenSrc v0.8.0
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.36.0
 
@@ -659,6 +793,8 @@
 
 - Updated the `StringValue` and `GenSrcLexer` classes to adapt to library API changes.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.35.0
 
 - Added Multi-Binding If Statements. #358
@@ -701,6 +837,8 @@
 - Updated some method implementations using Optional Chaining or Null Coalescing.
 
 ## Dyvil GenSrc v0.7.0
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.34.0
 
@@ -764,6 +902,8 @@
 ## Dyvil GenSrc v0.7.0
 
 - Renamed the `dyvil.tools` package to `dyvilx.tools`.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.33.0
 
@@ -870,6 +1010,8 @@
 - Added missing Localizations.
 - Fixed an error caused by unresolved specs in Import directives.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.32.0
 
 ## Dyvil Library v0.32.0
@@ -971,6 +1113,8 @@
 - Updated the `LiteralText` and `ProcessedText` classes.
 - Updated the `Template` class to use the new parser.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.31.0
 
 - Dropped support for the `nil` literal. #337
@@ -1060,6 +1204,8 @@
 ## Dyvil GenSrc v0.5.0
 
 - It is now possible to register and resolve from multiple source roots.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.30.0
 
@@ -1154,6 +1300,8 @@
 ## Dyvil GenSrc v0.4.1
 
 - Fixed a compilation error in the `Template` class.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.29.0
 
@@ -1304,6 +1452,8 @@
 - Updated the `GenSrc` class to use the `BasicTool` class.
 - Updated the template loader and parser to use the `FileSource` class from the `parsing` library.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.28.0
 
 - Added support for Optional and Implicitly Unwrapped Optional Types. #298
@@ -1440,6 +1590,8 @@
 - Removed the `ForReplacementMap` class.
 - Updated `#define`, `#undefine` and `#import` to operate on file-level scope. #315
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.27.1
 
 ## Dyvil Library v0.27.1
@@ -1466,6 +1618,8 @@
 ## Dyvil Property Format v0.8.0
 
 ## Dyvil GenSrc v0.2.0
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.27.0
 
@@ -1573,6 +1727,8 @@
 - Templates without specializations now use a default one based on their filename.
 - The `#foreach` directive now uses `,` as the separator.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.26.0
 
 - Added support for infix, prefix and postfix type operators. #303
@@ -1661,6 +1817,8 @@
 -  Renamed the `inheritFrom` property to `@inheritFrom`.
 
 ## Dyvil Property Format v0.6.4
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.25.0
 
@@ -1777,6 +1935,8 @@
 ## Dyvil Property Format v0.6.3
 
 - Bump DPF version number because of binary changes.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.24.0
 
@@ -1896,6 +2056,8 @@
 
 -  Updated references to the former `*Convertible` classes in Dyvil source code.
 -  Updated usages of `Name` API methods.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.23.0
 
@@ -2029,6 +2191,8 @@
 ## Dyvil Property Format v0.6.1
 
 - Adapted the DPF implementations to API changes in the library and compiler.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.22.0
 
@@ -2180,6 +2344,8 @@
 - Fixed the DPF compilation tasks being executed in incorrect order.
 - Removed the `Value.toPropertyValue(any)` extension method.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.21.1
 
 ## Dyvil Library v0.21.1
@@ -2201,6 +2367,8 @@
 - Fixed Extension Methods available through `using` declarations not being displayed by the `:complete` command.
 
 ## Dyvil Property Format v0.5.0
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.21.0
 
@@ -2317,6 +2485,8 @@
 ## Dyvil Property Format v0.5.0
 
 - Removed the `FlatMapConverter.parse(String, ...)` methods.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.20.0
 
@@ -2476,6 +2646,8 @@
 - Removed the `REPLResult` class.
 
 ## Dyvil Property Format v0.4.1
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.19.0
 
@@ -2698,6 +2870,8 @@
 
 ## Dyvil Property Format v0.4.1
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.18.0
 
 - Enabled Nested Methods and removed the error that was produced upon their declaration. #48
@@ -2787,6 +2961,8 @@
 - Improved Syntax Error Reporting in the REPL for some inputs.
 - Improved the way Result Classes are generated for `void` statements in the REPL.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.17.1
 
 ## Dyvil Library v0.17.1
@@ -2817,6 +2993,8 @@
 - Fixed Return Statements being disallowed in the REPL. #202
 
 ## Dyvil Property Format v0.4.1
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.17.0
 
@@ -2938,6 +3116,8 @@
 
 - Updated all DPF classes for primitive changes.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.16.1
 
 ## Dyvil Library v0.16.1
@@ -2969,6 +3149,8 @@
 - Fixed backtick identifiers being supported incorrectly by the REPL.
 
 ## Dyvil Property Format v0.4.0
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.16.0
 
@@ -3082,6 +3264,8 @@
 - Moved the `dyvil.tools.dpf.Parser` class to `dyvil.tools.dpf.converter.string`.
 - Moved the `dyvil.tools.util.Printer` class to `dyvil.tools.dpf.converter.string`.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.15.0
 
 - Added Property Initializers. #178
@@ -3137,6 +3321,8 @@
 
 ## Dyvil Property Format v0.3.2
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.14.1
 
 ## Dyvil Library v0.14.0
@@ -3172,6 +3358,8 @@
 ## Dyvil REPL v0.8.0
 
 ## Dyvil Property Format v0.3.2
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.14.0
 
@@ -3213,6 +3401,8 @@
 - Updated several REPL APIs.
 
 ## Dyvil Property Format v0.3.2
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.13.0
 
@@ -3275,6 +3465,8 @@
 ## Dyvil REPL v0.7.0
 
 ## Dyvil Property Format v0.3.2
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.12.0
 
@@ -3364,6 +3556,8 @@
 
 - Fixed the accept method implementation for DPF String Interpolations.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.11.1
 
 ## Dyvil Library v0.11.1
@@ -3401,6 +3595,8 @@
 - Added `converter.NameAccess.toString()` implementation.
 - Added `converter.StringInterpolation.toString()` implementation.
 - Fixed `FlatMapConverter` working incorrectly for nested and qualified nodes.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.11.0
 
@@ -3451,6 +3647,8 @@
 
 - Added the FlatMapConverter, a DPF Visitor that converts the tree into a flat Map structure.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.10.1
 
 ## Dyvil Library v0.10.0
@@ -3479,6 +3677,8 @@
 ## Dyvil REPL v0.6.0
 
 ## Dyvil Property Format v0.2.1
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.10.0
 
@@ -3573,6 +3773,8 @@
 - Fixed REPL Markers not being reported when the input was not parseable as an expression.
 
 ## Dyvil Property Format v0.2.1
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.9.0
 
@@ -3670,6 +3872,8 @@
 
 - Made commas in DPF Maps optional.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.8.0
 
 ## Dyvil Library v0.7.0
@@ -3720,6 +3924,8 @@
 - Renamed `dyvil.tools.dpf.ast.DPFFile` to RootNode.
 - Renamed `dyvil.tools.dpf.DPFParser` to Parser.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.7.0
 
 - Added support for String Interpolation in Double-Quoted String Literals without `@` symbols.
@@ -3753,6 +3959,8 @@
 - Added various visitor classes for use in both AST and parser.
 - Added a basic AST implementation.
 - Added a basic Printer.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.6.0
 
@@ -3824,6 +4032,8 @@
 - Fixed an error that was caused by semantically invalid method definitions in the REPL.
 - Removed the Semicolon after REPL variables.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.5.0
 
 - Added special type treatment for the names `Tuple` and `Function`.
@@ -3867,6 +4077,8 @@
 - Improved synthetic REPL variable names. They now have more meaningful names that are directly based on the type of the variable.
 - Improved REPL result computation in anonymous classes to support `return` statements.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.4.0
 
 - Added support for Unicode identifiers and symbols.
@@ -3907,6 +4119,8 @@
 - Fixed REPL Variable assignment working incorrectly.
 - Fixed Anonymous Classes with unresolved constructors being reported as such twice within the REPL.
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.3.0
 
 ## Dyvil Library v0.2.0
@@ -3941,6 +4155,8 @@
 
 ## Dyvil REPL v0.1.1
 
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.2.0
 
 - Added support for Type (Use) Annotations.
@@ -3968,6 +4184,8 @@
 ## Dyvil REPL v0.1.1
 - Added support for multi-line input.
 - Fixed commands being handled incorrectly.
+
+------------------------------------------------------------------------------------------------------------------------
 
 # Dyvil v0.1.0-ALPHA
 
