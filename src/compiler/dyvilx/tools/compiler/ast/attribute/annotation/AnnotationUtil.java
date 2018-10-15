@@ -12,8 +12,7 @@ public final class AnnotationUtil
 
 	public static final String JAVA_NAME_INTERNAL = "dyvil/annotation/JavaName";
 
-	public static final String DYVIL_NAME_INTERNAL = "dyvil/annotation/internal/DyvilName";
-	public static final String DYVIL_NAME          = "L" + DYVIL_NAME_INTERNAL + ";";
+	public static final String DYVIL_NAME = "Ldyvil/annotation/internal/DyvilName;";
 
 	public static final String AUTOMANGLED_INTERNAL = "dyvil/annotation/AutoMangled";
 
