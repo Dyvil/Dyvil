@@ -6,36 +6,33 @@ import dyvil.collection.iterator._
 @JavaName("Iterators")
 extension Iterator
 {
+	// =============== Constructors ===============
+
+	@JavaName("empty")
 	static func apply<type E>() -> Iterator<E> = EmptyIterator<E>()
 
+	@JavaName("of")
 	static func apply<type E>(element: E) -> Iterator<E> = SingletonIterator<E>(element)
 
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> Iterator<E> = ArrayIterator<E>(elements)
 
-	// TODO convert to proper extension funcs when generic extension classes are implemented
+	// =============== Methods ===============
 
-	infix func map<type E, type R>(_ base: Iterator<+E>, by mapper: E -> R) -> Iterator<+R>
-	{
-		return MappingIterator(base, mapper)
-	}
+	// TODO convert mapped and filtered to proper extension funcs when generic extension classes are implemented
 
-	infix func filter<type E>(_ base: Iterator<+E>, by filter: E -> boolean) -> Iterator<E>
-	{
-		return FilterIterator(base, filter)
-	}
+	infix func mapped<type E, type R>(_ base: Iterator<+E>, by mapper: E -> R) -> Iterator<R> = MappingIterator(base, mapper)
 
-	infix func ++ <type E>(lhs: Iterator<+E>, rhs: Iterator<+E>) -> Iterator<E>
-	{
-		return ConcatIterator(lhs, rhs)
-	}
+	infix func filtered<type E>(_ base: Iterator<+E>, by filter: E -> boolean) -> Iterator<E> = FilterIterator(base, filter)
 
-	infix func + <type E>(lhs: E, rhs: Iterator<+E>) -> Iterator<E>
-	{
-		return PrependIterator(lhs, rhs)
-	}
+	// =============== Operators ===============
 
-	infix func + <type E>(lhs: Iterator<+E>, rhs: E) -> Iterator<E>
-	{
-		return AppendIterator(lhs, rhs)
-	}
+	@JavaName("concat")
+	infix func ++ <type E>(lhs: Iterator<+E>, rhs: Iterator<+E>) -> Iterator<E> = ConcatIterator(lhs, rhs)
+
+	@JavaName("prepend")
+	infix func + <type E>(lhs: E, rhs: Iterator<+E>) -> Iterator<E> = PrependIterator(lhs, rhs)
+
+	@JavaName("append")
+	infix func + <type E>(lhs: Iterator<+E>, rhs: E) -> Iterator<E> = AppendIterator(lhs, rhs)
 }
