@@ -180,16 +180,18 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			final IValue implicit;
-			if (this.receiver == null && (implicit = context.resolveImplicit(null)) != null)
+			IValue implicitValue;
+			if (this.receiver == null && (implicitValue = context.resolveImplicit(null)) != null)
 			{
-				value = this.resolveAsMethod(implicit, markers, context);
+				implicitValue = implicitValue.resolve(markers, context);
+
+				value = this.resolveAsMethod(implicitValue, markers, context);
 				if (value != null)
 				{
 					return value;
 				}
 
-				value = this.resolveAsField(implicit, markers, context);
+				value = this.resolveAsField(implicitValue, markers, context);
 				if (value != null)
 				{
 					return value;

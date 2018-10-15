@@ -122,7 +122,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		// static final func apply<TypeParams...>(classParams...: ClassParamTypes...) -> This
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final AttributeList attributes = AttributeList
 			                                 .of(Modifiers.PUBLIC | Modifiers.STATIC_FINAL | Modifiers.GENERATED);
 		final IType type = this.theClass.getThisType();
@@ -155,7 +155,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		}
 
 		// = new This(params...)
-		applyMethod.setValue(new ConstructorCall(this.theClass.position(), this.theClass.getThisType(), arguments));
+		applyMethod.setValue(new ConstructorCall(this.theClass.getPosition(), this.theClass.getThisType(), arguments));
 
 		return applyMethod;
 	}
@@ -175,7 +175,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		// static final func unapply<TypeParams...>(value: This) -> (T...)
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final AttributeList attributes = AttributeList
 			                                 .of(Modifiers.PUBLIC | Modifiers.STATIC_FINAL | Modifiers.GENERATED);
 		final IType type = this.getUnapplyReturnType();
@@ -220,7 +220,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		// static final func unapply<TypeParams...>(value: any) -> (T...)?
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final AttributeList attributes = AttributeList
 			                                 .of(Modifiers.PUBLIC | Modifiers.STATIC_FINAL | Modifiers.GENERATED);
 		final IType type = NullableType.apply(this.getUnapplyReturnType());

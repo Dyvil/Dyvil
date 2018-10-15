@@ -2,7 +2,7 @@ package dyvilx.tools.compiler.parser.expression;
 
 import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.access.ClassConstructorCall;
 import dyvilx.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
@@ -14,26 +14,40 @@ import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public class ConstructorCallParser extends Parser
 {
+	// =============== Constants ===============
+
+	// --------------- Parser Modes ---------------
+
 	private static final int NEW                        = 0;
 	private static final int CONSTRUCTOR_PARAMETERS     = 1;
 	private static final int CONSTRUCTOR_PARAMETERS_END = 2;
 	private static final int ANONYMOUS_CLASS_END        = 4;
 	private static final int ANONYMOUS_CLASS            = 8;
 
+	// --------------- Flags ---------------
+
 	public static final int IGNORE_ANON_CLASS = 1;
 
-	protected IValueConsumer consumer;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	private ConstructorCall call;
 
 	private byte flags;
 
-	public ConstructorCallParser(IValueConsumer consumer)
+	// =============== Constructors ===============
+
+	public ConstructorCallParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
 	}
+
+	// =============== Methods ===============
 
 	public ConstructorCallParser withFlags(int flags)
 	{
@@ -67,7 +81,7 @@ public class ConstructorCallParser extends Parser
 			{
 				// new ... (
 				this.mode = CONSTRUCTOR_PARAMETERS_END;
-				ArgumentListParser.parseArguments(pm, token.next(), this.call);
+				ArgumentListParser.parseArguments(pm, token.next(), this.call::setArguments);
 				return;
 			}
 			// Fallthrough
@@ -108,7 +122,7 @@ public class ConstructorCallParser extends Parser
 	public void end(IParserManager pm, IToken token)
 	{
 		this.call.setPosition(this.call.getPosition().to(token));
-		this.consumer.setValue(this.call);
+		this.consumer.accept(this.call);
 		pm.popParser();
 	}
 

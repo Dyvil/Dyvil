@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.AbstractValue;
@@ -11,14 +11,13 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class ReturnStatement extends AbstractValue implements IValueConsumer
+public class ReturnStatement extends AbstractValue
 {
 	private static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker
 		                                                                  .markerSupplier("return.type.incompatible",
@@ -55,15 +54,14 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		return this.value == null || this.value.isResolved();
 	}
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	public void setValue(IValue value)
+	{
+		this.value = value;
 	}
 
 	@Override

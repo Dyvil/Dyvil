@@ -55,7 +55,7 @@ public class EnumConstantParser extends AbstractMemberParser
 		case VALUE:
 			if (type == BaseSymbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser(this.constant));
+				pm.pushParser(new ExpressionParser(this.constant::setValue));
 				this.mode = END;
 				return;
 			}

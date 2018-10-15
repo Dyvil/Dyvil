@@ -1,12 +1,12 @@
 package dyvil.source
 
-case class TextSource(protected let text: String { public override get }) implements Source
+case class TextSource(protected let text: String { @JavaName("text") public override get }) implements Source
 {
 	protected const EXPECTED_LINE_LENGTH: int = 80
 
 	var lineStarts: [int]! // 0-based, i.e. the line start of line 1 is at index 0 of this array
 
-	var lineCount: int { override get: this.getLineStarts().size }
+	override var lineCount: int { @JavaName("lineCount") get: this.getLineStarts().size }
 
 	override func line(at index: int) -> String!
 	{

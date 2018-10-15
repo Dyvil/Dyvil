@@ -4,7 +4,7 @@ using dyvil.math.BigIntegers
 
 #let(TYPES = [ 'long', 'BigInteger' ])
 
-@BytecodeName("Combinatorics")
+@JavaName("Combinatorics")
 extension Math
 {
 	// --------------- Factorial ---------------
@@ -38,13 +38,13 @@ extension Math
 	}
 }
 
-@BytecodeName("Combinatorics$LongSyntax")
+@JavaName("Combinatorics$LongSyntax")
 extension long
 {
 	postfix func !(_ lhs: long) -> long = Math.factorial(lhs)
 }
 
-@BytecodeName("Combinatorics$BigIntegerSyntax")
+@JavaName("Combinatorics$BigIntegerSyntax")
 extension BigInt
 {
 	postfix func !(_ lhs: BigInt) -> BigInt = Math.factorial(lhs)

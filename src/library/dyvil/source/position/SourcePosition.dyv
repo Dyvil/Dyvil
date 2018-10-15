@@ -44,13 +44,13 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	// Instance Methods
 
-	var startLine:   int { get }
+	var startLine:   int { @JavaName("startLine") get }
 
-	var endLine:     int { get }
+	var endLine:     int { @JavaName("endLine") get }
 
-	var startColumn: int { get }
+	var startColumn: int { @JavaName("startColumn") get }
 
-	var endColumn:   int { get }
+	var endColumn:   int { @JavaName("endColumn") get }
 
 	func raw() -> SourcePosition = new Base(this.startLine, this.endLine, this.startColumn, this.endColumn)
 
@@ -76,10 +76,10 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	private static case class Base
 	(
-		let startLine:   int { override get }
-		let endLine:     int { override get }
-		let startColumn: int { override get }
-		let endColumn:   int { override get }
+		let startLine:   int { @JavaName("startLine") override get }
+		let endLine:     int { @JavaName("endLine") override get }
+		let startColumn: int { @JavaName("startColumn") override get }
+		let endColumn:   int { @JavaName("endColumn") override get }
 	)
 	implements SourcePosition
 	{

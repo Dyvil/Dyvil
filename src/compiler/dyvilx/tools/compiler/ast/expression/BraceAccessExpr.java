@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -12,22 +13,25 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class BraceAccessExpr implements IValue, IDefaultContext
 {
+	// =============== Fields ===============
+
 	protected IValue value;
 	protected IValue statement;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected SourcePosition position;
-	protected IVariable     variable;
-	protected FieldAccess   implicitAccess;
+	protected IVariable      variable;
+
+	// =============== Constructors ===============
 
 	public BraceAccessExpr(SourcePosition position, IValue value)
 	{
@@ -35,23 +39,7 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		this.value = value;
 	}
 
-	@Override
-	public int valueTag()
-	{
-		return BRACE_ACCESS;
-	}
-
-	@Override
-	public SourcePosition getPosition()
-	{
-		return this.position;
-	}
-
-	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
-	}
+	// =============== Properties ===============
 
 	public IValue getValue()
 	{
@@ -74,9 +62,39 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	}
 
 	@Override
+	public SourcePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Expression Info ---------------
+
+	@Override
+	public int valueTag()
+	{
+		return BRACE_ACCESS;
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	// --------------- Context Resolution ---------------
+
+	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		return type == null ? this.implicitAccess : null;
+		return type == null ? new FieldAccess(this.variable) : null;
 	}
 
 	@Override
@@ -91,11 +109,7 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		return variable == this.variable;
 	}
 
-	@Override
-	public boolean isResolved()
-	{
-		return true;
-	}
+	// --------------- Expression Type ---------------
 
 	@Override
 	public IType getType()
@@ -115,6 +129,8 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		this.statement = withType;
 		return this;
 	}
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -136,26 +152,27 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		}
 		else
 		{
-			this.value = context.resolveImplicit(null);
-		}
-
-		if (this.value == null)
-		{
-			markers.add(Markers.semanticError(this.position, "braceaccess.invalid"));
-		}
-		else
-		{
-			final IType valueType = this.value.getType();
-
-			final IValue typedValue = this.value.withType(valueType, valueType, markers, context);
-			if (typedValue != null)
+			final IValue implicitValue = context.resolveImplicit(null);
+			if (implicitValue != null)
 			{
-				this.value = typedValue;
+				this.value = implicitValue.resolve(markers, context);
 			}
-
-			this.variable = new Variable(Names.$0, this.value.getType());
-			this.implicitAccess = new FieldAccess(this.variable);
+			else
+			{
+				markers.add(Markers.semanticError(this.position, "braceaccess.invalid"));
+				this.value = DummyValue.INSTANCE;
+			}
 		}
+
+		final IType valueType = this.value.getType();
+
+		final IValue typedValue = this.value.withType(valueType, valueType, markers, context);
+		if (typedValue != null)
+		{
+			this.value = typedValue;
+		}
+
+		this.variable = new Variable(Names.$0, this.value.getType());
 
 		context = context.push(this);
 		this.statement = this.statement.resolve(markers, context);
@@ -164,13 +181,12 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		return this;
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, context);
-		}
+		this.value.checkTypes(markers, context);
 
 		context = context.push(this);
 		this.statement.checkTypes(markers, context);
@@ -180,23 +196,19 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value.check(markers, context);
-		}
+		this.value.check(markers, context);
 
 		context = context.push(this);
 		this.statement.check(markers, context);
 		context.pop();
 	}
 
+	// --------------- Compilation Phases ---------------
+
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.foldConstants();
-		}
+		this.value = this.value.foldConstants();
 
 		this.statement = this.statement.foldConstants();
 		return this;
@@ -205,31 +217,10 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.cleanup(compilableList, classCompilableList);
-		}
+		this.value = this.value.cleanup(compilableList, classCompilableList);
 
 		this.statement = this.statement.cleanup(compilableList, classCompilableList);
 		return this;
-	}
-
-	@Override
-	public String toString()
-	{
-		return Formattable.toString(this);
-	}
-
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		if (this.value != null)
-		{
-			this.value.toString(prefix, buffer);
-		}
-
-		buffer.append('.');
-		this.statement.toString(prefix, buffer);
 	}
 
 	@Override
@@ -249,5 +240,22 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		this.statement.writeExpression(writer, type);
 
 		writer.resetLocals(localCount);
+	}
+
+	// --------------- Formatting ---------------
+
+	@Override
+	public String toString()
+	{
+		return Formattable.toString(this);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.value.toString(prefix, buffer);
+
+		buffer.append('.');
+		this.statement.toString(prefix, buffer);
 	}
 }

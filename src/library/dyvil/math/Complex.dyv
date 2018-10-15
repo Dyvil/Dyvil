@@ -21,7 +21,7 @@ public case class Complex(let real: double, let imag: double) implements RingCom
 	@OverloadPriority
 	static inline func apply(real: double, imag: double) -> Complex = new Complex(real, imag)
 
-	@BytecodeName("fromPolar")
+	@JavaName("fromPolar")
 	static inline func apply(explicit length: double, explicit argument: double) -> Complex
 		= new Complex(length * Math.cos(argument), length * Math.sin(argument))
 

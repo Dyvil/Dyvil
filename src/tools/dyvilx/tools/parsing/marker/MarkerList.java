@@ -68,7 +68,7 @@ public final class MarkerList implements Iterable<Marker>
 
 	public void add(Marker marker)
 	{
-		if (marker == null)
+		if (marker == null || marker.isIgnored())
 		{
 			return;
 		}

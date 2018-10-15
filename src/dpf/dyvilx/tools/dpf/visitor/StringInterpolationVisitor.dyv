@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.visitor
+
+interface StringInterpolationVisitor
+{
+	func visitStringPart(string: String) -> void
+
+	func visitValue() -> ValueVisitor
+
+	func visitEnd() -> void {}
+}

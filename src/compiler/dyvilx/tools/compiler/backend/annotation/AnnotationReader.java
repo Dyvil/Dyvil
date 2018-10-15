@@ -15,57 +15,80 @@ import java.util.function.Consumer;
 
 public class AnnotationReader implements AnnotationVisitor
 {
-	private Consumer<Annotation> consumer;
-	private Annotation           annotation;
-	private ArgumentList         arguments;
+	// =============== Fields ===============
 
-	public AnnotationReader(Consumer<Annotation> consumer, Annotation annotation)
+	protected final Annotation   annotation;
+	private final   ArgumentList arguments;
+
+	protected final Consumer<Annotation> completion;
+
+	// =============== Constructors ===============
+
+	public AnnotationReader(Annotation annotation)
 	{
-		this.consumer = consumer;
+		this(annotation, null);
+	}
+
+	public AnnotationReader(Annotation annotation, Consumer<Annotation> completion)
+	{
+		this.completion = completion;
 		this.annotation = annotation;
 		this.annotation.setArguments(this.arguments = new ArgumentList());
 	}
 
+	// =============== Static Methods ===============
+
+	static IValue getEnumValue(String descriptor, String name)
+	{
+		return new EnumValue(ClassFormat.extendedToType(descriptor), Name.fromQualified(name));
+	}
+
+	// =============== Methods ===============
+
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.arguments.add(Name.fromRaw(key), IValue.fromObject(value));
-	}
-
-	static IValue getEnumValue(String enumClass, String name)
-	{
-		return new EnumValue(ClassFormat.extendedToType(enumClass), Name.fromRaw(name));
+		this.arguments.add(Name.fromQualified(key), IValue.fromObject(value));
 	}
 
 	@Override
 	public void visitEnum(String key, String enumClass, String name)
 	{
-		this.arguments.add(Name.fromRaw(key), getEnumValue(enumClass, name));
+		this.arguments.add(Name.fromQualified(key), getEnumValue(enumClass, name));
 	}
 
 	@Override
 	public AnnotationVisitor visitAnnotation(String key, String desc)
 	{
 		Annotation annotation = new ExternalAnnotation(ClassFormat.extendedToType(desc));
-		AnnotationExpr value = new AnnotationExpr(annotation);
-		this.arguments.add(Name.fromRaw(key), value);
-		return new AnnotationReader(value, annotation);
+		AnnotationExpr annotationExpr = new AnnotationExpr(annotation);
+		return new AnnotationReader(annotation, result -> {
+			annotationExpr.setAnnotation(result);
+			this.arguments.add(Name.fromQualified(key), annotationExpr);
+		});
 	}
 
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ArrayExpr valueList = new ArrayExpr();
-		this.arguments.add(Name.fromRaw(key), valueList);
-		return new AnnotationValueReader(valueList.getValues());
+		ArrayExpr arrayExpr = new ArrayExpr();
+		return new AnnotationValueReader(arrayExpr.getValues()::add)
+		{
+			@Override
+			public void visitEnd()
+			{
+				super.visitEnd();
+				AnnotationReader.this.arguments.add(Name.fromQualified(key), arrayExpr);
+			}
+		};
 	}
 
 	@Override
 	public void visitEnd()
 	{
-		if (this.consumer != null)
+		if (this.completion != null)
 		{
-			this.consumer.accept(this.annotation);
+			this.completion.accept(this.annotation);
 		}
 	}
 }

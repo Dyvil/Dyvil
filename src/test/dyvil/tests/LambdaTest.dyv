@@ -10,7 +10,7 @@ public class LambdaTest
 	public interface MyFunction<P, R>
 	{
 		func apply(par: P) -> R
-		
+
 		func andThen<A>(other: MyFunction<R, A>) -> MyFunction<P, A> = x => other(this(x))
 	}
 
@@ -79,18 +79,37 @@ public class LambdaTest
 	static func closures() -> Test = test "Closures" {
 		let result = List<String>()
 
+		// capturing
 		let function1: -> void = function { result += "a" }
+
+		// non-capturing
 		let function2: -> String = function { "b" }
 
+		// capturing another closure
 		repeatClosure(3) { result += function2() }
 
-		with("c") { result += $0 }
+		// named
+		with("c") { it => result += it }
 
 		function1()
 
-		let expected = List("b", "b", "b", "c", "a")
+		result =?= List("b", "b", "b", "c", "a")
 
-		result =?= expected
+		test "#408 + #415" {
+			// #408 "Trailing closure syntax does not work with explicit closure parameter names"
+			// #415 "Implicit Receivers are not captured correctly"
+
+			// This code differs from the example code in that the closures don't print, but add tests.
+			// The use of a captured variable as an implicit receiver failed the verifier before issue #415 was fixed
+
+			func test(s: String, f: String -> void) -> void = f(s)
+
+			test("abc") { $0 =?= "abc" } // ok (trailing closure, no explicit parameter names)
+
+			test("abc", { name => name =?= "abc" }) // ok (explicit parameter names, no trailing closure)
+
+			test("abc") { name => name =?= "abc" } // was "error - test(String) cannot be resolved"
+		}
 	}
 
 	static func partialFunctions() -> Test = test "Partial Functions" {

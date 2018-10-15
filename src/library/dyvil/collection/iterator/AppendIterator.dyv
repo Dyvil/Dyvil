@@ -13,17 +13,17 @@ class AppendIterator<type E>(let head: Iterator<+E>, let tail: E) implements Ite
 
 	// Implementation
 
-	var returned: boolean
+	var hasReturned: boolean
 
-	override func hasNext() -> boolean = this.head.hasNext() || !this.returned
+	override func hasNext() -> boolean = this.head.hasNext() || !this.hasReturned
 
 	override func next() -> E
 	{
 		if (this.head.hasNext()) return this.head.next()
 
-		if (this.returned) throw new NoSuchElementException
+		if (this.hasReturned) throw new NoSuchElementException
 
-		this.returned = true
+		this.hasReturned = true
 		return this.tail
 	}
 

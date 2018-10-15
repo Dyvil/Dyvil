@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model.value
+
+import package dyvilx.tools.dpf.model
+
+public interface Builder extends Value, model.Expandable, dyvilx.tools.dpf.visitor.BuilderVisitor
+{
+	var name: Name { get }
+
+	var node: model.Node? { get }
+}

@@ -1,0 +1,45 @@
+package dyvilx.tools.dpf.ast
+
+import dyvilx.tools.dpf.ast.value.Value
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.dpf.visitor.NodeVisitor
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
+
+public class Property
+(
+	protected let name:  Name   { public override get }
+	protected var _value: Value!
+)
+extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement
+{
+	var value: Value { override get: this._value!; set: this._value = newValue }
+
+	public init(name: Name) : this(name, null)
+
+	protected override func visitValue(value: Value) -> void = this.value = value
+
+	override func accept(visitor: NodeVisitor) -> void = this.value.accept(visitor.visitProperty(this.name))
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Property
+	{
+		let property = mutate ? this : new Property(this.name)
+		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
+		return property
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		buffer.append(this.name).append(" = ")
+		this.value.toString(indent, buffer)
+	}
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is Property && this.equals(obj as Property)
+
+	func equals(that: Property) -> boolean = this === that || this.name === that.name && this.value == that.value
+
+	override func hashCode() -> int = 31 * this.name.hashCode + this.value.hashCode
+}

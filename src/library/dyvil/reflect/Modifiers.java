@@ -232,7 +232,7 @@ public interface Modifiers
 	 * {@code enum}, {@code object} or {@code annotation} / {@code @interface}). This value excludes the {@code
 	 * ABSTRACT} bit flag.
 	 */
-	int CLASS_TYPE_MODIFIERS = INTERFACE | ANNOTATION | ENUM | OBJECT | TRAIT;
+	int CLASS_TYPE_MODIFIERS = INTERFACE | ANNOTATION | ENUM | OBJECT | TRAIT | EXTENSION;
 
 	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | PACKAGE;
 

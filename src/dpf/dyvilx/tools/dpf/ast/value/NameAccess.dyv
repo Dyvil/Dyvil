@@ -1,0 +1,68 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvil.collection.Map
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+
+import java.util.Objects
+
+class NameAccess
+(
+	protected var value: Value? { public get; private set }
+	protected let name: Name { public get }
+)
+extends DPFValueVisitor implements Value, Expandable
+{
+	static func apply(name: Name) -> NameAccess = new NameAccess(null, name)
+
+	static func apply(value: Value, name: Name) -> NameAccess = new NameAccess(value, name)
+
+	override func visitValue(value: Value) -> void = this.value = value
+
+	override func accept(visitor: ValueVisitor) -> void
+	{
+		if (this.value == null)
+		{
+			visitor.visitName(this.name)
+			return
+		}
+
+		this.value!.accept(visitor.visitValueAccess(this.name))
+	}
+
+	override func expand(mappings: [String:Object], mutate: boolean) -> Object
+	{
+		let builder = new StringBuilder()
+
+		var value = this.value
+		while (value is NameAccess)
+		{
+			let nameAccess = value as NameAccess
+			builder.insert(0, '.').insert(0, nameAccess.name)
+			value = nameAccess.value
+		}
+
+		builder.append(this.name)
+		return mappings[builder.toString()] ?? this
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		if let value = this.value
+		{
+			value.toString(indent, buffer)
+			buffer.append('.')
+		}
+		buffer.append(this.name)
+	}
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is NameAccess && this.equals(obj as NameAccess)
+
+	func equals(that: NameAccess) -> boolean = this === that || this.name === that.name && this.value == that.value
+
+	override func hashCode() -> int = 31 * this.name.hashCode + (this.value?.hashCode ?? 0)
+}

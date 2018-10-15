@@ -1,0 +1,18 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvilx.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvilx.tools.parsing.lexer.StringLiterals
+
+case class StringValue(protected let value: String) implements Constant
+{
+	override func accept(visitor: ValueVisitor) -> void = visitor.visitString(this.value)
+
+	override func toObject() -> Object = this.value
+
+	override func appendString(builder: StringBuilder) -> void = builder.append(this.value)
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void = StringLiterals.appendStringLiteral(this.value, buffer)
+}

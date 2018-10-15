@@ -220,7 +220,7 @@ public class ClassMetadata implements IClassMetadata
 	{
 		// init(classParams...)
 
-		final SourcePosition position = this.theClass.position();
+		final SourcePosition position = this.theClass.getPosition();
 		final AttributeList attributes = this.theClass.getConstructorAttributes();
 		attributes.addFlag(Modifiers.GENERATED);
 		final CodeConstructor constructor = new CodeConstructor(this.theClass, attributes);

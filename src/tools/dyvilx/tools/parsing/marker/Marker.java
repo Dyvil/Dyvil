@@ -9,12 +9,19 @@ import dyvil.source.Source;
 import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public abstract class Marker implements Comparable<Marker>
 {
+	// =============== Fields ===============
+
 	protected final SourcePosition position;
 
 	private final String       message;
 	private       List<String> info;
+
+	// =============== Constructors ===============
 
 	public Marker(SourcePosition position, String message)
 	{
@@ -27,6 +34,8 @@ public abstract class Marker implements Comparable<Marker>
 		this.position = position;
 	}
 
+	// =============== Properties ===============
+
 	public SourcePosition getPosition()
 	{
 		return this.position;
@@ -37,29 +46,42 @@ public abstract class Marker implements Comparable<Marker>
 		return this.message;
 	}
 
-	public void addInfo(String info)
-	{
-		if (this.info == null)
-		{
-			this.info = new ArrayList<>(2);
-		}
-		this.info.add(info);
-	}
-
-	public void addError(Throwable throwable)
-	{
-		final StringBuilder builder = new StringBuilder();
-		throwable.printStackTrace(new AppendablePrintStream(builder));
-		this.addInfo(builder.toString());
-	}
-
 	public abstract MarkerLevel getLevel();
 
 	public abstract String getColor();
 
+	public boolean isIgnored()
+	{
+		return false;
+	}
+
 	public abstract boolean isError();
 
 	public abstract boolean isWarning();
+
+	// =============== Methods ===============
+
+	// --------------- Info ---------------
+
+	public List<String> getInfo()
+	{
+		return this.info != null ? this.info : (this.info = new ArrayList<>(2));
+	}
+
+	public void addInfo(String info)
+	{
+		this.getInfo().add(info);
+	}
+
+	public void addError(Throwable throwable)
+	{
+		// TODO optimize / avoid unnecessary temp objects
+		final StringBuilder builder = new StringBuilder();
+		throwable.printStackTrace(new AppendablePrintStream(builder));
+		this.getInfo().addAll(Arrays.asList(builder.toString().split("\n")));
+	}
+
+	// --------------- Comparison ---------------
 
 	@Override
 	public int compareTo(@NonNull Marker o)
@@ -83,39 +105,30 @@ public abstract class Marker implements Comparable<Marker>
 		return this == obj || obj instanceof Marker && this.equals((Marker) obj);
 	}
 
-	public boolean equals(Marker that)
+	public boolean equals(@NonNull Marker that)
 	{
-		if (this == that)
-		{
-			return true;
-		}
-		if (!this.position.equals(that.position))
-		{
-			return false;
-		}
-		if (this.getLevel() != that.getLevel())
-		{
-			return false;
-		}
-		if (!this.message.equals(that.message))
-		{
-			return false;
-		}
-		//
-		return this.info != null ? this.info.equals(that.info) : that.info == null;
+		return this == that || //
+		       this.position.equals(that.position) //
+		       && this.getLevel() == that.getLevel() //
+		       && this.message.equals(that.message) //
+		       && Objects.equals(this.info, that.info);
 	}
+
+	// --------------- Hashing ---------------
 
 	@Override
 	public int hashCode()
 	{
 		int result = this.position.hashCode();
-		result = 31 * result + (this.getLevel().hashCode());
-		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
-		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
+		result = 31 * result + this.getLevel().hashCode();
+		result = 31 * result + this.message.hashCode();
+		result = 31 * result + Objects.hashCode(this.info);
 		return result;
 	}
 
-	public void log(Source source, String indent, StringBuilder buffer, boolean colors)
+	// --------------- Formatting ---------------
+
+	public final void log(Source source, String indent, StringBuilder buffer, boolean colors)
 	{
 		final String type = BaseMarkers.INSTANCE.getString("marker_level." + this.getLevel().name().toLowerCase());
 
@@ -154,7 +167,7 @@ public abstract class Marker implements Comparable<Marker>
 	}
 
 	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn, boolean colors,
-		                       String colorString)
+		String colorString)
 	{
 		final int limit = Math.min(startColumn, line.length());
 
@@ -171,22 +184,23 @@ public abstract class Marker implements Comparable<Marker>
 			}
 		}
 
-		if (startColumn < endColumn)
+		if (colors)
 		{
-			if (colors)
-			{
-				buf.append(colorString);
-			}
-			for (int i = startColumn; i < endColumn; i++)
-			{
-				buf.append('^');
-			}
-			if (colors)
-			{
-				buf.append(Console.ANSI_RESET);
-			}
-
-			buf.append('\n');
+			buf.append(colorString);
 		}
+		for (int i = startColumn; i < endColumn; i++)
+		{
+			buf.append('^');
+		}
+		if (startColumn == endColumn)
+		{
+			buf.append('^');
+		}
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
+		}
+
+		buf.append('\n');
 	}
 }

@@ -1,12 +1,11 @@
 package dyvilx.tools.compiler.ast.constructor;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.member.MemberKind;
-import dyvilx.tools.compiler.ast.header.ClassCompilable;
 
-public interface IInitializer extends ClassMember, IValueConsumer, ClassCompilable
+public interface IInitializer extends ClassMember, ClassCompilable
 {
 	@Override
 	default MemberKind getKind()
@@ -16,6 +15,5 @@ public interface IInitializer extends ClassMember, IValueConsumer, ClassCompilab
 
 	IValue getValue();
 
-	@Override
 	void setValue(IValue value);
 }

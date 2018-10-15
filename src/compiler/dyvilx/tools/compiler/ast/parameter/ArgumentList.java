@@ -2,7 +2,9 @@ package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -36,8 +38,11 @@ public class ArgumentList implements Resolvable, IValueList
 
 	private static final int DEFAULT_CAPACITY = 3;
 
-	public static final int MISMATCH = -1;
-	public static final int DEFAULT  = -2;
+	public static final Name FENCE = Name.fromRaw("_");
+
+	public static final int REGULAR_MATCH = -1;
+	public static final int DEFAULT_MATCH = -2;
+	public static final int MISMATCH      = -3;
 
 	// =============== Fields ===============
 
@@ -173,7 +178,7 @@ public class ArgumentList implements Resolvable, IValueList
 		// Require that no argument labels exists before or at the index
 		for (int i = 0; i <= index; i++)
 		{
-			if (this.labels[i] != null)
+			if (this.labels[i] != null && this.labels[i] != FENCE)
 			{
 				return -1;
 			}
@@ -190,11 +195,11 @@ public class ArgumentList implements Resolvable, IValueList
 			return this.size;
 		}
 
-		for (; startIndex < this.size; startIndex++)
+		for (int index = startIndex; index < this.size; index++)
 		{
-			if (this.labels[startIndex] != null)
+			if (this.labels[index] != null)
 			{
-				return startIndex;
+				return index;
 			}
 		}
 
@@ -511,24 +516,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		for (int i = 0; i < this.size; i++)
 		{
-			final Name label = this.labels[i];
-			final IValue value = this.values[i];
-
-			value.resolveTypes(markers, context);
-
-			if (label == null)
-			{
-				continue;
-			}
-
-			for (int j = 0; j < i; j++)
-			{
-				if (this.labels[j] == label)
-				{
-					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.label", label));
-					break;
-				}
-			}
+			this.values[i].resolveTypes(markers, context);
 		}
 	}
 
@@ -553,6 +541,19 @@ public class ArgumentList implements Resolvable, IValueList
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.labels != null)
+		{
+			final Set<Name> labelSet = new IdentityHashSet<>(this.size);
+			for (int i = 0; i < this.size; i++)
+			{
+				final Name label = this.labels[i];
+				if (label != null && label != FENCE && !labelSet.add(label))
+				{
+					markers.add(Markers.semanticError(this.values[i].getPosition(), "arguments.duplicate.label", label));
+				}
+			}
+		}
+
 		for (int i = 0; i < this.size; i++)
 		{
 			this.values[i].check(markers, context);
@@ -587,7 +588,7 @@ public class ArgumentList implements Resolvable, IValueList
 		{
 			return param.isVarargs() && this != EMPTY ? 0 : checkDefault(param);
 		}
-		if (this.getLabel(argumentIndex) == null && param.hasModifier(Modifiers.EXPLICIT))
+		if (this.getLabel(argumentIndex) != param.getLabel() && param.hasModifier(Modifiers.EXPLICIT))
 		{
 			// explicit parameters require an argument label
 			return checkDefault(param);
@@ -596,7 +597,7 @@ public class ArgumentList implements Resolvable, IValueList
 		if (!param.isVarargs())
 		{
 			return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
-			                  param.getCovariantType(), implicitContext) ? 0 : MISMATCH;
+			                  param.getCovariantType(), implicitContext) ? REGULAR_MATCH : MISMATCH;
 		}
 
 		if (this == EMPTY)
@@ -612,7 +613,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 	protected static int checkDefault(IParameter param)
 	{
-		return param.isDefault() || param.isImplicit() ? DEFAULT : MISMATCH;
+		return param.isDefault() || param.isImplicit() ? DEFAULT_MATCH : MISMATCH;
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
@@ -646,7 +647,7 @@ public class ArgumentList implements Resolvable, IValueList
 		if (argument.checkVarargs(false))
 		{
 			return checkMatch_(matchValues, matchTypes, matchIndex, argument, paramType, implicitContext) ?
-				       0 :
+				       REGULAR_MATCH :
 				       MISMATCH;
 		}
 
@@ -841,7 +842,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.labels[i] != null)
+			if (this.labels[i] != null && this.labels[i] != FENCE)
 			{
 				return false;
 			}

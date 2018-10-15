@@ -1,0 +1,125 @@
+package dyvilx.tools.dpf.ast.builder
+
+import dyvilx.tools.dpf.{
+	model.Expandable
+	ast.{ Node, value.Value }
+	visitor.{ BuilderVisitor, NodeVisitor, ValueVisitor }
+}
+import dyvilx.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
+
+public class Builder
+(
+	protected let name:       Name { public override get }
+	protected var parameters: List<Parameter>
+	protected var node:       Node? { public override get }
+)
+implements Value, dyvilx.tools.dpf.model.value.Builder
+{
+	static func apply(name: Name) -> Builder = new Builder(name)
+
+	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, mutable.ArrayList(parameters...), null)
+
+	static func apply(name: Name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
+
+	public init(name: Name) : this(name, new mutable.ArrayList<Parameter>, null)
+
+	@JavaName("withNode")
+	func with(node: Node) -> Builder { this.node = node; this }
+
+	@JavaName("withParameter")
+	func with(parameter: Parameter) -> Builder { this.add(parameter); this }
+
+	@JavaName("addParameter")
+	func add(parameter: Parameter) -> void = this.parameters.add(parameter)
+
+	override func visitParameter(name: Name!) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
+
+	override func visitNode() -> Node
+	{
+		if (this.node != null) return this.node!!
+		return this.node = new Node(this.name)
+	}
+
+	override func visitEnd() -> void { }
+
+	override func accept(visitor: ValueVisitor) -> void
+	{
+		let builderVisitor = visitor.visitBuilder(this.name)
+		for (parameter <- this.parameters)
+		{
+			parameter.value.accept(builderVisitor.visitParameter(parameter.name))
+		}
+		if let node = this.node
+		{
+			node.acceptBody(builderVisitor.visitNode())
+		}
+		builderVisitor.visitEnd()
+	}
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Builder
+	{
+		if (mutate)
+		{
+			for (parameter <- this.parameters)
+			{
+				parameter.expand(mappings, true)
+			}
+			if (this.node != null)
+			{
+				this.node = this.node!.expand(mappings, true)
+			}
+			return this
+		}
+
+		return new Builder(this.name
+		                   this.parameters.mapped(parameter => parameter.expand(mappings, false))
+		                   this.node?.expand(mappings, false))
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		buffer.append(this.name)
+
+		let parameterCount = this.parameters.size
+		if (parameterCount > 0)
+		{
+			buffer.append('(')
+
+			this.parameters[0].toString(indent, buffer)
+			for (i <- 1 ..< parameterCount)
+			{
+				buffer.append(", ")
+				this.parameters[i].toString(indent, buffer)
+			}
+
+			buffer.append(')')
+		}
+		else if (this.node == null)
+		{
+			buffer.append("()")
+			return
+		}
+
+		if let node = this.node
+		{
+			buffer.append(" {\n")
+			node.bodyToString(indent + '\t', buffer)
+			buffer.append(indent).append('}')
+		}
+	}
+
+	override func equals(obj: Object!) -> boolean = this === obj || obj is Builder && this.equals(obj as Builder)
+
+	func equals(that: Builder) -> boolean = this === that || this.name === that.name && this.parameters == that.parameters && this.node == that.node
+
+	override func hashCode() -> int
+	{
+		var result = this.name.hashCode
+		result = 31 * result + this.parameters.hashCode
+		result = 31 * result + this.node.hashCode
+		return result
+	}
+}

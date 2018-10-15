@@ -1,0 +1,36 @@
+package dyvilx.tools.dpf.converter.flatmap
+
+import dyvil.collection.Map
+import dyvilx.tools.dpf.converter.DyvilValueVisitor
+import dyvilx.tools.dpf.visitor.NodeVisitor
+import dyvilx.tools.dpf.visitor.ValueVisitor
+
+class FlatMapConverter
+(
+	protected let map: Map<String, Object>
+	protected let name: String
+)
+implements NodeVisitor
+{
+	public init(map: Map<String, Object>) : this(map, "")
+
+	protected func getName(name: Name) -> String
+	{
+		if (this.name.isEmpty)
+		{
+			return name.qualified
+		}
+		return this.name ++ '.' ++ name.qualified
+	}
+
+	override func visitNode(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))
+
+	override func visitNodeAccess(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))
+
+	override func visitProperty(name: Name) -> ValueVisitor = new DyvilValueVisitor()
+	{
+		let propertyName = this<FlatMapConverter>.getName(name)
+
+		override func visitObject(o: Object!) -> void = this<FlatMapConverter>.map.put(this.propertyName, o)
+	}
+}

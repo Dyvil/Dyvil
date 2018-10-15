@@ -8,7 +8,6 @@ import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.compiler.ast.attribute.Attribute;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -33,7 +32,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
-public abstract class Annotation implements Attribute, Typed, ObjectCompilable, IArgumentsConsumer
+public abstract class Annotation implements Attribute, Typed, ObjectCompilable
 {
 	public static final class LazyFields
 	{
@@ -90,7 +89,6 @@ public abstract class Annotation implements Attribute, Typed, ObjectCompilable, 
 		return this.arguments;
 	}
 
-	@Override
 	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;

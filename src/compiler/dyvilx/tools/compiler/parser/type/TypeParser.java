@@ -27,6 +27,8 @@ import static dyvilx.tools.parsing.lexer.BaseSymbols.isTerminator;
 
 public final class TypeParser extends Parser implements Consumer<IType>
 {
+	// =============== Constants ===============
+
 	protected static final int NAME           = 0;
 	protected static final int GENERICS       = 1;
 	protected static final int GENERICS_END   = 1 << 1;
@@ -39,9 +41,12 @@ public final class TypeParser extends Parser implements Consumer<IType>
 	// Flags
 
 	public static final int NAMED_ONLY      = 1;
-	public static final int IGNORE_LAMBDA   = 2;
-	public static final int CLOSE_ANGLE     = 4;
-	public static final int IGNORE_OPERATOR = 8;
+	public static final int IGNORE_LAMBDA   = 1 << 1;
+	public static final int CLOSE_ANGLE     = 1 << 2;
+	public static final int IGNORE_OPERATOR = 1 << 3;
+	public static final int OPTIONAL        = 1 << 4;
+
+	// =============== Fields ===============
 
 	protected Consumer<IType> consumer;
 
@@ -49,6 +54,8 @@ public final class TypeParser extends Parser implements Consumer<IType>
 	private IType type;
 
 	private int flags;
+
+	// =============== Constructors ===============
 
 	public TypeParser(Consumer<IType> consumer)
 	{
@@ -74,6 +81,75 @@ public final class TypeParser extends Parser implements Consumer<IType>
 		this.flags = flags;
 		// this.mode = NAME;
 	}
+
+	// =============== Static Methods ===============
+
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that starts with {@code <}. This includes the special
+	 * left-arrow token {@code <-}.
+	 */
+	public static boolean isGenericStart(IToken token)
+	{
+		return isGenericStart(token, token.type());
+	}
+
+	public static boolean isGenericStart(IToken token, int type)
+	{
+		switch (type)
+		{
+		case DyvilSymbols.ARROW_LEFT:
+			return true;
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+			return token.nameValue().unqualified.charAt(0) == '<';
+		}
+		return false;
+	}
+
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that starts with {@code >}.
+	 */
+	public static boolean isGenericEnd(IToken token)
+	{
+		return isGenericEnd(token, token.type());
+	}
+
+	public static boolean isGenericEnd(IToken token, int type)
+	{
+		switch (type)
+		{
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+			return token.nameValue().unqualified.charAt(0) == '>';
+		}
+		return false;
+	}
+
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that ends with {@code >}. This includes the special
+	 * right-arrow {@code ->} and double-right-arrow {@code =>} tokens.
+	 */
+	public static boolean isGenericEnd2(IToken token)
+	{
+		return isGenericEnd2(token, token.type());
+	}
+
+	public static boolean isGenericEnd2(IToken token, int type)
+	{
+		switch (type)
+		{
+		case DyvilSymbols.ARROW_RIGHT:
+		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+			return true;
+		// case Tokens.LETTER_IDENTIFIER: // if it is a LETTER_IDENTIFIER token, the last token cannot be a '>'
+		case Tokens.SYMBOL_IDENTIFIER:
+			final String unqualified = token.nameValue().unqualified;
+			return unqualified.charAt(unqualified.length() - 1) == '>';
+		}
+		return false;
+	}
+
+	// =============== Methods ===============
 
 	public TypeParser withFlags(int flags)
 	{
@@ -193,7 +269,7 @@ public final class TypeParser extends Parser implements Consumer<IType>
 						// Token starts with a >
 						// Handles Type< > gracefully
 
-						pm.popParser(true);
+						this.end(pm, token);
 						return;
 					}
 
@@ -208,7 +284,7 @@ public final class TypeParser extends Parser implements Consumer<IType>
 			{
 				if (isTerminator(type))
 				{
-					pm.popParser(true);
+					this.end(pm, token);
 					return;
 				}
 				pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
@@ -266,11 +342,6 @@ public final class TypeParser extends Parser implements Consumer<IType>
 			this.mode = END;
 			return;
 		}
-		case LAMBDA_END:
-			this.type.expandPosition(token.prev());
-			this.consumer.accept(this.type);
-			pm.popParser(true);
-			return;
 		case ARRAY_COLON:
 			if (type == BaseSymbols.COLON)
 			{
@@ -315,7 +386,6 @@ public final class TypeParser extends Parser implements Consumer<IType>
 			pm.report(token, "type.generic.close_angle");
 			// Fallthrough
 		case END:
-		{
 			switch (type)
 			{
 			case BaseSymbols.DOT:
@@ -408,79 +478,25 @@ public final class TypeParser extends Parser implements Consumer<IType>
 				}
 				break;
 			}
-
-			if (this.type != null)
-			{
-				this.consumer.accept(this.type);
-			}
-			pm.popParser(true);
-		}
+			// Fallthrough
+		case LAMBDA_END:
+			this.end(pm, token);
+			return;
 		}
 	}
 
-	/**
-	 * Returns {@code true} iff the given token is a symbol token that starts with {@code <}. This includes the special
-	 * left-arrow token {@code <-}.
-	 */
-	public static boolean isGenericStart(IToken token)
+	private void end(IParserManager pm, IToken token)
 	{
-		return isGenericStart(token, token.type());
-	}
-
-	public static boolean isGenericStart(IToken token, int type)
-	{
-		switch (type)
+		if (this.type != null)
 		{
-		case DyvilSymbols.ARROW_LEFT:
-			return true;
-		case Tokens.SYMBOL_IDENTIFIER:
-		case Tokens.LETTER_IDENTIFIER:
-			return token.nameValue().unqualified.charAt(0) == '<';
+			this.consumer.accept(this.type);
 		}
-		return false;
-	}
-
-	/**
-	 * Returns {@code true} iff the given token is a symbol token that starts with {@code >}.
-	 */
-	public static boolean isGenericEnd(IToken token)
-	{
-		return isGenericEnd(token, token.type());
-	}
-
-	public static boolean isGenericEnd(IToken token, int type)
-	{
-		switch (type)
+		else if ((this.flags & OPTIONAL) == 0)
 		{
-		case Tokens.SYMBOL_IDENTIFIER:
-		case Tokens.LETTER_IDENTIFIER:
-			return token.nameValue().unqualified.charAt(0) == '>';
+			pm.report(Markers.syntaxError(token, "type.expected", token));
+			this.consumer.accept(Types.UNKNOWN);
 		}
-		return false;
-	}
-
-	/**
-	 * Returns {@code true} iff the given token is a symbol token that ends with {@code >}. This includes the special
-	 * right-arrow {@code ->} and double-right-arrow {@code =>} tokens.
-	 */
-	public static boolean isGenericEnd2(IToken token)
-	{
-		return isGenericEnd2(token, token.type());
-	}
-
-	public static boolean isGenericEnd2(IToken token, int type)
-	{
-		switch (type)
-		{
-		case DyvilSymbols.ARROW_RIGHT:
-		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-			return true;
-		// case Tokens.LETTER_IDENTIFIER: // if it is a LETTER_IDENTIFIER token, the last token cannot be a '>'
-		case Tokens.SYMBOL_IDENTIFIER:
-			final String unqualified = token.nameValue().unqualified;
-			return unqualified.charAt(unqualified.length() - 1) == '>';
-		}
-		return false;
+		pm.popParser(true);
 	}
 
 	@Override

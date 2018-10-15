@@ -69,7 +69,7 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.attributes);
 					this.consumer.addInitializer(initializer);
 					this.mode = END;
-					pm.pushParser(new StatementListParser(initializer));
+					pm.pushParser(new StatementListParser(initializer::setValue));
 					return;
 				}
 

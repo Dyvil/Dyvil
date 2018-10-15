@@ -20,10 +20,10 @@ import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IHeaderUnit;
 import dyvilx.tools.compiler.ast.member.AbstractMember;
+import dyvilx.tools.compiler.ast.method.AbstractMethod;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
@@ -220,7 +220,6 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 	@Override
 	public void checkMatch(MatchList<IConstructor> list, ArgumentList arguments)
 	{
-		final int parameterCount = this.parameters.size();
 		if (arguments == null)
 		{
 			list.add(new Candidate<>(this));
@@ -229,7 +228,7 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 
 		final int argumentCount = arguments.size();
 
-		if (argumentCount > parameterCount && !this.isVariadic())
+		if (argumentCount > this.parameters.size() && !this.isVariadic())
 		{
 			return;
 		}
@@ -237,33 +236,7 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 		final int[] matchValues = new int[argumentCount];
 		final IType[] matchTypes = new IType[argumentCount];
 
-		int defaults = 0;
-		int varargs = 0;
-		for (int i = 0; i < parameterCount; i++)
-		{
-			final IParameter parameter = this.parameters.get(i);
-			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, 0, i, parameter, list);
-
-			switch (partialVarargs)
-			{
-			case ArgumentList.MISMATCH:
-				return;
-			case ArgumentList.DEFAULT:
-				defaults++;
-				continue;
-			default:
-				varargs += partialVarargs;
-			}
-		}
-
-		for (int matchValue : matchValues)
-		{
-			if (matchValue == IValue.MISMATCH)
-			{
-				return;
-			}
-		}
-		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs));
+		AbstractMethod.checkMatch(this, list, this.parameters, 0, arguments, matchValues, matchTypes, 0, false);
 	}
 
 	// --------------- Argument Checking ---------------
@@ -345,6 +318,12 @@ public abstract class AbstractConstructor extends AbstractMember implements ICon
 	}
 
 	// --------------- Compilation ---------------
+
+	@Override
+	public String getInternalName()
+	{
+		return "<init>";
+	}
 
 	// - - - - - - - - Descriptor and Signature - - - - - - - -
 

@@ -1,0 +1,36 @@
+package dyvilx.tools.dpf.model
+
+type Mappings = Map<String, Object>
+
+public interface Expandable
+{
+	func expand(mappings: Mappings, mutate: boolean) -> Object
+
+	infix func expand(obj: Object!, mappings: Mappings, mutate: boolean) -> Object = obj match
+	{
+		case var exp: Expandable    => exp.expand(mappings, mutate)
+		case var col: Collection<_> => col.expand(mappings, mutate)
+		case var map: Map<_, _>     => map.expand(mappings, mutate)
+		case _ => obj
+	}
+
+	infix func expand(collection: Collection<_>, mappings: Mappings, mutate: boolean) -> Collection<_>
+	{
+		if (!mutate || collection.isImmutable())
+		{
+			return collection.mapped(_.expand(mappings, mutate))
+		}
+		collection.map(_.expand(mappings, true))
+		return collection
+	}
+
+	infix func expand(map: Map<_, _>, mappings: Mappings, mutate: boolean) -> Map<_, _>
+	{
+		if (!mutate || map.isImmutable())
+		{
+			return map.entryMapped((k, v) => (k.expand(mappings, mutate), v.expand(mappings, mutate)))
+		}
+		map.mapEntries((k, v) => (k.expand(mappings, true), v.expand(mappings, true)))
+		return map
+	}
+}

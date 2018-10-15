@@ -2,9 +2,9 @@ package dyvil.source
 
 interface Source
 {
-	var lineCount: int { get }
+	var lineCount: int { @JavaName("lineCount") get }
 
-	var text: String { get }
+	var text: String { @JavaName("text") get }
 
 	func line(at index: int) -> String!
 }

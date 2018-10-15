@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.statement.exception;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.AbstractValue;
@@ -19,7 +18,7 @@ import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class ThrowStatement extends AbstractValue implements IValueConsumer
+public class ThrowStatement extends AbstractValue
 {
 	// =============== Static Final Fields ===============
 
@@ -49,7 +48,6 @@ public class ThrowStatement extends AbstractValue implements IValueConsumer
 		return this.value;
 	}
 
-	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;

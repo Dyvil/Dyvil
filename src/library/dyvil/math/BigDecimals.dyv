@@ -4,7 +4,7 @@ public header BigDecimals
 
 import java.math.BigDecimal
 
-@BytecodeName("BigDecimals$BigDecimalSyntax")
+@JavaName("BigDecimals$BigDecimalSyntax")
 extension BigDecimal
 {
 	// =============== Static Methods ===============
@@ -46,19 +46,19 @@ extension BigDecimal
 	infix func **(lhs: BigDecimal, rhs: BigDecimal) -> BigDecimal inline = PowImpl.pow(lhs, rhs)
 }
 
-@BytecodeName("BigDecimals$LongSyntax")
+@JavaName("BigDecimals$LongSyntax")
 extension long
 {
 	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
-@BytecodeName("BigDecimals$DoubleSyntax")
+@JavaName("BigDecimals$DoubleSyntax")
 extension double
 {
 	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
-@BytecodeName("BigDecimals$BigIntegerSyntax")
+@JavaName("BigDecimals$BigIntegerSyntax")
 extension java.math.BigInteger
 {
 	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)

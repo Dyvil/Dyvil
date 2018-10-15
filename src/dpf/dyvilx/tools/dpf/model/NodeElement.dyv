@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model
+
+import dyvilx.tools.dpf.visitor.NodeVisitor
+
+public interface NodeElement extends Expandable
+{
+	var name: Name! { get }
+
+	func accept(visitor: NodeVisitor) -> void
+}

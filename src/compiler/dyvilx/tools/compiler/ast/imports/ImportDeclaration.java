@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.ast.imports;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.header.ObjectCompilable;
 import dyvilx.tools.compiler.ast.structure.Package;
@@ -14,14 +14,31 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportConsumer
+public class ImportDeclaration implements ASTNode, ObjectCompilable
 {
+	// =============== Fields ===============
+
+	protected IImport theImport;
+
 	protected SourcePosition position;
-	protected IImport        theImport;
+
+	// =============== Constructors ===============
 
 	public ImportDeclaration(SourcePosition position)
 	{
 		this.position = position;
+	}
+
+	// =============== Properties ===============
+
+	public IImport getImport()
+	{
+		return this.theImport;
+	}
+
+	public void setImport(IImport iimport)
+	{
+		this.theImport = iimport;
 	}
 
 	@Override
@@ -36,16 +53,9 @@ public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportCons
 		this.position = position;
 	}
 
-	public IImport getImport()
-	{
-		return this.theImport;
-	}
+	// =============== Methods ===============
 
-	@Override
-	public void setImport(IImport iimport)
-	{
-		this.theImport = iimport;
-	}
+	// --------------- Resolution Phases ---------------
 
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -66,14 +76,14 @@ public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportCons
 		}
 	}
 
-	// Context
+	// --------------- Context ---------------
 
 	public IImportContext getContext()
 	{
 		return this.theImport.asContext();
 	}
 
-	// Compilation
+	// --------------- Object Compilation ---------------
 
 	@Override
 	public void write(DataOutput output) throws IOException
@@ -87,7 +97,7 @@ public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportCons
 		this.theImport = IImport.readImport(input);
 	}
 
-	// Formatting
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
@@ -96,13 +106,13 @@ public class ImportDeclaration implements ASTNode, ObjectCompilable, IImportCons
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append("import ");
 
 		if (this.theImport != null)
 		{
-			this.theImport.toString(prefix, buffer);
+			this.theImport.toString(indent, buffer);
 		}
 	}
 }

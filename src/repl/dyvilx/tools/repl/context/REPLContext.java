@@ -16,11 +16,9 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
@@ -43,9 +41,10 @@ import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.util.function.BiConsumer;
 
 public class REPLContext extends AbstractHeader
-	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
+	implements IDefaultContext, IMemberConsumer<REPLVariable>
 {
 	private static final String CLASS_PACKAGE = "replgen";
 	public static final  String CLASS_PREFIX  = "Result";
@@ -217,15 +216,6 @@ public class REPLContext extends AbstractHeader
 
 	private void processMethod(IMethod method)
 	{
-		int methods = this.methods.size();
-		for (int i = 0; i < methods; i++)
-		{
-			if (this.methods.get(i).overrides(method, null))
-			{
-				this.methods.set(i, method);
-				return;
-			}
-		}
 		this.methods.add(method);
 	}
 
@@ -269,8 +259,7 @@ public class REPLContext extends AbstractHeader
 		}
 	}
 
-	@Override
-	public void setValue(IValue value)
+	public void addValue(IValue value)
 	{
 		final Name name = Name.fromRaw("res" + this.resultIndex++);
 		final REPLVariable field = new REPLVariable(this, name, value);
@@ -404,7 +393,16 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.classes.get(name);
+		// iterate backwards to use youngest definition
+		for (int i = this.classes.size() - 1; i >= 0; i--)
+		{
+			final IClass iclass = this.classes.get(i);
+			if (iclass.getName() == name)
+			{
+				return iclass;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -416,62 +414,39 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		if (type == null || this.fields.isEmpty())
+		if (type == null)
 		{
 			return null;
 		}
 
-		IValue candidate = null;
-
-		for (IClass iclass : this.classes)
-		{
-			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
-			{
-				continue;
-			}
-			if (candidate != null)
-			{
-				return null; // ambiguous
-			}
-			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
-		}
-
-		for (IField field : this.fields.values())
-		{
-			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
-			{
-				continue;
-			}
-			if (candidate != null)
-			{
-				return null; // ambiguous
-			}
-			candidate = new FieldAccess(field);
-		}
-
-		return candidate;
+		// TODO resolve ambiguities in object instance fields by newest first (?)
+		return ClassBody.resolveImplicitValue(type, this.fields.values(), this.classes);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (IMethod method : this.methods)
-		{
-			method.checkMatch(list, receiver, name, arguments);
-		}
-
-		for (IClass iclass : this.classes)
-		{
-			if (iclass.hasModifier(Modifiers.EXTENSION))
-			{
-				iclass.getMethodMatches(list, receiver, name, arguments);
-			}
-		}
-
 		if (name == null)
 		{
+			for (IMethod method : this.methods)
+			{
+				method.checkMatch(list, receiver, null, arguments);
+			}
+
+			this.classes.getExtensionMethodMatches(list, receiver, null, arguments);
 			return;
 		}
+
+		// *************** Method Definitions ***************
+
+		this.resolveNewestFirst(list, (method, tempList) -> method.checkMatch(tempList, receiver, name, arguments));
+
+		// *************** Extension Methods ***************
+
+		// here normal resolution is ok, since all extension classes are considered
+		this.classes.getExtensionMethodMatches(list, receiver, name, arguments);
+
+		// *************** Properties ***************
 
 		final Name removeEq = Util.removeEq(name);
 
@@ -480,6 +455,8 @@ public class REPLContext extends AbstractHeader
 		{
 			property.checkMatch(list, receiver, name, arguments);
 		}
+
+		// *************** Field Properties ***************
 
 		final IField field = this.fields.get(removeEq);
 		if (field != null)
@@ -495,9 +472,26 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (IMethod method : this.methods)
+		this.resolveNewestFirst(list, (method, tempList) -> method.checkImplicitMatch(tempList, value, targetType));
+
+		// here normal order is ok, since all extension classes are considered
+		this.classes.getExtensionImplicitMatches(list, value, targetType);
+	}
+
+	private void resolveNewestFirst(MatchList<IMethod> list, BiConsumer<IMethod, MatchList<IMethod>> consumer)
+	{
+		final MatchList<IMethod> tempList = list.emptyCopy();
+
+		// iterate backwards to have youngest definition first
+		for (int i = this.methods.size() - 1; i >= 0; i--)
 		{
-			method.checkImplicitMatch(list, value, targetType);
+			consumer.accept(this.methods.get(i), tempList);
+		}
+
+		if (!tempList.isEmpty())
+		{
+			// getCandidate(0) instead of getBestCandidate to ignore ambiguous results
+			list.add(tempList.getCandidate(0));
 		}
 	}
 

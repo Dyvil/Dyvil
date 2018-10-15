@@ -1,12 +1,20 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Iterators;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
+import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.method.MatchList;
+import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -96,6 +104,50 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 		return new ArrayIterator<>(this.classes, 0, this.size);
 	}
 
+	public Iterable<IClass> objectClasses()
+	{
+		return () -> Iterators.filtered(this.iterator(), IClass::isObject);
+	}
+
+	public Iterable<IField> objectClassInstanceFields()
+	{
+		return () -> Iterators.mapped(this.objectClasses().iterator(), iclass -> iclass.getMetadata().getInstanceField());
+	}
+
+	// --------------- Context Resolution ---------------
+
+	public IField resolveImplicitObjectInstanceField(IType type)
+	{
+		return ClassBody.resolveImplicitField(type, this.objectClassInstanceFields());
+	}
+
+	public void getExtensionMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			final IClass iclass = this.classes[i];
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
+			{
+				// only uses the body to avoid infinite recursion with PrimitiveType
+				// (and because extension classes can only define extension methods in the body anyway)
+				iclass.getBody().getMethodMatches(list, receiver, name, arguments);
+			}
+		}
+	}
+
+	public void getExtensionImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			final IClass iclass = this.classes[i];
+			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
+			{
+				// s.a. for body rationale
+				iclass.getBody().getImplicitMatches(list, value, targetType);
+			}
+		}
+	}
+
 	// --------------- Resolution Phases ---------------
 
 	@Override
@@ -116,6 +168,8 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 		}
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -133,6 +187,8 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 			this.classes[i].check(markers, context);
 		}
 	}
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	public void foldConstants()

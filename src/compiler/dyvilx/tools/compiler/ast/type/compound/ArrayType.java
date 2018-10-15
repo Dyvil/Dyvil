@@ -299,13 +299,21 @@ public class ArrayType implements IObjectType
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		this.type.getArrayClass().getMethodMatches(list, receiver, name, arguments);
+		final IClass arrayClass = this.type.getArrayClass();
+		if (arrayClass != null)
+		{
+			arrayClass.getMethodMatches(list, receiver, name, arguments);
+		}
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.type.getArrayClass().getImplicitMatches(list, value, targetType);
+		final IClass arrayClass = this.type.getArrayClass();
+		if (arrayClass != null)
+		{
+			arrayClass.getImplicitMatches(list, value, targetType);
+		}
 	}
 
 	@Override

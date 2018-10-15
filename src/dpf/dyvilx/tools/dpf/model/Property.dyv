@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.model
+
+import dyvilx.tools.dpf.model.value.Value
+
+public interface Property extends NodeElement
+{
+	var name: Name { get }
+
+	var value: Value { get }
+}

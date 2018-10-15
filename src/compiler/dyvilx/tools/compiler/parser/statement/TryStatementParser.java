@@ -4,8 +4,6 @@ import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
-import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.statement.exception.CatchBlock;
@@ -20,22 +18,31 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class TryStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
+public class TryStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
+	// =============== Constants ===============
+
 	private static final int ACTION          = 1;
 	private static final int CATCH           = 2;
 	private static final int CATCH_OPEN      = 4;
 	private static final int CATCH_CLOSE     = 8;
 	private static final int CATCH_SEPARATOR = 16;
 
-	protected TryStatement statement;
-	private   CatchBlock   catchBlock;
+	// =============== Fields ===============
+
+	protected final TryStatement statement;
+
+	private CatchBlock catchBlock;
+
+	// =============== Constructors ===============
 
 	public TryStatementParser(TryStatement statement)
 	{
 		this.statement = statement;
 		this.mode = ACTION;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -47,7 +54,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			pm.popParser(true);
 			return;
 		case ACTION:
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = CATCH;
 			return;
 		case CATCH:
@@ -59,7 +66,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			}
 			if (type == DyvilKeywords.FINALLY)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this.statement::setFinallyBlock));
 				this.mode = END;
 				return;
 			}
@@ -92,7 +99,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
-			pm.pushParser(new ExpressionParser(this.catchBlock));
+			pm.pushParser(new ExpressionParser(this.catchBlock::setAction));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
@@ -110,24 +117,11 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.mode = CATCH;
-				pm.pushParser(new StatementListParser(this.catchBlock), true);
+				pm.pushParser(new StatementListParser(this.catchBlock::setAction), true);
 				return;
 			}
 
 			pm.report(token, "try.catch.separator");
-		}
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case CATCH:
-			this.statement.setAction(value);
-			return;
-		case END:
-			this.statement.setFinallyBlock(value);
 		}
 	}
 

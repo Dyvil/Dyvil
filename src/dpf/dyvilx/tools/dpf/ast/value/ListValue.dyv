@@ -1,0 +1,70 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.dpf.visitor.{ ListVisitor, ValueVisitor }
+import dyvilx.tools.parsing.ASTNode
+
+import java.util.function.Function
+
+@LiteralConvertible.FromArray
+case class ListValue(protected let elements: List<Value> { public get })
+	implements Value, ListVisitor, Expandable
+{
+	static final func apply(elements: Value...) -> ListValue = ListValue(MutableList(elements...))
+
+	// Visitor
+
+	override func visitElement() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void = this<ListValue>.elements.add(value)
+	}
+
+	override func accept(visitor: ValueVisitor)
+	{
+		let listVisitor = visitor.visitList()
+
+		for (element <- this.elements)
+		{
+			element.accept(listVisitor.visitElement())
+		}
+
+		listVisitor.visitEnd()
+	}
+
+	// Expandable
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> ListValue
+	{
+		let valueFunction: Function<Value, Value> = value => Value.wrap(Expandable.expand(value, mappings, mutate))
+		if (mutate)
+		{
+			this.elements.map(valueFunction)
+			return this
+		}
+
+		return new ListValue(this.elements.mapped(valueFunction))
+	}
+
+	// String
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		let len = this.elements.size
+		if (len <= 0)
+		{
+			buffer.append('[]')
+			return
+		}
+
+		buffer.append('[ ')
+		this.elements[0].toString(indent, buffer)
+		for (i <- 1 ..< len)
+		{
+			buffer.append(', ')
+			this.elements[i].toString(indent, buffer)
+		}
+		buffer.append(' ]')
+	}
+}

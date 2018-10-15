@@ -1,27 +1,33 @@
 package dyvilx.tools.compiler.parser.pattern;
 
-import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
-import dyvilx.tools.compiler.ast.pattern.PatternList;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class PatternListParser extends Parser implements IPatternConsumer
+import java.util.function.Consumer;
+
+public class PatternListParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int PATTERN = 0;
 	private static final int COMMA   = 1;
 
-	protected PatternList patternList;
+	// =============== Fields ===============
 
-	private Pattern pattern;
+	protected final Consumer<Pattern> consumer;
 
-	public PatternListParser(PatternList list)
+	// =============== Constructors ===============
+
+	public PatternListParser(Consumer<Pattern> consumer)
 	{
-		this.patternList = list;
+		this.consumer = consumer;
 		// this.mode = PATTERN;
 	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -29,10 +35,6 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 		final int type = token.type();
 		if (BaseSymbols.isCloseBracket(type))
 		{
-			if (this.pattern != null)
-			{
-				this.patternList.add(this.pattern);
-			}
 			pm.popParser(true);
 			return;
 		}
@@ -41,22 +43,24 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 		{
 		case PATTERN:
 			this.mode = COMMA;
-			pm.pushParser(new PatternParser(this), true);
+			pm.pushParser(new PatternParser(this.consumer), true);
 			return;
 		case COMMA:
-			this.mode = PATTERN;
-			if (type == BaseSymbols.COMMA)
+			switch (type)
 			{
-				this.patternList.add(this.pattern);
+			case BaseSymbols.SEMICOLON:
+				if (!token.isInferred())
+				{
+					pm.report(token, "pattern.list.comma");
+				}
+				// Fallthrough
+			case BaseSymbols.COMMA:
+				this.mode = PATTERN;
+				return;
+			default:
+				pm.report(token, "pattern.list.comma");
 				return;
 			}
-			pm.report(token, "pattern.list.comma");
 		}
-	}
-
-	@Override
-	public void setPattern(Pattern Pattern)
-	{
-		this.pattern = Pattern;
 	}
 }

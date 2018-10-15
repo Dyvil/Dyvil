@@ -56,7 +56,7 @@ final class Name private (public let unqualified: String { get }, public let qua
 	@Deprecated(replacements: ["Name.apply(unqualified: String, qualified: String)"]) // in Dyvil only
 	static func from(unqualified: String, qualified: String) -> Name = apply(unqualified, qualified)
 
-	@BytecodeName('fromRaw')
+	@JavaName('fromRaw')
 	static func apply(explicit raw value: String) -> Name
 	{
 		if let name = CACHE.get(value) { return name }
@@ -64,7 +64,7 @@ final class Name private (public let unqualified: String { get }, public let qua
 		return create(value)
 	}
 
-	@BytecodeName('fromUnqualified')
+	@JavaName('fromUnqualified')
 	static func apply(explicit unqualified: String) -> Name
 	{
 		if let name = CACHE.get(unqualified) { return name }
@@ -75,7 +75,7 @@ final class Name private (public let unqualified: String { get }, public let qua
 		return create(unqualified, qualified)
 	}
 
-	@BytecodeName('fromQualified')
+	@JavaName('fromQualified')
 	static func apply(explicit qualified: String) -> Name
 	{
 		if let name = CACHE.get(qualified) { return name }

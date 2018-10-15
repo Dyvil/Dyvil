@@ -1,0 +1,222 @@
+package dyvilx.tools.dpf.converter.binary
+
+import dyvilx.tools.dpf.visitor._
+
+import java.io.DataOutput
+import java.io.IOException
+
+using dyvilx.tools.dpf.converter.binary.BinaryConstants._
+
+class BinaryWriter(private let dataOutput: DataOutput)
+	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
+{
+	private func writeTag(tag: int) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(tag)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	private func writeTagThrowing(tag: int) -> void throws IOException = this.dataOutput.writeByte(tag as byte)
+
+	private func writeName(name: Name!) -> void
+	{
+		try
+		{
+			Name.write(name, this.dataOutput)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	private func writeNameThrowing(name: Name) -> void throws IOException = this.dataOutput.writeUTF(name.unqualified)
+
+	private func writeTagAndName(tag: int, name: Name) -> void
+	{
+		try
+		{
+			this.writeTagAndNameThrowing(tag, name)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	private func writeTagAndNameThrowing(tag: int, name: Name) -> void throws IOException
+	{
+		this.writeTagThrowing(tag)
+		Name.write(name, this.dataOutput)
+	}
+
+	private static func throwEx(ex: Exception) -> void = throw new RuntimeException(ex)
+
+	// NodeVisitor
+
+	public override func visitNode(name: Name) -> NodeVisitor
+	{
+		this.writeTagAndName(NODE, name)
+		return this
+	}
+
+	public override func visitProperty(name: Name) -> ValueVisitor
+	{
+		this.writeTagAndName(PROPERTY, name)
+		return this
+	}
+
+	public override func visitNodeAccess(name: Name) -> NodeVisitor
+	{
+		this.writeTagAndName(NODE_ACCESS, name)
+		return this
+	}
+
+	// ValueVisitor
+
+	public override func visitInt(value: int) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(INT)
+			this.dataOutput.writeInt(value)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	public override func visitLong(value: long) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(LONG)
+			this.dataOutput.writeLong(value)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	public override func visitFloat(value: float) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(FLOAT)
+			this.dataOutput.writeFloat(value)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	public override func visitDouble(value: double) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(DOUBLE)
+			this.dataOutput.writeDouble(value)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	public override func visitString(value: String) -> void
+	{
+		try
+		{
+			this.writeTagThrowing(STRING)
+			this.dataOutput.writeUTF(value)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	public override func visitName(value: Name) -> void = this.writeTagAndName(NAME, value)
+
+	public override func visitStringInterpolation() -> StringInterpolationVisitor
+	{
+		this.writeTag(STRING_INTERPOLATION)
+		return this
+	}
+
+	public override func visitValueAccess(name: Name) -> ValueVisitor
+	{
+		this.writeTagAndName(NAME_ACCESS, name)
+		return this
+	}
+
+	public override func visitList() -> ListVisitor
+	{
+		this.writeTag(LIST)
+		return this
+	}
+
+	public override func visitMap() -> MapVisitor
+	{
+		this.writeTag(MAP)
+		return this
+	}
+
+	public override func visitBuilder(name: Name) -> BuilderVisitor
+	{
+		this.writeTagAndName(BUILDER, name)
+		return this
+	}
+
+	// ListVisitor
+
+	override func visitElement() -> ValueVisitor = this
+
+	// MapVisitor
+
+	override func visitKey() -> ValueVisitor = this
+
+	// StringInterpolationVisitor
+
+	override func visitStringPart(string: String) -> void
+	{
+		try
+		{
+			this.dataOutput.writeUTF(string)
+		}
+		catch (ex: IOException)
+		{
+			throwEx(ex)
+		}
+	}
+
+	// BuilderVisitor
+
+	override func visitParameter(name: Name!) -> ValueVisitor
+	{
+		this.writeName(name ?? Name(""))
+		return this
+	}
+
+	override func visitNode() -> NodeVisitor
+	{
+		this.writeName(null)
+		this.writeTag(END)
+		return this
+	}
+
+	// Shared
+
+	override func visitValue() -> ValueVisitor = this
+
+	override func visitEnd() -> void = this.writeTag(END)
+}

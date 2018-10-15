@@ -1,9 +1,8 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.lang.Name;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 
-public interface IValueList extends Iterable<IValue>, IValueConsumer
+public interface IValueList extends Iterable<IValue>
 {
 	int size();
 
@@ -19,12 +18,6 @@ public interface IValueList extends Iterable<IValue>, IValueConsumer
 	void add(IValue value);
 
 	default void add(Name label, IValue value)
-	{
-		this.add(value);
-	}
-
-	@Override
-	default void setValue(IValue value)
 	{
 		this.add(value);
 	}

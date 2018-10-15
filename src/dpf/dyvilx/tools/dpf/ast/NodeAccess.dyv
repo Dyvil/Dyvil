@@ -1,0 +1,62 @@
+package dyvilx.tools.dpf.ast
+
+import dyvilx.tools.dpf.visitor.{ NodeVisitor, ValueVisitor }
+import dyvilx.tools.dpf.model.Expandable
+import dyvil.source.position.SourcePosition
+import dyvilx.tools.parsing.ASTNode
+
+public class NodeAccess
+(
+	protected let name: Name { public override get }
+	protected var _element: NodeElement!
+)
+implements dyvilx.tools.dpf.model.NodeAccess, NodeElement
+{
+	var element: NodeElement { override get: this._element!; set: this._element = newValue }
+
+	public init(name: Name) : this(name, null)
+
+	override func visitNode(name: Name) -> NodeVisitor
+	{
+		let node = new Node(name)
+		this.element = node
+		return node
+	}
+
+	override func visitProperty(name: Name) -> ValueVisitor
+	{
+		let property = new Property(name)
+		this.element = property
+		return property
+	}
+
+	override func visitNodeAccess(name: Name) -> NodeVisitor
+	{
+		let access = new NodeAccess(name)
+		this.element = access
+		return access
+	}
+
+	override func accept(visitor: NodeVisitor) -> void = this.element.accept(visitor.visitNodeAccess(this.name))
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> NodeAccess
+	{
+		let nodeAccess = mutate ? this : new NodeAccess(this.name)
+		nodeAccess.element = Expandable.expand(this.element, mappings, mutate) as NodeElement
+		return nodeAccess
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		buffer.append(this.name).append('.')
+		this.element.toString(indent, buffer)
+	}
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is NodeAccess && this.equals(obj as NodeAccess)
+
+	func equals(that: NodeAccess) -> boolean = this === that || this.name === that.name && this.element == that.element
+
+	override func hashCode() -> int = 31 * this.name.hashCode + this.element.hashCode
+}

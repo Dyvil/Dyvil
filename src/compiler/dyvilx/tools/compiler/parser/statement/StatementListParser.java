@@ -7,7 +7,7 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.constructor.IInitializer;
 import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
+import dyvilx.tools.compiler.ast.expression.Closure;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LambdaExpr;
 import dyvilx.tools.compiler.ast.field.IProperty;
@@ -15,7 +15,6 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.NestedMethod;
-import dyvilx.tools.compiler.ast.statement.Closure;
 import dyvilx.tools.compiler.ast.statement.MemberStatement;
 import dyvilx.tools.compiler.ast.statement.StatementList;
 import dyvilx.tools.compiler.ast.statement.VariableStatement;
@@ -33,11 +32,15 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 import static dyvilx.tools.compiler.parser.method.ParameterListParser.LAMBDA_ARROW_END;
 import static dyvilx.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 
-public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer<IVariable>
+public final class StatementListParser extends Parser implements IMemberConsumer<IVariable>
 {
+	// =============== Constants ===============
+
 	private static final int OPEN_BRACKET          = 0;
 	private static final int LAMBDA_PARAMETERS_END = 1;
 	private static final int LAMBDA_TYPE_ARROW     = 1 << 1;
@@ -47,32 +50,44 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int LABEL_END             = 1 << 5;
 	private static final int SEPARATOR             = 1 << 6;
 
-	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
+	// =============== Fields ===============
 
-	protected IValueConsumer consumer;
-	protected boolean        closure;
+	// --------------- Constructor ---------------
+
+	protected final Consumer<IValue> consumer;
+
+	protected final boolean closure;
+
+	// --------------- Temporary ---------------
+
+	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
 
 	private LambdaExpr    lambdaExpr;
 	private StatementList statementList;
 
 	private Name label;
 
-	public StatementListParser(IValueConsumer consumer)
+	// =============== Constructors ===============
+
+	public StatementListParser(Consumer<IValue> consumer)
 	{
-		this.consumer = consumer;
-		// this.mode = OPEN_BRACKET;
+		this(consumer, false);
 	}
 
-	public StatementListParser(IValueConsumer consumer, boolean closure)
+	public StatementListParser(Consumer<IValue> consumer, boolean closure)
 	{
 		this.consumer = consumer;
 		this.closure = closure;
 		// this.mode = OPEN_BRACKET;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Parsing ---------------
+
 	public void end(IParserManager pm)
 	{
-		this.consumer.setValue(this.lambdaExpr != null ? this.lambdaExpr : this.statementList);
+		this.consumer.accept(this.lambdaExpr != null ? this.lambdaExpr : this.statementList);
 		pm.popParser();
 	}
 
@@ -101,7 +116,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			final IToken lambdaArrow = this.findLambdaArrow(next);
 			if (lambdaArrow != null)
 			{
-				this.lambdaExpr = new LambdaExpr(lambdaArrow.raw());
+				this.lambdaExpr = this.closure ? new Closure(lambdaArrow.raw()) : new LambdaExpr(lambdaArrow.raw());
 				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
 
 				if (next == lambdaArrow)
@@ -128,8 +143,18 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
-			// { ...
-			this.statementList = this.closure ? new Closure(token) : new StatementList(token);
+			if (this.closure)
+			{
+				// ... { ...
+				this.lambdaExpr = new Closure(token.raw());
+				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
+			}
+			else
+			{
+				// { ...
+				this.statementList = new StatementList(token);
+			}
+
 			this.mode = EXPRESSION;
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
@@ -179,7 +204,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this::addStatement).withFlags(ExpressionParser.OPTIONAL));
 			return;
 		case LABEL_NAME:
 			if (Tokens.isIdentifier(type))
@@ -283,8 +308,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 		}
 	}
 
-	@Override
-	public void setValue(IValue value)
+	public void addStatement(IValue value)
 	{
 		if (this.label != null)
 		{
@@ -297,10 +321,12 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 		}
 	}
 
+	// --------------- Declarations ---------------
+
 	@Override
 	public void addDataMember(IVariable field)
 	{
-		this.setValue(new VariableStatement(field));
+		this.addStatement(new VariableStatement(field));
 	}
 
 	@Override
@@ -312,7 +338,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	@Override
 	public void addMethod(IMethod method)
 	{
-		this.setValue(new MemberStatement(method));
+		this.addStatement(new MemberStatement(method));
 	}
 
 	@Override
@@ -324,24 +350,24 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	@Override
 	public void addProperty(IProperty property)
 	{
-		this.setValue(new MemberStatement(property));
+		this.addStatement(new MemberStatement(property));
 	}
 
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
-		this.setValue(new MemberStatement(constructor));
+		this.addStatement(new MemberStatement(constructor));
 	}
 
 	@Override
 	public void addInitializer(IInitializer initializer)
 	{
-		this.setValue(new MemberStatement(initializer));
+		this.addStatement(new MemberStatement(initializer));
 	}
 
 	@Override
 	public void addClass(IClass theClass)
 	{
-		this.setValue(new MemberStatement(theClass));
+		this.addStatement(new MemberStatement(theClass));
 	}
 }

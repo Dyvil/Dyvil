@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.parser.expression;
 
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.LambdaExpr;
 import dyvilx.tools.compiler.ast.expression.TupleLikeExpr;
@@ -17,37 +16,62 @@ import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public class LambdaOrTupleParser extends Parser
 {
-	protected static final int OPEN_PARENTHESIS = 0;
-	protected static final int TUPLE            = 1;
-	protected static final int PARAMETERS_END   = 1 << 1;
-	protected static final int TYPE_ARROW       = 1 << 2;
-	protected static final int RETURN_ARROW     = 1 << 3;
-	protected static final int TUPLE_END        = 1 << 4;
-	protected static final int SINGLE_PARAMETER = 1 << 5;
+	// =============== Constants ===============
 
-	protected IValueConsumer consumer;
+	private static final int OPEN_PARENTHESIS = 0;
+	private static final int TUPLE            = 1;
+	private static final int PARAMETERS_END   = 1 << 1;
+	private static final int TYPE_ARROW       = 1 << 2;
+	private static final int RETURN_ARROW     = 1 << 3;
+	private static final int TUPLE_END        = 1 << 4;
+	private static final int SINGLE_PARAMETER = 1 << 5;
+
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> consumer;
 
 	private IValue value;
 
-	public LambdaOrTupleParser(IValueConsumer consumer)
+	// =============== Constructors ===============
+
+	public LambdaOrTupleParser(Consumer<IValue> consumer)
 	{
-		this.mode = OPEN_PARENTHESIS;
-		this.consumer = consumer;
+		this(consumer, false);
 	}
 
-	public LambdaOrTupleParser(IValueConsumer consumer, int mode)
+	public LambdaOrTupleParser(Consumer<IValue> consumer, boolean tupleOnly)
 	{
+		this(consumer, tupleOnly ? TUPLE : OPEN_PARENTHESIS);
+	}
+
+	private LambdaOrTupleParser(Consumer<IValue> consumer, int mode)
+	{
+		this.consumer = consumer;
 		this.mode = mode;
-		this.consumer = consumer;
 	}
 
-	public LambdaOrTupleParser(IValueConsumer consumer, boolean tupleOnly)
+	// =============== Static Methods ===============
+
+	public static LambdaOrTupleParser singleParameter(Consumer<IValue> consumer)
 	{
-		this.mode = tupleOnly ? TUPLE : OPEN_PARENTHESIS;
-		this.consumer = consumer;
+		return new LambdaOrTupleParser(consumer, SINGLE_PARAMETER);
 	}
+
+	public static LambdaOrTupleParser typeArrow(Consumer<IValue> consumer)
+	{
+		return new LambdaOrTupleParser(consumer, TYPE_ARROW);
+	}
+
+	public static TypeParser returnTypeParser(LambdaExpr value)
+	{
+		return new TypeParser(value::setReturnType).withFlags(TypeParser.IGNORE_LAMBDA);
+	}
+
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -88,13 +112,13 @@ public class LambdaOrTupleParser extends Parser
 		case TUPLE:
 			// ( ... )
 			final TupleLikeExpr tupleExpr = new TupleLikeExpr(token);
-			pm.pushParser(new ArgumentListParser(tupleExpr));
+			pm.pushParser(new ArgumentListParser(tupleExpr::setValues));
 			this.value = tupleExpr;
 			this.mode = TUPLE_END;
 			return;
 		case TUPLE_END:
 			this.value.expandPosition(token);
-			this.consumer.setValue(this.value);
+			this.consumer.accept(this.value);
 
 			pm.popParser();
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
@@ -137,7 +161,7 @@ public class LambdaOrTupleParser extends Parser
 			}
 			// Fallthrough
 		case RETURN_ARROW:
-			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)));
+			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)::setValue));
 			this.mode = END;
 			if (type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
@@ -147,12 +171,7 @@ public class LambdaOrTupleParser extends Parser
 			return;
 		case END:
 			pm.popParser(true);
-			this.consumer.setValue(this.value);
+			this.consumer.accept(this.value);
 		}
-	}
-
-	public static TypeParser returnTypeParser(LambdaExpr value)
-	{
-		return new TypeParser(value::setReturnType).withFlags(TypeParser.IGNORE_LAMBDA);
 	}
 }

@@ -323,9 +323,9 @@ public class CompleteCommand implements ICommand
 		context.getImplicitMatches(matchList, value, null);
 		Types.BASE_CONTEXT.getImplicitMatches(matchList, value, null);
 
-		for (int i = 0, count = matchList.size(); i < count; i++)
+		for (Candidate<IMethod> candidate : matchList)
 		{
-			checkMember(methods, matchList.getCandidate(i).getMember(), "", true);
+			checkMember(methods, candidate.getMember(), "", true);
 		}
 	}
 

@@ -6,7 +6,7 @@ import java.io.File
 
 object DefaultSpec implements Specialization
 {
-	override func file() -> File! = null
+	override var file: File! { get: null }
 
 	override func subscript(key: String) -> String! = null
 }

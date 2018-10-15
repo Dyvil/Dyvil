@@ -1,0 +1,59 @@
+package dyvilx.tools.dpf.converter
+
+import dyvilx.tools.dpf.ast.builder.Builder
+import dyvilx.tools.dpf.ast.value._
+import dyvilx.tools.dpf.visitor._
+
+abstract class DPFValueVisitor implements ValueVisitor
+{
+	protected abstract func visitValue(value: Value) -> void
+
+	// Implementation Methods
+
+	override func visitInt(value: int) -> void = this.visitValue(new IntValue(value))
+
+	override func visitLong(value: long) -> void = this.visitValue(new LongValue(value))
+
+	override func visitFloat(value: float) -> void = this.visitValue(new FloatValue(value))
+
+	override func visitDouble(value: double) -> void = this.visitValue(new DoubleValue(value))
+
+	override func visitString(value: String) -> void = this.visitValue(new StringValue(value))
+
+	override func visitName(value: Name) -> void = this.visitValue(NameAccess(value))
+
+	override func visitStringInterpolation() -> StringInterpolationVisitor
+	{
+		let stringInterpolation = new StringInterpolation()
+		this.visitValue(stringInterpolation)
+		return stringInterpolation
+	}
+
+	override func visitValueAccess(name: Name) -> ValueVisitor
+	{
+		let access = NameAccess(name)
+		this.visitValue(access)
+		return access
+	}
+
+	override func visitList() -> ListVisitor
+	{
+		let list = ListValue()
+		this.visitValue(list)
+		return list
+	}
+
+	override func visitMap() -> MapVisitor
+	{
+		let map = MapValue()
+		this.visitValue(map)
+		return map
+	}
+
+	override func visitBuilder(name: Name) -> BuilderVisitor
+	{
+		let builder = Builder(name)
+		this.visitValue(builder)
+		return builder
+	}
+}

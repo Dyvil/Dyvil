@@ -330,7 +330,8 @@ public final class PrimitiveType implements IType
 		}
 		if (this == Types.VOID)
 		{
-			return this.boxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("apply"));
+			return this.boxMethod = Package.dyvilLang.resolveClass("Primitives$VoidWrapper").getBody()
+			                                         .getMethod(Names.apply);
 		}
 		return this.boxMethod = IContext.resolveMethod(this.getWrapperClass(), null, Names.valueOf,
 		                                               new ArgumentList(new DummyValue(this)));
@@ -345,7 +346,8 @@ public final class PrimitiveType implements IType
 		}
 		if (this == Types.VOID)
 		{
-			return this.unboxMethod = Types.PRIMITIVES_CLASS.getBody().getMethod(Name.fromRaw("voidValue"));
+			return this.unboxMethod = Package.dyvilLang.resolveClass("Primitives$VoidWrapper").getBody()
+			                                           .getMethod(Names.value);
 		}
 		return this.unboxMethod = this.getWrapperClass().getBody().getMethod(Name.fromRaw(this.name + "Value"));
 	}
@@ -481,7 +483,6 @@ public final class PrimitiveType implements IType
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		Types.PRIMITIVES_HEADER.getMethodMatches(list, receiver, name, arguments);
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 		if (list.hasCandidate())
 		{
 			return;
@@ -497,7 +498,6 @@ public final class PrimitiveType implements IType
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		Types.PRIMITIVES_HEADER.getImplicitMatches(list, value, targetType);
-		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override

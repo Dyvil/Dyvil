@@ -6,19 +6,26 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.type.IType;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class MatchList<T extends IOverloadable> implements IImplicitContext, Iterable<Candidate<T>>
 {
-	private static final byte SORTED    = 1;
-	private static final byte SKIP_SORT = 2;
+	// =============== Constants ===============
 
-	private Candidate<T>[] candidates = (Candidate<T>[]) new Candidate[4];
-	private int size;
+	private static final int INITIAL_CAPACITY = 4;
 
-	private byte sorted = SORTED;
+	// =============== Fields ===============
+
+	private Candidate<T>[] candidates = (Candidate<T>[]) new Candidate[INITIAL_CAPACITY];
+	private int            size;
+
+	private boolean sorted   = true;
+	private boolean skipSort = false;
 
 	private final IImplicitContext implicitContext;
+
+	// =============== Constructors ===============
 
 	public MatchList(IImplicitContext implicitContext)
 	{
@@ -28,16 +35,14 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 	public MatchList(IImplicitContext implicitContext, boolean skipSort)
 	{
 		this.implicitContext = implicitContext;
-
-		if (skipSort)
-		{
-			this.sorted |= SKIP_SORT;
-		}
+		this.skipSort = skipSort;
 	}
+
+	// =============== Properties ===============
 
 	public boolean isSkipSort()
 	{
-		return (this.sorted & SKIP_SORT) != 0;
+		return this.skipSort;
 	}
 
 	public int size()
@@ -50,10 +55,99 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 		return this.size <= 0;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Candidate Iteration ---------------
+
+	@Override
+	public Iterator<Candidate<T>> iterator()
+	{
+		this.sort();
+		return new ArrayIterator<>(this.candidates, 0, this.size);
+	}
+
+	// --------------- Accessing Candidates ---------------
+
 	public boolean hasCandidate()
 	{
 		return !this.isSkipSort() && !this.isEmpty() && !this.isAmbigous() && !this.getBestCandidate().invalid;
 	}
+
+	public Candidate<T> getCandidate(int index)
+	{
+		this.sort();
+		return this.candidates[index];
+	}
+
+	public Candidate<T> getBestCandidate()
+	{
+		switch (this.size)
+		{
+		case 0:
+			return null;
+		case 1:
+			return this.candidates[0];
+		default:
+			// this.sort(); // calling isAmbiguous() sorts this list
+			return this.isAmbigous() ? null : this.candidates[0];
+		}
+	}
+
+	public T getBestMember()
+	{
+		final Candidate<T> bestCandidate = this.getBestCandidate();
+		return bestCandidate == null ? null : bestCandidate.member;
+	}
+
+	// --------------- Ambiguity ---------------
+
+	public boolean isAmbigous()
+	{
+		if (this.size <= 1 || this.skipSort)
+		{
+			return false;
+		}
+
+		this.sort();
+
+		final Candidate<T> first = this.candidates[0];
+		for (int i = 1; i < this.size; i++)
+		{
+			final Candidate<T> candidate = this.candidates[i];
+			if (candidate.member != first.member && first.equals(candidate))
+			{
+				// if two candidates have the same rank but different members, its ambiguous
+				// sometimes the same member is added twice, but we don't count that as ambiguous.
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public Iterable<Candidate<T>> getAmbiguousCandidates()
+	{
+		return () -> {
+			if (this.isEmpty())
+			{
+				return Collections.emptyIterator();
+			}
+
+			this.sort();
+
+			final Candidate<T> first = this.candidates[0];
+			int count = 1;
+
+			while (count < this.size && first.equals(this.candidates[count]))
+			{
+				count++;
+			}
+
+			return new ArrayIterator<>(this.candidates, 0, count);
+		};
+	}
+
+	// --------------- Adding Candidates ---------------
 
 	public void ensureCapacity(int capacity)
 	{
@@ -71,7 +165,7 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 
 	public void add(Candidate<T> candidate)
 	{
-		this.sorted &= ~SORTED;
+		this.sorted = false;
 
 		this.ensureCapacity(this.size + 1);
 		this.candidates[this.size++] = candidate;
@@ -85,75 +179,26 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 			return;
 		}
 
-		this.sorted &= ~SORTED;
+		this.sorted = false;
 		this.ensureCapacity(this.size + otherSize);
 		System.arraycopy(list.candidates, 0, this.candidates, this.size, otherSize);
 		this.size += otherSize;
 	}
 
-	public Candidate<T> getCandidate(int index)
-	{
-		return this.candidates[index];
-	}
-
-	public boolean isAmbigous()
-	{
-		if (this.size <= 1 || (this.sorted & SKIP_SORT) != 0)
-		{
-			return false;
-		}
-
-		this.sort();
-
-		final Candidate<T> first = this.candidates[0];
-		for (int i = 1; i < this.size; i++)
-		{
-			final Candidate<T> candidate = this.candidates[i];
-			if (candidate.member != first.member && first.compareTo(candidate) == 0)
-			{
-				// if two candidates have the same rank but different members, its ambiguous
-				// sometimes the same member is added twice, but we don't count that as ambiguous.
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public Candidate<T> getBestCandidate()
-	{
-		switch (this.size)
-		{
-		case 0:
-			return null;
-		case 1:
-			return this.candidates[0];
-		}
-
-		// this.sort(); // calling isAmbiguous() sorts this list
-		if (this.isAmbigous())
-		{
-			return null;
-		}
-		return this.candidates[0];
-	}
-
-	public T getBestMember()
-	{
-		final Candidate<T> bestCandidate = this.getBestCandidate();
-		return bestCandidate == null ? null : bestCandidate.member;
-	}
+	// --------------- Sorting Candidates ---------------
 
 	private void sort()
 	{
-		if (this.sorted != 0 || this.size <= 1)
+		if (this.sorted || this.skipSort || this.size <= 1)
 		{
 			return;
 		}
 
 		Arrays.sort(this.candidates, 0, this.size);
-		this.sorted |= SORTED;
+		this.sorted = true;
 	}
+
+	// --------------- Implicit Resolution ---------------
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
@@ -161,15 +206,10 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 		this.implicitContext.getImplicitMatches(list, value, targetType);
 	}
 
-	@Override
-	public Iterator<Candidate<T>> iterator()
-	{
-		this.sort();
-		return new ArrayIterator<>(this.candidates, 0, this.size);
-	}
+	// --------------- Copying ---------------
 
 	public MatchList<T> emptyCopy()
 	{
-		return new MatchList<>(this.implicitContext, this.isSkipSort());
+		return new MatchList<>(this.implicitContext, this.skipSort);
 	}
 }

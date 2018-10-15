@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.access.AbstractCall;
@@ -19,13 +18,14 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class LiteralConversion extends AbstractCall
 {
+	// =============== Fields ===============
+
 	protected IValue literal;
 	protected Name   name;
 
-	public LiteralConversion(SourcePosition position)
-	{
-		this.position = position;
-	}
+	// =============== Constructors ===============
+
+	// --------------- With Annotation ---------------
 
 	public LiteralConversion(IValue literal, Annotation annotation)
 	{
@@ -34,46 +34,13 @@ public class LiteralConversion extends AbstractCall
 
 	public LiteralConversion(IValue literal, Annotation annotation, ArgumentList arguments)
 	{
-		this.position = literal.getPosition();
-		this.literal = literal;
-
-		Name[] names = parseAnnotation(annotation);
-		this.name = names[0];
-		for (int i = 1; i < names.length; i++)
-		{
-			arguments.setLabel(i - 1, names[i]);
-		}
-		this.arguments = arguments;
+		this(literal, methodNameAndArgumentLabels(annotation), arguments);
 	}
 
-	public LiteralConversion(IValue literal, Name name, ArgumentList arguments)
+	private static Name[] methodNameAndArgumentLabels(Annotation annotation)
 	{
-		this.literal = literal;
-		this.name = name;
-		this.arguments = arguments;
-	}
-
-	public LiteralConversion(IValue literal, IMethod method)
-	{
-		this(literal, method, new ArgumentList(literal));
-	}
-
-	public LiteralConversion(IValue literal, IMethod method, ArgumentList arguments)
-	{
-		this.position = literal.getPosition();
-		this.literal = literal;
-		this.arguments = arguments;
-
-		if (method != null)
-		{
-			this.method = method;
-			this.name = method.getName();
-		}
-	}
-
-	public static Name[] parseAnnotation(Annotation annotation)
-	{
-		final String method = getMethod(annotation);
+		final IValue value = annotation.getArguments().getFirst();
+		final String method = value != null ? value.stringValue() : null;
 		if (method == null)
 		{
 			return new Name[] { Names.apply };
@@ -116,28 +83,60 @@ public class LiteralConversion extends AbstractCall
 		return result;
 	}
 
-	public static String getMethod(Annotation annotation)
+	private LiteralConversion(IValue literal, Name[] methodNameAndArgumentLabels, ArgumentList arguments)
 	{
-		final IValue value = annotation.getArguments().getFirst();
-		if (value == null)
-		{
-			return null;
-		}
-		return value.stringValue();
+		this(literal, methodNameAndArgumentLabels[0], withArgumentLabels(arguments, methodNameAndArgumentLabels));
 	}
 
-	public static Name getMethodName(Annotation annotation)
+	private static ArgumentList withArgumentLabels(ArgumentList arguments, Name[] methodNameAndArgumentLabels)
 	{
-		final String method = getMethod(annotation);
-		if (method == null)
+		for (int i = 1; i < methodNameAndArgumentLabels.length; i++)
 		{
-			return Names.apply;
+			arguments.setLabel(i - 1, methodNameAndArgumentLabels[i]);
 		}
-
-		final int index = method.indexOf('(');
-		final String name = index < 0 ? method : method.substring(0, index);
-		return Name.apply(name);
+		return arguments;
 	}
+
+	// --------------- With Name ---------------
+
+	public LiteralConversion(IValue literal, Name name, ArgumentList arguments)
+	{
+		this.position = literal.getPosition();
+		this.literal = literal;
+		this.name = name;
+		this.arguments = arguments;
+	}
+
+	// --------------- With Method ---------------
+
+	public LiteralConversion(IValue literal, IMethod method)
+	{
+		this(literal, method, new ArgumentList(literal));
+	}
+
+	public LiteralConversion(IValue literal, IMethod method, ArgumentList arguments)
+	{
+		this.position = literal.getPosition();
+		this.literal = literal;
+		this.arguments = arguments;
+
+		if (method != null)
+		{
+			this.method = method;
+			this.name = method.getName();
+		}
+	}
+
+	// =============== Static Methods ===============
+
+	public static IValue converting(IValue literal, IType type, IMethod method, MarkerList markers, IContext context,
+		ITypeContext typeContext)
+	{
+		return new LiteralConversion(literal, method).checkArguments(markers, context, method)
+		                                             .withType(type, typeContext, markers, context);
+	}
+
+	// =============== Properties ===============
 
 	@Override
 	public int valueTag()
@@ -162,11 +161,14 @@ public class LiteralConversion extends AbstractCall
 		return this.literal;
 	}
 
-	@Override
-	public void setType(IType type)
+	public void setLiteral(IValue literal)
 	{
-		this.type = type;
+		this.literal = literal;
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Typing ---------------
 
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
@@ -216,6 +218,8 @@ public class LiteralConversion extends AbstractCall
 		return this;
 	}
 
+	// --------------- Resolution Phase ---------------
+
 	@Override
 	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
 	{
@@ -224,6 +228,8 @@ public class LiteralConversion extends AbstractCall
 
 		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, name));
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

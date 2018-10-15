@@ -15,13 +15,13 @@ interface Set<type E> extends Collection<E>
 	@SafeVarargs
 	static func apply<type E>(elements: E...) -> ImmutableSet<E> = ImmutableSet(elements...)
 
-	@BytecodeName("from")
+	@JavaName("from")
 	static func apply<type E>(explicit from array: [E]) -> ImmutableSet<E> = ImmutableSet.from(array)
 
-	@BytecodeName("from")
+	@JavaName("from")
 	static func apply<type E>(explicit from iterable: Iterable<+E>) -> ImmutableSet<E> = ImmutableSet.from(iterable)
 
-	@BytecodeName("from")
+	@JavaName("from")
 	static func apply<type E>(explicit from collection: Collection<+E>) -> ImmutableSet<E> = ImmutableSet.from(collection)
 
 	// Accessors

@@ -1,0 +1,123 @@
+package dyvilx.tools.dpf.converter.string
+
+import dyvilx.tools.dpf.visitor._
+
+public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, BuilderVisitor, StringInterpolationVisitor
+{
+	private var indent: int = 0
+
+	private func printIndent() -> void = for (i <- 0 ..< this.indent) System.out.print('\t')
+
+	private func value(text: String) -> void
+	{
+		System.out.print('\t')
+		System.out.println(text)
+	}
+
+	private func holder(text: String) -> void
+	{
+		this.printIndent()
+		System.out.print(text)
+	}
+
+	private func section(text: String) -> void
+	{
+		this.printIndent()
+		System.out.println(text)
+		this.indent += 1
+	}
+
+	override func visitNode(name: Name) -> NodeVisitor
+	{
+		this.section("Node \(name)")
+		return this
+	}
+
+	override func visitProperty(name: Name) -> ValueVisitor
+	{
+		this.holder("Property \(name):")
+		return this
+	}
+
+	override func visitNodeAccess(name: Name) -> NodeVisitor
+	{
+		this.section("Access \(name)")
+		return this
+	}
+
+	override func visitInt(value: int) -> void = this.value("Int \(value)")
+
+	override func visitLong(value: long) -> void = this.value("Long \(value)")
+
+	override func visitFloat(value: float) -> void = this.value("Float \(value)")
+
+	override func visitDouble(value: double) -> void = this.value("Double \(value)")
+
+	override func visitString(value: String) -> void = this.value("String \(value)")
+
+	override func visitName(value: Name) -> void = this.value("Name \(value)")
+
+	override func visitStringInterpolation() -> StringInterpolationVisitor
+	{
+		this.section("String Interpolation")
+		return this
+	}
+
+	override func visitValueAccess(name: Name) -> ValueVisitor
+	{
+		this.value("Access \(name)")
+		return this
+	}
+
+	override func visitList() -> ListVisitor
+	{
+		this.section("List")
+		return this
+	}
+
+	override func visitMap() -> MapVisitor
+	{
+		this.section("Map ")
+		return this
+	}
+
+	override func visitBuilder(name: Name) -> BuilderVisitor
+	{
+		this.section("Builder '\(name)'")
+		return this
+	}
+
+	override func visitNode() -> NodeVisitor
+	{
+		this.section("Builder Node")
+		return this
+	}
+
+	override func visitParameter(name: Name!) -> ValueVisitor
+	{
+		this.holder(name == null ? "Parameter:" : "Parameter '\(name)':")
+		return this
+	}
+
+	override func visitElement() -> ValueVisitor
+	{
+		this.holder("Element")
+		return this
+	}
+
+	override func visitKey() -> ValueVisitor
+	{
+		this.holder("Key")
+		return this
+	}
+
+	override func visitValue() -> ValueVisitor
+	{
+		this.holder("Value")
+		return this
+	}
+
+	override func visitStringPart(string: String) -> void = this.value("String Part '\(string)'")
+
+	override func visitEnd() -> void = this.indent -= 1
+}

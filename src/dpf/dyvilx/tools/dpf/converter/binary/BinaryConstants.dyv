@@ -1,0 +1,36 @@
+package dyvilx.tools.dpf.converter.binary
+
+public interface BinaryConstants
+{
+	const END = 0
+
+	// Node Elements
+
+	const NODE        = 1
+	const NODE_ACCESS = 2
+	const PROPERTY    = 3
+
+	// Values
+
+	const BOOLEAN = 16
+
+	const BYTE  = 17
+	const SHORT = 18
+	const CHAR  = 19
+	const INT   = 20
+
+	const LONG = 21
+
+	const FLOAT                = 22
+	const DOUBLE               = 23
+	const STRING               = 24
+	const STRING_INTERPOLATION = 25
+	const NAME                 = 28
+	const NAME_ACCESS          = 29
+
+	const BUILDER = 31
+
+	// const TUPLE = 32
+	const LIST = 33
+	const MAP  = 34
+}

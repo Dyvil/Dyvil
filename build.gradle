@@ -290,7 +290,7 @@ tasks.withType(JavaCompile).all {
 	it.options.fork = true
 }
 
-private void setupCompiler(Map args, JavaExec exec) {
+private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] source_dirs = args['source_dirs']
 	String[] libraries = args['libraries']
 	String output_dir = args['output_dir']
@@ -306,7 +306,7 @@ private void setupCompiler(Map args, JavaExec exec) {
 
 		for (String src : source_dirs) {
 			exec.inputs.files fileTree(src) {
-				include Constants.dyvilFilters
+				include fileFilters
 			}
 		}
 	}
@@ -342,8 +342,12 @@ private void setupCompiler(Map args, JavaExec exec) {
 	exec.args 'compile', '--ansi'
 }
 
+private void setupCompiler(Map args, JavaExec exec) {
+	setupCompiler(args, exec, Constants.dyvilFilters)
+}
+
 private void setupGenSrc(Map args, JavaExec exec) {
-	setupCompiler(args, exec)
+	setupCompiler(args, exec, Constants.genSrcFilters)
 
 	String gensrc_dir = args['gensrc_dir']
 
@@ -516,23 +520,21 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 /**
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
-task bootstrapLibrary(type: Copy, dependsOn: [ 'buildLibrary' ]) {
-	from("$buildDir/libs/")
-	include('dyvil-library-*.jar')
-	rename('dyvil-library-.*\\.jar', 'dyvil-library.jar')
-	into('libs/')
+task bootstrapLibrary(type: Copy, dependsOn: [ 'buildLibrary' ]) { Copy task ->
+	confBootstrapTask(task, 'dyvil-library', Constants.libraryVersion)
 }
-task bootstrapCompiler(type: Copy, dependsOn: [ 'buildCompiler' ]) {
-	from("$buildDir/libs/")
-	include('dyvil-compiler-*.jar')
-	rename('dyvil-compiler-.*\\.jar', 'dyvil-compiler.jar')
-	into('libs/')
+task bootstrapCompiler(type: Copy, dependsOn: [ 'buildCompiler' ]) { Copy task ->
+	confBootstrapTask(task, 'dyvil-compiler', Constants.compilerVersion)
 }
-task bootstrapGenSrc(type: Copy, dependsOn: [ 'buildGenSrc' ]) {
-	from("$buildDir/libs/")
-	include('dyvil-gensrc-*.jar')
-	rename('dyvil-gensrc-.*\\.jar', 'dyvil-gensrc.jar')
-	into('libs/')
+task bootstrapGenSrc(type: Copy, dependsOn: [ 'buildGenSrc' ]) { Copy task ->
+	confBootstrapTask(task, 'dyvil-gensrc', Constants.genSrcVersion)
+}
+
+def confBootstrapTask(Copy task, String artifact, String version) {
+	task.from("$buildDir/libs/")
+			.include("$artifact-${ version }.jar")
+			.rename(".*", "${ artifact }.jar")
+			.into('libs/')
 }
 
 task bootstrap(dependsOn: [ 'bootstrapLibrary', 'bootstrapCompiler', 'bootstrapGenSrc' ])

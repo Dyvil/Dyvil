@@ -17,7 +17,7 @@ final class Types
 
 	// Class Extensions
 
-	@BytecodeName("arrayTypeOf")
+	@JavaName("arrayTypeOf")
 	static func arrayType<@Reified(.ANY_CLASS) type T: any>() -> Class<[T]> = class<[T]>
 
 	@OverloadPriority
@@ -41,7 +41,7 @@ final class Types
 		return Class.forName(builder.toString, false, componentType.getClassLoader)
 	}
 
-	@BytecodeName("objectArrayType")
+	@JavaName("objectArrayType")
 	postfix func arrayType<type T: Object>(componentType: Class<T>) -> Class<[T]>
 	{
 		let className = componentType.isArray ? "[\(componentType.getName)" : "[L\(componentType.getName);"

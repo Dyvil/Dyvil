@@ -1,42 +1,47 @@
 package dyvilx.tools.compiler.parser.header;
 
-import dyvilx.tools.compiler.ast.consumer.IImportConsumer;
 import dyvilx.tools.compiler.ast.imports.*;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
-public final class ImportParser extends Parser
+import java.util.function.Consumer;
+
+public class ImportParser extends Parser
 {
-	public static final Name annotation = Name.fromRaw("annotation");
-	public static final Name type       = Name.fromRaw("type");
+	// =============== Constants ===============
 
 	private static final int IMPORT           = 1;
 	private static final int DOT_ALIAS        = 2;
 	private static final int MULTI_IMPORT_END = 4;
 
-	protected IImportConsumer consumer;
-	protected IImport         theImport;
+	// =============== Fields ===============
+
+	protected Consumer<IImport> consumer;
+	protected IImport           theImport;
 
 	private int masks;
 
-	public ImportParser(IImportConsumer consumer)
+	// =============== Constructors ===============
+
+	public ImportParser(Consumer<IImport> consumer)
+	{
+		this(consumer, 0);
+	}
+
+	public ImportParser(Consumer<IImport> consumer, int masks)
 	{
 		this.consumer = consumer;
+		this.masks = masks;
 		this.mode = IMPORT;
 	}
 
-	public ImportParser(IImportConsumer consumer, int masks)
-	{
-		this(consumer);
-		this.masks = masks;
-	}
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -165,9 +170,9 @@ public final class ImportParser extends Parser
 	{
 		if (this.masks != 0)
 		{
-			this.consumer.setImport(new KindedImport(this.theImport, this.masks));
+			this.consumer.accept(new KindedImport(this.theImport, this.masks));
 			return;
 		}
-		this.consumer.setImport(this.theImport);
+		this.consumer.accept(this.theImport);
 	}
 }

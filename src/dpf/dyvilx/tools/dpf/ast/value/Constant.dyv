@@ -1,0 +1,10 @@
+package dyvilx.tools.dpf.ast.value
+
+interface Constant extends Value
+{
+	var isConstant: boolean { get: true }
+
+	func toObject() -> Object
+
+	func appendString(builder: StringBuilder) -> void
+}

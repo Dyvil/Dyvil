@@ -46,28 +46,28 @@ abstract class Output
 
 	// --------------- print(All) ---------------
 
-	@BytecodeName("printAll")
+	@JavaName("printAll")
 	static func print(values: any! ...) -> void
 	{
 		printAllImpl(values, ' ')
 		println
 	}
 
-	@BytecodeName("printAllWithSeparator")
+	@JavaName("printAllWithSeparator")
 	static func print(values: any! ..., explicit separator: String) -> void
 	{
 		printAllImpl(values, separator)
 		println
 	}
 
-	@BytecodeName("printAllWithTerminator")
+	@JavaName("printAllWithTerminator")
 	static func print(values: any! ..., explicit terminator: String) -> void
 	{
 		printAllImpl(values, ' ')
 		print terminator
 	}
 
-	@BytecodeName("printAll")
+	@JavaName("printAll")
 	static func print(values: any! ..., explicit separator: String, explicit terminator: String) -> void
 	{
 		printAllImpl(values, separator)

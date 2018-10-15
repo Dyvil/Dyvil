@@ -1,0 +1,8 @@
+package dyvilx.tools.dpf.model
+
+import dyvilx.tools.dpf.visitor.NodeVisitor
+
+public interface Node extends NodeElement, NodeVisitor
+{
+	override var name: Name { get }
+}

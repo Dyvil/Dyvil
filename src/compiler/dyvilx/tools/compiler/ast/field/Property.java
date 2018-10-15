@@ -20,8 +20,8 @@ import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
@@ -184,6 +184,14 @@ public class Property extends AbstractMember implements IProperty, IDefaultConte
 
 		if (this.getter != null)
 		{
+			// Expose getters for non-boolean properties like "prop" as "getProp" to Java.
+			// Boolean properties retain their name.
+			// (the naming convention recommends names like isFoo or hasBar)
+			if (!Types.isSuperType(Types.BOOLEAN, this.type))
+			{
+				((CodeMethod) this.getter).setInternalName(Util.getGetter(this.name.qualified));
+			}
+
 			final AttributeList getterAttributes = this.getter.getAttributes();
 
 			// Add <generated> Modifier and copy Property Modifiers
@@ -195,6 +203,10 @@ public class Property extends AbstractMember implements IProperty, IDefaultConte
 		}
 		if (this.setter != null)
 		{
+			// Expose setters for properties like "prop" as "setProp" to Java
+			// Boolean properties like "hasProp" also use "setHasProp"
+			((CodeMethod) this.setter).setInternalName(Util.getSetter(this.name.qualified));
+
 			final AttributeList setterModifiers = this.setter.getAttributes();
 
 			// Add <generated> Modifier and copy Property Modifiers

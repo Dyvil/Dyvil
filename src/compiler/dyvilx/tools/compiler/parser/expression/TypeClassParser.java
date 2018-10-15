@@ -1,48 +1,42 @@
 package dyvilx.tools.compiler.parser.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.ClassOperator;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.TypeOperator;
-import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
+import dyvilx.tools.compiler.parser.type.TypeParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.token.IToken;
 
+import java.util.function.Consumer;
+
 public class TypeClassParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int TYPE_CLASS      = 0;
 	private static final int TYPE            = 1;
 	private static final int PARENTHESES_END = 2;
 	private static final int ANGLE_END       = 4;
 
-	private IValueConsumer valueConsumer;
+	// =============== Fields ===============
+
+	protected final Consumer<IValue> valueConsumer;
 
 	private IValue value;
 
-	public TypeClassParser(IValueConsumer valueConsumer)
+	// =============== Constructors ===============
+
+	public TypeClassParser(Consumer<IValue> valueConsumer)
 	{
 		this.valueConsumer = valueConsumer;
 
 		// this.mode = TYPE_CLASS
 	}
 
-	public TypeClassParser(IValueConsumer valueConsumer, IToken token, boolean isClass)
-	{
-		this.valueConsumer = valueConsumer;
-
-		this.mode = TYPE;
-		if (isClass)
-		{
-			this.value = new ClassOperator(token.raw());
-		}
-		else
-		{
-			this.value = new TypeOperator(token.raw());
-		}
-	}
+	// =============== Methods ===============
 
 	@Override
 	public void parse(IParserManager pm, IToken token)
@@ -93,7 +87,7 @@ public class TypeClassParser extends Parser
 				return;
 			}
 
-			this.valueConsumer.setValue(this.value);
+			this.valueConsumer.accept(this.value);
 			pm.popParser();
 			return;
 		case ANGLE_END:
@@ -103,12 +97,12 @@ public class TypeClassParser extends Parser
 				return;
 			}
 
-			this.valueConsumer.setValue(this.value);
+			this.valueConsumer.accept(this.value);
 			pm.popParser();
 			pm.splitJump(token, 1);
 			return;
 		case END:
-			this.valueConsumer.setValue(this.value);
+			this.valueConsumer.accept(this.value);
 			pm.popParser(true);
 		}
 	}

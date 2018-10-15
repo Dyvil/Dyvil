@@ -1,0 +1,47 @@
+package dyvilx.tools.dpf.ast.builder
+
+import dyvilx.tools.dpf.model.Expandable
+import dyvilx.tools.dpf.ast.value.Value
+import dyvilx.tools.dpf.converter.DPFValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
+
+public case class Parameter
+(
+	var name:  Name?  { get; set }
+	var value: Value! { get; set }
+)
+extends DPFValueVisitor implements ASTNode, Expandable
+{
+	// Constructors
+
+	static func apply(name: Name) -> Parameter = new Parameter(name, null)
+
+	static func apply(value: Value) -> Parameter = new Parameter(null, value)
+
+	public init(name: Name?) : this(name, null)
+
+	// Accessors
+
+	protected override func visitValue(value: Value) -> void = this.value = value
+
+	override var position: SourcePosition! { get: null; set {} }
+
+	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter
+	{
+		let parameter = mutate ? this : new Parameter(this.name)
+		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
+		return parameter
+	}
+
+	public override func toString() -> String = format(this)
+
+	public override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		if (this.name != null)
+		{
+			buffer.append(this.name).append(": ")
+		}
+		this.value.toString(indent, buffer)
+	}
+}

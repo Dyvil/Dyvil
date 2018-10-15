@@ -6,7 +6,7 @@ import java.math.BigInteger
 
 type BigInt = BigInteger
 
-@BytecodeName("BigIntegers$BigIntegerSyntax")
+@JavaName("BigIntegers$BigIntegerSyntax")
 extension BigInt
 {
 	// =============== Static Methods ===============
@@ -58,7 +58,7 @@ extension BigInt
 	infix func >> (lhs: BigInt, rhs: int) -> BigInt inline = lhs.shiftRight(rhs)
 }
 
-@BytecodeName("BigIntegers$LongSyntax")
+@JavaName("BigIntegers$LongSyntax")
 extension long
 {
 	func toBigInt() -> BigInt inline = BigInt(this)

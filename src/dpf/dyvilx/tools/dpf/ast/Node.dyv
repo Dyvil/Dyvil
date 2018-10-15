@@ -1,0 +1,145 @@
+package dyvilx.tools.dpf.ast
+
+import dyvil.collection.Collection
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvilx.tools.dpf.visitor.NodeVisitor
+import dyvilx.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
+
+public class Node(
+	protected let name: Name { public override get }
+) implements dyvilx.tools.dpf.model.Node, NodeElement
+{
+	var nodes: List<Node> = new ArrayList<Node>
+	var properties: List<Property> = new ArrayList<Property>
+	var nodeAccesses: List<NodeAccess> = new ArrayList<NodeAccess>
+
+	@JavaName("addNode")
+	func add(node: Node) -> void = this.nodes.add(node)
+
+	@JavaName("addNodeAccess")
+	func add(nodeAccess: NodeAccess) -> void = this.nodeAccesses.add(nodeAccess)
+
+	@JavaName("addProperty")
+	func add(property: Property) -> void = this.properties.add(property)
+
+	override func visitNode(name: Name) -> NodeVisitor
+	{
+		let node = new Node(name)
+		this.nodes.add(node)
+		return node
+	}
+
+	override func visitProperty(name: Name) -> ValueVisitor
+	{
+		let property = new Property(name)
+		this.properties.add(property)
+		return property
+	}
+
+	override func visitNodeAccess(name: Name) -> NodeVisitor
+	{
+		let access = new NodeAccess(name)
+		this.nodeAccesses.add(access)
+		return access
+	}
+
+	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor.visitNode(this.name))
+
+	internal func acceptBody(nodeVisitor: NodeVisitor) -> void
+	{
+		for (element <- this.properties) element.accept(nodeVisitor)
+		for (node <- this.nodes) node.accept(nodeVisitor)
+		for (nodeAccess <- this.nodeAccesses) nodeAccess.accept(nodeVisitor)
+		nodeVisitor.visitEnd()
+	}
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Node
+	{
+		if (mutate)
+		{
+			this.expandChildren(mappings)
+			return this
+		}
+		else
+		{
+			let node = new Node(this.name)
+			this.expand(node, mappings)
+			return node
+		}
+	}
+
+	protected func expandChildren(mappings: Map<String, Object>) -> void
+	{
+		for (node <- this.nodes) node.expand(mappings, true)
+		for (property <- this.properties) property.expand(mappings, true)
+		for (nodeAccess <- this.nodeAccesses) nodeAccess.expand(mappings, true)
+	}
+
+	protected func expand(node: Node, mappings: Map<String, Object>) -> void
+	{
+		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false))
+		node.properties = this.properties.mapped(property => property.expand(mappings, false))
+		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false))
+	}
+
+	override func toString() -> String = format(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+	{
+		buffer.append(this.name).append('\n').append(indent).append('{').append('\n')
+
+		this.bodyToString(indent + '\t', buffer)
+
+		buffer.append(indent).append('}')
+	}
+
+	func bodyToString(indent: String, buffer: StringBuilder) -> void
+	{
+		for (element <- this.properties)
+		{
+			buffer.append(indent)
+			element.toString(indent, buffer)
+			buffer.append('\n')
+		}
+
+		for (node <- this.nodes)
+		{
+			buffer.append(indent).append('\n').append(indent)
+			node.toString(indent, buffer)
+			buffer.append('\n')
+		}
+
+		for (nodeAccess <- this.nodeAccesses)
+		{
+			buffer.append(indent).append('\n').append(indent)
+			nodeAccess.toString(indent, buffer)
+			buffer.append('\n')
+		}
+	}
+
+	override func equals(obj: any!) -> boolean = this === obj || obj is Node && this.equals(obj as Node)
+
+	func equals(that: Node) -> boolean
+	{
+		if (this === that) return true
+		if (this.name !== that.name) return false
+		if (!Collection.unorderedEquals(this.properties, that.properties)) return false
+		if (!Collection.unorderedEquals(this.nodes, that.nodes)) return false
+		if (!Collection.unorderedEquals(this.nodeAccesses, that.nodeAccesses)) return false
+		return true
+	}
+
+	override func hashCode() -> int
+	{
+		let prime = 31
+		var result = this.name.hashCode()
+		result = prime * result + Collection.unorderedHashCode(this.properties)
+		result = prime * result + Collection.unorderedHashCode(this.nodes)
+		result = prime * result + Collection.unorderedHashCode(this.nodeAccesses)
+		return result
+	}
+}

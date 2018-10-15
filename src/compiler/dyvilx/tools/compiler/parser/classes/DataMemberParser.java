@@ -97,7 +97,7 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 		case VALUE:
 			if (type == BaseSymbols.EQUALS && (this.flags & PARSE_VALUE) != 0)
 			{
-				pm.pushParser(new ExpressionParser(this.dataMember));
+				pm.pushParser(new ExpressionParser(this.dataMember::setValue));
 				this.mode = END;
 				return;
 			}

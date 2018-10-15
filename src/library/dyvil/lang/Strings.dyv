@@ -2,7 +2,7 @@ package dyvil.lang
 
 import java.util.regex.{ Pattern, Matcher }
 
-@BytecodeName("Strings")
+@JavaName("Strings")
 extension String
 {
 	private const STRING_VALUE_OFFSET: long = dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
@@ -96,7 +96,7 @@ extension String
 		return buffer.toString!!
 	}
 
-	@BytecodeName("repeat")
+	@JavaName("repeat")
 	func repeated(times: int) -> String = times match {
 		case 0 => return ""
 		case 1 => return this
@@ -108,7 +108,7 @@ extension String
 // The following classes only have syntactic meaning in the Dyvil language,
 // they are practically useless in Java code.
 
-@BytecodeName("Strings$StringSyntax")
+@JavaName("Strings$StringSyntax")
 extension String
 {
 	// =============== Static Methods ===============
@@ -150,7 +150,7 @@ extension String
 	static func |_|(string: CharSequence) -> int inline = string.length
 }
 
-@BytecodeName("Strings$CharSequenceSyntax")
+@JavaName("Strings$CharSequenceSyntax")
 extension CharSequence
 {
 	// =============== Methods ===============
@@ -160,7 +160,7 @@ extension CharSequence
 	func subscript(range: Range<int>) -> CharSequence inline = this.subSequence(range.first, range.last + 1)
 }
 
-@BytecodeName("Strings$CharSyntax")
+@JavaName("Strings$CharSyntax")
 extension char
 {
 	// =============== Static Methods ===============
@@ -178,7 +178,7 @@ extension char
 	static func char(_ c: String) -> char inline = c[0]
 }
 
-@BytecodeName("Strings$PatternSyntax")
+@JavaName("Strings$PatternSyntax")
 extension Pattern
 {
 	// =============== Methods ===============
@@ -186,7 +186,7 @@ extension Pattern
 	static func apply(from string: String) implicit -> Pattern inline = Pattern.compile(string)!!
 }
 
-@BytecodeName("Strings$AnyToStringBuilder")
+@JavaName("Strings$AnyToStringBuilder")
 extension any
 {
 	// =============== Methods ===============

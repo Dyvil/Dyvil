@@ -9,7 +9,6 @@ import dyvilx.tools.asm.Handle;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -46,7 +45,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IValueConsumer, IParametric
+public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IParametric
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",
@@ -162,15 +161,14 @@ public final class LambdaExpr implements IValue, ClassCompilable, IDefaultContex
 
 	// Return Value
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	public void setValue(IValue value)
+	{
+		this.value = value;
 	}
 
 	// Metadata

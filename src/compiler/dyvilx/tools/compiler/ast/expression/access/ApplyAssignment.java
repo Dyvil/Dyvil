@@ -1,15 +1,14 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.consumer.IValueConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
-import dyvil.lang.Name;
 
-public class ApplyAssignment extends AbstractCall implements IValueConsumer
+public class ApplyAssignment extends AbstractCall
 {
 	public ApplyAssignment(SourcePosition position)
 	{
@@ -39,12 +38,6 @@ public class ApplyAssignment extends AbstractCall implements IValueConsumer
 	protected Name getReferenceName()
 	{
 		return null;
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		this.arguments = this.arguments.appended(Names.newValue, value);
 	}
 
 	@Override

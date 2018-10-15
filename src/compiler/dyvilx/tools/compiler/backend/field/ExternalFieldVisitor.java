@@ -34,7 +34,7 @@ public class ExternalFieldVisitor implements FieldVisitor
 		if (!this.field.skipAnnotation(internal, null))
 		{
 			Annotation annotation = new ExternalAnnotation(new InternalType(internal));
-			return new AnnotationReader(this.field.annotationConsumer(), annotation);
+			return new AnnotationReader(annotation, this.field.annotationConsumer());
 		}
 		return null;
 	}

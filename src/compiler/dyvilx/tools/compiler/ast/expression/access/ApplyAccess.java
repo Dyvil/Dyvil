@@ -4,7 +4,7 @@ import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.statement.Closure;
+import dyvilx.tools.compiler.ast.expression.Closure;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvil.lang.Name;
@@ -83,8 +83,8 @@ public class ApplyAccess extends AbstractCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		// Merge Applied Statement Lists if a non-curried method version is
-		// available. Doesn't works with multiple applied statement lists.
+		// Merge trailing closures if a non-curried method version is
+		// available. Doesn't works with multiple trailing closures.
 		// with(x...) { statements }
 		// -> with(x..., { statements })
 		if (this.arguments.size() == 1 && this.receiver instanceof ICall)
@@ -92,15 +92,15 @@ public class ApplyAccess extends AbstractCall
 			final ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirst();
 
-			if (argument instanceof Closure)
+			if (Closure.isTrailingClosure(argument))
 			{
 				argument = argument.resolve(markers, context);
 
-				final ArgumentList oldArgs = call.getArguments();
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 
-				call.setArguments(oldArgs.appended(null, argument));
+				final ArgumentList oldArgs = call.getArguments();
+				call.setArguments(oldArgs.appended(ArgumentList.FENCE, argument));
 
 				final IValue resolvedCall = call.resolveCall(markers, context, false);
 				if (resolvedCall != null)

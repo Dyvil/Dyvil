@@ -9,14 +9,20 @@ import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
 
-public final class TypeListParser extends Parser
+public class TypeListParser extends Parser
 {
+	// =============== Constants ===============
+
 	private static final int TYPE      = 0;
 	private static final int SEPARATOR = 1;
+
+	// =============== Fields ===============
 
 	protected Consumer<IType> consumer;
 
 	private boolean closeAngle;
+
+	// =============== Constructors ===============
 
 	public TypeListParser(Consumer<IType> consumer)
 	{
@@ -31,39 +37,47 @@ public final class TypeListParser extends Parser
 		// this.mode = TYPE;
 	}
 
+	// =============== Methods ===============
+
+	private boolean isEndToken(IToken token, int type)
+	{
+		switch (type)
+		{
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.EQUALS:
+		case BaseSymbols.SEMICOLON:
+		case Tokens.EOF:
+			return true;
+		}
+		return BaseSymbols.isCloseBracket(type) || this.closeAngle && TypeParser.isGenericEnd(token, type);
+	}
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
+		if (this.isEndToken(token, type))
+		{
+			pm.popParser(true);
+			return;
+		}
+
 		switch (this.mode)
 		{
 		case TYPE:
 			this.mode = SEPARATOR;
-
-			pm.pushParser(new TypeParser(this.consumer, this.closeAngle), true);
+			// uses optional flag to allow trailing commas
+			pm.pushParser(new TypeParser(this.consumer, this.closeAngle).withFlags(TypeParser.OPTIONAL), true);
 			return;
 		case SEPARATOR:
 			switch (type)
 			{
-			//noinspection DefaultNotLastCaseInSwitch
-			default:
-				if (!BaseSymbols.isCloseBracket(type) && !TypeParser.isGenericEnd(token, type))
-				{
-					break;
-				}
-				// Fallthrough
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-			case BaseSymbols.EQUALS:
-			case BaseSymbols.SEMICOLON:
-			case Tokens.EOF:
-				pm.popParser(true);
+			case BaseSymbols.COMMA:
+				this.mode = TYPE;
 				return;
-			}
-
-			this.mode = TYPE;
-			if (type != BaseSymbols.COMMA)
-			{
+			default:
 				pm.report(token, "type.list.comma");
+				return;
 			}
 		}
 	}

@@ -1,0 +1,97 @@
+package dyvilx.tools.dpf.ast.value
+
+import dyvilx.tools.dpf.DPFConvertible
+
+import dyvil.collection.mutable.ArrayList
+
+import dyvilx.tools.dpf.ast.value._
+import dyvilx.tools.dpf.visitor.ValueVisitor
+import dyvilx.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
+
+import java.lang.reflect.Array
+
+@LiteralConvertible.FromInt
+@LiteralConvertible.FromLong
+@LiteralConvertible.FromFloat
+@LiteralConvertible.FromDouble
+@LiteralConvertible.FromChar
+@LiteralConvertible.FromString
+@LiteralConvertible.FromBoolean
+@LiteralConvertible.FromStringInterpolation
+@LiteralConvertible.FromArray("apply(elements:)")
+@LiteralConvertible.FromMap("apply(entries:)")
+public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
+{
+	// Conversion Methods
+
+	implicit static final func apply(literal: int) -> IntValue = IntValue(literal)
+
+	implicit static final func apply(literal: long) -> LongValue = LongValue(literal)
+
+	implicit static final func apply(literal: float) -> FloatValue = FloatValue(literal)
+
+	implicit static final func apply(literal: double) -> DoubleValue = DoubleValue(literal)
+
+	implicit static final func apply(literal: char) -> StringValue = StringValue(literal.toString)
+
+	implicit static final func apply(literal: String) -> StringValue = StringValue(literal)
+
+	implicit static final func apply(literal: Name) -> NameAccess = NameAccess(literal)
+
+	implicit static final func apply(literal: boolean) -> NameAccess = NameAccess(Name(literal.toString))
+
+	static final func apply(elements: Value...) -> ListValue = ListValue(elements...)
+
+	static final func apply(entries: (Value, Value)...) = MapValue(entries...)
+
+	static final func apply(base: String, values: Value...) -> StringInterpolation
+		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
+
+	implicit static final func apply(from: DPFConvertible) -> Value = from.toPropertyValue
+
+	// Override Methods
+
+	override var position: SourcePosition! { get: null; set {} }
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
+
+	override func accept(visitor: ValueVisitor) -> void
+
+	// Value Conversions
+
+	static final func wrap(value: any!) -> Value
+	{
+		if let value = value as? Value { return value }
+
+		let valueClass = value.dynamicClass
+
+		if (valueClass === class String)  return StringValue(value as String)
+		if (valueClass === class Int)     return IntValue(value as Int)
+		if (valueClass === class Long)    return LongValue(value as Long)
+		if (valueClass === class Float)   return FloatValue(value as Float)
+		if (valueClass === class Double)  return DoubleValue(value as Double)
+		if (valueClass === class Name)    return NameAccess(value as Name)
+		if (valueClass === class Boolean) return Value(value as boolean)
+
+		if let conv = value as? DPFConvertible { return conv }
+		if let list = value as? List { return ListValue(list) }
+		if let map = value as? Map { return MapValue(map) }
+
+		if (value.getClass.isArray)
+		{
+			// Convert Arrays using Reflection
+			let size = Array.getLength(value)
+			let list = new ArrayList<Value>(capacity: size)
+
+			for (i <- 0 ..< size)
+			{
+				list.add(wrap(Array.get(value, i)))
+			}
+
+			return ListValue(list)
+		}
+
+		throw new RuntimeException("Cannot convert instance of type \(valueClass) to a DPF Value")
+	}
+}

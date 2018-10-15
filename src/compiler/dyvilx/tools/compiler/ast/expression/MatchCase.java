@@ -1,38 +1,42 @@
 package dyvilx.tools.compiler.ast.expression;
 
-import dyvilx.tools.compiler.ast.consumer.IPatternConsumer;
-import dyvilx.tools.compiler.ast.field.IVariable;
-import dyvilx.tools.compiler.phase.Resolvable;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
+import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.config.Formatting;
+import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
+public class MatchCase implements Resolvable, IDefaultContext
 {
+	// =============== Constants ===============
+
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.condition.type");
+
+	// =============== Fields ===============
 
 	protected Pattern pattern;
 	protected IValue  condition;
 	protected IValue  action;
+
+	// =============== Properties ===============
 
 	public Pattern getPattern()
 	{
 		return this.pattern;
 	}
 
-	@Override
 	public void setPattern(Pattern pattern)
 	{
 		this.pattern = pattern;
@@ -63,11 +67,14 @@ public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 		return this.pattern.isExhaustive() && this.condition == null;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Context Resolution ---------------
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IDataMember field = this.pattern.resolveField(name);
-		return field != null ? field : null;
+		return this.pattern.resolveField(name);
 	}
 
 	@Override
@@ -75,6 +82,8 @@ public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 	{
 		return this.resolveField(variable.getName()) == variable;
 	}
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -134,6 +143,8 @@ public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 		context.pop();
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -164,6 +175,8 @@ public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 		context.pop();
 	}
 
+	// --------------- Compilation Phases ---------------
+
 	@Override
 	public void foldConstants()
 	{
@@ -189,6 +202,8 @@ public class MatchCase implements Resolvable, IDefaultContext, IPatternConsumer
 			this.action = this.action.cleanup(compilableList, classCompilableList);
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()

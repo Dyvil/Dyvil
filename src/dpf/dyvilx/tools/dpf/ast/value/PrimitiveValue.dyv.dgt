@@ -1,0 +1,23 @@
+#let(TYPE_NAME = spec['TYPE_NAME'])
+#let(PRIMITIVE = spec['PRIMITIVE'])
+#let(LITERAL_SUFFIX = spec['LITERAL_SUFFIX'])
+
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvilx.tools.dpf.ast.value
+
+import dyvilx.tools.dpf.visitor.ValueVisitor
+
+case class #(TYPE_NAME)Value(protected let value: PRIMITIVE) implements Constant
+{
+	override func accept(visitor: ValueVisitor) -> void = visitor.visit#(TYPE_NAME)(this.value)
+
+	override func toObject() -> Object = this.value
+
+	override func appendString(builder: StringBuilder) -> void = builder.append(this.value)
+
+	override func toString() -> String = "\(this.value)LITERAL_SUFFIX"
+
+	override func toString(indent: String, buffer: StringBuilder) -> void = buffer.append(this.value)#if(LITERAL_SUFFIX != ''){.append('LITERAL_SUFFIX')}
+}

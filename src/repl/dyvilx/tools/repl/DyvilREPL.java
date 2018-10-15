@@ -50,7 +50,6 @@ public final class DyvilREPL
 		registerCommand(new JavapCommand());
 		registerCommand(new LibraryCommand());
 		registerCommand(new MethodsCommand());
-		registerCommand(new RenameCommand());
 		registerCommand(new VariablesCommand());
 		registerCommand(new VersionCommand());
 		registerCommand(new LoadCommand());

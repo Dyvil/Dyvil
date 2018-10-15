@@ -2,45 +2,91 @@ package dyvilx.tools.compiler.ast.header;
 
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.compiler.ast.structure.Package;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
+import dyvilx.tools.parsing.marker.MarkerList;
 
 public class PackageDeclaration implements ASTNode
 {
+	// =============== Fields ===============
+
 	protected SourcePosition position;
-	protected String        thePackage;
-	
+	protected String         fullPackageName;
+
+	// =============== Constructors ===============
+
 	public PackageDeclaration(SourcePosition position)
 	{
 		this.position = position;
 	}
-	
-	public PackageDeclaration(SourcePosition position, String thePackage)
+
+	public PackageDeclaration(SourcePosition position, String fullPackageName)
 	{
 		this.position = position;
-		this.thePackage = thePackage;
+		this.fullPackageName = fullPackageName;
 	}
-	
+
+	// =============== Properties ===============
+
+	public String getPackage()
+	{
+		return this.fullPackageName;
+	}
+
+	public void setPackage(String thePackage)
+	{
+		this.fullPackageName = thePackage;
+	}
+
 	@Override
 	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
-	
-	public void setPackage(String thePackage)
+
+	// =============== Methods ===============
+
+	// --------------- Phases ---------------
+
+	public static void check(PackageDeclaration packageDeclaration, MarkerList markers, Package enclosingPackage)
 	{
-		this.thePackage = thePackage;
+		if (packageDeclaration != null)
+		{
+			packageDeclaration.check(markers, enclosingPackage);
+			return;
+		}
+
+		if (enclosingPackage != Package.rootPackage)
+		{
+			markers.add(Markers.semanticError(SourcePosition.ORIGIN, "package_declaration.missing",
+			                                  enclosingPackage.getFullName()));
+		}
 	}
-	
-	public String getPackage()
+
+	public void check(MarkerList markers, Package enclosingPackage)
 	{
-		return this.thePackage;
+		if (enclosingPackage == Package.rootPackage)
+		{
+			markers.add(Markers.semanticError(this.position, "package_declaration.default_package"));
+			return;
+		}
+
+		final String fullName = enclosingPackage.getFullName();
+		if (!this.fullPackageName.equals(fullName))
+		{
+			markers.add(
+				Markers.semanticError(this.position, "package_declaration.mismatch", this.fullPackageName, fullName));
+		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
@@ -51,6 +97,6 @@ public class PackageDeclaration implements ASTNode
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("package ").append(this.thePackage);
+		buffer.append("package ").append(this.fullPackageName);
 	}
 }

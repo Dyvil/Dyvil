@@ -46,7 +46,7 @@ public abstract class #(TYPE_NAME)Array
 	#if (IS_GENERIC) {
 		static inline func apply GENERIC_REIFIED(size: int) -> [T] = ObjectArray<T>(size, of: class T)
 
-		@BytecodeName('ofType')
+		@JavaName('ofType')
 		static func apply GENERIC(size: int, of elementType: Class<T>) -> [T] = Array.newInstance(elementType, size) as [T]
 	}
 	#else {
@@ -84,7 +84,7 @@ public abstract class #(TYPE_NAME)Array
 	}
 
 	#if (IS_RANGEABLE) {
-		@BytecodeName('rangeClosed')
+		@JavaName('rangeClosed')
 		static func apply GENERIC(from: T, to: T) -> [T]
 		{
 			let array = #APPLY{(to - from + 1)#if (RANGE_CAST) { as int}}
@@ -94,7 +94,7 @@ public abstract class #(TYPE_NAME)Array
 			return array
 		}
 
-		@BytecodeName('rangeOpen')
+		@JavaName('rangeOpen')
 		static func apply GENERIC(from: T, explicit toExclusive: T) -> [T]
 		{
 			let array = #APPLY{(toExclusive - from)#if (RANGE_CAST) { as int}}
