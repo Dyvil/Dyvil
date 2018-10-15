@@ -1,12 +1,14 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Iterators;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.method.IMethod;
@@ -102,12 +104,28 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 		return new ArrayIterator<>(this.classes, 0, this.size);
 	}
 
+	public Iterable<IClass> objectClasses()
+	{
+		return () -> Iterators.filtered(this.iterator(), IClass::isObject);
+	}
+
+	public Iterable<IField> objectClassInstanceFields()
+	{
+		return () -> Iterators.mapped(this.objectClasses().iterator(), iclass -> iclass.getMetadata().getInstanceField());
+	}
+
 	// --------------- Context Resolution ---------------
+
+	public IField resolveImplicitObjectInstanceField(IType type)
+	{
+		return ClassBody.resolveImplicitField(type, this.objectClassInstanceFields());
+	}
 
 	public void getExtensionMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		for (IClass iclass : this)
+		for (int i = 0; i < this.size; i++)
 		{
+			final IClass iclass = this.classes[i];
 			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
 			{
 				// only uses the body to avoid infinite recursion with PrimitiveType
@@ -119,8 +137,9 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 
 	public void getExtensionImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (IClass iclass : this)
+		for (int i = 0; i < this.size; i++)
 		{
+			final IClass iclass = this.classes[i];
 			if (iclass.hasModifier(Modifiers.EXTENSION) && iclass.getBody() != null)
 			{
 				// s.a. for body rationale

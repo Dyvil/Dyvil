@@ -227,24 +227,15 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 			return null;
 		}
 
-		IValue candidate = null;
+		return resolveImplicitValue(type, this.fields(), this.classes);
+	}
 
-		for (IClass iclass : this.classes)
-		{
-			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
-			{
-				continue;
-			}
-			if (candidate != null)
-			{
-				return null; // ambiguous
-			}
-			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
-		}
+	public static IField resolveImplicitField(IType type, Iterable<IField> fields)
+	{
+		IField candidate = null;
 
-		for (int i = 0; i < this.fieldCount; i++)
+		for (IField field : fields)
 		{
-			final IField field = this.fields[i];
 			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
 			{
 				continue;
@@ -254,11 +245,29 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 				return null; // ambiguous
 			}
 
-			// this<Class> is added automatically later
-			candidate = new FieldAccess(field);
+			candidate = field;
 		}
 
 		return candidate;
+	}
+
+	public static IValue resolveImplicitValue(IType type, Iterable<IField> fields, ClassList classes)
+	{
+		final IField implicitField = resolveImplicitField(type, fields);
+		final IField implicitObject = classes.resolveImplicitObjectInstanceField(type);
+
+		if (implicitField != null && implicitObject == null)
+		{
+			// this<Class> is added automatically later
+			return new FieldAccess(implicitField);
+		}
+		if (implicitField == null && implicitObject != null)
+		{
+			return new FieldAccess(implicitObject);
+		}
+
+		// if both are non-null, it's regarded as ambiguous and null is returned
+		return null;
 	}
 
 	// endregion

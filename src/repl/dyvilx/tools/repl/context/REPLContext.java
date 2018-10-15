@@ -19,7 +19,6 @@ import dyvilx.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.expression.operator.IOperator;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.field.IField;
@@ -415,40 +414,13 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public IValue resolveImplicit(IType type)
 	{
-		if (type == null || this.fields.isEmpty())
+		if (type == null)
 		{
 			return null;
 		}
 
-		IValue candidate = null;
-
-		for (IClass iclass : this.classes)
-		{
-			if (!iclass.isImplicit() || !iclass.isObject() || !Types.isSuperType(type, iclass.getClassType()))
-			{
-				continue;
-			}
-			if (candidate != null)
-			{
-				return null; // ambiguous
-			}
-			candidate = new FieldAccess(iclass.getMetadata().getInstanceField());
-		}
-
-		for (IField field : this.fields.values())
-		{
-			if (!field.isImplicit() || !Types.isSuperType(type, field.getType()))
-			{
-				continue;
-			}
-			if (candidate != null)
-			{
-				return null; // ambiguous
-			}
-			candidate = new FieldAccess(field);
-		}
-
-		return candidate;
+		// TODO resolve ambiguities in object instance fields by newest first (?)
+		return ClassBody.resolveImplicitValue(type, this.fields.values(), this.classes);
 	}
 
 	@Override
