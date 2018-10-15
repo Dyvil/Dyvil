@@ -463,13 +463,13 @@ public class MatchExpr implements IValue
 		}
 
 		// MatchError
-		writer.visitLabel(elseLabel);
+		writer.visitTargetLabel(elseLabel);
 		if (!this.exhaustive)
 		{
 			this.writeMatchError(writer, varIndex, matchedType);
 		}
 
-		writer.visitLabel(endLabel);
+		writer.visitTargetLabel(endLabel);
 		writer.resetLocals(localCount);
 	}
 
@@ -742,11 +742,11 @@ public class MatchExpr implements IValue
 		// Generate Match Error
 		if (matchErrorLabel != null)
 		{
-			writer.visitLabel(matchErrorLabel);
+			writer.visitTargetLabel(matchErrorLabel);
 			this.writeMatchError(writer, varIndex, matchedType);
 		}
 
-		writer.visitLabel(endLabel);
+		writer.visitTargetLabel(endLabel);
 
 		writer.resetLocals(localCount);
 	}
