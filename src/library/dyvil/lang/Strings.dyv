@@ -131,6 +131,13 @@ extension String
 
 	// =============== Operators ===============
 
+	// --------------- Pattern Matching ---------------
+
+	// here so the compiler does not use the Pattern-based method with an implicit conversion
+	infix func ~=(pattern: String, value: String) = pattern == value
+
+	infix func ~=(pattern: Pattern, value: String) = pattern.matches(value)
+
 	// --------------- Concatenation ---------------
 
 	infix func +(lhs: char, rhs: String) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs + rhs
@@ -184,6 +191,8 @@ extension Pattern
 	// =============== Methods ===============
 
 	static func apply(from string: String) implicit -> Pattern inline = Pattern.compile(string)!!
+
+	func matches(string: String) -> boolean = this.matcher(string).matches()
 }
 
 @JavaName("Strings$AnyToStringBuilder")

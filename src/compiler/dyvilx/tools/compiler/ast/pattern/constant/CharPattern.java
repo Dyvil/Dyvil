@@ -98,7 +98,7 @@ public final class CharPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		if (this.type == TYPE_CHAR)
 		{
@@ -110,19 +110,19 @@ public final class CharPattern extends AbstractPattern
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean switchCheck()
+	public boolean isSwitchHashInjective()
 	{
-		return this.type != TYPE_CHAR;
+		return this.type == TYPE_CHAR;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		if (this.type == TYPE_CHAR)
 		{

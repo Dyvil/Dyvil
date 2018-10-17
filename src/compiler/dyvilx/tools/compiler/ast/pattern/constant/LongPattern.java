@@ -56,7 +56,7 @@ public final class LongPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return this.value;
 	}

@@ -31,7 +31,7 @@ public final class NullPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return Null.instance;
 	}

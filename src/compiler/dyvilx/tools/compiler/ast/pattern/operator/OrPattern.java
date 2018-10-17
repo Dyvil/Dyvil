@@ -8,10 +8,16 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
 public class OrPattern extends BinaryPattern
 {
+	// =============== Constructors ===============
+
 	public OrPattern(Pattern left, SourcePosition token, Pattern right)
 	{
 		super(left, token, right);
 	}
+
+	// =============== Properties ===============
+
+	// --------------- General ---------------
 
 	@Override
 	public int getPatternType()
@@ -24,6 +30,55 @@ public class OrPattern extends BinaryPattern
 	{
 		return this.left.isExhaustive() || this.right.isExhaustive();
 	}
+
+	// --------------- Sub Patterns ---------------
+
+	@Override
+	public int getSubPatternCount()
+	{
+		return this.left.getSubPatternCount() + this.right.getSubPatternCount();
+	}
+
+	@Override
+	public Pattern getSubPattern(int index)
+	{
+		final int leftCount = this.left.getSubPatternCount();
+		if (index < leftCount)
+		{
+			return this.left.getSubPattern(index);
+		}
+		return this.right.getSubPattern(index - leftCount);
+	}
+
+	// --------------- Switch Hash ---------------
+
+	@Override
+	public boolean hasSwitchHash()
+	{
+		return this.left.hasSwitchHash() && this.right.hasSwitchHash();
+	}
+
+	@Override
+	public boolean isSwitchHashInjective()
+	{
+		return this.left.isSwitchHashInjective() && this.right.isSwitchHashInjective();
+	}
+
+	@Override
+	public int getMinSwitchHashValue()
+	{
+		return Math.min(this.left.getMinSwitchHashValue(), this.left.getMinSwitchHashValue());
+	}
+
+	@Override
+	public int getMaxSwitchHashValue()
+	{
+		return Math.max(this.left.getMaxSwitchHashValue(), this.right.getMaxSwitchHashValue());
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Type ---------------
 
 	@Override
 	protected Pattern withType()
@@ -39,46 +94,7 @@ public class OrPattern extends BinaryPattern
 		return this;
 	}
 
-	@Override
-	public boolean isSwitchable()
-	{
-		return this.left.isSwitchable() && this.right.isSwitchable();
-	}
-
-	@Override
-	public int subPatterns()
-	{
-		return this.left.subPatterns() + this.right.subPatterns();
-	}
-
-	@Override
-	public boolean switchCheck()
-	{
-		return this.left.switchCheck() || this.right.switchCheck();
-	}
-
-	@Override
-	public int minValue()
-	{
-		return Math.min(this.left.minValue(), this.left.minValue());
-	}
-
-	@Override
-	public int maxValue()
-	{
-		return Math.max(this.left.maxValue(), this.right.maxValue());
-	}
-
-	@Override
-	public Pattern subPattern(int index)
-	{
-		final int leftCount = this.left.subPatterns();
-		if (index < leftCount)
-		{
-			return this.left.subPattern(index);
-		}
-		return this.right.subPattern(index - leftCount);
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
@@ -99,6 +115,8 @@ public class OrPattern extends BinaryPattern
 
 		writer.resetLocals(locals);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

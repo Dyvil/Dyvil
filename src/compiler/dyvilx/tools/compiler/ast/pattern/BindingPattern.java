@@ -123,15 +123,15 @@ public final class BindingPattern implements Pattern, IDataMemberConsumer<Variab
 	}
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean switchCheck()
+	public boolean isSwitchHashInjective()
 	{
-		return this.variableRequested;
+		return !this.variableRequested;
 	}
 
 	@Override

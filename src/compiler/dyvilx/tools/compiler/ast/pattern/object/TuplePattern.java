@@ -153,12 +153,12 @@ public final class TuplePattern extends AbstractPattern implements PatternList
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		final Object[] subValues = new Object[this.patternCount];
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			final Object subValue = this.get(i).constantValue();
+			final Object subValue = this.get(i).getConstantValue();
 			if (subValue == null)
 			{
 				return null;

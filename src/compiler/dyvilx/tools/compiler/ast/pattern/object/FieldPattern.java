@@ -79,7 +79,7 @@ public class FieldPattern implements Pattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		if (this.dataMember.hasConstantValue())
 		{

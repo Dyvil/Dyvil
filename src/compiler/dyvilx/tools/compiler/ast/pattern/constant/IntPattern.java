@@ -61,7 +61,7 @@ public final class IntPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return this.value;
 	}
@@ -69,13 +69,13 @@ public final class IntPattern extends AbstractPattern
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		return this.value;
 	}

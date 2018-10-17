@@ -5,15 +5,21 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 
-public class AndPattern extends BinaryPattern implements Pattern
+public class AndPattern extends BinaryPattern
 {
+	// =============== Constructors ===============
+
 	public AndPattern(Pattern left, SourcePosition position, Pattern right)
 	{
 		super(left, position, right);
 	}
+
+	// =============== Properties ===============
+
+	// --------------- General ---------------
 
 	@Override
 	public int getPatternType()
@@ -26,6 +32,16 @@ public class AndPattern extends BinaryPattern implements Pattern
 	{
 		return this.left.isExhaustive() && this.right.isExhaustive();
 	}
+
+	@Override
+	public int getSubPatternCount()
+	{
+		return -1;
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Type ---------------
 
 	@Override
 	protected Pattern withType()
@@ -41,6 +57,8 @@ public class AndPattern extends BinaryPattern implements Pattern
 		return this;
 	}
 
+	// --------------- Field Resolution ---------------
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -52,17 +70,7 @@ public class AndPattern extends BinaryPattern implements Pattern
 		return this.right.resolveField(name);
 	}
 
-	@Override
-	public boolean isSwitchable()
-	{
-		return false;
-	}
-
-	@Override
-	public int subPatterns()
-	{
-		return -1;
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeJumpOnMismatch(MethodWriter writer, int varIndex, Label target) throws BytecodeException
@@ -72,6 +80,8 @@ public class AndPattern extends BinaryPattern implements Pattern
 		this.left.writeJumpOnMismatch(writer, varIndex, target);
 		this.right.writeJumpOnMismatch(writer, varIndex, target);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

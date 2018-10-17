@@ -345,10 +345,10 @@ public class MatchExpr implements IValue
 
 			matchCase.check(markers, context);
 
-			for (int j = 0, subPatterns = pattern.subPatterns(); j < subPatterns; j++)
+			for (int j = 0, subPatterns = pattern.getSubPatternCount(); j < subPatterns; j++)
 			{
-				final Pattern subPattern = pattern.subPattern(j);
-				final Object constantValue = subPattern.constantValue();
+				final Pattern subPattern = pattern.getSubPattern(j);
+				final Object constantValue = subPattern.getConstantValue();
 
 				if (constantValue != null && !values.add(constantValue))
 				{
@@ -410,7 +410,7 @@ public class MatchExpr implements IValue
 		// First run: Determine if a switch instruction can be generated
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			if (!this.cases[i].pattern.isSwitchable())
+			if (!this.cases[i].pattern.hasSwitchHash())
 			{
 				return false;
 			}
@@ -531,10 +531,7 @@ public class MatchExpr implements IValue
 			MatchCase matchCase = this.cases[i];
 			Pattern pattern = matchCase.pattern;
 
-			if (switchVar || pattern.switchCheck())
-			{
-				switchVar = true;
-			}
+			switchVar |= !pattern.isSwitchHashInjective();
 
 			if (pattern.isExhaustive())
 			{
@@ -543,19 +540,19 @@ public class MatchExpr implements IValue
 				continue;
 			}
 
-			int min = pattern.minValue();
+			int min = pattern.getMinSwitchHashValue();
 			if (min < low)
 			{
 				low = min;
 			}
 
-			int max = pattern.maxValue();
+			int max = pattern.getMaxSwitchHashValue();
 			if (max > high)
 			{
 				high = max;
 			}
 
-			cases += pattern.subPatterns();
+			cases += pattern.getSubPatternCount();
 		}
 
 		// Check if a match error should be generated - Non-exhaustive pattern
@@ -626,17 +623,17 @@ public class MatchExpr implements IValue
 		{
 			final MatchCase matchCase = this.cases[i];
 			final Pattern pattern = matchCase.pattern;
-			final int subPatterns = pattern.subPatterns();
+			final int subPatterns = pattern.getSubPatternCount();
 
 			for (int j = 0; j < subPatterns; j++)
 			{
-				final Pattern subPattern = pattern.subPattern(j);
+				final Pattern subPattern = pattern.getSubPattern(j);
 				if (subPattern.isExhaustive())
 				{
 					continue;
 				}
 
-				final int switchValue = subPattern.switchValue();
+				final int switchValue = subPattern.getSwitchHashValue();
 				keyCache.add(switchValue, matchCase, subPattern);
 			}
 		}
@@ -690,7 +687,7 @@ public class MatchExpr implements IValue
 
 				writer.visitTargetLabel(entry.switchLabel);
 
-				if (pattern.switchCheck())
+				if (!pattern.isSwitchHashInjective())
 				{
 					pattern.writeJumpOnMismatch(writer, varIndex, elseLabel);
 				}
@@ -719,7 +716,7 @@ public class MatchExpr implements IValue
 		{
 			writer.visitTargetLabel(defaultLabel);
 
-			if (defaultCase.pattern.switchCheck())
+			if (!defaultCase.pattern.isSwitchHashInjective())
 			{
 				defaultCase.pattern.writeJumpOnMismatch(writer, varIndex, matchErrorLabel);
 			}

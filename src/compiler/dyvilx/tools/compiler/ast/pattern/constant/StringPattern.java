@@ -49,7 +49,7 @@ public final class StringPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return this.value;
 	}
@@ -57,19 +57,19 @@ public final class StringPattern extends AbstractPattern
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean switchCheck()
+	public boolean isSwitchHashInjective()
 	{
-		return true;
+		return false;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		return this.value.hashCode();
 	}

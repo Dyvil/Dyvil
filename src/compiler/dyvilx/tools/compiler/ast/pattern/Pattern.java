@@ -15,6 +15,8 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public interface Pattern extends ASTNode, Typed
 {
+	// =============== Constants ===============
+
 	int NULL    = 0;
 	int BOOLEAN = 1;
 	int BYTE    = 2;
@@ -41,6 +43,10 @@ public interface Pattern extends ASTNode, Typed
 	int OR  = 48;
 	int AND = 49;
 
+	// =============== Properties ===============
+
+	// --------------- General Pattern Info ---------------
+
 	int getPatternType();
 
 	default boolean isExhaustive()
@@ -53,10 +59,53 @@ public interface Pattern extends ASTNode, Typed
 		return false;
 	}
 
-	default Object constantValue()
+	// --------------- Constant Value ---------------
+
+	default Object getConstantValue()
 	{
 		return null;
 	}
+
+	// --------------- Sub Patterns ---------------
+
+	default int getSubPatternCount()
+	{
+		return 1;
+	}
+
+	default Pattern getSubPattern(int index)
+	{
+		return this;
+	}
+
+	// --------------- Switch Hashs ---------------
+
+	default boolean hasSwitchHash()
+	{
+		return false;
+	}
+
+	default boolean isSwitchHashInjective()
+	{
+		return true;
+	}
+
+	default int getSwitchHashValue()
+	{
+		return -1;
+	}
+
+	default int getMinSwitchHashValue()
+	{
+		return this.getSwitchHashValue();
+	}
+
+	default int getMaxSwitchHashValue()
+	{
+		return this.getSwitchHashValue();
+	}
+
+	// --------------- Type ---------------
 
 	@Override
 	IType getType();
@@ -77,56 +126,21 @@ public interface Pattern extends ASTNode, Typed
 		return Types.isSuperType(type, this.getType());
 	}
 
+	// --------------- Field Resolution ---------------
+
 	default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
+
+	// --------------- Resolution Phases ---------------
 
 	default Pattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 
-	// Sub Patterns
-
-	default int subPatterns()
-	{
-		return 1;
-	}
-
-	default Pattern subPattern(int index)
-	{
-		return this;
-	}
-
-	// Switch Resolution
-
-	default boolean isSwitchable()
-	{
-		return false;
-	}
-
-	default boolean switchCheck()
-	{
-		return false;
-	}
-
-	default int switchValue()
-	{
-		return -1;
-	}
-
-	default int minValue()
-	{
-		return this.switchValue();
-	}
-
-	default int maxValue()
-	{
-		return this.switchValue();
-	}
-
-	// Compilation
+	// --------------- Compilation ---------------
 
 	static void loadVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
