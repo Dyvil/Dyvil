@@ -6,6 +6,8 @@ import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
+import java.util.function.Consumer;
+
 public class OrPattern extends BinaryPattern
 {
 	// =============== Constructors ===============
@@ -31,25 +33,6 @@ public class OrPattern extends BinaryPattern
 		return this.left.isExhaustive() || this.right.isExhaustive();
 	}
 
-	// --------------- Sub Patterns ---------------
-
-	@Override
-	public int getSubPatternCount()
-	{
-		return this.left.getSubPatternCount() + this.right.getSubPatternCount();
-	}
-
-	@Override
-	public Pattern getSubPattern(int index)
-	{
-		final int leftCount = this.left.getSubPatternCount();
-		if (index < leftCount)
-		{
-			return this.left.getSubPattern(index);
-		}
-		return this.right.getSubPattern(index - leftCount);
-	}
-
 	// --------------- Switch Hash ---------------
 
 	@Override
@@ -64,19 +47,14 @@ public class OrPattern extends BinaryPattern
 		return this.left.isSwitchHashInjective() && this.right.isSwitchHashInjective();
 	}
 
-	@Override
-	public int getMinSwitchHashValue()
-	{
-		return Math.min(this.left.getMinSwitchHashValue(), this.left.getMinSwitchHashValue());
-	}
-
-	@Override
-	public int getMaxSwitchHashValue()
-	{
-		return Math.max(this.left.getMaxSwitchHashValue(), this.right.getMaxSwitchHashValue());
-	}
-
 	// =============== Methods ===============
+
+	@Override
+	public void forEachAtom(Consumer<Pattern> action)
+	{
+		this.left.forEachAtom(action);
+		this.right.forEachAtom(action);
+	}
 
 	// --------------- Type ---------------
 

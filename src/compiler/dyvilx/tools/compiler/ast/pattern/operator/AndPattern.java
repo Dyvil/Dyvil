@@ -33,12 +33,6 @@ public class AndPattern extends BinaryPattern
 		return this.left.isExhaustive() && this.right.isExhaustive();
 	}
 
-	@Override
-	public int getSubPatternCount()
-	{
-		return -1;
-	}
-
 	// =============== Methods ===============
 
 	// --------------- Type ---------------

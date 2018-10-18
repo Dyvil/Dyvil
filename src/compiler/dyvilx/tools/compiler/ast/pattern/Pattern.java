@@ -8,10 +8,12 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.function.Consumer;
 
 public interface Pattern extends ASTNode, Typed
 {
@@ -66,18 +68,6 @@ public interface Pattern extends ASTNode, Typed
 		return null;
 	}
 
-	// --------------- Sub Patterns ---------------
-
-	default int getSubPatternCount()
-	{
-		return 1;
-	}
-
-	default Pattern getSubPattern(int index)
-	{
-		return this;
-	}
-
 	// --------------- Switch Hashs ---------------
 
 	default boolean hasSwitchHash()
@@ -93,16 +83,6 @@ public interface Pattern extends ASTNode, Typed
 	default int getSwitchHashValue()
 	{
 		return -1;
-	}
-
-	default int getMinSwitchHashValue()
-	{
-		return this.getSwitchHashValue();
-	}
-
-	default int getMaxSwitchHashValue()
-	{
-		return this.getSwitchHashValue();
 	}
 
 	// --------------- Type ---------------
@@ -134,6 +114,11 @@ public interface Pattern extends ASTNode, Typed
 	}
 
 	// --------------- Resolution Phases ---------------
+
+	default void forEachAtom(Consumer<Pattern> action)
+	{
+		action.accept(this);
+	}
 
 	default Pattern resolve(MarkerList markers, IContext context)
 	{
