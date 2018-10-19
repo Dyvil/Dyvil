@@ -93,4 +93,11 @@ public final class JarLibrary extends Library
 			return Stream.empty();
 		}
 	}
+
+	@Override
+	public Stream<String> listPackageNames(String directory)
+	{
+		// zip paths somehow retain the trailing / when calling getFileName, so we have to remove it here
+		return super.listPackageNames(directory).map(s -> s.replace("/", ""));
+	}
 }
