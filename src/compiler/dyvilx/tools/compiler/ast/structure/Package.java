@@ -207,10 +207,10 @@ public class Package implements Named, IDefaultContext
 			return pack;
 		}
 
-		String internal = this.getDirectory() + name;
 		for (Library library : rootPackage.compiler.config.libraries)
 		{
-			if (library.isSubPackage(internal))
+			// use this approach instead of isSubPackage to protect against case-insensitive matches
+			if (library.listPackageNames(this.getDirectory()).anyMatch(name::equals))
 			{
 				return this.createSubPackage(name);
 			}

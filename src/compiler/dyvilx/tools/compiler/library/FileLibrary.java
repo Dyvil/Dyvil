@@ -36,12 +36,6 @@ public class FileLibrary extends Library
 	}
 
 	@Override
-	public boolean isSubPackage(String directory)
-	{
-		return this.getFile(directory).isDirectory();
-	}
-
-	@Override
 	public InputStream getInputStream(String fileName)
 	{
 		try
@@ -61,7 +55,7 @@ public class FileLibrary extends Library
 	{
 		try
 		{
-			return Files.list(this.file.toPath().resolve(directory)).filter(Files::isDirectory);
+			return Files.list(this.getFile(directory).toPath()).filter(Files::isDirectory);
 		}
 		catch (IOException e)
 		{

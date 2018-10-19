@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.library;
 
 import dyvil.reflect.ReflectUtils;
+import dyvil.reflect.Variance;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,8 +29,8 @@ public abstract class Library
 
 	static
 	{
-		javaLibraryLocation = getFileLocation(java.lang.String.class);
-		dyvilLibraryLocation = getFileLocation(dyvil.reflect.Variance.class);
+		javaLibraryLocation = getFileLocation(String.class);
+		dyvilLibraryLocation = getFileLocation(Variance.class);
 
 		dyvilLibrary = tryLoad(dyvilLibraryLocation);
 		javaLibrary = tryLoad(javaLibraryLocation);
@@ -110,10 +111,6 @@ public abstract class Library
 	public abstract void unloadLibrary();
 
 	public abstract Stream<Path> listPaths(String directory);
-
-	// --------------- Package Access ---------------
-
-	public abstract boolean isSubPackage(String directory);
 
 	// --------------- Package Discovery ---------------
 
