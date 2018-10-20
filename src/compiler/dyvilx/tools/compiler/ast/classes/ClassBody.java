@@ -36,10 +36,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
@@ -278,7 +275,9 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public Collection<IProperty> properties()
 	{
-		return Arrays.asList(this.properties).subList(0, this.propertyCount);
+		return this.propertyCount > 0 ?
+			       Arrays.asList(this.properties).subList(0, this.propertyCount) :
+			       Collections.emptyList();
 	}
 
 	public Collection<IProperty> allProperties()
