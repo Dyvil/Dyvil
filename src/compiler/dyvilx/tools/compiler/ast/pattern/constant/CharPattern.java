@@ -73,13 +73,13 @@ public final class CharPattern extends AbstractPattern
 			case PrimitiveType.SHORT_CODE:
 			case PrimitiveType.INT_CODE:
 			case PrimitiveType.CHAR_CODE:
-				this.type = CHAR;
+				this.type = TYPE_CHAR;
 				return this;
 			}
 
 			if (Types.isSuperType(type, Types.CHAR.getObjectType()))
 			{
-				this.type = CHAR;
+				this.type = TYPE_CHAR;
 				return new TypeCheckPattern(this, type, Types.CHAR);
 			}
 		}
