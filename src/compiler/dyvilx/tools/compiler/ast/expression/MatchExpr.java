@@ -339,6 +339,12 @@ public class MatchExpr implements IValue
 
 			matchCase.check(markers, context);
 
+			if (matchCase.condition != null)
+			{
+				// don't diagnose duplicate patterns for conditional cases
+				continue;
+			}
+
 			pattern.forEachAtom(subPattern -> {
 				final Object constantValue = subPattern.getConstantValue();
 
