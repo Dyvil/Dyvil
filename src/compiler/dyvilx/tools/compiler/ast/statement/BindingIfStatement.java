@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.ast.statement;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
@@ -23,6 +21,9 @@ import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BindingIfStatement extends IfStatement
 {

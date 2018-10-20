@@ -1,9 +1,5 @@
 package dyvilx.tools.repl;
 
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.TreeMap;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -24,6 +20,10 @@ import dyvilx.tools.repl.input.REPLParser;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class DyvilREPL
 {
@@ -35,8 +35,8 @@ public final class DyvilREPL
 	protected REPLParser      parser      = new REPLParser(this.context);
 	protected REPLClassLoader classLoader = new REPLClassLoader(this);
 
-	protected File dumpDir;
-	private List<File> autoLoadFiles = new ArrayList<>();
+	protected File       dumpDir;
+	private   List<File> autoLoadFiles = new ArrayList<>();
 
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 

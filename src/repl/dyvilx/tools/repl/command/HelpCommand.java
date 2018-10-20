@@ -1,12 +1,11 @@
 package dyvilx.tools.repl.command;
 
-import dyvil.collection.Entry;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.TreeSet;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.io.PrintStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class HelpCommand implements ICommand
 {
@@ -41,9 +40,9 @@ public class HelpCommand implements ICommand
 
 		final Set<String> commands = new TreeSet<>();
 
-		for (Entry<String, ICommand> entry : DyvilREPL.getCommands())
+		for (ICommand command : DyvilREPL.getCommands().values())
 		{
-			commands.add(entry.getValue().getName());
+			commands.add(command.getName());
 		}
 
 		int maxLength = 0;

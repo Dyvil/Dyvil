@@ -1,8 +1,6 @@
 package dyvilx.tools.compiler.ast.method;
 
 import dyvil.annotation.Reified;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -46,7 +44,9 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class CodeMethod extends AbstractMethod
 {
@@ -320,8 +320,9 @@ public class CodeMethod extends AbstractMethod
 				continue;
 			}
 
-			markers.add(Markers.semanticError(this.position, "method.duplicate.descriptor", this.name,
-			                                  this.internalName, this.getDescriptor()));
+			markers.add(Markers
+				            .semanticError(this.position, "method.duplicate.descriptor", this.name, this.internalName,
+				                           this.getDescriptor()));
 			return;
 		}
 	}

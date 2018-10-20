@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.ast.header;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -28,6 +26,9 @@ import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvilx.tools.compiler.config.Formatting;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
 	// =============== Fields ===============
@@ -36,10 +37,10 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 
 	protected PackageDeclaration packageDeclaration;
 
-	protected HeaderDeclaration  headerDeclaration;
+	protected HeaderDeclaration headerDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
-	protected int importCount;
+	protected int                 importCount;
 
 	protected ITypeAlias[] typeAliases;
 	protected int          typeAliasCount;
@@ -220,11 +221,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			return;
 		}
 
-		final IOperator existing = this.infixOperatorMap.get(name);
-		if (existing == null)
-		{
-			this.infixOperatorMap.put(name, operator);
-		}
+		this.infixOperatorMap.putIfAbsent(name, operator);
 	}
 
 	// --------------- Type Aliases ---------------

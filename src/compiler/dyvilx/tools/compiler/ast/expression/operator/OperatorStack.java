@@ -1,19 +1,20 @@
 package dyvilx.tools.compiler.ast.expression.operator;
 
-import dyvil.collection.Stack;
-import dyvil.collection.mutable.LinkedList;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 {
 	protected int               operatorCount;
-	protected ASTNode[]        operands = new ASTNode[3];
+	protected ASTNode[]         operands  = new ASTNode[3];
 	protected OperatorElement[] operators = new OperatorElement[2];
 
 	public void addOperator(Name name, SourcePosition position)
@@ -74,8 +75,8 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 			return this.binaryOp(lhs, element1, this.binaryOp(center, element2, rhs));
 		}
 
-		final Stack<OperatorElement> operatorStack = new LinkedList<>();
-		final Stack<T> operandStack = new LinkedList<>();
+		final Deque<OperatorElement> operatorStack = new LinkedList<>();
+		final Deque<T> operandStack = new LinkedList<>();
 		operandStack.push((T) this.operands[0]);
 
 		for (int i = 0; i < this.operatorCount; i++)
@@ -92,14 +93,15 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 		return operandStack.pop();
 	}
 
-	protected void pushOperator(Stack<T> operandStack, Stack<OperatorElement> operatorStack, OperatorElement element,
-		                           MarkerList markers)
+	protected void pushOperator(Deque<T> operandStack, Deque<OperatorElement> operatorStack, OperatorElement element,
+		MarkerList markers)
 	{
-		OperatorElement element2;
 		while (!operatorStack.isEmpty())
 		{
-			element2 = operatorStack.peek();
-			final OperatorElement ternary = operatorStack.peek(1);
+			final OperatorElement element2 = operatorStack.pop();
+			final OperatorElement ternary = operatorStack.peek();
+			operatorStack.push(element2);
+
 			if (!lowerPrecedence(element, element2,
 			                     ternary != null && ternary.operator.getType() == IOperator.TERNARY ? ternary : null,
 			                     markers))
@@ -112,7 +114,7 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 		operatorStack.push(element);
 	}
 
-	protected void popOperator(Stack<T> operandStack, Stack<OperatorElement> operatorStack)
+	protected void popOperator(Deque<T> operandStack, Deque<OperatorElement> operatorStack)
 	{
 		final OperatorElement operatorElement = operatorStack.pop();
 		final T rhs = operandStack.pop();
@@ -121,7 +123,7 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 
 		final OperatorElement peek = operatorStack.peek();
 		if (peek != null && peek.operator.getType() == IOperator.TERNARY // ternary operator
-			    && operatorElement.name == peek.operator.getName2()) // right-hand part
+		    && operatorElement.name == peek.operator.getName2()) // right-hand part
 		{
 			final T cond = operandStack.pop();
 			operatorStack.pop(); // == peek
@@ -136,7 +138,7 @@ public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 	}
 
 	protected static boolean lowerPrecedence(OperatorElement element1, OperatorElement element2,
-		                                        OperatorElement ternaryOperator, MarkerList markers)
+		OperatorElement ternaryOperator, MarkerList markers)
 	{
 		final byte element1Type = element1.operator.getType();
 		if (element1Type == IOperator.TERNARY)

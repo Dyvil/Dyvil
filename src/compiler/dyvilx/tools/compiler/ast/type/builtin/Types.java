@@ -1,8 +1,5 @@
 package dyvilx.tools.compiler.ast.type.builtin;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -23,6 +20,11 @@ import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.transform.Names;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 public final class Types
 {
@@ -281,7 +283,7 @@ public final class Types
 
 	private static Set<IClass> superClasses(IType type)
 	{
-		Set<IClass> types = new IdentityHashSet<>();
+		Set<IClass> types = Collections.newSetFromMap(new IdentityHashMap<>());
 		addSuperClasses(type, types);
 		return types;
 	}

@@ -1,8 +1,5 @@
 package dyvilx.tools.repl.command;
 
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashSet;
-import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
 import dyvil.source.LineSource;
 import dyvil.util.Qualifier;
@@ -34,6 +31,10 @@ import dyvilx.tools.repl.context.REPLContext;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class CompleteCommand implements ICommand
 {
@@ -166,14 +167,15 @@ public class CompleteCommand implements ICommand
 			output.println(I18n.get("command.complete.type", type));
 
 			findMembers(type, fields, properties, methods, memberStart, true);
-			findExtensions(context, type, value, extensionMethods, memberStart, true);
+			findExtensions(context, type, value, extensionMethods, memberStart);
 		}
 		else
 		{
 			output.println(I18n.get("command.complete.expression", value, type));
 
-			findInstanceMembers(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
-			findExtensions(context, type, value, extensionMethods, memberStart, false);
+			findInstanceMembers(type, fields, properties, methods, memberStart,
+			                    Collections.newSetFromMap(new IdentityHashMap<>()));
+			findExtensions(context, type, value, extensionMethods, memberStart);
 			findConversions(context, type, value, conversionMethods);
 		}
 
@@ -234,7 +236,7 @@ public class CompleteCommand implements ICommand
 	}
 
 	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods,
-		                               String start, boolean statics)
+		String start, boolean statics)
 	{
 		final IClass theClass = type.getTheClass();
 		if (theClass == null)
@@ -265,7 +267,7 @@ public class CompleteCommand implements ICommand
 	}
 
 	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties,
-		                                       Set<IMethod> methods, String start, Set<IClass> dejaVu)
+		Set<IMethod> methods, String start, Set<IClass> dejaVu)
 	{
 		final IClass iclass = type.getTheClass();
 		if (iclass == null || dejaVu.contains(iclass))
@@ -296,8 +298,7 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findExtensions(IContext context, IType type, IValue value, Set<IMethod> methods, String start,
-		                                  boolean statics)
+	private static void findExtensions(IContext context, IType type, IValue value, Set<IMethod> methods, String start)
 	{
 		final MatchList<IMethod> matchList = new MatchList<>(context, true);
 

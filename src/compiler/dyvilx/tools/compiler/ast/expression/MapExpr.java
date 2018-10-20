@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.mutable.HashSet;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
 import dyvil.reflect.Opcodes;
@@ -18,18 +17,21 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.MapType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MapExpr implements IValue
 {
 	public static final class LazyTypes
 	{
-		public static final IClass MAP_CONVERTIBLE_CLASS = dyvilx.tools.compiler.ast.type.builtin.Types.LITERALCONVERTIBLE_CLASS
+		public static final IClass MAP_CONVERTIBLE_CLASS = Types.LITERALCONVERTIBLE_CLASS
 			                                                   .resolveClass(Name.fromRaw("FromMap"));
 	}
 
@@ -259,7 +261,7 @@ public class MapExpr implements IValue
 		this.keys.check(markers, context);
 		this.values.check(markers, context);
 
-		final HashSet<Object> keys = new HashSet<>();
+		final Set<Object> keys = new HashSet<>();
 
 		for (IValue key : this.keys)
 		{

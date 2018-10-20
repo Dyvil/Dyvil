@@ -1,9 +1,8 @@
 package dyvilx.tools.compiler.ast.statement;
 
-import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.*;
@@ -24,17 +23,18 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.statement.control.Label;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
@@ -42,7 +42,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		                                                                         .markerSupplier("statementlist.return",
 		                                                                                         "type.expected",
 		                                                                                         "return.type");
-	protected SourcePosition position;
+	protected            SourcePosition             position;
 
 	protected IValue[] values;
 	protected int      valueCount;
@@ -422,7 +422,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		final IValue implicitValue = context.resolveImplicit(null);
 		if (implicitValue != null)
 		{
-			final IValue call = resolveApplyStatement(markers, context, arguments, implicitValue.resolve(markers, context));
+			final IValue call = resolveApplyStatement(markers, context, arguments,
+			                                          implicitValue.resolve(markers, context));
 			if (call != null)
 			{
 				return call;
@@ -433,9 +434,10 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	private static IValue resolveApplyStatement(MarkerList markers, IContext context, ArgumentList arguments,
-		                                           IValue receiver)
+		IValue receiver)
 	{
-		final MethodCall call = new MethodCall(arguments.getFirst().getPosition(), receiver, Names.applyStatement, arguments);
+		final MethodCall call = new MethodCall(arguments.getFirst().getPosition(), receiver, Names.applyStatement,
+		                                       arguments);
 		return call.resolveCall(markers, context, false);
 	}
 
@@ -501,9 +503,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		for (IMethod candidate : this.methods)
 		{
 			if (candidate.getName() == methodName // same name
-				    && candidate.getParameters().size() == parameterCount && candidate.getDescriptor().equals(desc))
+			    && candidate.getParameters().size() == parameterCount && candidate.getDescriptor().equals(desc))
 			{
-				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate.descriptor", methodName, desc));
+				markers.add(Markers
+					            .semanticError(memberStatement.getPosition(), "method.duplicate.descriptor", methodName,
+					                           desc));
 			}
 		}
 

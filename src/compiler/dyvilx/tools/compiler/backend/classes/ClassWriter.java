@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.backend.classes;
 
-import dyvil.collection.List;
 import dyvil.io.FileUtils;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.header.ICompilable;
@@ -9,6 +8,7 @@ import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.compiler.lang.I18n;
 
 import java.io.*;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;

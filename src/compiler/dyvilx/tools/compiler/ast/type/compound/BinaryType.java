@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.ast.type.compound;
 
-import dyvil.collection.Set;
 import dyvil.lang.Formattable;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
@@ -26,6 +25,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Set;
 
 public abstract class BinaryType implements IObjectType
 {

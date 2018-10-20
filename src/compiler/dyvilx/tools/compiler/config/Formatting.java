@@ -1,9 +1,9 @@
 package dyvilx.tools.compiler.config;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 

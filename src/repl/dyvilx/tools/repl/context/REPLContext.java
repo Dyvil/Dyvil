@@ -1,9 +1,5 @@
 package dyvilx.tools.repl.context;
 
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.TextSource;
@@ -41,10 +37,13 @@ import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class REPLContext extends AbstractHeader
-	implements IDefaultContext, IMemberConsumer<REPLVariable>
+public class REPLContext extends AbstractHeader implements IDefaultContext, IMemberConsumer<REPLVariable>
 {
 	private static final String CLASS_PACKAGE = "replgen";
 	public static final  String CLASS_PREFIX  = "Result";

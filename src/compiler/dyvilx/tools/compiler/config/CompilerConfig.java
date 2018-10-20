@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.config;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.io.FileUtils;
 import dyvil.lang.Strings;
 import dyvilx.tools.compiler.DyvilCompiler;
@@ -10,6 +8,8 @@ import dyvilx.tools.compiler.library.Library;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CompilerConfig

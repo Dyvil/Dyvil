@@ -1,14 +1,14 @@
 package dyvilx.tools.repl.command;
 
-import dyvil.collection.Map;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.util.MemberSorter;
 import dyvilx.tools.compiler.util.Util;
-import dyvil.lang.Name;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class VariablesCommand implements ICommand
 {
@@ -41,7 +41,7 @@ public class VariablesCommand implements ICommand
 			return;
 		}
 
-		final IField[] fields = fieldMap.toValueArray(IField.class);
+		final IField[] fields = fieldMap.values().toArray(new IField[0]);
 		Arrays.sort(fields, MemberSorter.MEMBER_COMPARATOR);
 
 		for (IField field : fields)

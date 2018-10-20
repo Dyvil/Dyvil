@@ -1,9 +1,5 @@
 package dyvilx.tools.compiler.ast.structure;
 
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
@@ -19,6 +15,10 @@ import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 

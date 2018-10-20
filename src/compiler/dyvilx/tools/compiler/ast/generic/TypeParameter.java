@@ -3,8 +3,6 @@ package dyvilx.tools.compiler.ast.generic;
 import dyvil.annotation.Reified;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
 import dyvilx.tools.asm.TypePath;
@@ -23,13 +21,15 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
 import dyvilx.tools.compiler.ast.type.typevar.CovariantTypeVarType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
+import java.util.ArrayList;
+import java.util.List;
 
 import static dyvilx.tools.compiler.ast.type.builtin.Types.isSuperClass;
 import static dyvilx.tools.compiler.ast.type.builtin.Types.isSuperType;
@@ -41,12 +41,12 @@ public abstract class TypeParameter implements ITypeParameter
 
 	protected Name name;
 
-	protected @NonNull IType upperBound = Types.NULLABLE_ANY;
+	protected @NonNull  IType upperBound = Types.NULLABLE_ANY;
 	protected @Nullable IType lowerBound;
 
 	// Metadata
-	protected int index;
-	protected IType erasure = Types.OBJECT;
+	protected int     index;
+	protected IType   erasure = Types.OBJECT;
 	private   IType   safeUpperBound;
 	protected IType[] upperBounds;
 
@@ -330,7 +330,7 @@ public abstract class TypeParameter implements ITypeParameter
 		// Flatten the tree-like upperBound structure into a list
 		final List<IType> list = new ArrayList<>();
 		getUpperBounds(list, upperBound);
-		return list.toArray(IType.class);
+		return list.toArray(new IType[0]);
 	}
 
 	private static void getUpperBounds(List<IType> list, IType upperBound)

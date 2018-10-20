@@ -1,6 +1,5 @@
 package dyvilx.tools.repl.command;
 
-import dyvil.collection.List;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.util.MemberSorter;
 import dyvilx.tools.compiler.util.Util;
@@ -8,6 +7,7 @@ import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MethodsCommand implements ICommand
 {
@@ -40,7 +40,7 @@ public class MethodsCommand implements ICommand
 			return;
 		}
 
-		final IMethod[] methods = methodList.toArray(IMethod.class);
+		final IMethod[] methods = methodList.toArray(new IMethod[0]);
 		Arrays.sort(methods, MemberSorter.METHOD_COMPARATOR);
 
 		for (IMethod method : methods)

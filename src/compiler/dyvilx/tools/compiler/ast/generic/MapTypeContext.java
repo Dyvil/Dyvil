@@ -1,13 +1,14 @@
 package dyvilx.tools.compiler.ast.generic;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvilx.tools.compiler.ast.type.IType;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public final class MapTypeContext implements ITypeContext
 {
 	private Map<ITypeParameter, IType> map = new IdentityHashMap<>();
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
@@ -25,7 +26,7 @@ public final class MapTypeContext implements ITypeContext
 	{
 		this.map.put(typeVar, type);
 	}
-	
+
 	@Override
 	public String toString()
 	{

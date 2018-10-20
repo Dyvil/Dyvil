@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.ast.external;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.ClassList;
@@ -22,12 +20,14 @@ import dyvilx.tools.compiler.ast.type.alias.TypeAlias;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExternalHeader extends AbstractHeader implements IDefaultContext
 {
 	private static final int IMPORTS      = 1;
 	private static final int TYPE_ALIASES = 1 << 1;
-	private static final int CLASSES = 1 << 2;
+	private static final int CLASSES      = 1 << 2;
 
 	private byte resolved;
 

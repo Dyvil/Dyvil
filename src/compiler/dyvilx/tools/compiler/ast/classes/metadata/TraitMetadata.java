@@ -1,8 +1,5 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
-import dyvil.collection.Set;
-import dyvil.collection.immutable.EmptySet;
-import dyvil.collection.mutable.ArraySet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
@@ -18,6 +15,10 @@ import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class TraitMetadata extends InterfaceMetadata
 {
@@ -42,21 +43,21 @@ public class TraitMetadata extends InterfaceMetadata
 		if (interfaces.size() <= 0)
 		{
 			// don't bother with classes that don't implement anything directly
-			return EmptySet.apply();
+			return Collections.emptySet();
 		}
 
 		// collect all directly and transitively inherited traits
-		final Set<IClass> interfaceTraits = new ArraySet<>();
+		final Set<IClass> interfaceTraits = new LinkedHashSet<>();
 		fillTraitsFromInterfaces(currentClass, interfaceTraits);
 
 		if (interfaceTraits.isEmpty())
 		{
 			// don't bother with classes that don't implement any traits directly
-			return EmptySet.apply();
+			return Collections.emptySet();
 		}
 
 		// collect all directly and transitively inherited traits of the super-class
-		final Set<IClass> superClassTraits = new ArraySet<>();
+		final Set<IClass> superClassTraits = new LinkedHashSet<>();
 		fillTraitsFromSuperClass(currentClass, superClassTraits);
 
 		// return only those traits that are directly or transitively inherited, except those from the super-class
@@ -74,7 +75,7 @@ public class TraitMetadata extends InterfaceMetadata
 	 */
 	public static Set<IClass> getAllTraits(IClass currentClass)
 	{
-		final Set<IClass> traits = new ArraySet<>();
+		final Set<IClass> traits = new LinkedHashSet<>();
 		fillTraits(currentClass, traits);
 		return traits;
 	}

@@ -9,16 +9,16 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
+import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 import dyvilx.tools.compiler.ast.pattern.PatternList;
-import dyvilx.tools.compiler.ast.pattern.AbstractPattern;
 import dyvilx.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.TupleType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
@@ -288,6 +288,7 @@ class TupleSurrogate
 	@Override
 	public String toString()
 	{
-		return dyvil.collection.immutable.ArrayList.apply(this.values).toString("(", ", ", ")");
+		final String s = Arrays.toString(this.values);
+		return '(' + s.substring(1, s.length() - 1) + ')';
 	}
 }

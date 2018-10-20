@@ -1,7 +1,5 @@
 package dyvilx.tools.compiler.backend.classes;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.asm.*;
@@ -24,6 +22,8 @@ import dyvilx.tools.compiler.backend.field.ExternalFieldVisitor;
 import dyvilx.tools.compiler.backend.method.ExternalMethodVisitor;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static dyvilx.tools.compiler.backend.ClassFormat.*;
 
@@ -212,7 +212,8 @@ public class ExternalClassVisitor implements ClassVisitor
 
 		if (this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name), desc, type);
+			final ClassParameter param = new ExternalClassParameter(this.theClass, Name.fromQualified(name), desc,
+			                                                        type);
 			param.setJavaFlags(access);
 			this.theClass.getParameters().add(param);
 			return new ExternalFieldVisitor(param);

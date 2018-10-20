@@ -2,10 +2,6 @@ package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
-import dyvil.collection.immutable.EmptyList;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -50,6 +46,10 @@ import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 public abstract class AbstractClass implements IClass, IDefaultContext
 {
@@ -387,7 +387,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public Collection<IMethod> allMethods()
 	{
-		final Collection<IMethod> bodyMethods = this.body != null ? this.body.allMethods() : EmptyList.apply();
+		final Collection<IMethod> bodyMethods = this.body != null ? this.body.allMethods() : Collections.emptyList();
 		final int parameters = this.parameters.size();
 
 		final Collection<IMethod> result = new ArrayList<>(parameters * 2 + bodyMethods.size());
@@ -403,7 +403,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		result.addAll(bodyMethods);
 
-		return result.view();
+		return result;
 	}
 
 	@Override

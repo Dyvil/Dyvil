@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.ast.classes;
 
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -37,6 +36,9 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 public class CodeClass extends AbstractClass
 {
@@ -210,7 +212,7 @@ public class CodeClass extends AbstractClass
 			this.typeParameters.checkTypes(markers, context);
 		}
 
-		final IdentityHashSet<IClass> checkedClasses = new IdentityHashSet<>();
+		final Set<IClass> checkedClasses = Collections.newSetFromMap(new IdentityHashMap<>());
 		checkedClasses.add(this);
 		this.checkSuperMethods(markers, this, this.getThisType(), checkedClasses);
 
