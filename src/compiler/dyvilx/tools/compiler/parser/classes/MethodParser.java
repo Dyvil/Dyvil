@@ -112,7 +112,7 @@ public class MethodParser extends AbstractMemberParser
 		case EXCEPTIONS:
 			if (type == DyvilKeywords.THROWS)
 			{
-				pm.pushParser(new TypeListParser(this.method.getExceptions()));
+				pm.pushParser(new TypeListParser(this.method.getExceptions()).withFlags(TypeListParser.ANY_TERMINATOR));
 				this.mode = BODY;
 				return;
 			}
