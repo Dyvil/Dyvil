@@ -345,6 +345,12 @@ public class MatchExpr implements IValue
 
 			matchCase.check(markers, context);
 
+			if (matchCase.condition != null)
+			{
+				// don't diagnose duplicate patterns for conditional cases
+				continue;
+			}
+
 			for (int j = 0, subPatterns = pattern.subPatterns(); j < subPatterns; j++)
 			{
 				final Pattern subPattern = pattern.subPattern(j);
