@@ -366,7 +366,9 @@ public final class TypeParser extends Parser implements Consumer<IType>
 			if (isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeListParser(((GenericType) this.type).getArguments(), true));
+
+				final TypeList arguments = ((GenericType) this.type).getArguments();
+				pm.pushParser(new TypeListParser(arguments).withFlags(TypeListParser.CLOSE_ANGLE));
 				this.mode = GENERICS_END;
 				return;
 			}

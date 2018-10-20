@@ -538,7 +538,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 			this.value = call;
 
 			pm.splitJump(next, 1);
-			pm.pushParser(new TypeListParser(call.getGenericData().getTypes(), true));
+			pm.pushParser(new TypeListParser(call.getGenericData().getTypes()).withFlags(TypeListParser.CLOSE_ANGLE));
 			this.mode = TYPE_ARGUMENTS_END;
 			return;
 		}
