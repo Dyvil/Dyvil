@@ -14,18 +14,24 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ExternalTypeParameter extends TypeParameter
 {
+	// =============== Constants ===============
+
 	private static final int UPPER_BOUND  = 1;
 	private static final int LOWER_BOUND  = 2;
 	private static final int REIFIED_KIND = 4;
 
+	// =============== Fields ===============
+
 	private int  upperBoundCount;
 	private byte resolved;
+
+	// =============== Constructors ===============
 
 	// shared constructor
 	{
@@ -42,10 +48,9 @@ public class ExternalTypeParameter extends TypeParameter
 		super(generic, name);
 	}
 
-	private void resolveAnnotations()
-	{
-		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
-	}
+	// =============== Properties ===============
+
+	// --------------- Position ---------------
 
 	@Override
 	public SourcePosition getPosition()
@@ -58,6 +63,22 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
+	// --------------- Attributes ---------------
+
+	@Override
+	public AttributeList getAttributes()
+	{
+		this.resolveAnnotations();
+		return super.getAttributes();
+	}
+
+	private void resolveAnnotations()
+	{
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
+	}
+
+	// --------------- Reification ---------------
+
 	@Override
 	public Reified.Type getReifiedKind()
 	{
@@ -68,6 +89,8 @@ public class ExternalTypeParameter extends TypeParameter
 		}
 		return this.reifiedKind;
 	}
+
+	// --------------- Upper Bound ---------------
 
 	@Override
 	public IType getUpperBound()
@@ -86,21 +109,6 @@ public class ExternalTypeParameter extends TypeParameter
 			}
 		}
 		return this.upperBound = createUpperBound(this.upperBounds, 0, this.upperBoundCount);
-	}
-
-	@Override
-	public IType getLowerBound()
-	{
-		if ((this.resolved & LOWER_BOUND) == 0)
-		{
-			this.resolved |= LOWER_BOUND;
-
-			if (this.lowerBound != null)
-			{
-				this.lowerBound = this.lowerBound.resolveType(null, RootPackage.rootPackage);
-			}
-		}
-		return this.lowerBound;
 	}
 
 	/**
@@ -151,12 +159,26 @@ public class ExternalTypeParameter extends TypeParameter
 		this.upperBounds[index] = bound;
 	}
 
+	// --------------- Lower Bound ---------------
+
 	@Override
-	public AttributeList getAttributes()
+	public IType getLowerBound()
 	{
-		this.resolveAnnotations();
-		return super.getAttributes();
+		if ((this.resolved & LOWER_BOUND) == 0)
+		{
+			this.resolved |= LOWER_BOUND;
+
+			if (this.lowerBound != null)
+			{
+				this.lowerBound = this.lowerBound.resolveType(null, RootPackage.rootPackage);
+			}
+		}
+		return this.lowerBound;
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -168,6 +190,8 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -177,6 +201,8 @@ public class ExternalTypeParameter extends TypeParameter
 	public void check(MarkerList markers, IContext context)
 	{
 	}
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	public void foldConstants()
@@ -188,15 +214,19 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
+	// --------------- Compilation ---------------
+
+	@Override
+	public void writeParameter(MethodWriter writer) throws BytecodeException
+	{
+	}
+
+	// --------------- Decompilation ---------------
+
 	@Override
 	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
 		this.upperBound = null;
 		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
-	}
-
-	@Override
-	public void writeParameter(MethodWriter writer) throws BytecodeException
-	{
 	}
 }

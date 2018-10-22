@@ -15,8 +15,8 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
@@ -26,7 +26,11 @@ import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
+	// =============== Fields ===============
+
 	protected SourcePosition position;
+
+	// =============== Constructors ===============
 
 	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
@@ -42,6 +46,10 @@ public class CodeTypeParameter extends TypeParameter
 		this.position = position;
 	}
 
+	// =============== Properties ===============
+
+	// --------------- Position ---------------
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -53,6 +61,40 @@ public class CodeTypeParameter extends TypeParameter
 	{
 		this.position = position;
 	}
+
+	// =============== Methods ===============
+
+	@Override
+	protected void computeReifiedKind()
+	{
+		super.computeReifiedKind();
+
+		final IType type;
+		final Reified.Type reifiedKind = this.getReifiedKind();
+		if (reifiedKind == Reified.Type.TYPE)
+		{
+			type = TypeOperator.LazyFields.TYPE;
+		}
+		else if (reifiedKind != null)
+		{
+			type = ClassOperator.LazyFields.CLASS;
+		}
+		else
+		{
+			return;
+		}
+
+		if (this.getReifiedKind() != null)
+		{
+			final AttributeList attributes = AttributeList
+				                                 .of(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
+			final Name name = Name.apply("reify_" + this.getName().qualified);
+			final CodeParameter parameter = new CodeParameter(null, this.getPosition(), name, type, attributes);
+			this.setReifyParameter(parameter);
+		}
+	}
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -108,35 +150,7 @@ public class CodeTypeParameter extends TypeParameter
 		this.computeReifiedKind();
 	}
 
-	@Override
-	protected void computeReifiedKind()
-	{
-		super.computeReifiedKind();
-
-		final IType type;
-		final Reified.Type reifiedKind = this.getReifiedKind();
-		if (reifiedKind == Reified.Type.TYPE)
-		{
-			type = TypeOperator.LazyFields.TYPE;
-		}
-		else if (reifiedKind != null)
-		{
-			type = ClassOperator.LazyFields.CLASS;
-		}
-		else
-		{
-			return;
-		}
-
-		if (this.getReifiedKind() != null)
-		{
-			final AttributeList attributes = AttributeList
-				                                 .of(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
-			final Name name = Name.apply("reify_" + this.getName().qualified);
-			final CodeParameter parameter = new CodeParameter(null, this.getPosition(), name, type, attributes);
-			this.setReifyParameter(parameter);
-		}
-	}
+	// --------------- Diagnostic Phases ---------------
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
@@ -166,6 +180,8 @@ public class CodeTypeParameter extends TypeParameter
 		}
 	}
 
+	// --------------- Compilation Phases ---------------
+
 	@Override
 	public void foldConstants()
 	{
@@ -194,10 +210,7 @@ public class CodeTypeParameter extends TypeParameter
 		}
 	}
 
-	@Override
-	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
-	{
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeParameter(MethodWriter writer) throws BytecodeException
@@ -206,5 +219,12 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.reifyParameter.writeParameter(writer);
 		}
+	}
+
+	// --------------- Decompilation ---------------
+
+	@Override
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
+	{
 	}
 }

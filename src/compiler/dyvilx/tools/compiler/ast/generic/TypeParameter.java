@@ -36,6 +36,8 @@ import static dyvilx.tools.compiler.ast.type.builtin.Types.isSuperType;
 
 public abstract class TypeParameter implements ITypeParameter
 {
+	// =============== Fields ===============
+
 	protected @NonNull AttributeList attributes = new AttributeList();
 	protected          Variance      variance   = Variance.INVARIANT;
 
@@ -44,7 +46,8 @@ public abstract class TypeParameter implements ITypeParameter
 	protected @NonNull  IType upperBound = Types.NULLABLE_ANY;
 	protected @Nullable IType lowerBound;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected int     index;
 	protected IType   erasure = Types.OBJECT;
 	private   IType   safeUpperBound;
@@ -55,6 +58,8 @@ public abstract class TypeParameter implements ITypeParameter
 	protected IParameter      reifyParameter;
 
 	private final IType covariantType = new CovariantTypeVarType(this);
+
+	// =============== Constructors ===============
 
 	public TypeParameter(ITypeParametric generic)
 	{
@@ -74,17 +79,17 @@ public abstract class TypeParameter implements ITypeParameter
 		this.variance = variance;
 	}
 
+	// =============== Properties ===============
+
+	// --------------- Accompanying Member ---------------
+
 	@Override
 	public ITypeParametric getGeneric()
 	{
 		return this.generic;
 	}
 
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
+	// --------------- Index ---------------
 
 	@Override
 	public int getIndex()
@@ -93,46 +98,12 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void setVariance(Variance variance)
+	public void setIndex(int index)
 	{
-		this.variance = variance;
+		this.index = index;
 	}
 
-	@Override
-	public Variance getVariance()
-	{
-		return this.variance;
-	}
-
-	@Override
-	public Reified.Type getReifiedKind()
-	{
-		return this.reifiedKind;
-	}
-
-	@Override
-	public IParameter getReifyParameter()
-	{
-		return this.reifyParameter;
-	}
-
-	@Override
-	public void setReifyParameter(IParameter parameter)
-	{
-		this.reifyParameter = parameter;
-	}
-
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
+	// --------------- Attributes ---------------
 
 	@Override
 	public ElementType getElementType()
@@ -173,6 +144,8 @@ public abstract class TypeParameter implements ITypeParameter
 		return false;
 	}
 
+	// --------------- Reification ---------------
+
 	protected void computeReifiedKind()
 	{
 		if (this.reifiedKind != null)
@@ -190,24 +163,52 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
+	public Reified.Type getReifiedKind()
 	{
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
+		return this.reifiedKind;
 	}
 
 	@Override
-	public IType getErasure()
+	public IParameter getReifyParameter()
 	{
-		return this.upperBounds[0];
+		return this.reifyParameter;
 	}
 
 	@Override
-	public IType getCovariantType()
+	public void setReifyParameter(IParameter parameter)
 	{
-		return this.covariantType;
+		this.reifyParameter = parameter;
 	}
 
-	// Upper Bound
+	// --------------- Variance ---------------
+
+	@Override
+	public Variance getVariance()
+	{
+		return this.variance;
+	}
+
+	@Override
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
+	}
+
+	// --------------- Name ---------------
+
+	@Override
+	public Name getName()
+	{
+		return this.name;
+	}
+
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
+	}
+
+	// --------------- Upper Bound ---------------
 
 	@Override
 	public IType getUpperBound()
@@ -224,8 +225,7 @@ public abstract class TypeParameter implements ITypeParameter
 		return (this.safeUpperBound = this.getUpperBound().getConcreteType(this::replaceBackRefs));
 	}
 
-	@Nullable
-	private IType replaceBackRefs(ITypeParameter typeParameter)
+	private @Nullable IType replaceBackRefs(ITypeParameter typeParameter)
 	{
 		if (typeParameter.getGeneric() == this.getGeneric() && typeParameter.getIndex() >= this.getIndex())
 		{
@@ -240,13 +240,28 @@ public abstract class TypeParameter implements ITypeParameter
 		this.upperBound = bound;
 	}
 
-	// Lower Bound
-
-	@Override
-	public void setLowerBound(IType bound)
+	protected static IType[] getUpperBounds(IType upperBound)
 	{
-		this.lowerBound = bound;
+		// Flatten the tree-like upperBound structure into a list
+		final List<IType> list = new ArrayList<>();
+		getUpperBounds(list, upperBound);
+		return list.toArray(new IType[0]);
 	}
+
+	private static void getUpperBounds(List<IType> list, IType upperBound)
+	{
+		if (upperBound.typeTag() != IType.INTERSECTION)
+		{
+			list.add(upperBound);
+			return;
+		}
+
+		final IntersectionType intersection = (IntersectionType) upperBound;
+		getUpperBounds(list, intersection.getLeft());
+		getUpperBounds(list, intersection.getRight());
+	}
+
+	// --------------- Lower Bound ---------------
 
 	@Override
 	public IType getLowerBound()
@@ -255,10 +270,34 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public void setLowerBound(IType bound)
+	{
+		this.lowerBound = bound;
+	}
+
+	// --------------- Other Types ---------------
+
+	@Override
+	public IType getErasure()
+	{
+		return this.upperBounds[0];
+	}
+
+	@Override
+	public IType getCovariantType()
+	{
+		return this.covariantType;
+	}
+
+	@Override
 	public IClass getTheClass()
 	{
 		return this.getSafeUpperBound().getTheClass();
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Subtyping ---------------
 
 	@Override
 	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
@@ -307,6 +346,8 @@ public abstract class TypeParameter implements ITypeParameter
 		return isSuperClass(superType, this.getSafeUpperBound());
 	}
 
+	// --------------- Field and Method Resolution ---------------
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -325,26 +366,7 @@ public abstract class TypeParameter implements ITypeParameter
 		this.getSafeUpperBound().getImplicitMatches(list, value, targetType);
 	}
 
-	protected static IType[] getUpperBounds(IType upperBound)
-	{
-		// Flatten the tree-like upperBound structure into a list
-		final List<IType> list = new ArrayList<>();
-		getUpperBounds(list, upperBound);
-		return list.toArray(new IType[0]);
-	}
-
-	private static void getUpperBounds(List<IType> list, IType upperBound)
-	{
-		if (upperBound.typeTag() != IType.INTERSECTION)
-		{
-			list.add(upperBound);
-			return;
-		}
-
-		final IntersectionType intersection = (IntersectionType) upperBound;
-		getUpperBounds(list, intersection.getLeft());
-		getUpperBounds(list, intersection.getRight());
-	}
+	// --------------- Descriptor and Signature ---------------
 
 	@Override
 	public void appendSignature(StringBuilder buffer)
@@ -388,6 +410,8 @@ public abstract class TypeParameter implements ITypeParameter
 	{
 		this.appendParameterDescriptor(buffer);
 	}
+
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeArgument(MethodWriter writer, IType type) throws BytecodeException
@@ -438,6 +462,16 @@ public abstract class TypeParameter implements ITypeParameter
 		}
 	}
 
+	// --------------- Decompilation ---------------
+
+	@Override
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
+	{
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
+	}
+
+	// --------------- Serialization ---------------
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
@@ -459,6 +493,8 @@ public abstract class TypeParameter implements ITypeParameter
 		this.lowerBound = IType.readType(in);
 		this.upperBound = IType.readType(in);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
