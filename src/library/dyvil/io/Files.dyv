@@ -1,0 +1,117 @@
+package dyvil.io
+
+import java.io.File
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.charset.Charset
+import java.util.List
+import java.util.regex.Pattern
+
+@JavaName("Files")
+extension File {
+
+	// --------------- Ant File Name Patterns ---------------
+
+	static func antPattern(pattern: String) -> Pattern {
+		let length = pattern.length()
+		let builder = new StringBuilder(length)
+
+		for (i <- 0 ..< length) {
+			pattern.charAt(i) match {
+				case '?' => builder.append('.')
+				case '*' if i + 1 < length && pattern.charAt(i + 1) == '*' => builder.append('.*')
+				case '*' => builder.append('[^/]*')
+				case '(' => builder.append('\\(')
+				case ')' => builder.append('\\)')
+				case '[' => builder.append('\\[')
+				case ']' => builder.append('\\]')
+				case '{' => builder.append('\\{')
+				case '}' => builder.append('\\}')
+				case '.' => builder.append('\\.')
+				case '^' => builder.append('\\^')
+				case '$' => builder.append('\\$')
+				case '|' => builder.append('\\|')
+				case let c => builder.append(c)
+			}
+		}
+
+		return Pattern(builder.toString())
+	}
+
+	// --------------- File Creation ---------------
+
+	func create() -> void throws IOException inline = this.createNewFile()
+
+	func tryCreate() -> boolean = IOAction.tryIO { this.create() }
+
+	func createRecursively() -> void throws IOException {
+		if this.exists() {
+			return
+		}
+
+		if let parent = this.getParentFile {
+			if !parent.exists() && !parent.mkdirs() {
+				throw new IOException("could not create parent directory \(parent)")
+			}
+		}
+
+		this.createNewFile()
+	}
+
+	func tryCreateRecursively() -> boolean = IOAction.tryIO { this.createRecursively() }
+
+	// --------------- Writing to a File ---------------
+
+	@JavaName("writeData")
+	func write(data: [byte]) -> void throws IOException {
+		this.createRecursively()
+		Files.write(this.toPath(), data)
+	}
+
+	@JavaName("tryWriteData")
+	func tryWrite(data: [byte]) -> boolean = IOAction.tryIO { this.write(data) }
+
+	@JavaName("writeText")
+	func write(text: String) -> void throws IOException = this.write(text.getBytes)
+
+	@JavaName("writeText")
+	func tryWrite(text: String) -> boolean = IOAction.tryIO { this.write(text) }
+
+	@JavaName("writeLines")
+	func write(lines: List<String>) -> void throws IOException {
+		this.createRecursively()
+		Files.write(this.toPath(), lines, Charset.defaultCharset)
+	}
+
+	@JavaName("tryWriteLines")
+	func tryWrite(lines: List<String>) -> boolean = IOAction.tryIO { this.write(lines) }
+
+	// --------------- Reading from a File ---------------
+
+	func readData() -> [byte] throws IOException inline = Files.readAllBytes(this.toPath())
+
+	func tryReadData() -> [byte]? = IOSupplier.tryIO { this.readData() }
+
+	func readText() -> String throws IOException inline = new String(this.readData())
+
+	func tryReadText() -> String? = IOSupplier.tryIO { this.readText() }
+
+	func readLines() -> List<String> throws IOException inline = Files.readAllLines(this.toPath()) as List<String>
+
+	func tryReadLines() -> List<String>? = IOSupplier.tryIO { this.readLines() }
+
+	// --------------- File Deletion ---------------
+
+	func deleteRecursively() -> boolean = this.deleteRecursively(Int.MAX_VALUE)
+
+	func deleteRecursively(maxDepth: int) -> boolean {
+		if (maxDepth > 0 && this.isDirectory) {
+			if let files = this.listFiles() {
+				for subFile <- files {
+					subFile.deleteRecursively(maxDepth - 1)
+				}
+			}
+		}
+		return this.delete()
+	}
+}
