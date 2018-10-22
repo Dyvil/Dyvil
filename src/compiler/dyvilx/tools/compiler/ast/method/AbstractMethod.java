@@ -513,12 +513,19 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && !receiver.isClassAccess() // a
-			    || mod == 0 && receiver.isClassAccess() && !receiver.getType().getTheClass().isObject()) // b
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
 			{
-				// Disallow non-static access to static method (a)
-				// and static access to instance method (unless it's an object class) (b)
+				// Disallow non-static access to static method
 				invalid = true;
+			}
+			else if (mod == 0 && receiver.isClassAccess())
+			{
+				final IClass receiverClass = receiver.getType().getTheClass();
+				if (receiverClass == null || !receiverClass.isObject())
+				{
+					// Disallow static access to instance method (unless it's an object class)
+					invalid = true;
+				}
 			}
 
 			final IType receiverType;
@@ -717,7 +724,8 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			{
 				// instance method, accessed via declaring class
 
-				if (!receiver.getType().getTheClass().isObject())
+				final IClass receiverClass = receiver.getType().getTheClass();
+				if (receiverClass == null || !receiverClass.isObject())
 				{
 					// declaring class is not an object class -> error
 

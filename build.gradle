@@ -10,9 +10,9 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // ---------------------------------------- Main Settings ----------------------------------------
 
 class Constants {
-	public static String version = '0.41.0'
+	public static String version = '0.41.1'
 	public static String libraryVersion = '0.41.0'
-	public static String compilerVersion = '0.41.0'
+	public static String compilerVersion = '0.41.1'
 	public static String replVersion = '0.26.0'
 	public static String dpfVersion = '0.16.0'
 	public static String genSrcVersion = '0.9.3'
