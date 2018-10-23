@@ -167,7 +167,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
+	public void resolveTypesAfterBody(MarkerList markers, IContext context)
 	{
 		// Check if a constructor needs to be generated
 

@@ -55,9 +55,9 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesPre(MarkerList markers, IContext context)
+	public void resolveTypesAfterAttributes(MarkerList markers, IContext context)
 	{
-		super.resolveTypesPre(markers, context);
+		super.resolveTypesAfterAttributes(markers, context);
 
 		for (IParameter param : this.theClass.getParameters())
 		{
@@ -82,9 +82,9 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	public void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
-		super.resolveTypesHeader(markers, context);
+		super.resolveTypesBeforeBody(markers, context);
 
 		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{

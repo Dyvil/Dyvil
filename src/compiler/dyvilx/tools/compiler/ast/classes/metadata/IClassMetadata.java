@@ -70,7 +70,7 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 		throw new UnsupportedOperationException();
 	}
 
-	default void resolveTypesPre(MarkerList markers, IContext context)
+	default void resolveTypesAfterAttributes(MarkerList markers, IContext context)
 	{
 	}
 
@@ -78,14 +78,14 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and -interfaces and type parameters have
 	 * already been resolved.
 	 */
-	default void resolveTypesHeader(MarkerList markers, IContext context)
+	default void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
 	}
 
 	/**
 	 * Called after the class body went through RESOLVE_TYPES.<p/> Checks which synthetic members have to be generated
 	 */
-	default void resolveTypesBody(MarkerList markers, IContext context)
+	default void resolveTypesAfterBody(MarkerList markers, IContext context)
 	{
 	}
 

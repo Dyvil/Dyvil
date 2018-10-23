@@ -36,7 +36,7 @@ public class ExtensionMetadata implements IClassMetadata
 	// Phases
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	public void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
 		final IType superType = this.theClass.getSuperType();
 		this.theClass.setPosition(superType.getPosition());
@@ -76,7 +76,7 @@ public class ExtensionMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
+	public void resolveTypesAfterBody(MarkerList markers, IContext context)
 	{
 		final ClassBody body = this.theClass.getBody();
 

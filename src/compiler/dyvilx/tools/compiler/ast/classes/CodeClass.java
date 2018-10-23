@@ -118,7 +118,7 @@ public class CodeClass extends AbstractClass
 		this.attributes.resolveTypes(markers, context, this);
 		ModifierChecks.checkModifiers(this, markers);
 
-		this.metadata.resolveTypesPre(markers, context);
+		this.metadata.resolveTypesAfterAttributes(markers, context);
 
 		if (this.typeParameters != null)
 		{
@@ -137,7 +137,7 @@ public class CodeClass extends AbstractClass
 			this.interfaces.resolveTypes(markers, context);
 		}
 
-		this.metadata.resolveTypesHeader(markers, context);
+		this.metadata.resolveTypesBeforeBody(markers, context);
 
 		// This has to happen here because the metadata might add 'abstract' modifiers in resolveTypesHeader
 		this.checkFunctional(markers);
@@ -147,7 +147,7 @@ public class CodeClass extends AbstractClass
 			this.body.resolveTypes(markers, context);
 		}
 
-		this.metadata.resolveTypesBody(markers, context);
+		this.metadata.resolveTypesAfterBody(markers, context);
 
 		this.metadata.resolveTypesGenerate(markers, context);
 
