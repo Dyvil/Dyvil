@@ -25,6 +25,8 @@ import dyvilx.tools.compiler.ast.type.generic.InternalGenericType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
 import dyvilx.tools.compiler.ast.type.typevar.InternalTypeVarType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @SuppressWarnings( { "UnnecessaryBoxing", "unused" })
@@ -469,10 +471,14 @@ public final class ClassFormat
 			// name::
 			index++;
 		}
+
+		List<IType> upperBounds = new ArrayList<>();
 		while (desc.charAt(index) == ':')
 		{
-			index = readTyped(desc, index + 1, typeParam::addUpperBound, true);
+			index = readTyped(desc, index + 1, upperBounds::add, true);
 		}
+
+		typeParam.setUpperBounds(upperBounds.toArray(new IType[0]));
 		generic.getTypeParameters().add(typeParam);
 		return index;
 	}

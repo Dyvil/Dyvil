@@ -13,10 +13,11 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.Arrays;
 
 public class ExternalTypeParameter extends TypeParameter
 {
@@ -28,15 +29,9 @@ public class ExternalTypeParameter extends TypeParameter
 
 	// =============== Fields ===============
 
-	private int  upperBoundCount;
 	private byte resolved;
 
 	// =============== Constructors ===============
-
-	// shared constructor
-	{
-		this.upperBounds = new IType[3];
-	}
 
 	public ExternalTypeParameter(ITypeParametric generic)
 	{
@@ -95,68 +90,36 @@ public class ExternalTypeParameter extends TypeParameter
 	@Override
 	public IType getUpperBound()
 	{
-		if (this.upperBound != null)
+		final IType upperBound = super.getUpperBound();
+		if ((this.resolved & UPPER_BOUND) != 0 || upperBound == null)
 		{
-			return this.upperBound;
+			return upperBound;
 		}
 
-		if ((this.resolved & UPPER_BOUND) == 0)
-		{
-			this.resolved |= UPPER_BOUND;
-			for (int i = 0; i < this.upperBoundCount; i++)
-			{
-				this.upperBounds[i] = this.upperBounds[i].resolveType(null, this.generic.getTypeParameterContext());
-			}
-		}
-		return this.upperBound = createUpperBound(this.upperBounds, 0, this.upperBoundCount);
+		this.resolved |= UPPER_BOUND;
+		final IType resolved = upperBound.resolveType(null, this.generic.getTypeParameterContext());
+		this.setUpperBound(resolved);
+		return resolved;
 	}
 
-	/**
-	 * Creates a balanced tree for the slice of the given array
-	 *
-	 * @param upperBounds
-	 * 	the upper bounds array
-	 * @param start
-	 * 	the start index
-	 * @param count
-	 * 	the number of elements
-	 *
-	 * @return a balanced tree of {@link IntersectionType}s
-	 */
-	private static IType createUpperBound(IType[] upperBounds, int start, int count)
+	@Override
+	public IType[] getUpperBounds()
 	{
-		if (count == 1)
+		IType[] upperBounds = super.getUpperBounds();
+		if ((this.resolved & UPPER_BOUND) != 0 || upperBounds == null)
 		{
-			return upperBounds[start];
+			return upperBounds;
 		}
 
-		final int halfCount = count / 2;
-		return new IntersectionType(createUpperBound(upperBounds, start, halfCount),
-		                            createUpperBound(upperBounds, start + halfCount, count - halfCount));
-	}
+		this.resolved |= UPPER_BOUND;
 
-	public void addUpperBound(IType bound)
-	{
-		this.upperBound = null;
+		final IContext typeParameterContext = this.generic.getTypeParameterContext();
+		final IType[] resolvedUpperBounds = Arrays.stream(upperBounds)
+		                                          .map(t -> t.resolveType(null, typeParameterContext))
+		                                          .toArray(IType[]::new);
 
-		final int index = this.upperBoundCount++;
-		if (index == 0)
-		{
-			// no need to resize the array, it has definitely a bigger capacity than zero
-
-			this.erasure = bound;
-			this.upperBounds[0] = bound;
-			return;
-		}
-
-		if (index >= this.upperBounds.length)
-		{
-			IType[] temp = new IType[index + 1];
-			System.arraycopy(this.upperBounds, 0, temp, 0, index);
-			this.upperBounds = temp;
-		}
-
-		this.upperBounds[index] = bound;
+		this.setUpperBounds(resolvedUpperBounds);
+		return resolvedUpperBounds;
 	}
 
 	// --------------- Lower Bound ---------------
@@ -226,7 +189,12 @@ public class ExternalTypeParameter extends TypeParameter
 	@Override
 	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
-		this.upperBound = null;
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
+		final IType [] upperBounds = super.getUpperBounds();
+		assert (this.resolved & UPPER_BOUND) == 0;
+
+		upperBounds[index] = IType.withAnnotation(upperBounds[index], annotation, typePath);
+
+		// reset cache
+		this.setUpperBounds(upperBounds);
 	}
 }

@@ -106,24 +106,14 @@ public class CodeTypeParameter extends TypeParameter
 			this.lowerBound = this.lowerBound.resolveType(markers, context);
 		}
 
-		this.upperBound = this.upperBound.resolveType(markers, context);
-		this.upperBounds = getUpperBounds(this.upperBound);
+		this.setUpperBound(this.getUpperBound().resolveType(markers, context));
 
-		// The first upper bound is meant to be a class bound.
-		IType type = this.upperBounds[0];
-
-		IClass typeClass = type.getTheClass();
-		if (typeClass != null && !typeClass.isInterface())
+		// Check if all upper bounds after the first are interfaces
+		final IType[] upperBounds = this.getUpperBounds();
+		for (int i = 1, count = upperBounds.length; i < count; i++)
 		{
-			// If the first type is a class type (not an interface), it becomes the erasure type.
-			this.erasure = type;
-		}
-
-		// Check if the remaining upper bounds are interfaces
-		for (int i = 1, count = this.upperBounds.length; i < count; i++)
-		{
-			type = this.upperBounds[i];
-			typeClass = type.getTheClass();
+			final IType type = upperBounds[i];
+			final IClass typeClass = type.getTheClass();
 
 			if (typeClass != null && !typeClass.isInterface())
 			{
@@ -141,9 +131,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.resolve(markers, context);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.resolve(markers, context);
+			upperBound.resolve(markers, context);
 		}
 
 		this.attributes.resolve(markers, context);
@@ -160,9 +152,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
+			upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 	}
 
@@ -174,9 +168,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.check(markers, context);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.check(markers, context);
+			upperBound.check(markers, context);
 		}
 	}
 
@@ -190,9 +186,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.foldConstants();
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.foldConstants();
+			upperBound.foldConstants();
 		}
 	}
 
@@ -204,9 +202,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.cleanup(compilableList, classCompilableList);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.cleanup(compilableList, classCompilableList);
+			upperBound.cleanup(compilableList, classCompilableList);
 		}
 	}
 
