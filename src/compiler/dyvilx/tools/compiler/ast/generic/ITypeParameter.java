@@ -41,9 +41,10 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	// --------------- Index ---------------
 
-	int getIndex();
-
-	void setIndex(int index);
+	default int getIndex()
+	{
+		return this.getGeneric().getTypeParameters().indexOf(this);
+	}
 
 	// --------------- Attributes ---------------
 

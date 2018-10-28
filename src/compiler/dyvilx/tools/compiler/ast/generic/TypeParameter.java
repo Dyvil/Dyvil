@@ -40,7 +40,6 @@ public abstract class TypeParameter implements ITypeParameter
 	// --------------- Accompanying Member ---------------
 
 	protected ITypeParametric generic;
-	protected int             index;
 
 	// --------------- Declaration ---------------
 
@@ -90,20 +89,6 @@ public abstract class TypeParameter implements ITypeParameter
 	public ITypeParametric getGeneric()
 	{
 		return this.generic;
-	}
-
-	// --------------- Index ---------------
-
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
 	}
 
 	// --------------- Attributes ---------------
@@ -496,8 +481,10 @@ public abstract class TypeParameter implements ITypeParameter
 	public void write(TypeAnnotatableVisitor visitor)
 	{
 		boolean method = this.generic instanceof IMethod;
+		final int index = this.getIndex();
+
 		int typeRef = TypeReference.newTypeParameterReference(
-			method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
+			method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, index);
 
 		if (this.variance != Variance.INVARIANT)
 		{
@@ -513,8 +500,8 @@ public abstract class TypeParameter implements ITypeParameter
 		for (int i = 0, size = upperBounds.length; i < size; i++)
 		{
 			final int boundTypeRef = TypeReference.newTypeParameterBoundReference(
-				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
-				this.index, i);
+				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, index,
+				i);
 			IType.writeAnnotations(upperBounds[i], visitor, boundTypeRef, "");
 		}
 	}
