@@ -15,6 +15,7 @@ import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -171,6 +172,8 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 
 			return;
 		case FOR_END:
+			pm.report(Markers.syntaxWarning(this.position, "for.c_style.deprecated"));
+
 			this.forStatement = new ForStatement(this.position, this.variable, this.condition, this.update);
 			this.parseEnd(pm, token, type);
 			return;
