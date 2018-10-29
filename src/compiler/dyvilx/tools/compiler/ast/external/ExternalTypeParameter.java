@@ -7,6 +7,7 @@ import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.TypeParameter;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -196,5 +197,13 @@ public class ExternalTypeParameter extends TypeParameter
 
 		// reset cache
 		this.setUpperBounds(upperBounds);
+	}
+
+	// --------------- Copying ---------------
+
+	@Override
+	public ITypeParameter copy()
+	{
+		throw new UnsupportedOperationException();
 	}
 }

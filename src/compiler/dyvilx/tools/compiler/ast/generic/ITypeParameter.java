@@ -34,6 +34,8 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	ITypeParametric getGeneric();
 
+	void setGeneric(ITypeParametric generic);
+
 	default boolean isAny()
 	{
 		return this.getGeneric() instanceof ITypeAlias;
@@ -157,4 +159,8 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 	// --------------- Decompilation ---------------
 
 	void addBoundAnnotation(Annotation annotation, int index, TypePath typePath);
+
+	// --------------- Copying ---------------
+
+	ITypeParameter copy();
 }

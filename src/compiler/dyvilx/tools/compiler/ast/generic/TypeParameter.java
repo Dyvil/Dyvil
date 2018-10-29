@@ -91,6 +91,12 @@ public abstract class TypeParameter implements ITypeParameter
 		return this.generic;
 	}
 
+	@Override
+	public void setGeneric(ITypeParametric generic)
+	{
+		this.generic = generic;
+	}
+
 	// --------------- Attributes ---------------
 
 	@Override

@@ -227,4 +227,18 @@ public class CodeTypeParameter extends TypeParameter
 	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
 	{
 	}
+
+	// --------------- Copying ---------------
+
+	@Override
+	public CodeTypeParameter copy()
+	{
+		final CodeTypeParameter copy = new CodeTypeParameter(this.position, this.generic, this.name, this.variance);
+		assert this.reifiedKind == null && this.reifyParameter == null;
+
+		copy.getAttributes().addAll(this.getAttributes());
+		copy.setUpperBound(this.getUpperBound());
+		copy.setLowerBound(this.getLowerBound());
+		return copy;
+	}
 }
