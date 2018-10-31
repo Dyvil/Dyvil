@@ -19,6 +19,19 @@ import java.util.ArrayList;
 
 public class TypeParameterList extends ArrayList<ITypeParameter> implements ResolvableList<ITypeParameter>
 {
+	// =============== Constructors ===============
+
+	public TypeParameterList()
+	{
+	}
+
+	public TypeParameterList(int capacity)
+	{
+		super(capacity);
+	}
+
+	// =============== Methods ===============
+
 	// --------------- Member Resolution ---------------
 
 	public ITypeParameter get(Name name)
@@ -148,6 +161,18 @@ public class TypeParameterList extends ArrayList<ITypeParameter> implements Reso
 			typeParameter.read(in);
 			list.add(typeParameter);
 		}
+	}
+
+	// --------------- Copying ---------------
+
+	public TypeParameterList elementCopy()
+	{
+		final TypeParameterList copy = new TypeParameterList(this.size());
+		for (ITypeParameter typeParameter : this)
+		{
+			copy.add(typeParameter.copy());
+		}
+		return copy;
 	}
 
 	// --------------- Formatting ---------------
