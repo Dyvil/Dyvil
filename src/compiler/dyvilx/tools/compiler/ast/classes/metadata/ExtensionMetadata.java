@@ -55,6 +55,11 @@ public class ExtensionMetadata implements IClassMetadata
 
 				method.setThisType(replaceTypeVars(superType, this.theClass, method));
 			}
+			else
+			{
+				// TODO use raw type?
+				method.setThisType(superType);
+			}
 		}
 	}
 
