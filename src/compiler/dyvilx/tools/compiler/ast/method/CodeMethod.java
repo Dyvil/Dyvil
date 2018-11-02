@@ -104,17 +104,16 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
+
 		if (this.thisType != null)
 		{
-			// Resolve the explicit receiver type, but do not expose type parameters of this method
 			this.thisType = this.thisType.resolveType(markers, context);
 		}
 		else
 		{
 			this.thisType = this.enclosingClass.getThisType();
 		}
-
-		context = context.push(this);
 
 		if (this.typeParameters != null)
 		{
