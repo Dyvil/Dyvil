@@ -89,7 +89,7 @@ public final class GenericData implements Resolvable, ITypeContext
 		}
 
 		final int index = typeVar.getIndex();
-		return index < this.member.typeArity() && this.member.getTypeParameters().get(index) == typeVar;
+		return index >= 0 && index < this.member.typeArity() && this.member.getTypeParameters().get(index) == typeVar;
 	}
 
 	@Override
