@@ -7,12 +7,15 @@ import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
+import dyvilx.tools.compiler.ast.generic.ITypeParameter;
+import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
@@ -41,6 +44,27 @@ public class ExtensionMetadata implements IClassMetadata
 		final IType superType = this.theClass.getSuperType();
 		this.theClass.setPosition(superType.getPosition());
 		this.theClass.setName(mangleName(superType));
+
+		for (IMethod method : this.theClass.getBody().methods())
+		{
+			method.getAttributes().addFlag(Modifiers.EXTENSION);
+
+			if (!method.isStatic())
+			{
+				ITypeParametric.prependTypeParameters(this.theClass, method);
+
+				method.setThisType(replaceTypeVars(superType, this.theClass, method));
+			}
+		}
+	}
+
+	private static IType replaceTypeVars(IType type, ITypeParametric origin, ITypeParametric target)
+	{
+		return type.getConcreteType(typeParameter -> {
+			assert typeParameter.getGeneric() == origin;
+			final ITypeParameter methodTypeParameter = target.getTypeParameters().get(typeParameter.getIndex());
+			return new TypeVarType(methodTypeParameter);
+		});
 	}
 
 	private static Name mangleName(IType type)
@@ -76,7 +100,7 @@ public class ExtensionMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesAfterBody(MarkerList markers, IContext context)
+	public void check(MarkerList markers, IContext context)
 	{
 		final ClassBody body = this.theClass.getBody();
 
@@ -91,22 +115,6 @@ public class ExtensionMetadata implements IClassMetadata
 		for (IProperty property : body.properties())
 		{
 			markers.add(Markers.semanticError(property.getPosition(), "extension.property.invalid"));
-		}
-
-		final IType superType = this.theClass.getSuperType();
-		for (IMethod method : body.methods())
-		{
-			method.setThisType(superType);
-			method.getAttributes().addFlag(Modifiers.EXTENSION);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.theClass.isTypeParametric())
-		{
-			markers.add(Markers.semanticError(this.theClass.getPosition(), "extension.generic"));
 		}
 	}
 
