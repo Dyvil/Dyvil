@@ -3,8 +3,6 @@ jdk: oraclejdk8
 install: true
 
 script:
-  - ./gradlew build
-  - ./gradlew test
+  - ./gradlew build test
   - ./gradlew bootstrap
-  - ./gradlew build
-  - ./gradlew test
+  - ./gradlew build test
