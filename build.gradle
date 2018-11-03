@@ -141,40 +141,43 @@ repositories {
 }
 
 dependencies {
-	compile fileTree('libs/')
-
 	// --------------- Library ---------------
 
-	libraryCompile(files("$buildDir/classes/dyvil/library", 'libs/dyvil-library.jar'))
+	def libraryBootstrap = files('libs/dyvil-library.jar')
+	def libraryDyvilClasses = files("$buildDir/classes/dyvil/library/")
 
-	def libraryCP = sourceSets.library.output + sourceSets.library.compileClasspath
+	libraryCompileOnly(libraryBootstrap)
 
 	// --------------- Compiler ---------------
 
-	compilerCompile(files("$buildDir/classes/dyvil/compiler"), libraryCP)
-
-	def compilerCP = sourceSets.compiler.output + sourceSets.compiler.compileClasspath
+	compilerCompileOnly(libraryBootstrap)
 
 	// --------------- DPF ---------------
 
-	dpfCompile(files("$buildDir/classes/dyvil/dpf"), libraryCP)
+	def dpfDyvilClasses = files("$buildDir/classes/dyvil/dpf/")
 
-	def dpfCP = sourceSets.dpf.output + sourceSets.dpf.compileClasspath
+	dpfCompileOnly(libraryBootstrap)
 
 	// --------------- REPL ---------------
 
-	replCompile(files("$buildDir/classes/dyvil/repl"), compilerCP)
+	replCompileOnly(libraryBootstrap)
+	replCompile(sourceSets.compiler.output)
 
 	// --------------- GenSrc ---------------
 
-	gensrcCompile(files("$buildDir/classes/dyvil/gensrc"), compilerCP)
+	gensrcCompileOnly(libraryBootstrap)
+	gensrcCompile(sourceSets.compiler.output)
 
 	// --------------- Test ---------------
+
+	def testDyvilClasses = files("$buildDir/classes/dyvil/test")
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
-	testCompile(files("$buildDir/classes/dyvil/test"), dpfCP)
+	testCompile(testDyvilClasses)
+	testCompile(sourceSets.library.output, libraryDyvilClasses)
+	testCompile(sourceSets.dpf.output, dpfDyvilClasses)
 }
 
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
@@ -398,13 +401,17 @@ task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDP
 	)
 }
 
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'compileDPFDyvil', 'copyTestDyvil' ]) {
+	JavaExec exec ->
 	setupCompiler(exec,
 			source_dirs: [ 'src/test/' ],
 			libraries: [ "$buildDir/classes/dyvil/library/", "$buildDir/classes/dyvil/dpf/" ],
 			output_dir: "$buildDir/classes/dyvil/test/",
 			exclude_patterns: [ 'dyvil/experimental/**' ],
 	)
+
+	// override classpath to use the new classes instead of bootstrap
+	exec.classpath = sourceSets.test.compileClasspath + sourceSets.compiler.runtimeClasspath
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -425,6 +432,9 @@ task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
 			output_dir: "$buildDir/classes/test-gen/",
 			gensrc_dir: "$buildDir/gensrc/test/",
 	)
+
+	// override classpath to use the new classes instead of bootstrap
+	exec.classpath = sourceSets.gensrc.runtimeClasspath
 }
 
 test.dependsOn 'testDyvil', 'testGenSrc'
