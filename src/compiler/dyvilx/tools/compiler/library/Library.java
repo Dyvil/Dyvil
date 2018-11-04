@@ -4,7 +4,6 @@ import dyvil.reflect.ReflectUtils;
 import dyvil.reflect.Variance;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -32,8 +31,8 @@ public abstract class Library
 		javaLibraryLocation = getFileLocation(String.class);
 		dyvilLibraryLocation = getFileLocation(Variance.class);
 
-		dyvilLibrary = tryLoad(dyvilLibraryLocation);
-		javaLibrary = tryLoad(javaLibraryLocation);
+		dyvilLibrary = load(dyvilLibraryLocation);
+		javaLibrary = load(javaLibraryLocation);
 	}
 
 	// =============== Fields ===============
@@ -61,21 +60,15 @@ public abstract class Library
 		}
 	}
 
+	@Deprecated
 	public static Library tryLoad(File file)
 	{
-		try
-		{
-			return load(file);
-		}
-		catch (FileNotFoundException ignored)
-		{
-			return null;
-		}
+		return load(file);
 	}
 
-	public static Library load(File file) throws FileNotFoundException
+	public static Library load(File file)
 	{
-		if (file == null)
+		if (file == null || !file.exists())
 		{
 			return null;
 		}
@@ -84,15 +77,12 @@ public abstract class Library
 		{
 			return new FileLibrary(file);
 		}
-		else if (file.getPath().endsWith(".jar"))
+		if (file.getPath().endsWith(".jar"))
 		{
 			return new JarLibrary(file);
 		}
 
-		final String error = "Invalid Library File: " + file.getAbsolutePath() + (file.exists() ?
-			                                                                          " (Unsupported Format)" :
-			                                                                          " (File does not exist)");
-		throw new FileNotFoundException(error);
+		return null;
 	}
 
 	// =============== Properties ===============

@@ -5,7 +5,6 @@ import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class LibraryCommand implements ICommand
 {
@@ -37,17 +36,17 @@ public class LibraryCommand implements ICommand
 		}
 
 		final File path = new File(argument);
-		try
-		{
-			final Library library = Library.load(path);
-			library.loadLibrary();
-			repl.getCompiler().config.libraries.add(library);
 
-			repl.getOutput().println(I18n.get("command.library.success", library));
-		}
-		catch (FileNotFoundException ex)
+		final Library library = Library.load(path);
+		if (library == null)
 		{
-			repl.getErrorOutput().println(ex);
+			repl.getOutput().println(I18n.get("command.library.not_found", path));
+			return;
 		}
+
+		library.loadLibrary();
+		repl.getCompiler().config.libraries.add(library);
+
+		repl.getOutput().println(I18n.get("command.library.success", library));
 	}
 }

@@ -7,7 +7,6 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -178,13 +177,14 @@ public class CompilerConfig
 
 	public void loadLibrary(String file)
 	{
-		try
+		final Library load = Library.load(new File(file));
+		if (load != null)
 		{
-			this.libraries.add(Library.load(new File(file)));
+			this.libraries.add(load);
 		}
-		catch (FileNotFoundException ex)
+		else
 		{
-			this.compiler.error(I18n.get("library.not_found", file), ex);
+			this.compiler.warn(I18n.get("library.not_found", file));
 		}
 	}
 
