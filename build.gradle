@@ -144,38 +144,47 @@ dependencies {
 	// --------------- Library ---------------
 
 	def libraryBootstrap = files('libs/dyvil-library.jar')
-	def libraryDyvilClasses = files("$buildDir/classes/dyvil/library/")
+	def libraryDyvilClasses = files("$buildDir/classes/dyvil/library/") {
+		builtBy 'compileLibraryDyvil'
+	}
 
 	libraryCompileOnly(libraryBootstrap)
 
 	// --------------- Compiler ---------------
 
 	compilerCompileOnly(libraryBootstrap)
+	compilerRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
 
 	// --------------- DPF ---------------
 
-	def dpfDyvilClasses = files("$buildDir/classes/dyvil/dpf/")
+	def dpfDyvilClasses = files("$buildDir/classes/dyvil/dpf/") {
+		builtBy 'compileDPFDyvil'
+	}
 
 	dpfCompileOnly(libraryBootstrap)
 
 	// --------------- REPL ---------------
 
 	replCompileOnly(libraryBootstrap)
+	replRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
 	replCompile(sourceSets.compiler.output)
 
 	// --------------- GenSrc ---------------
 
 	gensrcCompileOnly(libraryBootstrap)
+	gensrcRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
 	gensrcCompile(sourceSets.compiler.output)
 
 	// --------------- Test ---------------
 
-	def testDyvilClasses = files("$buildDir/classes/dyvil/test")
+	def testDyvilClasses = files("$buildDir/classes/dyvil/test") {
+		builtBy 'compileTestDyvil'
+	}
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
-	testCompile(testDyvilClasses)
+	testRuntimeOnly(testDyvilClasses)
 	testCompile(sourceSets.library.output, libraryDyvilClasses)
 	testCompile(sourceSets.dpf.output, dpfDyvilClasses)
 }
@@ -431,6 +440,9 @@ task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
 			source_dirs: [ 'src/test/' ],
 			output_dir: "$buildDir/classes/test-gen/",
 			gensrc_dir: "$buildDir/gensrc/test/",
+			// the line is here to ensure the compiler finds all Dyvil classes
+			// (somehow its classpath-based library resolution is insufficient)
+			libraries: [ "$buildDir/classes/dyvil/library/" ]
 	)
 
 	// override classpath to use the new classes instead of bootstrap
