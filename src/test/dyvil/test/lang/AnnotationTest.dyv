@@ -1,9 +1,8 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class AnnotationTest
-{
+public class AnnotationTest {
 	@interface TypeAnnotation
 
 	@interface Inner(name: String)
@@ -12,10 +11,10 @@ public class AnnotationTest
 
 	@Inner(name: "inner")
 	@Outer(inner: @Inner(name: "Nested"))
-    static func foo(args: @TypeAnnotation [@TypeAnnotation String]) -> void
-	{
-	}
+	static func foo(args: @TypeAnnotation [@TypeAnnotation String]) -> void {}
 
-	static func apply() -> Test = test "Annotations" {
+	@Test
+	func annotations() -> void {
+		// only test compilation
 	}
 }

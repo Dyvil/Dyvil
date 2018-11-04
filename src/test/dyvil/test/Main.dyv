@@ -11,9 +11,6 @@ public class Main
 		print "Running Dyvil Tests..."
 
 		let tests = [
-			AnnotationTest()
-			ArrayTest()
-			AssignmentTest()
 			BridgeTest()
 			BuilderTest()
 			CaptureTest()
