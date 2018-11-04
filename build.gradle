@@ -410,17 +410,17 @@ task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDP
 	)
 }
 
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'compileDPFDyvil', 'copyTestDyvil' ]) {
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'dpfClasses', 'compileDPFDyvil', 'copyTestDyvil' ]) {
 	JavaExec exec ->
 	setupCompiler(exec,
 			source_dirs: [ 'src/test/' ],
-			libraries: [ "$buildDir/classes/dyvil/library/", "$buildDir/classes/dyvil/dpf/" ],
+			libraries: sourceSets.test.compileClasspath.filter { it.exists() }.toList(),
 			output_dir: "$buildDir/classes/dyvil/test/",
 			exclude_patterns: [ 'dyvil/experimental/**' ],
 	)
 
 	// override classpath to use the new classes instead of bootstrap
-	exec.classpath = sourceSets.test.compileClasspath + sourceSets.compiler.runtimeClasspath
+	exec.classpath = sourceSets.compiler.runtimeClasspath
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -450,6 +450,7 @@ task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
 }
 
 test.dependsOn 'testDyvil', 'testGenSrc'
+test.testClassesDirs = sourceSets.test.runtimeClasspath
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
