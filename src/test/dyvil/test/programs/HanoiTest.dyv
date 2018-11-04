@@ -1,0 +1,61 @@
+package dyvil.test.programs
+
+using dyvil.Test
+
+class HanoiTest
+{
+	private let moves: List<String> = List<String>()
+
+	static func apply() -> Test = test "Hanoi"
+	{
+		for (i <- 1 .. 10)
+		{
+			let test = new HanoiTest(i)
+			test "#\(i)" { requiredMoves(i) =?= test.moves.size }
+		}
+	}
+
+	static func requiredMoves(n: int) -> int = (1 << n) - 1
+
+	@LiteralConvertible.FromString
+	static class Tower(public let id: String) extends mutable.LinkedList<int>
+	{
+		static func apply(id: String) -> Tower = new Tower(id)
+	}
+
+	public init() {}
+
+	public init(n: int)
+	{
+		this.run(n)
+	}
+
+	func run(n: int) -> void
+	{
+		this.moves.clear()
+
+		let source: Tower = 'source'
+		for (i <- 1 .. n) source.push(i) // fill the tower
+
+		this.move(n, source, 'helper', 'target')
+	}
+
+	func move(from: Tower, to: Tower) -> void
+	{
+		if let item = from.pop()
+		{
+			this.moves.add "Move \(item) from \(from.id) to \(to.id)"
+			to.push(item)
+		}
+	}
+
+	func move(n: int, from: Tower, helper: Tower, to: Tower) -> void
+	{
+		if (n > 0)
+		{
+			this.move(n - 1, from, to, helper) // from   -> helper
+			this.move(from, to)                // from   -> to
+			this.move(n - 1, helper, from, to) // helper -> to
+		}
+	}
+}

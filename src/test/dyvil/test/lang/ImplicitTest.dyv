@@ -1,0 +1,79 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+class ImplicitTest
+{
+	implicit object ImplicitObject
+
+	@FunctionalInterface
+	public static interface DebugPrintable
+	{
+		static implicit func int2debug(i: int) -> DebugPrintable = => i.toString
+
+		static implicit func string2debug(s: String) -> DebugPrintable = => s
+
+		func toDebugString() -> String
+	}
+
+	static class ErrorExample
+	{
+		static class A { func test() -> String = "A" }
+		static class B { func test() -> String = "B" }
+
+		implicit postfix func s2a(s: String) -> A = new A
+
+		implicit postfix func s2b(s: String) -> B = new B
+
+		// "a".test() -> error: Ambigous call to method 'test' [method.access.ambiguous]
+	}
+
+	static implicit func i2s(i: int) -> String = i.toString
+
+	static implicit func b2s(b: boolean) -> String = b.toString
+
+	// Uses implicitly to ensure s is also eligible for implicit resolution
+	static func implicitS(implicit s: String = "default") -> String = implicitly<String>()
+
+	static func implicitly<type T>(implicit value: T) -> T = value
+
+	static func apply() -> Test = test "Implicit" {
+		test "Conversions" {
+
+			let s: String = 123
+
+			test "Assignment" { s =?= "123" }
+			test "Method Call" { true.toUpperCase =?= "TRUE" }
+
+			// Type Check is enough
+			var debug: DebugPrintable = "abc"
+			debug = 123
+		}
+
+		test "Arguments" {
+			test "Default" {
+				implicitS =?= "default"
+				implicitS() =?= "default"
+			}
+
+			test "Provided" {
+				implicitS("provided") =?= "provided"
+			}
+
+			test "Available" {
+				implicit let s = "implicit let"
+				implicitS =?= s
+			}
+		}
+
+		test "Implicit Objects" {
+			implicitly<ImplicitObject>() =?= ImplicitObject
+		}
+
+		test "Generic Arguments" {
+			implicit let s = "implicit"
+
+			implicitly<String>() =?= s
+		}
+	}
+}

@@ -1,0 +1,21 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+public class AnnotationTest
+{
+	@interface TypeAnnotation
+
+	@interface Inner(name: String)
+
+	@interface Outer(inner: Inner)
+
+	@Inner(name: "inner")
+	@Outer(inner: @Inner(name: "Nested"))
+    static func foo(args: @TypeAnnotation [@TypeAnnotation String]) -> void
+	{
+	}
+
+	static func apply() -> Test = test "Annotations" {
+	}
+}

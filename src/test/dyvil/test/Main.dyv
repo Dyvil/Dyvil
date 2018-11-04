@@ -1,6 +1,7 @@
 package dyvil.test
 
-import dyvil.tests._
+import dyvil.test.programs._
+import dyvil.test.lang._
 using dyvil.Test
 
 public class Main

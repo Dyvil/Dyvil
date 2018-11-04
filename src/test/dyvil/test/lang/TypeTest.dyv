@@ -1,0 +1,79 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+infix operator <<< { 120 }
+
+public class TypeTest
+{
+	// Receiver Type Specifiers
+
+	static case class MyList<T>(elements: T...)
+	{
+		@JavaName("sum_doubles")
+		public func sum(this: MyList<double>) -> double
+		{
+			var result = 0D
+			for (d <- this.elements) result += d
+			return result
+		}
+
+		@JavaName("sum_ints")
+		public func sum(this: MyList<int>) -> int
+		{
+			var result = 0
+			for (i <- this.elements) result += i
+			return result
+		}
+	}
+
+	// Recursive Type Parameters
+
+	interface Recur<type +SELF: Recur<SELF>>
+	{
+		func next() -> SELF
+	}
+
+	static func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
+
+	static case class IntRecur(let value: int) implements Recur<IntRecur>
+	{
+		override func next() -> IntRecur = IntRecur(this.value + 1)
+	}
+
+	static class RecurWrapper<type R: Recur<R>>(let value: R)
+
+	// Misc.
+
+	infix func <<< <T, C: Collection<T>>(collection: C, element: T) = collection.added(element)
+
+	static func voidTest<T>(value: T) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+
+	static func apply() -> Test = test "Types" {
+		test "Receiver Type" {
+			let doubles = MyList(1D, 2D, 3D)
+
+			doubles.sum =?= 6D
+		}
+
+		test "Receiver Type Overload" {
+			let ints = MyList(-1, -2, -3)
+
+			ints.sum =?= -6
+
+			/*
+			{
+				MyList("a", "b", "c").sum
+			}
+			// */
+		}
+
+		List(1, 2, 3) <<< 1
+
+		let n: IntRecur = nextRecur(IntRecur 10)
+
+		n =?= IntRecur 11
+
+		let w: RecurWrapper<IntRecur> = new RecurWrapper(IntRecur 10)
+	}
+}

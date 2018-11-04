@@ -1,0 +1,38 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+public class ArrayTest
+{
+	static func apply() -> Test = test "Arrays" {
+		test "Element Types" {
+			[]   .elementType =?= class any
+			[[]] .elementType =?= class [any]
+			[1]  .elementType =?= class Int
+			["a"].elementType =?= class String
+		}
+
+		test "Nested Element Types" {
+			[]     .nestedElementType =?= class any
+			[[]]   .nestedElementType =?= class any
+			[[1]]  .nestedElementType =?= class Int
+			[["a"]].nestedElementType =?= class String
+		}
+
+		test "Boxed" {
+			let array: [String] = [ 'a', 'b', 'c' ]
+			let obj: [Object] = boxed<Object>(array)
+			let nobj: [Object!] = genericTest(array)
+
+			obj =?= nobj
+		}
+	}
+
+	postfix func elementType <@Reified(Reified.Type.OBJECT_CLASS) T>(array: [T]) -> Class<T> = class T
+
+	postfix func nestedElementType <@Reified(Reified.Type.OBJECT_CLASS) T>(array: [[T]]) -> Class<T> = class T
+
+	static func genericTest<type T: any!>(array: [T]) -> [Object!] = boxed<Object!>(array)
+
+	static func boxed<@Reified(.ANY_CLASS) type T: any!>(array: [T]) -> [T & Object!] = array
+}

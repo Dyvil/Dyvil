@@ -1,0 +1,30 @@
+package dyvil.test.programs
+
+using dyvil.Collections
+using dyvil.Test
+
+public class FibonacciTest
+{
+	static func apply() -> Test = test "Fibonacci" {
+		let sequence = fibonacciSequence(20)
+
+		for (i <- 0 ..< sequence.size)
+		{
+			test "#\(i + 1)" { sequence[i] =?= fibonacci(i) }
+		}
+	}
+
+	static func fibonacciSequence(n: int) -> List<int>
+	{
+		let list: MutableList<int> = [ 1, 1 ]
+
+		for (i <- 2 ..< n)
+		{
+			list += list[i - 1] + list[i - 2]
+		}
+
+		return list
+	}
+
+	static func fibonacci(n: int) -> int = if n <= 1 { 1 } else fibonacci(n - 1) + fibonacci(n - 2)
+}

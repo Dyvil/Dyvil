@@ -1,0 +1,37 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+import java.io._
+
+class ObjectTest
+{
+	static object TestObject
+
+	static func apply() -> Test = test "Objects" {
+		let obj = TestObject.instance
+
+		test "Equality"  { obj          =?= TestObject }
+		test "Hash Code" { obj.hashCode =?= "dyvil/test/lang/ObjectTest$TestObject".hashCode }
+		test "String"    { obj.toString =?= "TestObject" }
+
+		test "Serialization" {
+			// ---- Serialize ----
+
+			let bos = new ByteArrayOutputStream
+			let oos = new ObjectOutputStream(bos)
+
+			oos.writeObject(TestObject)
+			oos.close()
+
+			let bytes = bos.toByteArray
+
+			// ---- Deserialize ----
+
+			let ois = new ObjectInputStream(new ByteArrayInputStream(bytes))
+			let deserialized = ois.readObject
+
+			deserialized =?= TestObject
+		}
+	}
+}

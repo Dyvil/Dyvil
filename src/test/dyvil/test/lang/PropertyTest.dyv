@@ -1,0 +1,42 @@
+package dyvil.test.lang
+
+using dyvil.Test
+
+class PropertyTest
+{
+	interface AbstractProperty
+	{
+		var value: int { get; set }
+	}
+
+	static class ConcreteProperty implements AbstractProperty
+	{
+		private var setterCalled: boolean = false
+		{
+			public get
+			public set
+		}
+
+		private var value: int = 1
+		{
+			public override get
+			public override set(newValue)
+			{
+				this.setterCalled = true
+				this.value = newValue
+			}
+		}
+	}
+
+	static func apply() -> Test = test "Properties" {
+		var c = new ConcreteProperty
+
+		test "Initializer" { c.value =?= 1 }
+
+		c.value = 20
+		test "Getter" { c.value =?= 20 }
+
+		c.value = 10
+		test "Setter" { c.setterCalled =?= true }
+	}
+}
