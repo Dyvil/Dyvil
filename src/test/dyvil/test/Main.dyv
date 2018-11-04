@@ -11,11 +11,7 @@ public class Main
 		print "Running Dyvil Tests..."
 
 		let tests = [
-			BridgeTest()
 			BuilderTest()
-			CaptureTest()
-			CaseClassTest()
-			ConstructorTest()
 			DeclarationTest()
 			DPFTest()
 			EnumTest()

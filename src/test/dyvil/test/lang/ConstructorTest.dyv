@@ -1,7 +1,7 @@
 package dyvil.test.lang
 
 using dyvil.Collections
-using dyvil.Test
+using dyvil.test.JUnit
 
 class ConstructorTest
 {
@@ -12,8 +12,7 @@ class ConstructorTest
 	{
 		public static var classInitialized: boolean
 
-		static init
-		{
+		static init {
 			classInitialized = true
 		}
 
@@ -24,8 +23,7 @@ class ConstructorTest
 	{
 		public var initialized: boolean
 
-		init
-		{
+		init {
 			this.initialized = true
 		}
 	}
@@ -34,80 +32,76 @@ class ConstructorTest
 
 	static case object O extends A(1, 1)
 
-	static class InitOrder
-	{
+	static class InitOrder {
 		public var order = MutableList<String>()
 
-		let i: int = { this.order += "init s" ; 0 }
+		let i: int = {
+			this.order += "init s"
+			0
+		}
 
-		init
-		{
+		init {
 			this.order += "init block"
 		}
 
-		public init() : this(1)
-		{
+		public init() : this(1) {
 			this.order += "init() body"
 		}
 
-		public init(value: int)
-		{
+		public init(value: int) {
 			this.order += "init(int) body"
 		}
 	}
 
-	static func apply() -> Test = test "Constructors" {
-		test "A" {
-			A.initClass
-			let a = A(1, 2)
+	@Test
+	func constructorsA() -> void {
+		A.initClass
+		let a = A(1, 2)
 
-			test "classInitialized" {
-				A.classInitialized =?= true
-			}
+		A.classInitialized =?= true
 
-			test "i" { a.i =?= 1 }
-			test "j" { a.j =?= 2 }
+		a.i =?= 1
+		a.j =?= 2
 
-			test "Protected Constructor" {
-				class(A).getDeclaredConstructors()[0].getModifiers() =?= dyvil.reflect.Modifiers.PROTECTED
-			}
-		}
+		class(A).getDeclaredConstructors()[0].getModifiers() =?= dyvil.reflect.Modifiers.PROTECTED
+	}
 
-		test "B" {
-			let b = B(1)
-			let ba: A = b // B -> A
+	@Test
+	func constructorsB() -> void {
+		let b = B(1)
+		let ba: A = b // B -> A
 
-			test "initialized" {
-				b.initialized =?= true
-			}
+		b.initialized =?= true
 
-			test "i" { ba.i =?= 1 }
-			test "j" { ba.j =?= 0 }
-		}
+		ba.i =?= 1
+		ba.j =?= 0
+	}
 
-		test "C" {
-			let c = C(2)
-			let ca: A = c // C -> A
+	@Test
+	func constructorsC() -> void {
+		let c = C(2)
+		let ca: A = c // C -> A
 
-			c =?= C(2)
+		c =?= C(2)
 
-			test "i" { ca.i =?= 0 }
-			test "j" { ca.j =?= 2 }
-		}
+		ca.i =?= 0
+		ca.j =?= 2
+	}
 
-		test "O" {
-			let o = O
-			let oa: A = o // O -> A
+	@Test
+	func constructorsO() -> void {
+		let o = O
+		let oa: A = o // O -> A
 
-			o =?= O
+		o =?= O
 
-			test "i" { oa.i =?= 1 }
-			test "j" { oa.j =?= 1 }
-		}
+		oa.i =?= 1
+		oa.j =?= 1
+	}
 
-		test "Initialization Order" {
-			let initOrder = new InitOrder
-			initOrder.order =?= List("init s", "init block", "init(int) body", "init() body")
-		}
+	@Test
+	func initOrder() -> void {
+		let initOrder = new InitOrder
+		initOrder.order =?= List("init s", "init block", "init(int) body", "init() body")
 	}
 }
