@@ -1,11 +1,11 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class DeclarationTest
-{
-	static func apply() -> Test = test "Declarations" {
-
+class DeclarationTest {
+	@Test
+	func declarations() {
+		// test compilation only
 	}
 
 	// --------------- Functions ---------------
@@ -16,7 +16,7 @@ class DeclarationTest
 
 	func f3() -> int inline throws Exception = 3
 
-	// func f4() -> int throws Exception inline = 4 // error for now
+	func f4() -> int throws Exception inline = 4
 
 	// func f5() -> int throws Exception = 5 inline // error
 
@@ -48,11 +48,13 @@ class DeclarationTest
 
 	// --------------- Constructor ---------------
 
-	public init(i1: int) : super() throws Exception {}
+	static class Constructors {
+		public init(i1: int) : super() throws Exception {}
 
-	// init() public : super() throws Exception {} // error
+		// init() public : super() throws Exception {} // error
 
-	init(i1: int, i2: int) : super() public throws Exception {}
+		init(i1: int, i2: int) : super() public throws Exception {}
 
-	// init() : super() throws Exception public {} // error for now
+		init() : super() throws Exception public {}
+	}
 }

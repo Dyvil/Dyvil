@@ -11,9 +11,7 @@ public class Main
 		print "Running Dyvil Tests..."
 
 		let tests = [
-			DeclarationTest()
 			DPFTest()
-			EnumTest()
 			ExtensionTest()
 			ForTest()
 			ImplicitTest()

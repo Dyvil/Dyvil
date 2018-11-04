@@ -1,37 +1,39 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class EnumTest
-{
-	static func apply() -> Test = test "Enum" {
-		load(class Empty)
-		load(class WithParams)
-		load(class WithCtor)
-		load(class Color)
-
-		test "constructors" {
-			Color.RED.rgb =?= 0xFF0000
-			Color.GREEN.rgb =?= 0x00FF00
-			Color.BLUE.rgb =?= 0x0000FF
-		}
-
-		test "from(ordinal)" {
-			require(Color.from(0) match {
-				case .RED => true
-				case _ => false
-			})
-		}
-
-		test "from(name)" {
-			require(Color.from("GREEN") match {
-				case .GREEN => true
-				case _ => false
-			})
-		}
+class EnumTest {
+	@Test
+	func constructors() -> void {
+		Color.RED.rgb =?= 0xFF0000
+		Color.GREEN.rgb =?= 0x00FF00
+		Color.BLUE.rgb =?= 0x0000FF
 	}
 
-	static func load(c: Class<_>) -> void {}
+	@Test
+	func fromOrdinal() -> void {
+		Color.from(0) =?= Color.RED
+		Color.from(1) =?= Color.GREEN
+		Color.from(2) =?= Color.BLUE
+	}
+
+	@Test
+	func fromName() -> void {
+		Color.from("RED") =?= Color.RED
+		Color.from("GREEN") =?= Color.GREEN
+		Color.from("BLUE") =?= Color.BLUE
+	}
+
+	@Test
+	func enumMatch() -> void {
+		for color <- Color.values {
+			color match {
+				case .RED => color =?= Color.RED
+				case .GREEN => color =?= Color.GREEN
+				case .BLUE => color =?= Color.BLUE
+			}
+		}
+	}
 
 	// Test Constructor / Initializer Generation and Transformation
 
@@ -39,8 +41,7 @@ class EnumTest
 
 	static enum WithParams(let s: String, let i: int)
 
-	static enum WithCtor
-	{
+	static enum WithCtor {
 		private init() : super()
 
 		private init(i: int) : this()
@@ -48,8 +49,7 @@ class EnumTest
 		private init(s: String, i: int) : this(i)
 	}
 
-	static enum Color(let rgb: int)
-	{
+	static enum Color(let rgb: int) {
 		case RED = (255, 0, 0)
 		case GREEN = 0x00FF00
 		case BLUE = (0, 0, 255)
