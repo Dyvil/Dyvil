@@ -8,7 +8,9 @@ public class ExtensionTest
 	static func apply() -> Test = test "Extension Methods" {
 		sourceFallback()
 		sourceOverride()
-		nonSource()
+		externalStrings()
+		sourceStrings()
+		generic()
 	}
 
 	// --------------- Extension of Source Classes ---------------
@@ -50,27 +52,65 @@ public class ExtensionTest
 		d.custom =?= "custom"
 	}
 
-	// --------------- Extension of non-Source Class ---------------
+	// --------------- External Extension of External Class ---------------
 
-	extension String
-	{
-		static func empty() -> String = ""
+	static func externalStrings() -> Test = test "External Strings Extension" {
+		"aaaba".count('a') =?= 4
 
-		func size() -> int = this.length
-	}
-
-	static func nonSource() -> Test = test "Non-Source" {
-		String.empty =?= ""
+		"A" * 4 =?= "AAAA"
 
 		String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
 
-		"abc".size =?= 3
+		let lambda1 = () => String(fromShared: [])
+		let lambda2 = (s: String, c: char) => s.contains(c)
 
-		let lambda1 = () => String.empty
-		let lambda2 = (s: String) => s.size
+		lambda1() =?= ""
+		lambda2("asdf", 'd') =?= true
+	}
+
+	// --------------- Source Extension of External Class ---------------
+
+	extension String {
+		static func myEmpty() -> String = ""
+
+		func mySize() -> int = this.length
+	}
+
+	static func sourceStrings() -> Test = test "Source Strings Extension" {
+		String.myEmpty =?= ""
+
+		"abc".mySize =?= 3
+
+		let lambda1 = () => String.myEmpty
+		let lambda2 = (s: String) => s.mySize
 
 		lambda1() =?= ""
 		lambda2("asdf") =?= 4
+	}
+
+	// --------------- Generic Extensions ---------------
+
+	extension<type T> List<T> {
+		static func myEmpty<type T>() -> List<T> = List<T>()
+
+		func first() -> T = this.get(0)
+
+		func last() -> T = this.get(this.size - 1)
+
+		func myAdd(element: T) -> void = this.add(element)
+	}
+
+	static func generic() -> Test = test "Generic Extensions" {
+		let list = MutableList(1, 2, 3)
+
+		list.first =?= 1
+		list.last =?= 3
+
+		list.myAdd(4)
+
+		list.last =?= 4
+
+		List.myEmpty<String>() =?= List<String>()
 	}
 
 	// --------------- Speed Test ---------------
