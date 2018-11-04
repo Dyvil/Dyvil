@@ -1,8 +1,8 @@
-package dyvil.test.programs
+package dyvilx.tools.dpf
 
 import java.io._
 
-using dyvil.Test
+using dyvil.test.JUnit
 
 import dyvil.collection.mutable.TreeMap
 
@@ -14,25 +14,20 @@ import dyvilx.tools.dpf.converter.{ binary._, string._, flatmap._ }
 using dyvilx.tools.dpf.DPFSyntax._
 import dyvilx.tools.dpf.DPFConvertible
 
-class DPFTest
-{
-	static case class Button(var text: String, var x: int, var y: int) implements DPFConvertible
-	{
-		private var visible: boolean = false
-		{
+class DPFTest {
+	static case class Button(var text: String, var x: int, var y: int) implements DPFConvertible {
+		private var visible: boolean = false {
 			public get
 			public set
 		}
 
-		override func toPropertyValue() -> Value
-		{
+		override func toPropertyValue() -> Value {
 			return "Button"(this.text, "x": this.x, "y": this.y) {
 				"visible": this.visible
 			}
 		}
 
-		public func apply(configure: Configure<Button>) -> Button
-		{
+		public func apply(configure: Configure<Button>) -> Button {
 			configure this
 			return this
 		}
@@ -68,16 +63,11 @@ class DPFTest
 
 	public const TEST_STRING: String = TEST_NODE.toString
 
-	static func apply() -> Test = test "DPF" {
-		test "DPF Parser" {
-			Parser.parse(TEST_STRING) =?= TEST_NODE
-		}
-
-		testExpand()
-		testBinary()
+	@Test func parser() -> void {
+		Parser.parse(TEST_STRING) =?= TEST_NODE
 	}
 
-	private static func testExpand() -> Test = test "Expand" {
+	@Test func expand() -> void {
 		// Parse as a Map
 		let baseMap = new TreeMap<String, Object>
 		TEST_NODE.accept(new FlatMapConverter(baseMap))
@@ -94,28 +84,21 @@ class DPFTest
 		nodeMap =?= expandedMap
 	}
 
-	private static func testBinary() -> Test = test "Binary" {
+	@Test func binary() -> void throws Exception {
 		let newNode = new RootNode
 
-		try
-		{
-			let byteArrayOutputStream = new ByteArrayOutputStream()
-			let dataOutputStream = new DataOutputStream(byteArrayOutputStream)
+		let byteArrayOutputStream = new ByteArrayOutputStream()
+		let dataOutputStream = new DataOutputStream(byteArrayOutputStream)
 
-			TEST_NODE.accept(new BinaryWriter(dataOutputStream))
+		TEST_NODE.accept(new BinaryWriter(dataOutputStream))
 
-			let bytes = byteArrayOutputStream.toByteArray
-			let byteArrayInputStream = new ByteArrayInputStream(bytes)
-			let dataInputStream = new DataInputStream(byteArrayInputStream)
+		let bytes = byteArrayOutputStream.toByteArray
+		let byteArrayInputStream = new ByteArrayInputStream(bytes)
+		let dataInputStream = new DataInputStream(byteArrayInputStream)
 
-			let binaryReader = new BinaryReader(dataInputStream)
+		let binaryReader = new BinaryReader(dataInputStream)
 
-			binaryReader.readNodes(newNode)
-		}
-		catch (ex: Throwable)
-		{
-			ex.printStackTrace
-		}
+		binaryReader.readNodes(newNode)
 
 		newNode =?= TEST_NODE
 	}
