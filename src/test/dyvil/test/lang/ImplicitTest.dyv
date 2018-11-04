@@ -1,14 +1,12 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class ImplicitTest
-{
+class ImplicitTest {
 	implicit object ImplicitObject
 
 	@FunctionalInterface
-	public static interface DebugPrintable
-	{
+	public static interface DebugPrintable {
 		static implicit func int2debug(i: int) -> DebugPrintable = => i.toString
 
 		static implicit func string2debug(s: String) -> DebugPrintable = => s
@@ -16,10 +14,13 @@ class ImplicitTest
 		func toDebugString() -> String
 	}
 
-	static class ErrorExample
-	{
-		static class A { func test() -> String = "A" }
-		static class B { func test() -> String = "B" }
+	static class ErrorExample {
+		static class A {
+			func test() -> String = "A"
+		}
+		static class B {
+			func test() -> String = "B"
+		}
 
 		implicit postfix func s2a(s: String) -> A = new A
 
@@ -37,43 +38,39 @@ class ImplicitTest
 
 	static func implicitly<type T>(implicit value: T) -> T = value
 
-	static func apply() -> Test = test "Implicit" {
-		test "Conversions" {
+	@Test
+	func conversions() -> void {
+		let s: String = 123
 
-			let s: String = 123
+		s =?= "123"
+		true.toUpperCase =?= "TRUE"
 
-			test "Assignment" { s =?= "123" }
-			test "Method Call" { true.toUpperCase =?= "TRUE" }
+		// Type Check is enough
+		var debug: DebugPrintable = "abc"
+		debug = 123
+	}
 
-			// Type Check is enough
-			var debug: DebugPrintable = "abc"
-			debug = 123
-		}
+	@Test
+	func arguments() -> void {
+		implicitS =?= "default"
+		implicitS() =?= "default"
+		implicitS("provided") =?= "provided"
 
-		test "Arguments" {
-			test "Default" {
-				implicitS =?= "default"
-				implicitS() =?= "default"
-			}
+		implicit let s = "implicit let"
+		implicitS =?= s
+	}
 
-			test "Provided" {
-				implicitS("provided") =?= "provided"
-			}
+	@Test
+	func genericArguments() -> void {
+		implicit let s = "implicit"
+		implicitly<String>() =?= s
 
-			test "Available" {
-				implicit let s = "implicit let"
-				implicitS =?= s
-			}
-		}
+		implicit let i = 10
+		implicitly<int>() =?= i
+	}
 
-		test "Implicit Objects" {
-			implicitly<ImplicitObject>() =?= ImplicitObject
-		}
-
-		test "Generic Arguments" {
-			implicit let s = "implicit"
-
-			implicitly<String>() =?= s
-		}
+	@Test
+	func objects() -> void {
+		implicitly<ImplicitObject>() =?= ImplicitObject
 	}
 }

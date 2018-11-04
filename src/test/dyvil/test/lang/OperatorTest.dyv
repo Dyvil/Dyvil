@@ -1,18 +1,12 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
 prefix operator +++
 postfix operator +++
 
-public class OperatorTest
-{
-	static func apply() -> Test = test "Operators" {
-		unary()
-		binary()
-		ternary()
-		circumfix()
-	}
+class OperatorTest {
+	// --------------- Unary ---------------
 
 	@JavaName('preinc')
 	prefix func ++(i: int) -> int = i
@@ -20,7 +14,13 @@ public class OperatorTest
 	@JavaName('postinc')
 	postfix func ++(i: int) -> int = i
 
-	static func unary() -> Test = test "Unary" {
+	@JavaName("plusPre")
+	prefix func +++(i: int) -> int = i - 1
+
+	@JavaName("plusPost")
+	postfix func +++(i: int) -> int = i + 1
+
+	@Test func unary() -> void {
 		infix func apply(i: int, j: int) -> (int, int) = (i, j)
 
 		var i = 1                         // Canonical Representation:
@@ -33,23 +33,21 @@ public class OperatorTest
 		let p = i+++ + + +++ i            // (i+++) + (+ (+++i))
 
 		// don't care about values, resolution pass is sufficient
-
-		require true
 	}
 
-	static func binary() -> Test = test "Binary" {
+	// --------------- Binary ---------------
+
+	@Test func binary() -> void {
 		let i = 1 + 2 * 3 + 4
 		let k = 1 : 2 : 3
 
-		test "Precedence" {
-			i =?= 11
-		}
-		test "Associativity" {
-			k =?= (1, (2, 3))
-		}
+		i =?= 11
+		k =?= (1, (2, 3))
 	}
 
-	static func ternary() -> Test = test "Ternary" {
+	// --------------- Ternary ---------------
+
+	@Test func ternary() -> void {
 		let i = true ? 1 : 2
 		let j = true ? 1 : true ? 2 : 3
 		let k = true ? true ? 1 : 2 : 3
@@ -58,7 +56,17 @@ public class OperatorTest
 		// don't care about values, type check pass is sufficient
 	}
 
-	static func circumfix() -> Test = test "Circumfix" {
+	// --------------- Circumfix ---------------
+
+	@JavaName("plusPre")
+	prefix func +++(s: String) -> String = "+++(\(s))"
+
+	@JavaName("plusPost")
+	postfix func +++(s: String) -> String = "(\(s))+++"
+
+	static func +++_+++(s: String) -> String = "+++(\(s))+++"
+
+	@Test func circumfix() -> void {
 		let d = -1.0
 		let i = -2
 		let c = dyvil.math.Complex(1.0, 1.0)
@@ -80,18 +88,4 @@ public class OperatorTest
 		s2 =?= "+++((a)+++)"
 		s3 =?= "(+++(a))+++"
 	}
-
-	@JavaName("plusPre")
-	prefix func +++(i: int) -> int = i - 1
-
-	@JavaName("plusPost")
-	postfix func +++(i: int) -> int = i + 1
-
-	@JavaName("plusPre")
-	prefix func +++(s: String) -> String = "+++(\(s))"
-
-	@JavaName("plusPost")
-	postfix func +++(s: String) -> String = "(\(s))+++"
-
-	static func +++_+++(s: String) -> String = "+++(\(s))+++"
 }

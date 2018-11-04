@@ -1,13 +1,14 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class NestedMethodTest
-{
-	static func apply() -> Test = test "Nested Methods" {
+class NestedMethodTest {
+	@Test func apply() -> void {
 		var i = 0
 
-		func testI(text: String, expected: int) -> Test = test text { i =?= expected }
+		func testI(text: String, expected: int) {
+			i =?= expected
+		}
 
 		func setI(newValue: int) = i = newValue
 

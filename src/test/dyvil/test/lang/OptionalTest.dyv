@@ -1,54 +1,47 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class OptionalTest
-{
-	static func apply() -> Test = test "Optionals" {
-		let optString = Optional("abc")
+class OptionalTest {
+	static let optString = Optional("abc")
 
-		test "Optional Chains" {
-			let optUppercase = optString?.toUpperCase
-			// = optString == null ? null : optString!!.toUpperCase
+	@Test func optionalChains() -> void {
+		let optUppercase = optString?.toUpperCase
+		// = optString == null ? null : optString!!.toUpperCase
 
-			optUppercase =?= "ABC"
-		}
+		optUppercase =?= "ABC"
+	}
 
-		test "Null Coalescing" {
-			let string = optString ?? "def" // = "abc"
-			string.staticType.toString =?= "java.lang.String"
+	@Test func nullCoalescing() -> void {
+		// with optional LHS
+		let string = optString ?? "def" // = "abc"
+		string.staticType.toString =?= "java.lang.String"
 
-			test "With Subscript" {
-				let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
+		// with subscript
+		let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
+		optUppercaseFirst =?= 65
 
-				optUppercaseFirst =?= 65
-			}
+		// with LHS that is not an optional chain
+		let a = (null as String?) ?? "a"
+		a =?= "a"
 
-			test "With non-optional-chain lhs" {
-				let a = (null as String?) ?? "a"
+		// with Primitives (see bug #357)
+		let optTuple = Optional((1, 2))
+		let optFirst = optTuple?._1
+		optFirst =?= 1
 
-				a =?= "a"
-			}
+		let optSecond = optTuple?._2 ?? 0
+		optSecond =?= 2
+	}
 
-			test "With Primitives" { // see bug #357
-				let optTuple = Optional((1, 2))
-				let optFirst = optTuple?._1
-				optFirst =?= 1
+	@Test func optionalBinding() -> void {
+		let opt = Optional "ABC"
 
-				let optSecond = optTuple?._2 ?? 0
-				optSecond =?= 2
-			}
-		}
+		if let abc = opt { } else { fail }
+		if (let abc = opt; !abc.isEmpty) { } else { fail }
+		if (let abc = opt, let a = abc.substring(0, 1)) { a =?= "A" } else { fail }
 
-		test "Optional Binding" {
-			let opt = Optional "ABC"
-
-			if let abc = opt { } else { fail }
-			if (let abc = opt; !abc.isEmpty) { } else { fail }
-			if (let abc = opt, let a = abc.substring(0, 1)) { a =?= "A" } else { fail }
-
-			let s = Optional "a"
-			if let s = s { s.staticType.toString =?= "java.lang.String" } else { fail }
-		}
+		let s = Optional "a"
+		if let s = s { s.staticType.toString =?= "java.lang.String" } else { fail }
 	}
 }

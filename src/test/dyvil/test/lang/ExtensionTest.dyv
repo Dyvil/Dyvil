@@ -1,37 +1,27 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 using dyvil.Strings
 
-public class ExtensionTest
-{
-	static func apply() -> Test = test "Extension Methods" {
-		sourceFallback()
-		sourceOverride()
-		externalStrings()
-		sourceStrings()
-		generic()
-	}
-
+class ExtensionTest {
 	// --------------- Extension of Source Classes ---------------
 
 	static class A
 
 	static class B extends A
 
-	static class C extends B
-	{
+	static class C extends B {
 		public func custom() -> String = "custom"
 	}
 
 	static class D extends C
 
-	extension A
-	{
+	extension A {
 		func custom() -> String = "fallback"
 	}
 
-	static func sourceFallback() -> Test = test "Source Fallback" {
+	@Test
+	func sourceFallback() -> void {
 		let a = new A
 		let b = new B
 
@@ -39,7 +29,8 @@ public class ExtensionTest
 		b.custom =?= "fallback"
 	}
 
-	static func sourceOverride() -> Test = test "Source Override" {
+	@Test
+	func sourceOverride() -> void {
 		let c = new C
 		let d = new D
 
@@ -54,7 +45,8 @@ public class ExtensionTest
 
 	// --------------- External Extension of External Class ---------------
 
-	static func externalStrings() -> Test = test "External Strings Extension" {
+	@Test
+	func externalStrings() -> void {
 		"aaaba".count('a') =?= 4
 
 		"A" * 4 =?= "AAAA"
@@ -76,7 +68,8 @@ public class ExtensionTest
 		func mySize() -> int = this.length
 	}
 
-	static func sourceStrings() -> Test = test "Source Strings Extension" {
+	@Test
+	func sourceStrings() -> void {
 		String.myEmpty =?= ""
 
 		"abc".mySize =?= 3
@@ -100,7 +93,8 @@ public class ExtensionTest
 		func myAdd(element: T) -> void = this.add(element)
 	}
 
-	static func generic() -> Test = test "Generic Extensions" {
+	@Test
+	func generic() -> void {
 		let list = MutableList(1, 2, 3)
 
 		list.first =?= 1
@@ -111,29 +105,5 @@ public class ExtensionTest
 		list.last =?= 4
 
 		List.myEmpty<String>() =?= List<String>()
-	}
-
-	// --------------- Speed Test ---------------
-
-	static func testSpeed() -> void
-	{
-		let values = [ new A, new B, new C, new D ]
-		let dump: [String] = new [String](4)
-		let random = Random()
-		let count = 1_000_000
-		var totalTime = 0L
-
-		for (i <- 0 ..< count)
-		{
-			let index = random.nextInt(values.size)
-			let current = values[index]
-
-			let now = System.nanoTime
-			dump[index] = current.custom
-			totalTime += System.nanoTime - now
-		}
-
-		print dump
-		print "Dynamic Dispatch Speed: \(totalTime / count) ns / invocation"
 	}
 }

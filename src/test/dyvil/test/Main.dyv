@@ -12,18 +12,6 @@ public class Main
 
 		let tests = [
 			DPFTest()
-			ExtensionTest()
-			ForTest()
-			ImplicitTest()
-			InheritanceTest()
-			IntrinsicTest()
-			LambdaTest()
-			MatchTest()
-			NestedMethodTest()
-			ObjectTest()
-			OperatorTest()
-			OptionalTest()
-			OverloadTest()
 			PrimitiveTest()
 			PropertyTest()
 			RangeTest()

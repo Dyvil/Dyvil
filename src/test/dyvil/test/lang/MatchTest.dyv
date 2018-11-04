@@ -3,51 +3,10 @@ package dyvil.test.lang
 import class dyvil.test.lang.CaseClassTest._
 
 using dyvil.Collections
-using dyvil.Test
+using dyvil.test.JUnit
 
-class MatchTest
-{
-	static enum TestEnum
-	{
-		case A
-		case B
-		case Aa
-		case BB
-		case AaAa
-		case AaBB
-		case BBAa
-		case BBBB
-	}
-
-	static class KeyValue
-	{
-		postfix func unapply(s: String) -> (String, String)?
-		{
-			let index = s.indexOf ':'
-			if (index < 0) return null
-			return (s.substring(0, index), s.substring(index + 1))
-		}
-	}
-
-	static func apply() -> Test = test "Match Expressions" {
-		mixedPrimitives()
-		table()
-		tableHoles()
-		lookup()
-		stringTable()
-		stringLookup()
-		stringCollision()
-		expression()
-		tuples()
-		enums()
-		caseClasses()
-		objects()
-		fields()
-		orPatterns()
-		andPatterns()
-	}
-
-	private static func mixedPrimitives() -> Test = test "Mixed Primitives" {
+class MatchTest {
+	@Test func mixedPrimitives() -> void {
 		/*
 		test "Integer" {
 			0 match {
@@ -87,7 +46,9 @@ class MatchTest
 		*/
 	}
 
-	private static func table() -> Test = test "Table Switch" {
+	// --------------- Ints ---------------
+
+	@Test func table() -> void {
 		2 match {
 			case 0 => fail
 			case 1 => fail
@@ -96,7 +57,7 @@ class MatchTest
 		}
 	}
 
-	private static func tableHoles() -> Test = test "Table Switch with Holes" {
+	@Test func tableHoles() -> void {
 		2 match {
 			case 0 => fail
 			case 1 => fail
@@ -106,7 +67,7 @@ class MatchTest
 		}
 	}
 
-	private static func lookup() -> Test = test "Lookup Switch" {
+	@Test func lookup() -> void {
 		100 match {
 			case 1   => fail
 			case 10  => fail
@@ -115,7 +76,9 @@ class MatchTest
 		}
 	}
 
-	private static func stringTable() -> Test = test "Table Switch String" {
+	// --------------- Strings ---------------
+
+	@Test func stringTable() -> void {
 		"a" match {
 			case "b" => fail
 			case "c" => fail
@@ -124,7 +87,7 @@ class MatchTest
 		}
 	}
 
-	private static func stringLookup() -> Test = test "Lookup Switch String" {
+	@Test func stringLookup() -> void {
 		"abc" match {
 			case "def" => fail
 			case "abc" => pass
@@ -132,20 +95,22 @@ class MatchTest
 		}
 	}
 
-	private static func stringCollision() -> Test = test "String Hash Collisions" {
+	@Test func stringCollision() -> void {
 		"AaBB" match {
-			case "Aa"   => fail
-			case "BB"   => fail
-			case "AaAa" => fail
-			case "BBBB" => fail
+			case "Aa"            => fail
+			case "BB"            => fail
+			case "AaAa"          => fail
+			case "BBBB"          => fail
 			case "BBAa" | "AaBB" => pass
-			case "ABC"  => fail
-			case "DEF"  => fail
-			case _      => fail
+			case "ABC"           => fail
+			case "DEF"           => fail
+			case _               => fail
 		}
 	}
 
-	private static func expression() -> Test = test "Expressions" {
+	// --------------- Match as Expression ---------------
+
+	@Test func expression() -> void {
 		let result = 10 match {
 			case 0     => "a"
 			case 1     => "b"
@@ -155,7 +120,9 @@ class MatchTest
 		result =?= "10"
 	}
 
-	private static func tuples() -> Test = test "Tuples" {
+	// --------------- Tuple Patterns ---------------
+
+	@Test func tuples() -> void {
 		var tuple = (1, 2)
 
 		tuple match {
@@ -168,9 +135,21 @@ class MatchTest
 		}
 	}
 
-	private static func enums() -> Test = test "Enums" {
-		match (TestEnum.BBAa)
-		{
+	// --------------- Enum Patterns ---------------
+
+	static enum TestEnum {
+		case A
+		case B
+		case Aa
+		case BB
+		case AaAa
+		case AaBB
+		case BBAa
+		case BBBB
+	}
+
+	@Test func enums() -> void {
+		match (TestEnum.BBAa) {
 			case TestEnum.A => fail
 			case TestEnum.B => fail
 			case .Aa        => fail
@@ -183,75 +162,85 @@ class MatchTest
 		}
 	}
 
-	private static func caseClasses() -> Test = test "Case Classes" {
-		test "Primitive" {
-			let option = Option(1)
-			var value: int = 0
+	// --------------- Destructuring ---------------
 
-			option match {
-				case Some(var i) => value = i // ensure correct type
-				case _	         => value = -1
-			}
+	@Test func primitiveDestructure() -> void {
+		let option = Option(1)
+		var value: int = 0
 
-			value =?= 1
+		option match {
+			case Some(var i) => value = i // ensure correct type
+			case _	         => value = -1
 		}
 
-		test "String" {
-			let option = Option("abc")
-			var value: String = ""
+		value =?= 1
+	}
 
-			option match {
-				case Some(var s) => value = s // ensure correct type
-				case _           => value = ""
-			}
+	@Test func stringDestructure() -> void {
+		let option = Option("abc")
+		var value: String = ""
 
-			value =?= "abc"
+		option match {
+			case Some(var s) => value = s // ensure correct type
+			case _           => value = ""
 		}
 
-		test "Case Classes" {
-			let person = Person(0L, "Peter", 30, 1.8)
-			let student = Student(1L, "John", 20, 1.85, "CS", 123456L)
+		value =?= "abc"
+	}
 
-			// destructure -> recreate -> check for equality
-			person match case Person(var id, var name, var age, var height)
-			{
-				Person(id, name, age, height) =?= person
-			}
+	// --------------- Case Classes ---------------
 
-			student match case Student(var id, var name, var age, var height, var faculty, var studentID)
-			{
-				Student(id, name, age, height, faculty, studentID) =?= student
-			}
+	@Test func caseClassDestructure() -> void {
+		let person = Person(0L, "Peter", 30, 1.8)
+		let student = Student(1L, "John", 20, 1.85, "CS", 123456L)
+
+		// destructure -> recreate -> check for equality
+		person match case Person(var id, var name, var age, var height) {
+			Person(id, name, age, height) =?= person
 		}
 
-		test "Optimized" {
-			let tree: Tree<String> = Node("a", Leaf("b"), EmptyLeaf)
-
-			match (tree)
-			{
-				case EmptyLeaf => fail
-				case Leaf(var s) => fail
-				case Node("a", Leaf("b"), EmptyLeaf) => pass
-				case _ => fail
-			}
-		}
-
-		test "Custom" {
-			var key: String! = null
-			var value: String! = null
-
-			"abc:def" match case KeyValue(var k, var v)
-			{
-				key = k
-				value = v
-			}
-
-			key =?= "abc"
-			value =?= "def"
+		student match case Student(var id, var name, var age, var height, var faculty, var studentID) {
+			Student(id, name, age, height, faculty, studentID) =?= student
 		}
 	}
 
-	private static func objects() -> Test = test "Objects" {
+	@Test func optimizedDestructure() -> void {
+		let tree: Tree<String> = Node("a", Leaf("b"), EmptyLeaf)
+
+		tree match {
+			case EmptyLeaf => fail
+			case Leaf(var s) => fail
+			case Node("a", Leaf("b"), EmptyLeaf) => pass
+			case _ => fail
+		}
+	}
+
+	// --------------- Custom Unapply ---------------
+
+	static class KeyValue {
+		static func unapply(s: String) -> (String, String)? {
+			let index = s.indexOf ':'
+			if (index < 0) return null
+			return (s.substring(0, index), s.substring(index + 1))
+		}
+	}
+
+	@Test func customUnapply() -> void {
+		var key: String! = null
+		var value: String! = null
+
+		"abc:def" match case KeyValue(var k, var v) {
+			key = k
+			value = v
+		}
+
+		key =?= "abc"
+		value =?= "def"
+	}
+
+	// --------------- Object Patterns ---------------
+
+	@Test func objects() -> void {
 		let option = Option<int>()
 
 		option match {
@@ -260,57 +249,49 @@ class MatchTest
 		}
 	}
 
-	private const ERROR: int = 0
-	private const SUCCESS: int = 1
+	// --------------- Field / Constant Patterns ---------------
 
-	private const ERROR_BOXED: Int = ERROR
+	const ERROR: int = 0
+	const SUCCESS: int = 1
 
-	private static func fields() -> Test = test "Fields" {
-		var value = 0
+	const ERROR_BOXED: Int = ERROR
 
+	@Test func fields() -> void {
 		SUCCESS match {
-			case MatchTest.ERROR => value = ERROR
-			case SUCCESS         => value = SUCCESS
-			case _               => value = ERROR
-		}
-
-		value =?= SUCCESS
-
-		test "Unboxing" {
-			ERROR_BOXED match {
-				case ERROR => value = SUCCESS
-				case _     => value = ERROR
-			}
-
-			value =?= SUCCESS
-		}
-
-		test "Boxing" {
-			ERROR match {
-				case ERROR_BOXED => value = SUCCESS
-				case _           => value = ERROR
-			}
-
-			value =?= SUCCESS
-		}
-
-		test "Object Unboxing" {
-			(ERROR_BOXED as Object) match {
-				case ERROR => value = SUCCESS
-				case _     => value = ERROR
-			}
-
-			value =?= SUCCESS
+			case MatchTest.ERROR => fail
+			case SUCCESS         => pass
+			case _               => fail
 		}
 	}
 
-	private static func orPatterns() -> Test = test "OR Patterns" {
+	@Test func unboxing() -> void {
+		ERROR_BOXED match {
+			case ERROR => pass
+			case _     => fail
+		}
+	}
+
+	@Test func boxing() -> void {
+		ERROR match {
+			case ERROR_BOXED => pass
+			case _           => fail
+		}
+	}
+
+	@Test func objectUnboxing() -> void {
+		(ERROR_BOXED as Object) match {
+			case ERROR => pass
+			case _     => fail
+		}
+	}
+
+	// --------------- Or Patterns ---------------
+
+	@Test func orPatterns() -> void {
 		let list = List<int>()
 
-		for (i <- 0 .. 10)
-		{
-			match (i)
-			{
+		for i <- 0 .. 10 {
+			i match {
 				case 1 | 2 | 3 => list += 0
 				case 4 | 5 | 6 => list += 1
 				case 7 | 8 | 9 => list += 2
@@ -321,7 +302,9 @@ class MatchTest
 		list =?= List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3)
 	}
 
-	private static func andPatterns() -> Test = test "AND Patterns" {
+	// --------------- And Patterns ---------------
+
+	@Test func andPatterns() -> void {
 		let tuple = (1, 2)
 
 		tuple match {

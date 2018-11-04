@@ -1,34 +1,31 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class InheritanceTest
-{
-	static func apply() -> Test = test "Inheritance" {
-		traitInit()
-		doubleTraitInit()
-		traitInitOrder()
-		traitConstructor()
-	}
-
+class InheritanceTest {
 	// --------------- Double-Layer Trait Initialization ---------------
 
-	trait IFoo
-	{
+	trait IFoo {
 		func onFooInit() -> void
 
-		init { this.onFooInit }
+		init {
+			this.onFooInit()
+		}
 	}
 
-	static class Foo1 implements IFoo
-	{
+	static class Foo1 implements IFoo {
 		public var fooInit: boolean
 
 		override func onFooInit() -> void = this.fooInit = true
 	}
 
-	static class Foo2 extends Foo1 implements IFoo
-	{
+	@Test
+	func traitInit() -> void {
+		let foo1 = new Foo1
+		foo1.fooInit =?= true
+	}
+
+	static class Foo2 extends Foo1 implements IFoo {
 		public var foo2Init: int
 
 		func fooInitAvailable() -> boolean = this.fooInit
@@ -36,12 +33,8 @@ class InheritanceTest
 		override func onFooInit() -> void = this.foo2Init += 1
 	}
 
-	static func traitInit() -> Test = test "Trait Init" {
-		let foo1 = new Foo1
-		foo1.fooInit =?= true
-	}
-
-	static func doubleTraitInit() -> Test = test "Double Trait Init" {
+	@Test
+	func doubleTraitInit() -> void {
 		let foo2 = new Foo2
 		foo2.foo2Init =?= 1
 	}
@@ -62,22 +55,20 @@ class InheritanceTest
 	static class A extends X implements T    { init { initOrder += 'A' } }
 	static class B extends A implements T, S { init { initOrder += 'B' } }
 
-	static func traitInitOrder() -> Test = test "Trait Initialization Order" {
+	@Test
+	func traitInitOrder() -> void {
 		let b = new B
 		initOrder =?= "XRHTASB"
 	}
 
 	// --------------- Trait Constructor ---------------
 
-	trait Named
-	{
-		var name: String
-		{
+	trait Named {
+		var name: String {
 			abstract get
 			abstract set
 
-			init
-			{
+			init {
 				this.name = "" // calls the setter
 			}
 		}
@@ -87,7 +78,8 @@ class InheritanceTest
 		private var name: String { public override get; public override set }
 	) implements Named
 
-	static func traitConstructor() -> Test = test "Trait Constructor" {
+	@Test
+	func traitConstructor() -> void {
 		let person: Named = new Person("Test Subject")
 		person.name =?= "Test Subject"
 	}
