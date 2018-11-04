@@ -1,0 +1,27 @@
+package dyvil.test
+
+import org.junit.Test
+import org.junit.Assert
+import static org.junit.Assert._
+
+public header JUnit
+
+@JavaName("JUnit")
+extension any
+{
+	// "should be equal to"
+	infix func =?=(actual: any!, expected: any!) -> void = assertEquals(expected, actual)
+	infix func =?=(actual: [any!], expected: [any!]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [byte], expected: [byte]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [short], expected: [short]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [char], expected: [char]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [int], expected: [int]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [long], expected: [long]) -> void = assertArrayEquals("", expected, actual)
+	infix func =?=(actual: [float], expected: [float]) -> void = assertArrayEquals("", expected, actual, 0)
+	infix func =?=(actual: [double], expected: [double]) -> void = assertArrayEquals("", expected, actual, 0)
+
+	// "should not be equal to"
+	infix func =!=(actual: any!, expected: any!) -> void = assertNotEquals(expected, actual)
+
+	static func fail() -> void = Assert.fail()
+}
