@@ -1,36 +1,5 @@
 package dyvil.test
 
-import dyvil.test.programs._
-import dyvil.test.lang._
-using dyvil.Test
-
-public class Main
-{
-	static func main(args: [String]) -> void
-	{
-		print "Running Dyvil Tests..."
-
-		let tests = [
-			PrimitiveTest()
-			PropertyTest()
-			RangeTest()
-			ReferenceTest()
-			ReifyTest()
-			SuperTest()
-			StringTest()
-			SymbolTest()
-			TypeTest()
-			VarargsTest()
-			VirtualStaticTest()
-		]
-
-		let errors = List<String>()
-		tests.forEach(t => t.addErrors(errors))
-
-		if (!errors.isEmpty)
-		{
-			errors.forEach(print _)
-			throw new AssertionError()
-		}
-	}
+class Main {
+	static func main(args: [String]) -> void {}
 }

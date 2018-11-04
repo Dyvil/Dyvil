@@ -1,36 +1,17 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class ReifyTest
-{
+class ReifyTest {
+	// --------------- Type ---------------
+
 	// Reify Type
 	static func typeOf<@Reified(.TYPE) T>() -> Type<T> = type T
 
 	// Reify Type, with Argument
 	static func typeOf<@Reified(.TYPE) T>(value: T) -> Type<T> = type T
 
-	// Reify Class
-	static func classOf<@Reified(.TYPE) T>() -> Class<T> = class T
-
-	// Reify Class, with Argument
-	static func classOf<@Reified(.TYPE) T>(value: T) -> Class<T> = class T
-
-	// Reify Class from Erasure
-	static func classOfErasure<@Reified(.ANY_CLASS) T>() -> Class<T> = class T
-
-	// Reify Class from Erasure, with Argument
-	static func classOfErasure<@Reified(.ANY_CLASS) T>(value: T) -> Class<T> = class T
-
-	static func apply() -> Test = test "Reify" {
-		typeTest()
-		classTest()
-		classErasureTest()
-		overrideTest()
-		captureTest()
-	}
-
-	static func typeTest() -> Test = test "Type" {
+	@Test func typeOf() -> void {
 		let listType = type<List<String>>
 
 		let type1 = ReifyTest.typeOf<List<String>>
@@ -40,7 +21,15 @@ public class ReifyTest
 		type2.toString =?= listType.toString
 	}
 
-	static func classTest() -> Test = test "Class" {
+	// --------------- Class ---------------
+
+	// Reify Class
+	static func classOf<@Reified(.TYPE) T>() -> Class<T> = class T
+
+	// Reify Class, with Argument
+	static func classOf<@Reified(.TYPE) T>(value: T) -> Class<T> = class T
+
+	@Test func classOf() -> void {
 		let stringClass = class String
 
 		let class1 = ReifyTest.classOf<String>
@@ -50,7 +39,15 @@ public class ReifyTest
 		class2 =?= stringClass
 	}
 
-	static func classErasureTest() -> Test = test "Erasure" {
+	// --------------- Erasure Class ---------------
+
+	// Reify Class from Erasure
+	static func classOfErasure<@Reified(.ANY_CLASS) T>() -> Class<T> = class T
+
+	// Reify Class from Erasure, with Argument
+	static func classOfErasure<@Reified(.ANY_CLASS) T>(value: T) -> Class<T> = class T
+
+	@Test func classOfErasure() -> void {
 		let stringClass = class String
 
 		let class1 = ReifyTest.classOfErasure<String>
@@ -60,28 +57,27 @@ public class ReifyTest
 		class2 =?= stringClass
 	}
 
-	static class Base
-	{
+	// --------------- Overriding ---------------
+
+	static class Base {
 		func foo<@Reified(.TYPE)         T>() -> Object = type<T>
 		func bar<@Reified(.ANY_CLASS)    T>() -> Object = class<T>
 		func baz<@Reified(.OBJECT_CLASS) T>() -> Object = class<T>
 	}
 
-	static class Derived1 extends Base
-	{
+	static class Derived1 extends Base {
 		override func foo<@Reified(.ANY_CLASS) T>() -> Object = class<T>
 		override func bar<@Reified(.TYPE)      T>() -> Object = type<T>
 		override func baz<@Reified(.TYPE)      T>() -> Object = type<T>
 	}
 
-	static class Derived2 extends Base
-	{
+	static class Derived2 extends Base {
 		override func foo<@Reified(.OBJECT_CLASS) T>() -> Object = class<T>
 		override func bar<@Reified(.OBJECT_CLASS) T>() -> Object = class<T>
 		override func baz<@Reified(.ANY_CLASS)    T>() -> Object = class<T>
 	}
 
-	static func overrideTest() -> Test = test "Override" {
+	@Test func overriding() -> void {
 		let b1: Base = new Derived1
 		let b2: Base = new Derived2
 
@@ -94,20 +90,25 @@ public class ReifyTest
 		b2.baz<String> =?= class<String>
 	}
 
-	// Capture
+	// --------------- Capture ---------------
 
-	interface Generic<T>
-	{
+	interface Generic<T> {
 		func get() -> T
 	}
 
-	static func capture<@Reified(.OBJECT_CLASS) type T>() = new Generic<T>() {
+	static func captureAnon<@Reified(.OBJECT_CLASS) type T>() = new Generic<T>() {
 		override func get() -> T = class(T).newInstance()
 	}
 
-	static func captureTest() -> Test = test "Capture" {
-		let gen = capture<String>()
-		let str = gen.get()
-		str =?= ""
+	@Test func captureAnonymousClass() -> void {
+		captureAnon<String>().get() =?= ""
 	}
+
+	/*
+	static func captureLambda<@Reified(.OBJECT_CLASS) type T>() = => class(T).newInstance
+
+	@Test func captureLambda() -> void {
+		captureLambda<String>().get() =?= ""
+	}
+	*/
 }

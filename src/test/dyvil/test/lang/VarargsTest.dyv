@@ -1,9 +1,8 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class VarargsTest
-{
+class VarargsTest {
 	// Declaration Styles with Type Checks
 	// All methods with the same first letter do the same thing
 
@@ -13,53 +12,49 @@ public class VarargsTest
 
 	static func g_1(ints... : Set<int>) -> Set<int> = ints
 
-	// Main Tested Methods
+	@Test func syntax() -> void {
+		f_1(1, 2, 3) =?= [ 1, 2, 3 ]
+		f_2(4, 5, 6) =?= [ 4, 5, 6 ]
+		g_1(7, 8, 9) =?= Set(7, 8, 9)
+	}
+
+	// --------------- One Varargs Parameter ---------------
 
 	static func newArray(args: int...) -> [int] = args
 
-	static func newTuple(i: int..., j: int...) -> IntArrayTuple = (i, j)
+	@Test func single() -> void {
+		newArray()        =?= [int]()
+		newArray(1)       =?= [ 1 ]
+		newArray(1, 2, 3) =?= [ 1, 2, 3 ]
 
-	static func newSet<T>(elements: T...) -> Set<T> = Set(elements...)
+		newArray(args: 1)       =?= [ 1 ]
+		newArray(args: 1, 2, 3) =?= [ 1, 2, 3 ]
+	}
+
+	// --------------- Multiple Varargs Parameters ---------------
+
+	static func newTuple(i: int..., j: int...) -> IntArrayTuple = (i, j)
 
 	@LiteralConvertible.FromTuple
 	static case class IntArrayTuple(let _1: [int], let _2: [int])
 
-	static func apply() -> Test = test "Varargs" {
-		single()
-		multiple()
-		expansion()
+	@Test func multiple() -> void {
+		newTuple()        =?= IntArrayTuple([], [])
+		newTuple(1)       =?= IntArrayTuple([ 1 ], [])
+		newTuple(1, 2, 3) =?= IntArrayTuple([ 1, 2, 3 ], [])
+
+		newTuple(i: 1)                   =?= IntArrayTuple([ 1 ],       [])
+		newTuple(i: 1,       j: 2)       =?= IntArrayTuple([ 1 ],       [ 2 ])
+		newTuple(i: 1, 2,    j: 3)       =?= IntArrayTuple([ 1, 2 ],    [ 3 ])
+		newTuple(i: 1,       j: 2, 3)    =?= IntArrayTuple([ 1 ],       [ 2, 3 ])
+		newTuple(i: 1, 2, 3, j: 4, 5, 6) =?= IntArrayTuple([ 1, 2, 3 ], [ 4, 5, 6 ])
 	}
 
-	static func single() -> Test = test "Single" {
-		test "List" {
-			newArray()        =?= [int]()
-			newArray(1)       =?= [ 1 ]
-			newArray(1, 2, 3) =?= [ 1, 2, 3 ]
-		}
+	// --------------- Varargs Expansion ---------------
 
-		test "Named" {
-			newArray(args: 1)       =?= [ 1 ]
-			newArray(args: 1, 2, 3) =?= [ 1, 2, 3 ]
-		}
-	}
+	static func newSet<T>(elements: T...) -> Set<T> = Set(elements...)
 
-	static func multiple() -> Test = test "Multiple" {
-		test "List" {
-			newTuple()        =?= IntArrayTuple([], [])
-			newTuple(1)       =?= IntArrayTuple([ 1 ], [])
-			newTuple(1, 2, 3) =?= IntArrayTuple([ 1, 2, 3 ], [])
-		}
-
-		test "Named" {
-			newTuple(i: 1)                   =?= IntArrayTuple([ 1 ],       [])
-			newTuple(i: 1,       j: 2)       =?= IntArrayTuple([ 1 ],       [ 2 ])
-			newTuple(i: 1, 2,    j: 3)       =?= IntArrayTuple([ 1, 2 ],    [ 3 ])
-			newTuple(i: 1,       j: 2, 3)    =?= IntArrayTuple([ 1 ],       [ 2, 3 ])
-			newTuple(i: 1, 2, 3, j: 4, 5, 6) =?= IntArrayTuple([ 1, 2, 3 ], [ 4, 5, 6 ])
-		}
-	}
-
-	static func expansion() -> Test = test "Expansion" {
+	@Test func expansion() -> void {
 		let array: [Int] = [ 1, 2, 3 ]
 
 		newSet(array...) =?= Set(1, 2, 3)

@@ -1,35 +1,55 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class VirtualStaticTest
-{
-	interface Interface<T>
-	{
+class VirtualStaticTest {
+	interface Interface<T> {
 		static func foo() -> T
 		static func bar(v: T) -> T
 	}
 
-	static class Base implements Interface<String>
-	{
+	static class Base implements Interface<String> {
 		override static func foo() -> String = "Base"
 		override static func bar(v: String) -> String = v ++ "_Base"
 	}
 
-	static class Derived extends Base
-	{
+	static class Derived extends Base {
 		override static func foo() -> String = "Derived"
 		override static func bar(v: String) -> String = v ++ "_Derived"
 	}
 
+	// --------------- Nullary ---------------
+
 	static func getFoo<type T, @Reified(.ANY_CLASS) type ITF: Interface<T>>() -> T = ITF.foo()
+
+	@Test func nullary() -> void {
+		getFoo<String, Base>() =?= "Base"
+		getFoo<String, Derived>() =?= "Derived"
+	}
+
+	@Test(expected: class AbstractMethodError)
+	func nullaryError() -> void {
+		// see #379
+		getFoo<Object, Interface<Object>>()
+	}
+
+	// --------------- Unary ---------------
 
 	static func getBar<type T, @Reified(.ANY_CLASS) type ITF: Interface<T>>(v: T) -> T = ITF.bar(v)
 
-	// Apply Methods
+	@Test func unary() -> void {
+		getBar<String, Base>("a") =?= "a_Base"
+		getBar<String, Derived>("a") =?= "a_Derived"
+	}
 
-	interface IntConstructible
-	{
+	@Test(expected: class AbstractMethodError)
+	func unaryError() -> void {
+		getBar<Object, Interface<Object>>("a")
+	}
+
+	// --------------- Apply ---------------
+
+	interface IntConstructible {
 		static func apply(value: int) -> IntConstructible
 	}
 
@@ -38,23 +58,16 @@ class VirtualStaticTest
 
 	static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(i: int) -> T = T(i) as T
 
-	// Test
-
-	static func apply() -> Test = test "Virtual Static Methods" {
-		expect(class AbstractMethodError, from: => getFoo<Object, Interface<Object>>()) // see #379
-		expect(class AbstractMethodError, from: => getBar<Object, Interface<Object>>(""))
-
-		getFoo<String, Base>() =?= "Base"
-		getFoo<String, Derived>() =?= "Derived"
-		getBar<String, Base>("") =?= "_Base"
-		getBar<String, Derived>("") =?= "_Derived"
-
-		expect(class AbstractMethodError, from: => create<IntConstructible>(10))
-
+	@Test func applyCreation() -> void {
 		let customInt = create<CustomInt>(10)
 		let myInt = create<MyInt>(20)
 
 		customInt.value =?= 10
 		myInt.value =?= 20
+	}
+
+	@Test(expected: class AbstractMethodError)
+	func applyCreationError() -> void {
+		create<IntConstructible>(10)
 	}
 }

@@ -1,10 +1,9 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class PrimitiveTest
-{
-	static func apply() -> Test = test "Primitives" {
+class PrimitiveTest {
+	@Test func primitives() -> void {
 		var z = false
 		var b = 0 as byte
 		var s = 0 as short

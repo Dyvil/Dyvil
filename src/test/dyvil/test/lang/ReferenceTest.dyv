@@ -1,22 +1,26 @@
 package dyvil.test.lang
 
-using dyvil.Test
+using dyvil.test.JUnit
 import dyvil.test.lang.LambdaTest
 
-public class ReferenceTest
-{
+public class ReferenceTest {
 	static func inc(i: int^) -> void = *i = *i + 1
+
+	// --------------- Static Field ---------------
 
 	public static var staticField: int = 0
 
-	public static var staticProperty: int
-	{
-		get: staticField
-		set: staticField = newValue
+	@Test func staticFieldReference() -> void {
+		staticField = 0
+
+		inc staticField
+
+		staticField =?= 1
 	}
 
-	static class Holder
-	{
+	// --------------- Instance Field ---------------
+
+	static class Holder {
 		public var instanceField: int = 0
 
 		public var instanceProperty: int
@@ -26,9 +30,53 @@ public class ReferenceTest
 		}
 	}
 
+	@Test func instanceFieldReference() -> void {
+		let holder = new Holder
+		inc holder.instanceField
+
+		holder.instanceField =?= 1
+	}
+
+	// --------------- Property ---------------
+
+	public static var staticProperty: int {
+		get: staticField
+		set: staticField = newValue
+	}
+
+	@Test func staticPropertyReference() -> void {
+		staticProperty = 0
+		inc staticProperty
+		staticProperty =?= 1
+	}
+
+	@Test func instancePropertyReference() -> void {
+		let holder = new Holder
+		inc holder.instanceProperty
+		holder.instanceProperty =?= 1
+	}
+
+	// --------------- Variable ---------------
+
+	@Test func variableReference() -> void {
+		var variable = 0
+		inc variable
+		variable =?= 1
+	}
+
+	@Test func captureReference() -> void {
+		var variable = 0
+		LambdaTest.repeatClosure(3) {
+			inc variable
+		}
+
+		variable =?= 3
+	}
+
+	// --------------- Receiver ---------------
+
 	@LiteralConvertible.FromInt
-	static case class MyInt(let value: int)
-	{
+	static case class MyInt(let value: int) {
 		static implicit func apply(i: int) -> MyInt = new MyInt(i)
 
 		infix func +(i: MyInt, j: MyInt) = MyInt(i.value + j.value)
@@ -40,62 +88,7 @@ public class ReferenceTest
 		postfix func addInplace(i: MyInt^, j: int) -> void = *i = *i + j
 	}
 
-	static func apply() -> Test = test "References" {
-		fieldReference()
-		propertyReference()
-		variableReference()
-		receiverReference()
-	}
-
-	static func fieldReference() -> Test = test "Fields" {
-		test "static" {
-			staticField = 0
-
-			inc staticField
-
-			staticField =?= 1
-		}
-
-		test "instance" {
-			let holder = new Holder
-			inc holder.instanceField
-
-			holder.instanceField =?= 1
-		}
-	}
-
-	static func propertyReference() -> Test = test "Properties" {
-		test "static" {
-			staticProperty = 0
-			inc staticProperty
-			staticProperty =?= 1
-		}
-
-		test "instance" {
-			let holder = new Holder
-			inc holder.instanceProperty
-			holder.instanceProperty =?= 1
-		}
-	}
-
-	static func variableReference() -> Test = test "Variables" {
-		test "inline" {
-			var variable = 0
-			inc variable
-			variable =?= 1
-		}
-
-		test "capture" {
-			var variable = 0
-			LambdaTest.repeatClosure(3) {
-				inc variable
-			}
-
-			variable =?= 3
-		}
-	}
-
-	static func receiverReference() -> Test = test "Receiver" {
+	@Test func receiverReference() -> void {
 		var i = MyInt(0) // has to be var
 		i.addInplace 1
 		i.value =?= 1

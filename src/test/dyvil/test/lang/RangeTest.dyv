@@ -1,14 +1,50 @@
 package dyvil.test.lang
 
 using dyvil.Collections
-using dyvil.Test
+using dyvil.test.JUnit
 import dyvil.collection.range.Rangeable
 
-class RangeTest
-{
+class RangeTest {
+	// --------------- Int Range ---------------
+
+	@Test func closedInt() -> void {
+		let range1 = 1 .. 4
+		let rangeInclusive = List<int>()
+		for i <- range1 {
+			rangeInclusive += i
+		}
+		rangeInclusive =?= List(1, 2, 3, 4)
+	}
+
+	@Test func halfOpenInt() -> void {
+		let range2 = 1 ..< 4
+		let rangeExclusive = List<int>()
+		for i <- range2 {
+			rangeExclusive += i
+		}
+		rangeExclusive =?= List(1, 2, 3)
+	}
+
+	@Test func forClosedInt() {
+		let forInclusive = List<int>()
+		for i <- 1 .. 4 {
+			forInclusive += i
+		}
+		forInclusive =?= List(1, 2, 3, 4)
+	}
+
+	@Test func forHalfOpenInt() {
+		let forExclusive = List<int>()
+		for i <- 1 ..< 4 {
+			forExclusive += i
+		}
+		forExclusive =?= List(1, 2, 3)
+	}
+
+	// --------------- Rangeable ---------------
+
 	@LiteralConvertible.FromInt
-	static case class RangeableInt(let value: int) implements Rangeable<RangeableInt>
-	{
+	static case class RangeableInt(let value: int) implements Rangeable<RangeableInt> {
 		override func next() -> RangeableInt = RangeableInt(this.value + 1)
 
 		override func prev() -> RangeableInt = RangeableInt(this.value - 1)
@@ -18,100 +54,42 @@ class RangeTest
 		override func compareTo(other: RangeableInt) -> int = this.value.compareTo(other.value)
 	}
 
-	static func apply() -> Test = test "Ranges" {
-		testInts()
-		testRangeable()
-	}
+	static let one: RangeableInt = 1
+	static let four: RangeableInt = 4
 
-	static func testInts() -> Test = test "Int Ranges" {
-		let range1 = 1 .. 4
-		let range2 = 1 ..< 4
-
-		test "inclusive" {
-			let rangeInclusive = List<int>()
-			for (i <- range1)
-			{
-				rangeInclusive += i
-			}
-
-			rangeInclusive =?= List(1, 2, 3, 4)
-		}
-
-		test "exclusive" {
-			let rangeExclusive = List<int>()
-			for (var i <- range2)
-			{
-				rangeExclusive += i
-			}
-			rangeExclusive =?= List(1, 2, 3)
-		}
-
-		test "for inclusive" {
-			let forInclusive = List<int>()
-			for (i <- 1 .. 4)
-			{
-				forInclusive += i
-			}
-
-			forInclusive =?= List(1, 2, 3, 4)
-		}
-
-		test "for exclusive" {
-			let forExclusive = List<int>()
-			for (i <- 1 ..< 4)
-			{
-				forExclusive += i
-			}
-
-			forExclusive =?= List(1, 2, 3)
-		}
-	}
-
-	static func testRangeable() -> Test = test "Rangeable" {
-		let one: RangeableInt = 1
-		let four: RangeableInt = 4
-
+	@Test func closedRangeable() -> void {
 		let range1 = one .. four
+		let rangeInclusive = List<RangeableInt>()
+		for i <- range1 {
+			rangeInclusive += i
+		}
+		rangeInclusive =?= List<RangeableInt>(1, 2, 3, 4)
+	}
+
+	@Test func halfOpenRangeable() -> void {
 		let range2 = one ..< four
-
-		test "inclusive" {
-			let rangeInclusive = List<RangeableInt>()
-			for (i <- range1)
-			{
-				rangeInclusive += i
-			}
-
-			rangeInclusive =?= List<RangeableInt>(1, 2, 3, 4)
+		let rangeExclusive = List<RangeableInt>()
+		for i <- range2 {
+			rangeExclusive += i
 		}
 
-		test "exclusive" {
-			let rangeExclusive = List<RangeableInt>()
-			for (i <- range2)
-			{
-				rangeExclusive += i
-			}
+		rangeExclusive =?= List<RangeableInt>(1, 2, 3)
+	}
 
-			rangeExclusive =?= List<RangeableInt>(1, 2, 3)
+	@Test func forClosedRangeable() -> void {
+		let forInclusive = List<RangeableInt>()
+		for i <- one .. four {
+			forInclusive += i
+		}
+		forInclusive =?= List<RangeableInt>(1, 2, 3, 4)
+	}
+
+	@Test func forHalfOpenRangeable() -> void {
+		let forExclusive = List<RangeableInt>()
+		for i <- one ..< four {
+			forExclusive += i
 		}
 
-		test "for inclusive" {
-			let forInclusive = List<RangeableInt>()
-			for (i <- one .. four)
-			{
-				forInclusive += i
-			}
-
-			forInclusive =?= List<RangeableInt>(1, 2, 3, 4)
-		}
-
-		test "for exclusive" {
-			let forExclusive = List<RangeableInt>()
-			for (i <- one ..< four)
-			{
-				forExclusive += i
-			}
-
-			forExclusive =?= List<RangeableInt>(1, 2, 3)
-		}
+		forExclusive =?= List<RangeableInt>(1, 2, 3)
 	}
 }
