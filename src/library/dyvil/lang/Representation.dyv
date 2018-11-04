@@ -89,7 +89,8 @@ abstract class Representation
 	{
 		builder.append(valueClass.getCanonicalName()).append('(')
 
-		for (var currentType: Class<_>! = valueClass; currentType != null; currentType = currentType.getSuperclass())
+		var currentType: Class<_>! = valueClass
+		while (currentType != null)
 		{
 			for (field <- currentType!!.getDeclaredFields)
 			{
@@ -110,6 +111,8 @@ abstract class Representation
 
 				builder.append(', ')
 			}
+
+			currentType = currentType!!.getSuperclass()
 		}
 
 		// delete extra ', '

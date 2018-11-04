@@ -74,9 +74,13 @@ case class ObjectRange<type +T: Rangeable<T>>(
 		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"
 	}
 
-	#func(forEach(varName NAME: String, body BODY: String) -> String) {
-		for (var NAME = this.start; NAME LESS_OP this.end; NAME = NAME.next) { BODY }
-	}
+	#func(forEach(varName NAME: String, body BODY: String) -> String) {{
+		var NAME = this.start
+		while (NAME LESS_OP this.end) {
+			{ BODY }
+			NAME = NAME.next
+		}
+	};}
 
 	override func forEach(action: T -> void) -> void = #forEach("current"){action(current)}
 
