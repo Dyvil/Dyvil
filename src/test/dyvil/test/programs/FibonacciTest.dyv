@@ -1,25 +1,22 @@
 package dyvil.test.programs
 
 using dyvil.Collections
-using dyvil.Test
+using dyvil.test.JUnit
 
-public class FibonacciTest
-{
-	static func apply() -> Test = test "Fibonacci" {
+class FibonacciTest {
+	@Test
+	func fibonacci() -> void {
 		let sequence = fibonacciSequence(20)
 
-		for (i <- 0 ..< sequence.size)
-		{
-			test "#\(i + 1)" { sequence[i] =?= fibonacci(i) }
+		for i <- 0 ..< sequence.size {
+			sequence[i] =?= fibonacci(i)
 		}
 	}
 
-	static func fibonacciSequence(n: int) -> List<int>
-	{
+	static func fibonacciSequence(n: int) -> List<int> {
 		let list: MutableList<int> = [ 1, 1 ]
 
-		for (i <- 2 ..< n)
-		{
+		for i <- 2 ..< n {
 			list += list[i - 1] + list[i - 2]
 		}
 

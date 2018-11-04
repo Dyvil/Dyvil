@@ -1,28 +1,25 @@
 package dyvil.test.programs
 
-using dyvil.Test
+using dyvil.test.JUnit
 
-class TreeMatchTest
-{
-	static func apply() -> Test = test "Tree Match" {
+class TreeMatchTest {
+	@Test
+	func treeMatch() -> void {
 		let a = Var "a"
 		let b = Var "b"
 
 		let expr = a + 3 * b + 6 * (5 + a * b)
 		let ctxt = [ "a": 4.0, "b": 10.0 ]
 
-		if let result = eval(expr, ctxt)
-		{
+		if let result = eval(expr, ctxt) {
 			result =?= 304.0
 		}
-		else
-		{
+		else {
 			fail('Evaluation failed')
 		}
 	}
 
-	interface Context
-	{
+	interface Context {
 		func resolve(name: String) -> Expr?
 	}
 
@@ -57,8 +54,7 @@ class TreeMatchTest
 
 	// Evaluation
 
-	static func eval(expr: Expr, context: Context) -> double?
-	{
+	static func eval(expr: Expr, context: Context) -> double? {
 		return simplify(expr, context) match {
 			case Const(var d) => d
 			case _ => null
