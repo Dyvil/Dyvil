@@ -8,6 +8,9 @@ import static org.hamcrest.core.IsNot.not
 
 public header JUnit
 
+infix operator =?= { associativity none, precedence 1 }
+infix operator =!= { associativity none, precedence 1 }
+
 @JavaName("JUnit")
 extension any
 {
@@ -16,6 +19,8 @@ extension any
 
 	// "should not be equal to"
 	infix func =!=(actual: any!, expected: any!) -> void = assertThat(expected, not(actual))
+
+	static func pass() -> void {}
 
 	static func fail() -> void = Assert.fail()
 }
