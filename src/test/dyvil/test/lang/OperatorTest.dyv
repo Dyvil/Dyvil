@@ -1,0 +1,91 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+prefix operator +++
+postfix operator +++
+
+class OperatorTest {
+	// --------------- Unary ---------------
+
+	@JavaName('preinc')
+	prefix func ++(i: int) -> int = i
+
+	@JavaName('postinc')
+	postfix func ++(i: int) -> int = i
+
+	@JavaName("plusPre")
+	prefix func +++(i: int) -> int = i - 1
+
+	@JavaName("plusPost")
+	postfix func +++(i: int) -> int = i + 1
+
+	@Test func unary() -> void {
+		infix func apply(i: int, j: int) -> (int, int) = (i, j)
+
+		var i = 1                         // Canonical Representation:
+		let j = [ i -i, i+++ i, i+++ -i ] // i.apply(-i), (i+++).apply(i), (i+++).apply(-i)
+		let k = [ i - i, i-i ]            // i - i
+		let l = [ i - -i, i - - i ]       // i - (-i)
+		let m = [ i+++ , i+++, i +++ ]    // i++
+		let n = i+++ + i                  // (i+++) + i
+		let o = i+++ + +++ i              // (i+++) + (+++i)
+		let p = i+++ + + +++ i            // (i+++) + (+ (+++i))
+
+		// don't care about values, resolution pass is sufficient
+	}
+
+	// --------------- Binary ---------------
+
+	@Test func binary() -> void {
+		let i = 1 + 2 * 3 + 4
+		let k = 1 : 2 : 3
+
+		i =?= 11
+		k =?= (1, (2, 3))
+	}
+
+	// --------------- Ternary ---------------
+
+	@Test func ternary() -> void {
+		let i = true ? 1 : 2
+		let j = true ? 1 : true ? 2 : 3
+		let k = true ? true ? 1 : 2 : 3
+		let l = true ? 1+1 : true ? true ? 2+2 : 3+3 : 4+4
+
+		// don't care about values, type check pass is sufficient
+	}
+
+	// --------------- Circumfix ---------------
+
+	@JavaName("plusPre")
+	prefix func +++(s: String) -> String = "+++(\(s))"
+
+	@JavaName("plusPost")
+	postfix func +++(s: String) -> String = "(\(s))+++"
+
+	static func +++_+++(s: String) -> String = "+++(\(s))+++"
+
+	@Test func circumfix() -> void {
+		let d = -1.0
+		let i = -2
+		let c = dyvil.math.Complex(1.0, 1.0)
+
+		let absd = |d|
+		let absi = |i|
+		let absc = |c|
+
+		absd =?= 1.0
+		absi =?= 2
+		absc =?= Math.sqrt(2)
+
+		let s = "a"
+		let s1 = +++s+++
+		let s2 = +++(s+++)
+		let s3 = (+++s)+++
+
+		s1 =?= "+++((a)+++)" // postfix is applied first
+		s2 =?= "+++((a)+++)"
+		s3 =?= "(+++(a))+++"
+	}
+}

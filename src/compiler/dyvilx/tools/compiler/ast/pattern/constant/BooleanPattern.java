@@ -51,7 +51,7 @@ public final class BooleanPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return this.value;
 	}
@@ -59,13 +59,13 @@ public final class BooleanPattern extends AbstractPattern
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		return this.value ? 1 : 0;
 	}

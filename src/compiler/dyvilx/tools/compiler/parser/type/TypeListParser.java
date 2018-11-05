@@ -37,17 +37,6 @@ public class TypeListParser extends Parser
 		// this.mode = TYPE;
 	}
 
-	@Deprecated
-	public TypeListParser(Consumer<IType> consumer, boolean closeAngle)
-	{
-		this(consumer);
-
-		if (closeAngle)
-		{
-			this.flags |= CLOSE_ANGLE;
-		}
-	}
-
 	// =============== Properties ===============
 
 	public TypeListParser withFlags(int flags)

@@ -1,0 +1,155 @@
+package dyvil.test.lang
+
+using dyvil.Collections
+using dyvil.Functions
+using dyvil.test.JUnit
+
+class LambdaTest {
+	@Test func basic() -> void {
+		let nullary1 = () => 1
+		let nullary2 = -> long => 2
+		let nullary3 = { => 1 }
+		let nullary4 = { -> float => 2 }
+		// Make sure these compile without errors
+
+		let expected = [ 1 : "A" ]
+		let actual = expected.flatMapped<int, String>((i, s) => [ (i, s) ])
+
+		actual =?= expected
+	}
+
+	@Test func chaining() -> void {
+		let fun1 = (i: int) -> int => i + 1
+		let fun2 = (i: int) -> int => i * 2
+		let fun12 = fun1.andThen fun2
+		let result = fun12(7)
+
+		result =?= 16
+	}
+
+	// --------------- Local Compound Assignment ---------------
+
+	@Test func localCompoundAssignment() -> void {
+		var localSum = 0
+		List(1, 2, 3).forEach(i => localSum += i)
+		localSum =?= 6
+	}
+
+	// --------------- Field Compound Assignment ---------------
+
+	private var sum: int = 0
+
+	@Test func fieldCompoundAssignment() -> void {
+		this.sum = 0
+		List(1, 2, 3).forEach(i => this.sum += i)
+		this.sum =?= 6
+	}
+
+	// --------------- Static Compound Assignment ---------------
+
+	private static var staticSum: int = 0
+
+	@Test func staticCompoundAssignment() -> void {
+		staticSum = 0
+		List(1, 2, 3).forEach(i => staticSum += i)
+		staticSum =?= 6
+	}
+
+	// --------------- Custom SAM Type ---------------
+
+	@FunctionalInterface
+	public interface MyFunction<P, R> {
+		func apply(par: P) -> R
+
+		func andThen<A>(other: MyFunction<R, A>) -> MyFunction<P, A> = x => other(this(x))
+	}
+
+	@FunctionalInterface
+	public interface IntFunction extends MyFunction<int, int> {
+		override func apply(par: int) -> int
+	}
+
+	@Test func customSAMType() -> void {
+		let intF: IntFunction = i => i * i
+		let result = intF(7)
+
+		result =?= 49
+	}
+
+	// --------------- Capture ---------------
+
+	static func repeatClosure(times: int, function: -> void) -> void = for (i <- 0 ..< times) function()
+
+	@Test func capture() -> void {
+		let result = List<String>()
+
+		// capturing
+		let function1: -> void = function { result += "a" }
+
+		// non-capturing
+		let function2: -> String = function { "b" }
+
+		// capturing another closure
+		repeatClosure(3) { result += function2() }
+
+		// named
+		with("c") { it => result += it }
+
+		function1()
+
+		result =?= List("b", "b", "b", "c", "a")
+	}
+
+	// --------------- Closures ---------------
+
+	@Test func closures() {
+		// #408 "Trailing closure syntax does not work with explicit closure parameter names"
+		// #415 "Implicit Receivers are not captured correctly"
+
+		// This code differs from the example code in that the closures don't print, but add tests.
+		// The use of a captured variable as an implicit receiver failed the verifier before issue #415 was fixed
+
+		func test(s: String, f: String -> void) -> void = f(s)
+
+		test("abc") { $0 =?= "abc" } // ok (trailing closure, no explicit parameter names)
+
+		test("abc", { name => name =?= "abc" }) // ok (explicit parameter names, no trailing closure)
+
+		test("abc") { name => name =?= "abc" } // was "error - test(String) cannot be resolved"
+	}
+
+	// --------------- Partial Functions ---------------
+
+	@Test func partialFunctions() -> void {
+		let compareInts: (int, int) -> int = _.compareTo _
+		let testFun: any! -> void = _ =?= -1
+
+		testFun(compareInts(1, 2))
+
+		with("A", _ =?= "A")
+	}
+
+	// --------------- Currying ---------------
+
+	@Test func curried() -> void {
+		let add2: int -> int -> int               = i => j =>           i + j
+		let add3: int -> int -> int -> int        = i => j => k =>      i + j + k
+		let add4: int -> int -> int -> int -> int = i => j => k => l => i + j + k + l
+
+		(add2 1 10) =?= 11
+		(add3 1 10 100) =?= 111
+		(add4 1 10 100 1000) =?= 1111
+	}
+
+	// --------------- Type Inference ---------------
+
+	@Test func typeInference() -> void {
+		let function1 = { i: int -> int => i }
+		let function2 = { i: int, j: int => (i, j) }
+		let functionCurried = (i: int) => (j: int) => (i, j)
+
+		function1.staticType.toString =?= type(int -> int).toString
+		function2.staticType.toString =?= type((int, int) -> (int, int)).toString
+		functionCurried.staticType.toString =?= type(int -> int -> (int, int)).toString
+	}
+}

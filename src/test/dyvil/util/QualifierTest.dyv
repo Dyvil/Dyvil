@@ -1,0 +1,17 @@
+package dyvil.util
+
+using dyvil.test.JUnit
+
+import func dyvil.util.Qualifier.unqualify
+
+class QualifierTest {
+	@Test func unqualify() -> void {
+		unqualify("this$is$a$test")       =?= "this$is$a$test"
+		unqualify("this$plus$minus$test") =?= "this+-$test"
+		unqualify("$plus$plus$div")       =?= "++/"
+		unqualify("$plus_and$div")        =?= "+_and/"
+		unqualify("$plus$_and$div")       =?= "+$_and/"
+		unqualify("$plus_$minus_and$div") =?= "+_-_and/"
+		unqualify("$plus$and_$div")       =?= "+$and_/"
+	}
+}

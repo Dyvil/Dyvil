@@ -232,19 +232,19 @@ public class UnapplyPattern extends AbstractPattern implements PatternList
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return this.switchValue != null;
 	}
 
 	@Override
-	public boolean switchCheck()
+	public boolean isSwitchHashInjective()
 	{
-		return true;
+		return false;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		return this.switchValue;
 	}

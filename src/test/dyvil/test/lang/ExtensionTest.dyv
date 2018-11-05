@@ -1,0 +1,109 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+using dyvil.Strings
+
+class ExtensionTest {
+	// --------------- Extension of Source Classes ---------------
+
+	static class A
+
+	static class B extends A
+
+	static class C extends B {
+		public func custom() -> String = "custom"
+	}
+
+	static class D extends C
+
+	extension A {
+		func custom() -> String = "fallback"
+	}
+
+	@Test
+	func sourceFallback() -> void {
+		let a = new A
+		let b = new B
+
+		a.custom =?= "fallback"
+		b.custom =?= "fallback"
+	}
+
+	@Test
+	func sourceOverride() -> void {
+		let c = new C
+		let d = new D
+
+		let cA: A = c
+		let cB: B = c
+
+		c.custom =?= "custom"
+		cA.custom =?= "custom"
+		cB.custom =?= "custom"
+		d.custom =?= "custom"
+	}
+
+	// --------------- External Extension of External Class ---------------
+
+	@Test
+	func externalStrings() -> void {
+		"aaaba".count('a') =?= 4
+
+		"A" * 4 =?= "AAAA"
+
+		String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
+
+		let lambda1 = () => String(fromShared: [])
+		let lambda2 = (s: String, c: char) => s.contains(c)
+
+		lambda1() =?= ""
+		lambda2("asdf", 'd') =?= true
+	}
+
+	// --------------- Source Extension of External Class ---------------
+
+	extension String {
+		static func myEmpty() -> String = ""
+
+		func mySize() -> int = this.length
+	}
+
+	@Test
+	func sourceStrings() -> void {
+		String.myEmpty =?= ""
+
+		"abc".mySize =?= 3
+
+		let lambda1 = () => String.myEmpty
+		let lambda2 = (s: String) => s.mySize
+
+		lambda1() =?= ""
+		lambda2("asdf") =?= 4
+	}
+
+	// --------------- Generic Extensions ---------------
+
+	extension<type T> List<T> {
+		static func myEmpty<type T>() -> List<T> = List<T>()
+
+		func first() -> T = this.get(0)
+
+		func last() -> T = this.get(this.size - 1)
+
+		func myAdd(element: T) -> void = this.add(element)
+	}
+
+	@Test
+	func generic() -> void {
+		let list = MutableList(1, 2, 3)
+
+		list.first =?= 1
+		list.last =?= 3
+
+		list.myAdd(4)
+
+		list.last =?= 4
+
+		List.myEmpty<String>() =?= List<String>()
+	}
+}

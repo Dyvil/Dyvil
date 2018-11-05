@@ -59,7 +59,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	public void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
 		// Add the java.lang.Annotation interface
 		if (!this.theClass.isSubClassOf(Annotation.LazyFields.ANNOTATION))
@@ -136,7 +136,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
+	public void resolveTypesAfterBody(MarkerList markers, IContext context)
 	{
 	}
 

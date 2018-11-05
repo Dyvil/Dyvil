@@ -141,40 +141,52 @@ repositories {
 }
 
 dependencies {
-	compile fileTree('libs/')
-
 	// --------------- Library ---------------
 
-	libraryCompile(files("$buildDir/classes/dyvil/library", 'libs/dyvil-library.jar'))
+	def libraryBootstrap = files('libs/dyvil-library.jar')
+	def libraryDyvilClasses = files("$buildDir/classes/dyvil/library/") {
+		builtBy 'compileLibraryDyvil'
+	}
 
-	def libraryCP = sourceSets.library.output + sourceSets.library.compileClasspath
+	libraryCompileOnly(libraryBootstrap)
 
 	// --------------- Compiler ---------------
 
-	compilerCompile(files("$buildDir/classes/dyvil/compiler"), libraryCP)
-
-	def compilerCP = sourceSets.compiler.output + sourceSets.compiler.compileClasspath
+	compilerCompileOnly(libraryBootstrap)
+	compilerRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
 
 	// --------------- DPF ---------------
 
-	dpfCompile(files("$buildDir/classes/dyvil/dpf"), libraryCP)
+	def dpfDyvilClasses = files("$buildDir/classes/dyvil/dpf/") {
+		builtBy 'compileDPFDyvil'
+	}
 
-	def dpfCP = sourceSets.dpf.output + sourceSets.dpf.compileClasspath
+	dpfCompileOnly(libraryBootstrap)
 
 	// --------------- REPL ---------------
 
-	replCompile(files("$buildDir/classes/dyvil/repl"), compilerCP)
+	replCompileOnly(libraryBootstrap)
+	replRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
+	replCompile(sourceSets.compiler.output)
 
 	// --------------- GenSrc ---------------
 
-	gensrcCompile(files("$buildDir/classes/dyvil/gensrc"), compilerCP)
+	gensrcCompileOnly(libraryBootstrap)
+	gensrcRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
+	gensrcCompile(sourceSets.compiler.output)
 
 	// --------------- Test ---------------
+
+	def testDyvilClasses = files("$buildDir/classes/dyvil/test") {
+		builtBy 'compileTestDyvil'
+	}
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
-	testCompile(files("$buildDir/classes/dyvil/test"), dpfCP)
+	testRuntimeOnly(testDyvilClasses)
+	testCompile(sourceSets.library.output, libraryDyvilClasses)
+	testCompile(sourceSets.dpf.output, dpfDyvilClasses)
 }
 
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
@@ -398,13 +410,18 @@ task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDP
 	)
 }
 
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	setupCompiler(exec,
-			source_dirs: [ 'src/test/' ],
-			libraries: [ "$buildDir/classes/dyvil/library/", "$buildDir/classes/dyvil/dpf/" ],
-			output_dir: "$buildDir/classes/dyvil/test/",
-			exclude_patterns: [ 'dyvil/experimental/**' ],
-	)
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'libraryClasses', 'compileLibraryDyvil',
+                                                   'dpfClasses', 'compileDPFDyvil', 'copyTestDyvil' ]) {
+	JavaExec exec ->
+		setupCompiler(exec,
+				source_dirs: [ 'src/test/' ],
+				libraries: sourceSets.test.compileClasspath.toList(),
+				output_dir: "$buildDir/classes/dyvil/test/",
+				exclude_patterns: [ 'dyvil/experimental/**' ],
+		)
+
+		// override classpath to use the new classes instead of bootstrap
+		exec.classpath = sourceSets.compiler.runtimeClasspath
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -424,10 +441,17 @@ task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
 			source_dirs: [ 'src/test/' ],
 			output_dir: "$buildDir/classes/test-gen/",
 			gensrc_dir: "$buildDir/gensrc/test/",
+			// the line is here to ensure the compiler finds all Dyvil classes
+			// (somehow its classpath-based library resolution is insufficient)
+			libraries: [ "$buildDir/classes/dyvil/library/" ]
 	)
+
+	// override classpath to use the new classes instead of bootstrap
+	exec.classpath = sourceSets.gensrc.runtimeClasspath
 }
 
 test.dependsOn 'testDyvil', 'testGenSrc'
+test.testClassesDirs = sourceSets.test.runtimeClasspath
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 

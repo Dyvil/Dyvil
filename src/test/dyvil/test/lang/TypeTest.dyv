@@ -1,0 +1,68 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+infix operator <<< { 120 }
+
+class TypeTest {
+	// --------------- This Type ---------------
+
+	static case class MyList<T>(elements: T...) {
+		@JavaName("sum_doubles")
+		func sum(this: MyList<double>) -> double {
+			var result = 0D
+			for (d <- this.elements) result += d
+			return result
+		}
+
+		@JavaName("sum_ints")
+		func sum(this: MyList<int>) -> int {
+			var result = 0
+			for (i <- this.elements) result += i
+			return result
+		}
+	}
+
+	@Test func thisType() -> void {
+		let doubles = MyList(1.0, 2.5D, 3.0)
+		doubles.sum =?= 6.5
+
+		let ints = MyList(4, 5, 6)
+		ints.sum =?= 15
+	}
+
+	// --------------- Recursive Type Parameters ---------------
+
+	interface Recur<type +SELF: Recur<SELF>> {
+		func next() -> SELF
+	}
+
+	static func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
+
+	static case class IntRecur(let value: int) implements Recur<IntRecur> {
+		override func next() -> IntRecur = IntRecur(this.value + 1)
+	}
+
+	static class RecurWrapper<type R: Recur<R>>(let value: R)
+
+	@Test func recursiveTypeParams() -> void {
+		let n: IntRecur = nextRecur(IntRecur 10)
+
+		n =?= IntRecur 11
+
+		let w: RecurWrapper<IntRecur> = new RecurWrapper(IntRecur 10)
+	}
+
+	// --------------- Dependent Type Parameters ---------------
+
+	infix func <<< <T, C: Collection<T>>(collection: C, element: T) = collection.added(element)
+
+	@Test func dependentTypeParams() -> void {
+		let added = List(1, 2, 3) <<< 1
+		added =?= List(1, 2, 3, 1)
+	}
+
+	// --------------- Misc. ---------------
+
+	static func voidTest<T>(value: T) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+}

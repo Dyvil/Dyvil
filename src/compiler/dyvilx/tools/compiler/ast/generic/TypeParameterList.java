@@ -2,54 +2,42 @@ package dyvilx.tools.compiler.ast.generic;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Name;
 import dyvilx.tools.asm.TypeAnnotatableVisitor;
-import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.header.IClassCompilableList;
-import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
-import dyvilx.tools.compiler.phase.Resolvable;
+import dyvilx.tools.compiler.phase.ResolvableList;
 import dyvilx.tools.compiler.util.Util;
-import dyvilx.tools.parsing.marker.MarkerList;
+import dyvilx.tools.parsing.ASTNode;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.ArrayList;
 
-public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
+public class TypeParameterList extends ArrayList<ITypeParameter> implements ResolvableList<ITypeParameter>
 {
-	private static final int DEFAULT_CAPACITY = 3;
-
-	private int              size;
-	private ITypeParameter[] typeParams;
+	// =============== Constructors ===============
 
 	public TypeParameterList()
 	{
-		this.typeParams = new ITypeParameter[DEFAULT_CAPACITY];
 	}
 
-	// List Manipulation
-
-	public int size()
+	public TypeParameterList(int capacity)
 	{
-		return this.size;
+		super(capacity);
 	}
 
-	public ITypeParameter get(int i)
-	{
-		return this.typeParams[i];
-	}
+	// =============== Methods ===============
+
+	// --------------- Member Resolution ---------------
 
 	public ITypeParameter get(Name name)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			final ITypeParameter typeParameter = this.typeParams[i];
 			if (typeParameter.getName() == name)
 			{
 				return typeParameter;
@@ -59,37 +47,11 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 		return null;
 	}
 
-	public void add(ITypeParameter parameter)
-	{
-		final int index = this.size++;
-		if (index >= this.typeParams.length)
-		{
-			final ITypeParameter[] temp = new ITypeParameter[index + 1];
-			System.arraycopy(this.typeParams, 0, temp, 0, index);
-			this.typeParams = temp;
-		}
-		this.typeParams[index] = parameter;
-		parameter.setIndex(index);
-	}
-
-	public void addAll(TypeParameterList list)
-	{
-		final int newSize = this.size + list.size;
-		if (newSize >= this.typeParams.length)
-		{
-			final ITypeParameter[] temp = new ITypeParameter[newSize];
-			System.arraycopy(this.typeParams, 0, temp, 0, this.size);
-			this.typeParams = temp;
-		}
-		System.arraycopy(list.typeParams, 0, this.typeParams, this.size, list.size);
-		this.size = newSize;
-	}
-
 	public boolean isMember(IDataMember member)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			if (this.typeParams[i].getReifyParameter() == member)
+			if (typeParameter.getReifyParameter() == member)
 			{
 				return true;
 			}
@@ -97,123 +59,66 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 		return false;
 	}
 
-	@Override
-	public Iterator<ITypeParameter> iterator()
-	{
-		return new ArrayIterator<>(this.typeParams, 0, this.size);
-	}
-
-	// Resolution
-
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].resolveTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].resolve(markers, context);
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].check(markers, context);
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.typeParams[i].cleanup(compilableList, classCompilableList);
-		}
-	}
-
-	// Compilation
+	// --------------- Signatures and Descriptors ---------------
 
 	public void appendSignature(StringBuilder buffer)
 	{
-		if (this.size > 0)
+		if (this.isEmpty())
 		{
-			buffer.append('<');
-			for (int i = 0; i < this.size; i++)
-			{
-				this.typeParams[i].appendSignature(buffer);
-			}
-			buffer.append('>');
+			return;
 		}
+
+		buffer.append('<');
+		for (ITypeParameter typeParameter : this)
+		{
+			typeParameter.appendSignature(buffer);
+		}
+		buffer.append('>');
 	}
 
 	public void appendParameterDescriptors(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			this.typeParams[i].appendParameterDescriptor(buffer);
+			typeParameter.appendParameterDescriptor(buffer);
 		}
 	}
 
 	public void appendParameterSignatures(StringBuilder buffer)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			this.typeParams[i].appendParameterSignature(buffer);
+			typeParameter.appendParameterSignature(buffer);
 		}
 	}
 
+	// --------------- Compilation ---------------
+
 	public void write(TypeAnnotatableVisitor visitor)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			this.typeParams[i].write(visitor);
+			typeParameter.write(visitor);
 		}
 	}
 
 	public void writeParameters(MethodWriter writer)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			this.typeParams[i].writeParameter(writer);
+			typeParameter.writeParameter(writer);
 		}
 	}
 
 	public void writeArguments(MethodWriter writer, ITypeContext typeContext)
 	{
-		for (int i = 0; i < this.size; i++)
+		for (ITypeParameter typeParameter : this)
 		{
-			final ITypeParameter typeParameter = this.typeParams[i];
 			typeParameter.writeArgument(writer, typeContext.resolveType(typeParameter));
 		}
 	}
+
+	// --------------- Serialization ---------------
 
 	public static void write(@Nullable TypeParameterList typeParameters, DataOutput out) throws IOException
 	{
@@ -227,11 +132,14 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 
 	private void write(DataOutput out) throws IOException
 	{
-		out.writeInt(this.size);
+		final int size = this.size();
 
-		for (int i = 0; i < this.size; i++)
+		out.writeInt(size);
+
+		//noinspection ForLoopReplaceableByForEach to avoid concurrency problems
+		for (int i = 0; i < size; i++)
 		{
-			this.typeParams[i].write(out);
+			this.get(i).write(out);
 		}
 	}
 
@@ -244,7 +152,8 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 		}
 
 		final TypeParameterList list = generic.getTypeParameters();
-		list.typeParams = new ITypeParameter[size];
+		list.clear();
+		list.ensureCapacity(size);
 
 		for (int i = 0; i < size; i++)
 		{
@@ -253,6 +162,20 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 			list.add(typeParameter);
 		}
 	}
+
+	// --------------- Copying ---------------
+
+	public TypeParameterList elementCopy()
+	{
+		final TypeParameterList copy = new TypeParameterList(this.size());
+		for (ITypeParameter typeParameter : this)
+		{
+			copy.add(typeParameter.copy());
+		}
+		return copy;
+	}
+
+	// --------------- Formatting ---------------
 
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
@@ -266,8 +189,8 @@ public class TypeParameterList implements Resolvable, Iterable<ITypeParameter>
 			buffer.append(' ');
 		}
 
-		Util.astToString(indent, this.typeParams, this.size, Formatting.getSeparator("generics.separator", ','),
-		                 buffer);
+		Util.astToString(indent, this.toArray(new ASTNode[0]), this.size(),
+		                 Formatting.getSeparator("generics.separator", ','), buffer);
 		Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 	}
 }

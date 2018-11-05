@@ -1,0 +1,38 @@
+package dyvil.test.programs
+
+using dyvil.test.JUnit
+
+class BuilderTest {
+	static case class Buildable (
+		var myInt: int        { get; set }
+		var myDouble: double  { get; set }
+		var myString: String! { get; set }
+	) {
+		static func apply() -> Buildable = new Buildable(0, 0D, null)
+
+		static func apply(configure: Configure<Buildable>) -> Buildable = Buildable().use(configure)
+	}
+
+	@Test
+	func braceAccess() -> void {
+		let buildable = Buildable().{
+			myInt = -42
+			myDouble = 2.5
+			myString = 'Test'
+			$0
+		}
+
+		buildable =?= Buildable(-42, 2.5D, "Test")
+	}
+
+	@Test
+	func closure() -> void {
+		let buildable = Buildable {
+			myInt = 10
+			myString = 'Hello World'
+			myDouble = 1.1
+		}
+
+		buildable =?= Buildable(10, 1.1D, "Hello World")
+	}
+}

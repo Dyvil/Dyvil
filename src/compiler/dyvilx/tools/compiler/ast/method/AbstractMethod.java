@@ -3,8 +3,6 @@ package dyvilx.tools.compiler.ast.method;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -58,6 +56,9 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.marker.SemanticError;
 
 import java.lang.annotation.ElementType;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
@@ -625,8 +626,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			// and only take exactly one parameter
 			return;
 		}
-		if (type != null && !Types.isSuperType(type, this.getType()
-		                                                 .asParameterType())) // getType to ensure it is resolved by ExternalMethods
+		if (type != null && !Types.isSuperType(type, this.getType().asParameterType()))
 		{
 			// The method's return type has to be a sub-type of the target type
 			return;
@@ -737,7 +737,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 				// normal instance method access
 
 				receiver = TypeChecker
-					           .convertValue(receiver, this.getReceiverType(), receiver.getType(), markers, context,
+					           .convertValue(receiver, this.getReceiverType(), genericData, markers, context,
 					                         TypeChecker.markerSupplier("method.access.receiver_type", this.name));
 			}
 
@@ -940,7 +940,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 
 		if (this.overrideMethods == null)
 		{
-			this.overrideMethods = new IdentityHashSet<>();
+			this.overrideMethods = Collections.newSetFromMap(new IdentityHashMap<>());
 		}
 		this.overrideMethods.add(method);
 	}

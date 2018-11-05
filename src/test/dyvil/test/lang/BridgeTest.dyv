@@ -1,0 +1,47 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class BridgeTest {
+	static interface Container<T> {
+		func get() -> T
+
+		func set(value: T) -> void
+	}
+
+	static case class IntContainer(value: int) implements Container<int> {
+		override func get() -> int = this.value
+
+		override func set(value: int) -> void = this.value = value
+	}
+
+	static case class LongContainer(value: long) implements Container<long> {
+		override func get() -> long = this.value
+
+		override func set(value: long) -> void = this.value = value
+	}
+
+	@Test
+	func bridgeMethodsInt() -> void {
+		let ic = IntContainer(1)
+
+		ic.get =?= 1
+
+		let ci: Container<int> = ic
+		ic.set(3)
+
+		ci.get =?= 3
+	}
+
+	@Test
+	func bridgeMethodsLong() -> void {
+		let lc = LongContainer(2L)
+
+		lc.get =?= 2L
+
+		let cl: Container<long> = lc
+		lc.set(4L)
+
+		cl.get =?= 4L
+	}
+}

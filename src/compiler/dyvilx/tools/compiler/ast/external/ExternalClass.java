@@ -1,9 +1,5 @@
 package dyvilx.tools.compiler.ast.external;
 
-import dyvil.collection.Entry;
-import dyvil.collection.Map;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -36,14 +32,17 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public final class ExternalClass extends AbstractClass
 {
-	private static final int METADATA            = 1;
-	private static final int SUPER_TYPES         = 1 << 1;
-	private static final int GENERICS            = 1 << 2;
-	private static final int ANNOTATIONS         = 1 << 5;
-	private static final int MEMBER_CLASSES      = 1 << 6;
+	private static final int METADATA       = 1;
+	private static final int SUPER_TYPES    = 1 << 1;
+	private static final int GENERICS       = 1 << 2;
+	private static final int ANNOTATIONS    = 1 << 5;
+	private static final int MEMBER_CLASSES = 1 << 6;
 
 	private byte                resolved;
 	private Map<String, String> innerTypes; // inner name -> full internal name
@@ -90,8 +89,8 @@ public final class ExternalClass extends AbstractClass
 		final IContext context = this.getCombiningContext();
 
 		this.metadata = IClass.getClassMetadata(this, this.attributes.flags());
-		this.metadata.resolveTypesHeader(null, context);
-		this.metadata.resolveTypesBody(null, context);
+		this.metadata.resolveTypesBeforeBody(null, context);
+		this.metadata.resolveTypesAfterBody(null, context);
 	}
 
 	private void resolveGenerics()
@@ -163,7 +162,7 @@ public final class ExternalClass extends AbstractClass
 			return;
 		}
 
-		for (Entry<String, String> entry : this.innerTypes)
+		for (Map.Entry<String, String> entry : this.innerTypes.entrySet())
 		{
 			final String innerName = entry.getKey();
 			this.resolveClass(Name.fromRaw(innerName)); // adds the class to the body
@@ -280,7 +279,7 @@ public final class ExternalClass extends AbstractClass
 
 	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
-		                        Set<IClass> checkedClasses)
+		Set<IClass> checkedClasses)
 	{
 		this.resolveGenerics();
 		this.resolveSuperTypes();

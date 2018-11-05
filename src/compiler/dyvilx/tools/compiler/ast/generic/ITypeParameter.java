@@ -20,25 +20,39 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable, ObjectCompilable
 {
+	// =============== Properties ===============
+
+	// --------------- Accompanying Member ---------------
+
 	ITypeParametric getGeneric();
 
-	int getIndex();
+	void setGeneric(ITypeParametric generic);
 
-	void setIndex(int index);
+	default boolean isAny()
+	{
+		return this.getGeneric() instanceof ITypeAlias;
+	}
 
-	// Variance
+	// --------------- Index ---------------
 
-	Variance getVariance();
+	default int getIndex()
+	{
+		return this.getGeneric().getTypeParameters().indexOf(this);
+	}
 
-	void setVariance(Variance variance);
+	// --------------- Attributes ---------------
+
+	// from Attributable
+
+	// --------------- Reification ---------------
 
 	Reified.Type getReifiedKind();
 
@@ -46,32 +60,39 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	void setReifyParameter(IParameter parameter);
 
-	default boolean isAny()
-	{
-		return this.getGeneric() instanceof ITypeAlias;
-	}
+	// --------------- Variance ---------------
 
-	IType getErasure();
+	Variance getVariance();
 
-	IType getCovariantType();
+	void setVariance(Variance variance);
 
-	// Upper Bounds
+	// --------------- Name ---------------
+
+	// from Named
+
+	// --------------- Upper Bound ---------------
 
 	IType getUpperBound();
 
 	void setUpperBound(IType bound);
 
-	void addBoundAnnotation(Annotation annotation, int index, TypePath typePath);
-
-	// Lower Bounds
+	// --------------- Lower Bound ---------------
 
 	IType getLowerBound();
 
 	void setLowerBound(IType bound);
 
-	// Super Types
+	// --------------- Other Types ---------------
+
+	IType getErasure();
+
+	IType getCovariantType();
 
 	IClass getTheClass();
+
+	// =============== Methods ===============
+
+	// --------------- Subtyping ---------------
 
 	boolean isAssignableFrom(IType type, ITypeContext typeContext);
 
@@ -87,7 +108,7 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	boolean isSubClassOf(IType superType);
 
-	// Resolution
+	// --------------- Field and Method Resolution ---------------
 
 	IDataMember resolveField(Name name);
 
@@ -95,7 +116,7 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
-	// Phases
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	void resolveTypes(MarkerList markers, IContext context);
@@ -103,11 +124,15 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 	@Override
 	void resolve(MarkerList markers, IContext context);
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	void checkTypes(MarkerList markers, IContext context);
 
 	@Override
 	void check(MarkerList markers, IContext context);
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	void foldConstants();
@@ -115,7 +140,7 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 	@Override
 	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
-	// Compilation
+	// --------------- Descriptor and Signature ---------------
 
 	void appendSignature(StringBuilder buffer);
 
@@ -123,9 +148,19 @@ public interface ITypeParameter extends ASTNode, Resolvable, Named, Attributable
 
 	void appendParameterSignature(StringBuilder buffer);
 
+	// --------------- Compilation ---------------
+
 	void writeParameter(MethodWriter writer) throws BytecodeException;
 
 	void writeArgument(MethodWriter writer, IType type) throws BytecodeException;
 
 	void write(TypeAnnotatableVisitor visitor);
+
+	// --------------- Decompilation ---------------
+
+	void addBoundAnnotation(Annotation annotation, int index, TypePath typePath);
+
+	// --------------- Copying ---------------
+
+	ITypeParameter copy();
 }

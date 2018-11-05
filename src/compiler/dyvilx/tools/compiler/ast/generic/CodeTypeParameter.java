@@ -15,8 +15,8 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
@@ -26,7 +26,11 @@ import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
+	// =============== Fields ===============
+
 	protected SourcePosition position;
+
+	// =============== Constructors ===============
 
 	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
@@ -42,6 +46,10 @@ public class CodeTypeParameter extends TypeParameter
 		this.position = position;
 	}
 
+	// =============== Properties ===============
+
+	// --------------- Position ---------------
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -54,59 +62,7 @@ public class CodeTypeParameter extends TypeParameter
 		this.position = position;
 	}
 
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		this.attributes.resolveTypes(markers, context, this);
-
-		if (this.lowerBound != null)
-		{
-			this.lowerBound = this.lowerBound.resolveType(markers, context);
-		}
-
-		this.upperBound = this.upperBound.resolveType(markers, context);
-		this.upperBounds = getUpperBounds(this.upperBound);
-
-		// The first upper bound is meant to be a class bound.
-		IType type = this.upperBounds[0];
-
-		IClass typeClass = type.getTheClass();
-		if (typeClass != null && !typeClass.isInterface())
-		{
-			// If the first type is a class type (not an interface), it becomes the erasure type.
-			this.erasure = type;
-		}
-
-		// Check if the remaining upper bounds are interfaces
-		for (int i = 1, count = this.upperBounds.length; i < count; i++)
-		{
-			type = this.upperBounds[i];
-			typeClass = type.getTheClass();
-
-			if (typeClass != null && !typeClass.isInterface())
-			{
-				final Marker marker = Markers.semanticError(type.getPosition(), "type_parameter.bound.class");
-				marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(typeClass)));
-				markers.add(marker);
-			}
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.resolve(markers, context);
-		}
-		if (this.upperBound != null)
-		{
-			this.upperBound.resolve(markers, context);
-		}
-
-		this.attributes.resolve(markers, context);
-		this.computeReifiedKind();
-	}
+	// =============== Methods ===============
 
 	@Override
 	protected void computeReifiedKind()
@@ -138,6 +94,56 @@ public class CodeTypeParameter extends TypeParameter
 		}
 	}
 
+	// --------------- Resolution Phases ---------------
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		this.attributes.resolveTypes(markers, context, this);
+
+		if (this.lowerBound != null)
+		{
+			this.lowerBound = this.lowerBound.resolveType(markers, context);
+		}
+
+		this.setUpperBound(this.getUpperBound().resolveType(markers, context));
+
+		// Check if all upper bounds after the first are interfaces
+		final IType[] upperBounds = this.getUpperBounds();
+		for (int i = 1, count = upperBounds.length; i < count; i++)
+		{
+			final IType type = upperBounds[i];
+			final IClass typeClass = type.getTheClass();
+
+			if (typeClass != null && !typeClass.isInterface())
+			{
+				final Marker marker = Markers.semanticError(type.getPosition(), "type_parameter.bound.class");
+				marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(typeClass)));
+				markers.add(marker);
+			}
+		}
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.resolve(markers, context);
+		}
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
+		{
+			upperBound.resolve(markers, context);
+		}
+
+		this.attributes.resolve(markers, context);
+		this.computeReifiedKind();
+	}
+
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -146,9 +152,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
+			upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 	}
 
@@ -160,11 +168,15 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.check(markers, context);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.check(markers, context);
+			upperBound.check(markers, context);
 		}
 	}
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	public void foldConstants()
@@ -174,9 +186,11 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.foldConstants();
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.foldConstants();
+			upperBound.foldConstants();
 		}
 	}
 
@@ -188,16 +202,15 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.lowerBound.cleanup(compilableList, classCompilableList);
 		}
-		if (this.upperBound != null)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			this.upperBound.cleanup(compilableList, classCompilableList);
+			upperBound.cleanup(compilableList, classCompilableList);
 		}
 	}
 
-	@Override
-	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
-	{
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeParameter(MethodWriter writer) throws BytecodeException
@@ -206,5 +219,26 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.reifyParameter.writeParameter(writer);
 		}
+	}
+
+	// --------------- Decompilation ---------------
+
+	@Override
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
+	{
+	}
+
+	// --------------- Copying ---------------
+
+	@Override
+	public CodeTypeParameter copy()
+	{
+		final CodeTypeParameter copy = new CodeTypeParameter(this.position, this.generic, this.name, this.variance);
+		assert this.reifiedKind == null && this.reifyParameter == null;
+
+		copy.getAttributes().addAll(this.getAttributes());
+		copy.setUpperBound(this.getUpperBound());
+		copy.setLowerBound(this.getLowerBound());
+		return copy;
 	}
 }

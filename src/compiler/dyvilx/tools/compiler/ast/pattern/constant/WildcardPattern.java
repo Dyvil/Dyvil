@@ -55,7 +55,7 @@ public final class WildcardPattern extends AbstractPattern
 	}
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return true;
 	}

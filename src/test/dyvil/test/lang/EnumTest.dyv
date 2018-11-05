@@ -1,0 +1,59 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class EnumTest {
+	@Test
+	func constructors() -> void {
+		Color.RED.rgb =?= 0xFF0000
+		Color.GREEN.rgb =?= 0x00FF00
+		Color.BLUE.rgb =?= 0x0000FF
+	}
+
+	@Test
+	func fromOrdinal() -> void {
+		Color.from(0) =?= Color.RED
+		Color.from(1) =?= Color.GREEN
+		Color.from(2) =?= Color.BLUE
+	}
+
+	@Test
+	func fromName() -> void {
+		Color.from("RED") =?= Color.RED
+		Color.from("GREEN") =?= Color.GREEN
+		Color.from("BLUE") =?= Color.BLUE
+	}
+
+	@Test
+	func enumMatch() -> void {
+		for color <- Color.values {
+			color match {
+				case .RED => color =?= Color.RED
+				case .GREEN => color =?= Color.GREEN
+				case .BLUE => color =?= Color.BLUE
+			}
+		}
+	}
+
+	// Test Constructor / Initializer Generation and Transformation
+
+	static enum Empty
+
+	static enum WithParams(let s: String, let i: int)
+
+	static enum WithCtor {
+		private init() : super()
+
+		private init(i: int) : this()
+
+		private init(s: String, i: int) : this(i)
+	}
+
+	static enum Color(let rgb: int) {
+		case RED = (255, 0, 0)
+		case GREEN = 0x00FF00
+		case BLUE = (0, 0, 255)
+
+		init(r: int, g: int, b: int) : this((r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF))
+	}
+}

@@ -7,13 +7,19 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public interface Resolvable
 {
+	// --------------- Resolution Phases ---------------
+
 	void resolveTypes(MarkerList markers, IContext context);
 
 	void resolve(MarkerList markers, IContext context);
 
+	// --------------- Diagnostic Phases ---------------
+
 	void checkTypes(MarkerList markers, IContext context);
 
 	void check(MarkerList markers, IContext context);
+
+	// --------------- Compilation Phases ---------------
 
 	void foldConstants();
 

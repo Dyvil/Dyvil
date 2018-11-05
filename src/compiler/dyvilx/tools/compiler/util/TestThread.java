@@ -1,13 +1,13 @@
 package dyvilx.tools.compiler.util;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public final class TestThread extends Thread
 {
@@ -72,6 +72,6 @@ public final class TestThread extends Thread
 		command.add(classpath.toString());
 		command.add(this.compiler.config.getMainType());
 		command.addAll(this.compiler.config.getMainArgs());
-		return command.toArray(String.class);
+		return command.toArray(new String[0]);
 	}
 }

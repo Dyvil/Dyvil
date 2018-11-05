@@ -2,9 +2,7 @@ package dyvilx.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.Set;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -27,8 +25,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class ArgumentList implements Resolvable, IValueList
 {
@@ -543,13 +540,14 @@ public class ArgumentList implements Resolvable, IValueList
 	{
 		if (this.labels != null)
 		{
-			final Set<Name> labelSet = new IdentityHashSet<>(this.size);
+			final Set<Name> labelSet = Collections.newSetFromMap(new IdentityHashMap<>(this.size));
 			for (int i = 0; i < this.size; i++)
 			{
 				final Name label = this.labels[i];
 				if (label != null && label != FENCE && !labelSet.add(label))
 				{
-					markers.add(Markers.semanticError(this.values[i].getPosition(), "arguments.duplicate.label", label));
+					markers
+						.add(Markers.semanticError(this.values[i].getPosition(), "arguments.duplicate.label", label));
 				}
 			}
 		}

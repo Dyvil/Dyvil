@@ -51,9 +51,9 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	public void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
-		super.resolveTypesHeader(markers, context);
+		super.resolveTypesBeforeBody(markers, context);
 
 		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{

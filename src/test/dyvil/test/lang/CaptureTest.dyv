@@ -1,0 +1,79 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class CaptureTest {
+	@Test
+	func lambdaCapture() -> void {
+		let abc = -1
+		let fun = (i: int) => (j: int) => (k: int) => (i, j, k, abc)
+		let res = fun 1 2 3
+
+		res =?= (1, 2, 3, -1)
+	}
+
+	static func supplier(i: int) -> (-> int) = => i
+
+	@Test
+	func methodParameterCapture() -> void {
+		let supplier = supplier(10)
+		supplier() =?= 10
+	}
+
+	@Test
+	func lambdaParameterCapture() -> void {
+		// Lambda Parameter capture by reference
+		let supplierLambda = (i: int) => => i
+		let supplier = supplierLambda(10)
+		supplier() =?= 10
+	}
+
+	static func classOf<@Reified(.ANY_CLASS) type T>() -> () -> Class<T> = => class T
+
+	static func typeOf<@Reified(.TYPE) type T>() -> () -> Type<T> = => type T
+
+	@Test
+	func typeParameterCapture() -> void {
+		let classSupplier = classOf<String>()
+		classSupplier() =?= class<String>
+
+		let typeSupplier = typeOf<String>()
+		typeSupplier().toString =?= type<String>.toString
+	}
+
+	static class ThisCapture {
+		func anonymous() -> Object = new Object {
+			override func toString() -> String = this<ThisCapture>.toString
+		}
+
+		func lambda() -> () -> ThisCapture = => this
+
+		override func toString() -> String = System.identityHashCode(this).toHexString
+	}
+
+	@Test
+	func lambdaThisCapture() -> void {
+		let instance = new ThisCapture
+		let lambda = instance.lambda
+
+		lambda() =?= instance
+	}
+
+	@Test
+	func anonClassCapture() -> void {
+		var abc = 123
+		var obj = new Object {
+			override func toString() -> String = abc.toString
+		}
+
+		obj.toString =?= abc.toString
+	}
+
+	@Test
+	func anonClassThisCapture() -> void {
+		var instance = new ThisCapture
+		var obj = instance.anonymous
+
+		instance.toString =?= obj.toString
+	}
+}

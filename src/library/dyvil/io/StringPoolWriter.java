@@ -1,10 +1,10 @@
 package dyvil.io;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StringPoolWriter extends FilterOutputStream implements DataOutput
 {

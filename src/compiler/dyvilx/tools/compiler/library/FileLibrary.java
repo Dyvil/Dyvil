@@ -36,12 +36,6 @@ public class FileLibrary extends Library
 	}
 
 	@Override
-	public boolean isSubPackage(String directory)
-	{
-		return this.getFile(directory).isDirectory();
-	}
-
-	@Override
 	public InputStream getInputStream(String fileName)
 	{
 		try

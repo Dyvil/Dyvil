@@ -1,7 +1,5 @@
 package dyvilx.tools.gensrc;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.compiler.sources.DyvilFileType;
@@ -9,6 +7,8 @@ import dyvilx.tools.gensrc.ast.Template;
 import dyvilx.tools.gensrc.sources.GenSrcFileType;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GenSrc extends DyvilCompiler
 {

@@ -1,8 +1,5 @@
 package dyvilx.tools.compiler;
 
-import dyvil.collection.List;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.TreeSet;
 import dyvil.io.Console;
 import dyvil.io.FileUtils;
 import dyvilx.tools.BasicTool;
@@ -22,6 +19,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static dyvilx.tools.compiler.sources.DyvilFileType.*;
 

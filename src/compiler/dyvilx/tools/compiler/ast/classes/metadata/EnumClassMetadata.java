@@ -43,9 +43,9 @@ public class EnumClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesPre(MarkerList markers, IContext context)
+	public void resolveTypesAfterAttributes(MarkerList markers, IContext context)
 	{
-		super.resolveTypesPre(markers, context);
+		super.resolveTypesAfterAttributes(markers, context);
 
 		this.theClass.getAttributes().addFlag(Modifiers.FINAL);
 

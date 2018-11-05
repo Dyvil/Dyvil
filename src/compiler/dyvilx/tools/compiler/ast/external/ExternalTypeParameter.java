@@ -7,30 +7,32 @@ import dyvilx.tools.asm.TypePath;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.context.IContext;
+import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.generic.TypeParameter;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
-import dyvilx.tools.compiler.ast.type.compound.IntersectionType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.Arrays;
 
 public class ExternalTypeParameter extends TypeParameter
 {
+	// =============== Constants ===============
+
 	private static final int UPPER_BOUND  = 1;
 	private static final int LOWER_BOUND  = 2;
 	private static final int REIFIED_KIND = 4;
 
-	private int  upperBoundCount;
+	// =============== Fields ===============
+
 	private byte resolved;
 
-	// shared constructor
-	{
-		this.upperBounds = new IType[3];
-	}
+	// =============== Constructors ===============
 
 	public ExternalTypeParameter(ITypeParametric generic)
 	{
@@ -42,10 +44,9 @@ public class ExternalTypeParameter extends TypeParameter
 		super(generic, name);
 	}
 
-	private void resolveAnnotations()
-	{
-		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
-	}
+	// =============== Properties ===============
+
+	// --------------- Position ---------------
 
 	@Override
 	public SourcePosition getPosition()
@@ -58,6 +59,22 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
+	// --------------- Attributes ---------------
+
+	@Override
+	public AttributeList getAttributes()
+	{
+		this.resolveAnnotations();
+		return super.getAttributes();
+	}
+
+	private void resolveAnnotations()
+	{
+		this.attributes.resolveTypes(null, RootPackage.rootPackage, this);
+	}
+
+	// --------------- Reification ---------------
+
 	@Override
 	public Reified.Type getReifiedKind()
 	{
@@ -69,24 +86,44 @@ public class ExternalTypeParameter extends TypeParameter
 		return this.reifiedKind;
 	}
 
+	// --------------- Upper Bound ---------------
+
 	@Override
 	public IType getUpperBound()
 	{
-		if (this.upperBound != null)
+		final IType upperBound = super.getUpperBound();
+		if ((this.resolved & UPPER_BOUND) != 0 || upperBound == null)
 		{
-			return this.upperBound;
+			return upperBound;
 		}
 
-		if ((this.resolved & UPPER_BOUND) == 0)
-		{
-			this.resolved |= UPPER_BOUND;
-			for (int i = 0; i < this.upperBoundCount; i++)
-			{
-				this.upperBounds[i] = this.upperBounds[i].resolveType(null, this.generic.getTypeParameterContext());
-			}
-		}
-		return this.upperBound = createUpperBound(this.upperBounds, 0, this.upperBoundCount);
+		this.resolved |= UPPER_BOUND;
+		final IType resolved = upperBound.resolveType(null, this.generic.getTypeParameterContext());
+		this.setUpperBound(resolved);
+		return resolved;
 	}
+
+	@Override
+	public IType[] getUpperBounds()
+	{
+		IType[] upperBounds = super.getUpperBounds();
+		if ((this.resolved & UPPER_BOUND) != 0 || upperBounds == null)
+		{
+			return upperBounds;
+		}
+
+		this.resolved |= UPPER_BOUND;
+
+		final IContext typeParameterContext = this.generic.getTypeParameterContext();
+		final IType[] resolvedUpperBounds = Arrays.stream(upperBounds)
+		                                          .map(t -> t.resolveType(null, typeParameterContext))
+		                                          .toArray(IType[]::new);
+
+		this.setUpperBounds(resolvedUpperBounds);
+		return resolvedUpperBounds;
+	}
+
+	// --------------- Lower Bound ---------------
 
 	@Override
 	public IType getLowerBound()
@@ -103,60 +140,9 @@ public class ExternalTypeParameter extends TypeParameter
 		return this.lowerBound;
 	}
 
-	/**
-	 * Creates a balanced tree for the slice of the given array
-	 *
-	 * @param upperBounds
-	 * 	the upper bounds array
-	 * @param start
-	 * 	the start index
-	 * @param count
-	 * 	the number of elements
-	 *
-	 * @return a balanced tree of {@link IntersectionType}s
-	 */
-	private static IType createUpperBound(IType[] upperBounds, int start, int count)
-	{
-		if (count == 1)
-		{
-			return upperBounds[start];
-		}
+	// =============== Methods ===============
 
-		final int halfCount = count / 2;
-		return new IntersectionType(createUpperBound(upperBounds, start, halfCount),
-		                            createUpperBound(upperBounds, start + halfCount, count - halfCount));
-	}
-
-	public void addUpperBound(IType bound)
-	{
-		this.upperBound = null;
-
-		final int index = this.upperBoundCount++;
-		if (index == 0)
-		{
-			// no need to resize the array, it has definitely a bigger capacity than zero
-
-			this.erasure = bound;
-			this.upperBounds[0] = bound;
-			return;
-		}
-
-		if (index >= this.upperBounds.length)
-		{
-			IType[] temp = new IType[index + 1];
-			System.arraycopy(this.upperBounds, 0, temp, 0, index);
-			this.upperBounds = temp;
-		}
-
-		this.upperBounds[index] = bound;
-	}
-
-	@Override
-	public AttributeList getAttributes()
-	{
-		this.resolveAnnotations();
-		return super.getAttributes();
-	}
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -168,6 +154,8 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -177,6 +165,8 @@ public class ExternalTypeParameter extends TypeParameter
 	public void check(MarkerList markers, IContext context)
 	{
 	}
+
+	// --------------- Compilation Phases ---------------
 
 	@Override
 	public void foldConstants()
@@ -188,15 +178,32 @@ public class ExternalTypeParameter extends TypeParameter
 	{
 	}
 
-	@Override
-	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
-	{
-		this.upperBound = null;
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeParameter(MethodWriter writer) throws BytecodeException
 	{
+	}
+
+	// --------------- Decompilation ---------------
+
+	@Override
+	public void addBoundAnnotation(Annotation annotation, int index, TypePath typePath)
+	{
+		final IType [] upperBounds = super.getUpperBounds();
+		assert (this.resolved & UPPER_BOUND) == 0;
+
+		upperBounds[index] = IType.withAnnotation(upperBounds[index], annotation, typePath);
+
+		// reset cache
+		this.setUpperBounds(upperBounds);
+	}
+
+	// --------------- Copying ---------------
+
+	@Override
+	public ITypeParameter copy()
+	{
+		throw new UnsupportedOperationException();
 	}
 }

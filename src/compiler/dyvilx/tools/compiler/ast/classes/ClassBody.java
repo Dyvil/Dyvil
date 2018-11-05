@@ -1,12 +1,8 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableCollection;
-import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.iterator.FilterIterator;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
@@ -40,6 +36,9 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 {
 	private static class MethodLink
@@ -67,16 +66,16 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 	private ClassList classes = new ClassList(0);
 
 	private IField[] fields = new IField[3];
-	private int fieldCount;
+	private int      fieldCount;
 
 	private IProperty[] properties;
 	private int         propertyCount;
 
 	private IMethod[] methods = new IMethod[3];
-	private int methodCount;
+	private int       methodCount;
 
 	private IConstructor[] constructors = new IConstructor[1];
-	private int constructorCount;
+	private int            constructorCount;
 
 	private IInitializer[] initializers;
 	private int            initializerCount;
@@ -274,14 +273,16 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	// region Properties
 
-	public Iterable<IProperty> properties()
+	public Collection<IProperty> properties()
 	{
-		return () -> new ArrayIterator<>(this.properties, 0, this.propertyCount);
+		return this.propertyCount > 0 ?
+			       Arrays.asList(this.properties).subList(0, this.propertyCount) :
+			       Collections.emptyList();
 	}
 
-	public ImmutableCollection<IProperty> allProperties()
+	public Collection<IProperty> allProperties()
 	{
-		final ArrayList<IProperty> builder = new ArrayList<>(this.propertyCount + this.fieldCount);
+		final List<IProperty> builder = new ArrayList<>(this.propertyCount + this.fieldCount);
 
 		builder.addAll(this.properties());
 
@@ -294,7 +295,7 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 			}
 		}
 
-		return builder.view();
+		return builder;
 	}
 
 	public int propertyCount()
@@ -354,12 +355,11 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public Collection<IMethod> allMethods()
 	{
-		final ArrayList<IMethod> result = new ArrayList<>(this.methodCount + this.propertyCount * 2 + this.fieldCount * 2);
+		final ArrayList<IMethod> result = new ArrayList<>(
+			this.methodCount + this.propertyCount * 2 + this.fieldCount * 2);
 
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			result.add(this.methods[i]);
-		}
+		result.addAll(Arrays.asList(this.methods).subList(0, this.methodCount));
+
 		for (int i = 0; i < this.propertyCount; i++)
 		{
 			addPropertyMethods(result, this.properties[i]);
@@ -373,7 +373,7 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 			}
 		}
 
-		return result.view();
+		return result;
 	}
 
 	protected static void addPropertyMethods(Collection<IMethod> collection, IProperty prop)
@@ -618,7 +618,8 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 			return this.implicitCache;
 		}
 
-		this.implicitCache = ((List<IMethod>) this.allMethods()).filtered(IMethod::isImplicitConversion);
+		this.implicitCache = this.allMethods().stream().filter(IMethod::isImplicitConversion)
+		                         .collect(Collectors.toList());
 
 		return this.implicitCache;
 	}

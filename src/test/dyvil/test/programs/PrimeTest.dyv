@@ -1,0 +1,68 @@
+package dyvil.test.programs
+
+using dyvil.test.JUnit
+using dyvil.Math
+
+class PrimeTest {
+	@Test
+	func isPrime() -> void {
+		isPrime(1) =?= false
+		isPrime(2) =?= true
+		isPrime(3) =?= true
+		isPrime(4) =?= false
+		isPrime(5) =?= true
+		isPrime(6) =?= false
+		isPrime(7) =?= true
+		isPrime(8) =?= false
+		isPrime(9) =?= false
+		isPrime(10) =?= false
+		isPrime(11) =?= true
+		isPrime(12) =?= false
+	}
+
+	private static func isPrime(value: int) -> boolean {
+		for j <- 2 .. sqrt(value) {
+			if value % j == 0 {
+				return false
+			}
+		}
+		return value >= 2
+	}
+
+	@Test
+	func primeFactors() -> void {
+		primeFactors(1) =?= List(1)
+		primeFactors(2) =?= List(2)
+		primeFactors(3) =?= List(3)
+		primeFactors(4) =?= List(2, 2)
+		primeFactors(5) =?= List(5)
+		primeFactors(6) =?= List(2, 3)
+		primeFactors(7) =?= List(7)
+		primeFactors(8) =?= List(2, 2, 2)
+		primeFactors(9) =?= List(3, 3)
+		primeFactors(10) =?= List(2, 5)
+		primeFactors(11) =?= List(11)
+		primeFactors(12) =?= List(2, 2, 3)
+	}
+
+	private static func primeFactors(value: int) -> List<int> {
+		if value <= 1 {
+			return List(1)
+		}
+
+		let res = List<int>()
+
+		label outer:
+		while value > 1 {
+			for prime <- 2 .. value {
+				if value % prime == 0 && isPrime(prime) {
+					res.add(prime)
+					value _/= prime
+					continue outer
+				}
+			}
+		}
+
+		return res.immutable
+	}
+}

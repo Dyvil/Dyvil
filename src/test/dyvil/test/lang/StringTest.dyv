@@ -1,0 +1,16 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class StringTest {
+	@Test func stringInterpolation() -> void {
+		let ab = 'a' ++ 'b'
+		ab =?= "ab"
+
+		let abbccd = 'a' + "bb" ++ "cc" + 'd'
+		abbccd =?= "abbccd"
+
+		let abbcdde = ('a' + "bb" + 'c') ++ "dd" + 'e'
+		abbcdde =?= "abbcdde"
+	}
+}

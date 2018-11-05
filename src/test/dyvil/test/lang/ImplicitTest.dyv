@@ -1,0 +1,76 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class ImplicitTest {
+	implicit object ImplicitObject
+
+	@FunctionalInterface
+	public static interface DebugPrintable {
+		static implicit func int2debug(i: int) -> DebugPrintable = => i.toString
+
+		static implicit func string2debug(s: String) -> DebugPrintable = => s
+
+		func toDebugString() -> String
+	}
+
+	static class ErrorExample {
+		static class A {
+			func test() -> String = "A"
+		}
+		static class B {
+			func test() -> String = "B"
+		}
+
+		implicit postfix func s2a(s: String) -> A = new A
+
+		implicit postfix func s2b(s: String) -> B = new B
+
+		// "a".test() -> error: Ambigous call to method 'test' [method.access.ambiguous]
+	}
+
+	static implicit func i2s(i: int) -> String = i.toString
+
+	static implicit func b2s(b: boolean) -> String = b.toString
+
+	// Uses implicitly to ensure s is also eligible for implicit resolution
+	static func implicitS(implicit s: String = "default") -> String = implicitly<String>()
+
+	static func implicitly<type T>(implicit value: T) -> T = value
+
+	@Test
+	func conversions() -> void {
+		let s: String = 123
+
+		s =?= "123"
+		true.toUpperCase =?= "TRUE"
+
+		// Type Check is enough
+		var debug: DebugPrintable = "abc"
+		debug = 123
+	}
+
+	@Test
+	func arguments() -> void {
+		implicitS =?= "default"
+		implicitS() =?= "default"
+		implicitS("provided") =?= "provided"
+
+		implicit let s = "implicit let"
+		implicitS =?= s
+	}
+
+	@Test
+	func genericArguments() -> void {
+		implicit let s = "implicit"
+		implicitly<String>() =?= s
+
+		implicit let i = 10
+		implicitly<int>() =?= i
+	}
+
+	@Test
+	func objects() -> void {
+		implicitly<ImplicitObject>() =?= ImplicitObject
+	}
+}

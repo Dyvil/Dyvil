@@ -1,12 +1,12 @@
 package dyvilx.tools.parsing.marker;
 
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.collection.mutable.BitSet;
-import dyvil.source.position.SourcePosition;
 import dyvil.source.Source;
+import dyvil.source.position.SourcePosition;
 import dyvil.util.I18n;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Iterator;
 
 public final class MarkerList implements Iterable<Marker>
@@ -123,7 +123,7 @@ public final class MarkerList implements Iterable<Marker>
 
 			for (int l = position.startLine(); l <= endLine; l++)
 			{
-				lines.add(l);
+				lines.set(l);
 			}
 
 			if (endLine > lastLine)
@@ -146,7 +146,7 @@ public final class MarkerList implements Iterable<Marker>
 
 		int markerIndex = 0;
 
-		for (int line : lines)
+		for (int line = lines.nextSetBit(0); line >= 0; line = lines.nextSetBit(line + 1))
 		{
 			buffer.append(String.format(formatString, line, source.line(line)));
 

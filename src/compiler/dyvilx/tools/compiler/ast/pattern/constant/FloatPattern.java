@@ -54,7 +54,7 @@ public final class FloatPattern extends AbstractPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return this.value;
 	}

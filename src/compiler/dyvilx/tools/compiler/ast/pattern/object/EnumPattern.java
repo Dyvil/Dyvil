@@ -60,7 +60,7 @@ public class EnumPattern extends FieldPattern
 	}
 
 	@Override
-	public Object constantValue()
+	public Object getConstantValue()
 	{
 		return new EnumSurrogate(this.name.qualified);
 	}
@@ -74,19 +74,19 @@ public class EnumPattern extends FieldPattern
 	// Switch Resolution
 
 	@Override
-	public boolean isSwitchable()
+	public boolean hasSwitchHash()
 	{
 		return this.targetType != null && Types.isSuperClass(Types.ENUM, this.targetType);
 	}
 
 	@Override
-	public boolean switchCheck()
+	public boolean isSwitchHashInjective()
 	{
-		return true;
+		return false;
 	}
 
 	@Override
-	public int switchValue()
+	public int getSwitchHashValue()
 	{
 		return this.name.qualified.hashCode();
 	}

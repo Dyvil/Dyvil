@@ -74,7 +74,7 @@ public class InterfaceMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	public void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
 		if (this.theClass instanceof ExternalClass)
 		{

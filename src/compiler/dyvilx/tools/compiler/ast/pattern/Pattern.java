@@ -8,13 +8,17 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.function.Consumer;
+
 public interface Pattern extends ASTNode, Typed
 {
+	// =============== Constants ===============
+
 	int NULL    = 0;
 	int BOOLEAN = 1;
 	int BYTE    = 2;
@@ -41,6 +45,10 @@ public interface Pattern extends ASTNode, Typed
 	int OR  = 48;
 	int AND = 49;
 
+	// =============== Properties ===============
+
+	// --------------- General Pattern Info ---------------
+
 	int getPatternType();
 
 	default boolean isExhaustive()
@@ -53,10 +61,31 @@ public interface Pattern extends ASTNode, Typed
 		return false;
 	}
 
-	default Object constantValue()
+	// --------------- Constant Value ---------------
+
+	default Object getConstantValue()
 	{
 		return null;
 	}
+
+	// --------------- Switch Hashs ---------------
+
+	default boolean hasSwitchHash()
+	{
+		return false;
+	}
+
+	default boolean isSwitchHashInjective()
+	{
+		return true;
+	}
+
+	default int getSwitchHashValue()
+	{
+		return -1;
+	}
+
+	// --------------- Type ---------------
 
 	@Override
 	IType getType();
@@ -77,9 +106,18 @@ public interface Pattern extends ASTNode, Typed
 		return Types.isSuperType(type, this.getType());
 	}
 
+	// --------------- Field Resolution ---------------
+
 	default IDataMember resolveField(Name name)
 	{
 		return null;
+	}
+
+	// --------------- Resolution Phases ---------------
+
+	default void forEachAtom(Consumer<Pattern> action)
+	{
+		action.accept(this);
 	}
 
 	default Pattern resolve(MarkerList markers, IContext context)
@@ -87,46 +125,7 @@ public interface Pattern extends ASTNode, Typed
 		return this;
 	}
 
-	// Sub Patterns
-
-	default int subPatterns()
-	{
-		return 1;
-	}
-
-	default Pattern subPattern(int index)
-	{
-		return this;
-	}
-
-	// Switch Resolution
-
-	default boolean isSwitchable()
-	{
-		return false;
-	}
-
-	default boolean switchCheck()
-	{
-		return false;
-	}
-
-	default int switchValue()
-	{
-		return -1;
-	}
-
-	default int minValue()
-	{
-		return this.switchValue();
-	}
-
-	default int maxValue()
-	{
-		return this.switchValue();
-	}
-
-	// Compilation
+	// --------------- Compilation ---------------
 
 	static void loadVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{

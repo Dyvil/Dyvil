@@ -1,0 +1,63 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class VarargsTest {
+	// Declaration Styles with Type Checks
+	// All methods with the same first letter do the same thing
+
+	static func f_1(ints... : [int]) -> [int] = ints
+
+	static func f_2(ints : int...) -> [int] = ints
+
+	static func g_1(ints... : Set<int>) -> Set<int> = ints
+
+	@Test func syntax() -> void {
+		f_1(1, 2, 3) =?= [ 1, 2, 3 ]
+		f_2(4, 5, 6) =?= [ 4, 5, 6 ]
+		g_1(7, 8, 9) =?= Set(7, 8, 9)
+	}
+
+	// --------------- One Varargs Parameter ---------------
+
+	static func newArray(args: int...) -> [int] = args
+
+	@Test func single() -> void {
+		newArray()        =?= [int]()
+		newArray(1)       =?= [ 1 ]
+		newArray(1, 2, 3) =?= [ 1, 2, 3 ]
+
+		newArray(args: 1)       =?= [ 1 ]
+		newArray(args: 1, 2, 3) =?= [ 1, 2, 3 ]
+	}
+
+	// --------------- Multiple Varargs Parameters ---------------
+
+	static func newTuple(i: int..., j: int...) -> IntArrayTuple = (i, j)
+
+	@LiteralConvertible.FromTuple
+	static case class IntArrayTuple(let _1: [int], let _2: [int])
+
+	@Test func multiple() -> void {
+		newTuple()        =?= IntArrayTuple([], [])
+		newTuple(1)       =?= IntArrayTuple([ 1 ], [])
+		newTuple(1, 2, 3) =?= IntArrayTuple([ 1, 2, 3 ], [])
+
+		newTuple(i: 1)                   =?= IntArrayTuple([ 1 ],       [])
+		newTuple(i: 1,       j: 2)       =?= IntArrayTuple([ 1 ],       [ 2 ])
+		newTuple(i: 1, 2,    j: 3)       =?= IntArrayTuple([ 1, 2 ],    [ 3 ])
+		newTuple(i: 1,       j: 2, 3)    =?= IntArrayTuple([ 1 ],       [ 2, 3 ])
+		newTuple(i: 1, 2, 3, j: 4, 5, 6) =?= IntArrayTuple([ 1, 2, 3 ], [ 4, 5, 6 ])
+	}
+
+	// --------------- Varargs Expansion ---------------
+
+	static func newSet<T>(elements: T...) -> Set<T> = Set(elements...)
+
+	@Test func expansion() -> void {
+		let array: [Int] = [ 1, 2, 3 ]
+
+		newSet(array...) =?= Set(1, 2, 3)
+		newSet(array)    =?= Set(array)
+	}
+}

@@ -1,0 +1,320 @@
+package dyvil.test.lang
+
+import class dyvil.test.lang.CaseClassTest._
+
+using dyvil.Collections
+using dyvil.test.JUnit
+
+class MatchTest {
+	@Test func mixedPrimitives() -> void {
+		/*
+		test "Integer" {
+			0 match {
+				case 0 => pass
+				case 1L => fail
+				case 2F => fail
+				case 3D => fail
+			}
+		}
+
+		test "Long" {
+			1L match {
+				case 0 => fail
+				case 1L => pass
+				case 2F => fail
+				case 3D => fail
+			}
+		}
+
+		test "Float" {
+			2F match {
+				case 0 => fail
+				case 1L => fail
+				case 2F => pass
+				case 3D => fail
+			}
+		}
+
+		test "Double" {
+			3D match {
+				case 0 => fail
+				case 1L => fail
+				case 2F => fail
+				case 3D => pass
+			}
+		}
+		*/
+	}
+
+	// --------------- Ints ---------------
+
+	@Test func table() -> void {
+		2 match {
+			case 0 => fail
+			case 1 => fail
+			case 2 => pass
+			case _ => fail
+		}
+	}
+
+	@Test func tableHoles() -> void {
+		2 match {
+			case 0 => fail
+			case 1 => fail
+			case 2 => pass
+			case 5 => fail
+			case 6 => fail
+		}
+	}
+
+	@Test func lookup() -> void {
+		100 match {
+			case 1   => fail
+			case 10  => fail
+			case 100 => pass
+			case _   => fail
+		}
+	}
+
+	// --------------- Strings ---------------
+
+	@Test func stringTable() -> void {
+		"a" match {
+			case "b" => fail
+			case "c" => fail
+			case "a" => pass
+			case _   => fail
+		}
+	}
+
+	@Test func stringLookup() -> void {
+		"abc" match {
+			case "def" => fail
+			case "abc" => pass
+			case _     => fail
+		}
+	}
+
+	@Test func stringCollision() -> void {
+		"AaBB" match {
+			case "Aa"            => fail
+			case "BB"            => fail
+			case "AaAa"          => fail
+			case "BBBB"          => fail
+			case "BBAa" | "AaBB" => pass
+			case "ABC"           => fail
+			case "DEF"           => fail
+			case _               => fail
+		}
+	}
+
+	// --------------- Match as Expression ---------------
+
+	@Test func expression() -> void {
+		let result = 10 match {
+			case 0     => "a"
+			case 1     => "b"
+			case var x => x.toString
+		}
+
+		result =?= "10"
+	}
+
+	// --------------- Tuple Patterns ---------------
+
+	@Test func tuples() -> void {
+		var tuple = (1, 2)
+
+		tuple match {
+			case (0, _) => fail
+			case (_, 0) => fail
+			case (1, 3) => fail
+			case (2, 2) => fail
+			case (1, 2) => pass
+			case _      => fail
+		}
+	}
+
+	// --------------- Enum Patterns ---------------
+
+	static enum TestEnum {
+		case A
+		case B
+		case Aa
+		case BB
+		case AaAa
+		case AaBB
+		case BBAa
+		case BBBB
+	}
+
+	@Test func enums() -> void {
+		match (TestEnum.BBAa) {
+			case TestEnum.A => fail
+			case TestEnum.B => fail
+			case .Aa        => fail
+			case .AaAa      => fail
+			case .AaBB      => fail
+			case .BB        => fail
+			case .BBAa      => pass
+			case .BBBB      => fail
+			case _          => fail
+		}
+	}
+
+	// --------------- Destructuring ---------------
+
+	@Test func primitiveDestructure() -> void {
+		let option = Option(1)
+		var value: int = 0
+
+		option match {
+			case Some(var i) => value = i // ensure correct type
+			case _	         => value = -1
+		}
+
+		value =?= 1
+	}
+
+	@Test func stringDestructure() -> void {
+		let option = Option("abc")
+		var value: String = ""
+
+		option match {
+			case Some(var s) => value = s // ensure correct type
+			case _           => value = ""
+		}
+
+		value =?= "abc"
+	}
+
+	// --------------- Case Classes ---------------
+
+	@Test func caseClassDestructure() -> void {
+		let person = Person(0L, "Peter", 30, 1.8)
+		let student = Student(1L, "John", 20, 1.85, "CS", 123456L)
+
+		// destructure -> recreate -> check for equality
+		person match case Person(var id, var name, var age, var height) {
+			Person(id, name, age, height) =?= person
+		}
+
+		student match case Student(var id, var name, var age, var height, var faculty, var studentID) {
+			Student(id, name, age, height, faculty, studentID) =?= student
+		}
+	}
+
+	@Test func optimizedDestructure() -> void {
+		let tree: Tree<String> = Node("a", Leaf("b"), EmptyLeaf)
+
+		tree match {
+			case EmptyLeaf => fail
+			case Leaf(var s) => fail
+			case Node("a", Leaf("b"), EmptyLeaf) => pass
+			case _ => fail
+		}
+	}
+
+	// --------------- Custom Unapply ---------------
+
+	static class KeyValue {
+		static func unapply(s: String) -> (String, String)? {
+			let index = s.indexOf ':'
+			if (index < 0) return null
+			return (s.substring(0, index), s.substring(index + 1))
+		}
+	}
+
+	@Test func customUnapply() -> void {
+		var key: String! = null
+		var value: String! = null
+
+		"abc:def" match case KeyValue(var k, var v) {
+			key = k
+			value = v
+		}
+
+		key =?= "abc"
+		value =?= "def"
+	}
+
+	// --------------- Object Patterns ---------------
+
+	@Test func objects() -> void {
+		let option = Option<int>()
+
+		option match {
+			case None => pass
+			case _    => fail
+		}
+	}
+
+	// --------------- Field / Constant Patterns ---------------
+
+	const ERROR: int = 0
+	const SUCCESS: int = 1
+
+	const ERROR_BOXED: Int = ERROR
+
+	@Test func fields() -> void {
+		SUCCESS match {
+			case MatchTest.ERROR => fail
+			case SUCCESS         => pass
+			case _               => fail
+		}
+	}
+
+	@Test func unboxing() -> void {
+		ERROR_BOXED match {
+			case ERROR => pass
+			case _     => fail
+		}
+	}
+
+	@Test func boxing() -> void {
+		ERROR match {
+			case ERROR_BOXED => pass
+			case _           => fail
+		}
+	}
+
+	@Test func objectUnboxing() -> void {
+		(ERROR_BOXED as Object) match {
+			case ERROR => pass
+			case _     => fail
+		}
+	}
+
+	// --------------- Or Patterns ---------------
+
+	@Test func orPatterns() -> void {
+		let list = List<int>()
+
+		for i <- 0 .. 10 {
+			i match {
+				case 1 | 2 | 3 => list += 0
+				case 4 | 5 | 6 => list += 1
+				case 7 | 8 | 9 => list += 2
+				case 0 | 10	   => list += 3
+			}
+		}
+
+		list =?= List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3)
+	}
+
+	// --------------- And Patterns ---------------
+
+	@Test func andPatterns() -> void {
+		let tuple = (1, 2)
+
+		tuple match {
+			case (_, 2) & (1, _) => pass
+			case _ => fail
+		}
+
+		tuple match {
+			case (1, _) & (_, 2) => pass
+			case _ => fail
+		}
+	}
+}

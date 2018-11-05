@@ -55,12 +55,6 @@ public final class JarLibrary extends Library
 	// --------------- Access ---------------
 
 	@Override
-	public boolean isSubPackage(String directory)
-	{
-		return Files.exists(this.jarFileSystem.getPath(directory), EMPTY_LINK_OPTIONS);
-	}
-
-	@Override
 	public InputStream getInputStream(String fileName)
 	{
 		final Path path = this.jarFileSystem.getPath(fileName);

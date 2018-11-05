@@ -1,0 +1,106 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class OverloadTest {
+	static let o = new Object
+	static let s = ""
+	static let i = 0
+
+	// --------------- Nullary ---------------
+
+	static func f() -> String = "f()"
+
+	@Test func nullary() -> void {
+		f() =?= "f()"
+	}
+
+	// --------------- Unary ---------------
+
+	static func f(i: int) -> String = "f(int)"
+	static func f(o: Object) -> String = "f(Object)"
+	static func f(s: String) -> String = "f(String)"
+
+	@Test func unary() -> void {
+		f(o) =?= "f(Object)"
+		f(s) =?= "f(String)"
+		f(i) =?= "f(int)"
+	}
+
+	// --------------- Binary ---------------
+
+	static func f(o: Object, o: Object) -> String = "f(Object, Object)"
+	static func f(o: Object, s: String) -> String = "f(Object, String)"
+	static func f(s: String, o: Object) -> String = "f(String, Object)"
+	static func f(s1: String, s2: String) -> String = "f(String, String)"
+
+	@Test func binary() -> void {
+		f(o, o) =?= "f(Object, Object)"
+		f(o, s) =?= "f(Object, String)"
+		f(s, o) =?= "f(String, Object)"
+		f(s, s) =?= "f(String, String)"
+	}
+
+	// --------------- Varargs ---------------
+
+	static func f(os: Object...) -> String = "f(Object...)"
+
+	static func f(s: String, ss: String...) -> String = "f(String, String...)"
+	static func f(s: String, os: Object...) -> String = "f(String, Object...)"
+
+	static func f(o: Object, os: Object...) -> String = "f(Object, Object...)"
+	static func f(o: Object, ss: String...) -> String = "f(Object, String...)"
+
+	@Test func varargs() -> void {
+		f(o, o, o) =?= "f(Object, Object...)"
+		f(o, o, s) =?= "f(Object, Object...)"
+		f(o, s, o) =?= "f(Object, Object...)"
+		f(o, s, s) =?= "f(Object, String...)"
+		f(s, s, o) =?= "f(String, Object...)"
+		f(s, s, s) =?= "f(String, String...)"
+		f(s, o, o) =?= "f(String, Object...)"
+		f(s, o, s) =?= "f(String, Object...)"
+	}
+
+	// --------------- Generic ---------------
+
+	@AutoMangled static func g(ints: List<int>) -> String = "g(List<int>)"
+	@AutoMangled static func g(strings: List<String>) -> String = "g(List<String>)"
+	@JavaName("g_intSet") static func g<type T: Set<int>>(ints: T) -> String = "g(Set<int>)"
+	@JavaName("g_stringSet") static func g<type T: Set<String>>(strings: T) -> String = "g(Set<String>)"
+
+	@AutoMangled static func h(ints: List<int>) -> String = "h(List<int>)"
+	@AutoMangled static func h(longs: List<long>) -> String = "h(List<long>)"
+	@AutoMangled static func h(floats: List<float>) -> String = "h(List<float>)"
+	@AutoMangled static func h(doubles: List<double>) -> String = "h(List<double>)"
+
+	@Test func generic() -> void {
+		g(List<int>())    =?= "g(List<int>)"
+		g(List<String>()) =?= "g(List<String>)"
+		g(Set<int>())     =?= "g(Set<int>)"
+		g(Set<String>())  =?= "g(Set<String>)"
+
+		h(List<int>())    =?= "h(List<int>)"
+		h(List<long>())   =?= "h(List<long>)"
+		h(List<float>())  =?= "h(List<float>)"
+		h(List<double>()) =?= "h(List<double>)"
+	}
+
+	// --------------- Priority ---------------
+
+	interface A
+	interface B
+	static class C implements A, B
+
+	@OverloadPriority
+	static func i(a: A) -> String = "i(A)"
+	static func i(b: B) -> String = "i(B)"
+
+	@Test func priority() -> void {
+		let c = new C
+
+		i(c)    =?= "i(A)" // i(A) has priority
+		i(a: c) =?= "i(A)"
+		i(b: c) =?= "i(B)"
+	}
+}

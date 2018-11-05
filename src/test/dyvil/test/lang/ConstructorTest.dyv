@@ -1,0 +1,107 @@
+package dyvil.test.lang
+
+using dyvil.Collections
+using dyvil.test.JUnit
+
+class ConstructorTest
+{
+	static case class A protected (
+		public let i: int
+		public let j: int
+	)
+	{
+		public static var classInitialized: boolean
+
+		static init {
+			classInitialized = true
+		}
+
+		static func initClass() -> void { /* noop, forces static initializer */ }
+	}
+
+	static case class B(override let i: int) extends A(i, 0)
+	{
+		public var initialized: boolean
+
+		init {
+			this.initialized = true
+		}
+	}
+
+	static case class C(override let j: int) extends A(0, j)
+
+	static case object O extends A(1, 1)
+
+	static class InitOrder {
+		public var order = MutableList<String>()
+
+		let i: int = {
+			this.order += "init s"
+			0
+		}
+
+		init {
+			this.order += "init block"
+		}
+
+		public init() : this(1) {
+			this.order += "init() body"
+		}
+
+		public init(value: int) {
+			this.order += "init(int) body"
+		}
+	}
+
+	@Test
+	func constructorsA() -> void {
+		A.initClass
+		let a = A(1, 2)
+
+		A.classInitialized =?= true
+
+		a.i =?= 1
+		a.j =?= 2
+
+		class(A).getDeclaredConstructors()[0].getModifiers() =?= dyvil.reflect.Modifiers.PROTECTED
+	}
+
+	@Test
+	func constructorsB() -> void {
+		let b = B(1)
+		let ba: A = b // B -> A
+
+		b.initialized =?= true
+
+		ba.i =?= 1
+		ba.j =?= 0
+	}
+
+	@Test
+	func constructorsC() -> void {
+		let c = C(2)
+		let ca: A = c // C -> A
+
+		c =?= C(2)
+
+		ca.i =?= 0
+		ca.j =?= 2
+	}
+
+	@Test
+	func constructorsO() -> void {
+		let o = O
+		let oa: A = o // O -> A
+
+		o =?= O
+
+		oa.i =?= 1
+		oa.j =?= 1
+	}
+
+	@Test
+	func initOrder() -> void {
+		let initOrder = new InitOrder
+		initOrder.order =?= List("init s", "init block", "init(int) body", "init() body")
+	}
+}

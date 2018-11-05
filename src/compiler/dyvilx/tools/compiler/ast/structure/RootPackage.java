@@ -1,11 +1,12 @@
 package dyvilx.tools.compiler.ast.structure;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 import dyvil.lang.Name;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.external.ExternalClass;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class RootPackage extends Package
 {

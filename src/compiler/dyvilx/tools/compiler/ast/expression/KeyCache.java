@@ -1,13 +1,16 @@
 package dyvilx.tools.compiler.ast.expression;
 
-import dyvil.collection.Collection;
-import dyvil.collection.mutable.TreeSet;
-import dyvil.math.MathUtils;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.pattern.Pattern;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+
 public class KeyCache
 {
+	// =============== Nested Classes ===============
+
 	public static class Entry implements Comparable<Entry>
 	{
 		public int       key;
@@ -24,10 +27,27 @@ public class KeyCache
 			this.pattern = pattern;
 		}
 
+		protected Entry(int key)
+		{
+			this.key = key;
+		}
+
 		@Override
 		public int compareTo(Entry o)
 		{
-			return java.lang.Integer.compare(this.key, o.key);
+			return Integer.compare(this.key, o.key);
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			return o instanceof Entry && this.key == ((Entry) o).key;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return this.key;
 		}
 
 		@Override
@@ -37,87 +57,81 @@ public class KeyCache
 		}
 	}
 
-	private Entry[]           entries;
-	private int               uniqueKeys;
-	private Collection<Entry> uniqueEntries;
+	// =============== Fields ===============
 
-	public KeyCache(int cases)
+	private TreeSet<Entry> entries;
+
+	// =============== Constructors ===============
+
+	public KeyCache()
 	{
-		this.entries = new Entry[MathUtils.nextPowerOf2(cases)];
+		this.entries = new TreeSet<>();
 	}
+
+	// =============== Properties ===============
+
+	public int count()
+	{
+		return this.entries.size();
+	}
+
+	public SortedSet<Entry> entries()
+	{
+		return this.entries;
+	}
+
+	public int min()
+	{
+		return this.entries.isEmpty() ? 0 : this.entries.first().key;
+	}
+
+	public int max()
+	{
+		return this.entries.isEmpty() ? 0 : this.entries.last().key;
+	}
+
+	// =============== Contains ===============
 
 	public boolean contains(int key)
 	{
-		int index = index(key, this.entries.length);
-		for (Entry entry = this.entries[index]; entry != null; entry = entry.next)
-		{
-			if (entry.key == key)
-			{
-				return true;
-			}
-		}
-		return false;
+		return this.entries.contains(new Entry(key));
 	}
 
-	private static int index(int key, int len) {return key & (len - 1);}
+	// =============== Iteration ===============
 
-	public void add(int key, MatchCase matchCase, Pattern pattern)
+	public void forEachEntry(Consumer<Entry> action)
 	{
-		this.uniqueEntries = null;
+		this.entries.forEach(top -> {
+			for (Entry entry = top; entry != null; entry = entry.next)
+			{
+				action.accept(entry);
+			}
+		});
+	}
 
+	// ===============  ===============
+
+	public Entry add(int key, MatchCase matchCase, Pattern pattern)
+	{
 		final Entry newEntry = new Entry(key, matchCase, pattern);
 
-		final int index = index(key, this.entries.length);
-		final Entry topEntry = this.entries[index];
-
-		for (Entry entry = topEntry; entry != null; entry = entry.next)
+		final Entry existing = this.entries.floor(newEntry);
+		if (existing != null && existing.key == newEntry.key)
 		{
-			if (entry.key == key)
-			{
-				newEntry.next = entry.next;
-				entry.next = newEntry;
-				return;
-			}
+			newEntry.next = existing.next;
+			existing.next = newEntry;
+		}
+		else
+		{
+			this.entries.add(newEntry);
 		}
 
-		newEntry.next = topEntry;
-		this.entries[index] = newEntry;
-		this.uniqueKeys++;
+		return newEntry;
 	}
 
-	public int uniqueKeyCount()
+	public SortedSet<Entry> uniqueEntries()
 	{
-		return this.uniqueKeys;
-	}
-
-	public Collection<Entry> uniqueEntries()
-	{
-		if (this.uniqueEntries != null)
-		{
-			return this.uniqueEntries;
-		}
-
-		Collection<Entry> result = new TreeSet<>();
-		for (Entry topEntry : this.entries)
-		{
-			if (topEntry == null)
-			{
-				continue;
-			}
-
-			int currentKey = topEntry.key;
-			result.add(topEntry);
-			for (Entry entry = topEntry; entry != null; entry = entry.next)
-			{
-				if (entry.key != currentKey)
-				{
-					currentKey = entry.key;
-					result.add(entry);
-				}
-			}
-		}
-
-		return this.uniqueEntries = result;
+		return this.entries;
 	}
 
 	@Override

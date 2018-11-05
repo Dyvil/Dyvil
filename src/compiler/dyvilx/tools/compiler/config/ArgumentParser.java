@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.config;
 
-import dyvil.collection.Set;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Set;
 
 public final class ArgumentParser
 {

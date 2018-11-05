@@ -1,15 +1,15 @@
 package dyvilx.tools.parsing.marker;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.io.AppendablePrintStream;
 import dyvil.io.Console;
 import dyvil.source.Source;
 import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Marker implements Comparable<Marker>
@@ -65,7 +65,7 @@ public abstract class Marker implements Comparable<Marker>
 
 	public List<String> getInfo()
 	{
-		return this.info != null ? this.info : (this.info = new ArrayList<>(2));
+		return this.info != null ? this.info : (this.info = new ArrayList<>());
 	}
 
 	public void addInfo(String info)

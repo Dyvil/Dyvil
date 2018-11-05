@@ -1,0 +1,96 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+import dyvil.test.lang.LambdaTest
+
+public class ReferenceTest {
+	static func inc(i: int^) -> void = *i = *i + 1
+
+	// --------------- Static Field ---------------
+
+	public static var staticField: int = 0
+
+	@Test func staticFieldReference() -> void {
+		staticField = 0
+
+		inc staticField
+
+		staticField =?= 1
+	}
+
+	// --------------- Instance Field ---------------
+
+	static class Holder {
+		public var instanceField: int = 0
+
+		public var instanceProperty: int
+		{
+			get: this.instanceField
+			set: this.instanceField = newValue
+		}
+	}
+
+	@Test func instanceFieldReference() -> void {
+		let holder = new Holder
+		inc holder.instanceField
+
+		holder.instanceField =?= 1
+	}
+
+	// --------------- Property ---------------
+
+	public static var staticProperty: int {
+		get: staticField
+		set: staticField = newValue
+	}
+
+	@Test func staticPropertyReference() -> void {
+		staticProperty = 0
+		inc staticProperty
+		staticProperty =?= 1
+	}
+
+	@Test func instancePropertyReference() -> void {
+		let holder = new Holder
+		inc holder.instanceProperty
+		holder.instanceProperty =?= 1
+	}
+
+	// --------------- Variable ---------------
+
+	@Test func variableReference() -> void {
+		var variable = 0
+		inc variable
+		variable =?= 1
+	}
+
+	@Test func captureReference() -> void {
+		var variable = 0
+		LambdaTest.repeatClosure(3) {
+			inc variable
+		}
+
+		variable =?= 3
+	}
+
+	// --------------- Receiver ---------------
+
+	@LiteralConvertible.FromInt
+	static case class MyInt(let value: int) {
+		static implicit func apply(i: int) -> MyInt = new MyInt(i)
+
+		infix func +(i: MyInt, j: MyInt) = MyInt(i.value + j.value)
+
+		infix func +(i: MyInt, j: int) -> MyInt = MyInt(i.value + j)
+
+		infix func +(i: int, j: MyInt) -> MyInt = MyInt(i + j.value)
+
+		postfix func addInplace(i: MyInt^, j: int) -> void = *i = *i + j
+	}
+
+	@Test func receiverReference() -> void {
+		var i = MyInt(0) // has to be var
+		i.addInplace 1
+		i.value =?= 1
+	}
+}

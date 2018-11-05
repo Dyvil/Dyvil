@@ -1,0 +1,79 @@
+package dyvil.test.lang
+
+import java.util.Iterator
+using dyvil.test.JUnit
+using dyvil.Collections
+
+class ForTest {
+	@Test
+	func iterative() -> void {
+		let list = List<int>()
+
+		for (var i = 0; i < 3; i += 1) {
+			list += i
+		}
+
+		list =?= List(0, 1, 2)
+	}
+
+	@Test
+	func array() -> void {
+		let array = [ 1, 2, 3 ]
+		let list = List<int>()
+
+		for i <- array {
+			list += i
+		}
+
+		list =?= List(1, 2, 3)
+	}
+
+	@Test
+	func iterable() -> void {
+		let iterable: Iterable<int> = List(1, 2, 3)
+		let list = List<int>()
+
+		for i <- iterable {
+			list += i
+		}
+
+		list =?= iterable
+	}
+
+	@Test
+	func iterator() -> void {
+		let iterable = List(1, 2, 3)
+		let iterator = iterable.iterator
+		let list = List<int>()
+
+		for i <- iterator {
+			list += i
+		}
+
+		list =?= iterable
+	}
+
+	@Test
+	func string() -> void {
+		let testString = "abc"
+		var string = ""
+
+		for c <- testString {
+			string += c
+		}
+
+		string =?= testString
+	}
+
+	func nested() -> void {
+		let results = List<(int, int)>()
+
+		for i <- 0 .. 1 {
+			for j <- 0 .. 1 {
+				results += (i, j)
+			}
+		}
+
+		results =?= List((0, 0), (0, 1), (1, 0), (1, 1))
+	}
+}

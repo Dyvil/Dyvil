@@ -1,0 +1,37 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class SuperTest {
+	static class A {
+		func foo() -> String = "A"
+	}
+
+	interface I {
+		func foo() -> String = "I"
+	}
+
+	static class B extends A implements I {
+		override func foo() -> String = "B"
+	}
+
+	interface J extends I {
+		override func foo() -> String = "J"
+	}
+
+	static class C extends B implements J {
+		override func foo() -> String = "C"
+		// public func aFoo: String = super<A>.foo // not available (currently)
+		// public func iFoo: String = super<I>.foo
+		func bFoo() -> String = super<B>.foo
+		func jFoo() -> String = super<J>.foo
+	}
+
+	@Test func superCalls() -> void {
+		let it = new C
+		// Main.test("Super Call Test A", "A", it.aFoo)
+		// Main.test("Super Call Test I", "I", it.iFoo)
+		it.bFoo =?= "B"
+		it.jFoo =?= "J"
+	}
+}

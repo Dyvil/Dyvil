@@ -65,14 +65,12 @@ public class CodeParameter extends AbstractParameter
 
 		this.attributes.addFlag(Modifiers.DEFAULT);
 
-		IValue value = this.value.resolve(markers, context);
+		final IValue value = this.value.resolve(markers, context);
 
 		final String kindName = this.getKind().getName();
-		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier(kindName + ".type.incompatible",
-		                                                                             kindName + ".type", "value.type",
-		                                                                             this.name);
 
-		value = TypeChecker.convertValue(value, this.type, null, markers, context, markerSupplier);
+		this.value = TypeChecker.convertValue(value, this.type, null, markers, context, TypeChecker.markerSupplier(
+			kindName + ".type.incompatible", kindName + ".type", "value.type", this.name));
 	}
 
 	@Override

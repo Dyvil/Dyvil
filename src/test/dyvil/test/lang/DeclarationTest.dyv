@@ -1,0 +1,60 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class DeclarationTest {
+	@Test
+	func declarations() {
+		// test compilation only
+	}
+
+	// --------------- Functions ---------------
+
+	inline func f1() -> int throws Exception = 1
+
+	func f2() inline -> int throws Exception = 2
+
+	func f3() -> int inline throws Exception = 3
+
+	func f4() -> int throws Exception inline = 4
+
+	// func f5() -> int throws Exception = 5 inline // error
+
+	// --------------- Variables ---------------
+
+	private var v1: int = 1
+
+	var v2 private : int = 2
+
+	var v3: int private = 3
+
+	// var v4: int = 4 private // error
+
+	// --------------- Properties ---------------
+
+	private var p1: int { get: 1; set(v): {} }
+
+	var p2 private : int { get: 2; set(v): {} }
+
+	var p3: int private { get: 3; set(v): {} }
+
+	var p4: int { private get: 4; private set(v): {} }
+
+	var p5: int { get private: 5; set(v) private: {} }
+
+	// var p6: int { get private: 6; set private (v): {} } // error
+
+	// var p7: int { get: 7 } private // error
+
+	// --------------- Constructor ---------------
+
+	static class Constructors {
+		public init(i1: int) : super() throws Exception {}
+
+		// init() public : super() throws Exception {} // error
+
+		init(i1: int, i2: int) : super() public throws Exception {}
+
+		init() : super() throws Exception public {}
+	}
+}

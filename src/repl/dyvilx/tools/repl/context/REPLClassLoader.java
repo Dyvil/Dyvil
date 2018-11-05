@@ -1,8 +1,6 @@
 package dyvilx.tools.repl.context;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 import dyvil.io.FileUtils;
 import dyvil.reflect.ReflectUtils;
 import dyvilx.tools.compiler.ast.header.ICompilable;
@@ -11,6 +9,8 @@ import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class REPLClassLoader extends ClassLoader
 {
@@ -46,7 +46,7 @@ public class REPLClassLoader extends ClassLoader
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException
 	{
-		final ICompilable compilable = this.compilables.removeKey(name);
+		final ICompilable compilable = this.compilables.remove(name);
 		if (compilable == null)
 		{
 			return super.findClass(name);
@@ -65,8 +65,7 @@ public class REPLClassLoader extends ClassLoader
 		}
 	}
 
-	@NonNull
-	public static String getClassName(ICompilable compilable)
+	public static @NonNull String getClassName(ICompilable compilable)
 	{
 		return compilable.getInternalName().replace('/', '.');
 	}

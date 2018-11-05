@@ -1,0 +1,18 @@
+package dyvil.io
+
+import java.io.IOException
+
+interface IOAction {
+
+	func apply() -> void throws IOException
+
+	static func tryIO(action: IOAction) -> boolean inline {
+		try {
+			action()
+			return true
+		}
+		catch (ignored: IOException) {
+			return false
+		}
+	}
+}
