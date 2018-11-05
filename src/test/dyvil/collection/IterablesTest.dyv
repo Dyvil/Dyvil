@@ -1,0 +1,211 @@
+package dyvil.collection
+
+import java.util.Iterator
+using dyvil.collection.Iterables._
+using dyvil.test.JUnit
+
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
+
+@RunWith(class Parameterized)
+class IterablesTest {
+	// =============== Classes ===============
+
+	static class GenericIterable<type T>(values: [T]) implements Iterable<T> {
+		override func iterator() -> Iterator<T> = this.values.asIterable.iterator
+	}
+
+	// =============== Static Fields ===============
+
+	static let emptyList: Iterable<Int> = List.empty<Int>()
+	static let emptyGeneric: Iterable<Int> = new GenericIterable<Int>([])
+
+	static let intList: Iterable<Int> = List(1, 2, 3)
+	static let intGeneric: Iterable<Int> = new GenericIterable<Int>([ 1, 2, 3 ])
+
+	// =============== Fields ===============
+
+	var empty: Iterable<Int>!
+	var ints: Iterable<Int>!
+
+	// =============== Constructors ===============
+
+	public init(empty: Iterable<Int>, ints: Iterable<Int>) {
+		this.empty = empty
+		this.ints = ints
+	}
+
+	// =============== Static Methods ===============
+
+	@Parameters
+	static func parameters() -> Iterable<[any!]> = [
+		[ emptyList, intList ] as [any!]
+		[ emptyList, intGeneric ] as [any!]
+		[ emptyGeneric, intList ] as [any!]
+		[ emptyGeneric, intGeneric ] as [any!]
+	]
+
+	// =============== Methods ===============
+
+	@Test func concat() -> void {
+		(this.empty ++ this.empty).size =?= 0
+		(this.empty ++ this.ints).size =?= 3
+		(this.ints ++ this.empty).size =?= 3
+		(this.ints ++ this.ints).size =?= 6
+	}
+
+	@Test func append() -> void {
+		let e1 = this.empty + 5
+		e1.size =?= 1
+		e1.first =?= 5
+		e1.last =?= 5
+
+		let e2 = this.ints + 5
+		e2.size =?= 4
+		e2.first =?= 1
+		e2.last =?= 5
+	}
+
+	@Test func prepend() -> void {
+		let e1 = 0 + this.empty
+		e1.size =?= 1
+		e1.first =?= 0
+		e1.last =?= 0
+
+		let e2 = 0 + this.ints
+		e2.size =?= 4
+		e2.first =?= 0
+		e2.last =?= 3
+	}
+
+	@Test func isEmpty() -> void {
+		this.empty.isEmpty =?= true
+		this.ints.isEmpty =?= false
+	}
+
+	@Test func size() -> void {
+		this.empty.size =?= 0
+		this.ints.size =?= 3
+	}
+
+	@Test func first() -> void {
+		this.empty.first =?= null
+		this.ints.first =?= 1
+	}
+
+	@Test func last() -> void {
+		this.empty.last =?= null
+		this.ints.last =?= 3
+	}
+
+	@Test func allMatch() -> void {
+		this.empty.allMatch(x => true) =?= true
+		this.empty.allMatch(x => false) =?= true
+
+		this.ints.allMatch(x => true) =?= true
+		this.ints.allMatch(x => false) =?= false
+		this.ints.allMatch(x => x > 0) =?= true
+		this.ints.allMatch(x => x > 1) =?= false
+		this.ints.allMatch(x => x > 3) =?= false
+	}
+
+	@Test func anyMatch() -> void {
+		this.empty.anyMatch(x => true) =?= false
+		this.empty.anyMatch(x => false) =?= false
+
+		this.ints.anyMatch(x => true) =?= true
+		this.ints.anyMatch(x => false) =?= false
+		this.ints.anyMatch(x => x > 0) =?= true
+		this.ints.anyMatch(x => x > 1) =?= true
+		this.ints.anyMatch(x => x > 3) =?= false
+	}
+
+	@Test func contains() -> void {
+		this.empty.contains(1) =?= false
+		this.empty.contains(null) =?= false
+		this.empty.contains("1") =?= false
+
+		this.ints.contains(1) =?= true
+		this.ints.contains(4) =?= false
+		this.ints.contains(null) =?= false
+		this.ints.contains("1") =?= false
+	}
+
+	@Test func find() -> void {
+		this.empty.find(x => true) =?= null
+		this.empty.find(x => false) =?= null
+
+		this.ints.find(x => true) =?= 1
+		this.ints.find(x => false) =?= null
+		this.ints.find(x => x == 1) =?= 1
+		this.ints.find(x => x == 3) =?= 3
+		this.ints.find(x => x > 1) =?= 2
+	}
+
+	@Test func count() -> void {
+		this.empty.count(null) =?= 0
+		this.empty.count(1) =?= 0
+		this.empty.count("1") =?= 0
+
+		this.ints.count(null) =?= 0
+		this.ints.count(1) =?= 1
+		this.ints.count(4) =?= 0
+		this.ints.count("1") =?= 0
+	}
+
+	@Test func fold() -> void {
+		this.empty.fold(0, (a, e) => a + 1) =?= 0 // count
+		this.empty.fold(0, _ + _) =?= 0 // sum
+		this.empty.fold(-1, (a, e) => e) =?= -1 // last
+
+		this.empty.fold(1, (a, e) => a + 1) =?= 1
+		this.empty.fold(2, (a, e) => 5) =?= 2
+		this.empty.fold("", (a, e) => "\(a)\(e)") =?= ""
+
+		this.ints.fold(0, (a, e) => a + 1) =?= 3 // count
+		this.ints.fold(0, _ + _) =?= 6 // sum
+		this.ints.fold(-1, (a, e) => e) =?= 3 // last
+
+		this.ints.fold(1, _ + _) =?= 7
+		this.ints.fold(1, (a, e) => a + 1) =?= 4
+		this.ints.fold(2, (a, e) => 5) =?= 5
+		this.ints.fold("", (a, e) => "\(a)\(e)") =?= "123"
+	}
+
+	@Test func reduce() -> void {
+		this.empty.reduce(_ + _) =?= null // sum
+		this.empty.reduce((a, e) => a) =?= null // first
+		this.empty.reduce((a, e) => e) =?= null // last
+		this.empty.reduce((a, e) => 5) =?= null
+
+		this.ints.reduce(_ + _) =?= 6 // sum
+		this.ints.reduce((a, e) => a) =?= 1 // first
+		this.ints.reduce((a, e) => e) =?= 3 // last
+		this.ints.reduce((a, e) => 5) =?= 5
+		this.ints.reduce((a, e) => a + 1) =?= 3
+	}
+
+	@Test func toStringBuilder() -> void {
+		let builder1 = new StringBuilder
+		this.empty.toString(builder1)
+		builder1.toString =?= "[]"
+
+		let builder2 = new StringBuilder
+		this.ints.toString(builder2)
+		builder2.toString =?= "[1, 2, 3]"
+	}
+
+	@Test func toStringCustom() -> void {
+		this.empty.toString("", "", "") =?= ""
+		this.empty.toString("", ", ", "") =?= ""
+		this.empty.toString("[", ", ", "]") =?= "[]"
+
+		this.ints.toString("", ", ", "") =?= "1, 2, 3"
+		this.ints.toString("[", ", ", "]") =?= "[1, 2, 3]"
+		this.ints.toString("[ ", ", ", " ]") =?= "[ 1, 2, 3 ]"
+		this.ints.toString("[", ",", "]") =?= "[1,2,3]"
+		this.ints.toString("", "", "") =?= "123"
+	}
+}
+

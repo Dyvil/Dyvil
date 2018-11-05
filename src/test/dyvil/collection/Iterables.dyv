@@ -1,0 +1,207 @@
+package dyvil.collection
+
+using dyvil.collection.Iterators._
+
+import java.util.Iterator
+import java.util.function.{ Predicate, Function, BiFunction }
+
+@JavaName("Iterables")
+extension<type E> Iterable<E> {
+
+	// =============== Operators ===============
+
+	static func |_|(it: Iterable<_>) -> int inline = it.size
+
+	@JavaName("concat")
+	infix func ++ <type E>(lhs: Iterable<+E>, rhs: Iterable<+E>) -> Iterable<E> = => lhs.iterator() ++ rhs.iterator()
+
+	@JavaName("append")
+	infix func + <type E>(lhs: Iterable<+E>, rhs: E) -> Iterable<E> = => lhs.iterator() + rhs
+
+	@JavaName("prepend")
+	infix func + <type E>(lhs: E, rhs: Iterable<+E>) -> Iterable<E> = => lhs + rhs.iterator()
+
+	// TODO waiting for filtered
+
+	// @JavaName("removedAll")
+	// infix func -- <type E>(lhs: Iterable<+E>, rhs: Iterable<any!>) -> Iterable<E> = lhs.filtered(e => !rhs.contains(e))
+
+	// @JavaName("removed")
+	// infix func - <type E>(lhs: Iterable<+E>, rhs: any!) -> Iterable<E> = lhs.filtered(e => rhs != e)
+
+	// =============== Properties ===============
+
+	// TODO make these properties (requires support for properties in extension classes)
+
+	func size() -> int {
+		var size = 0
+		for e <- this {
+			size += 1
+		}
+		return size
+	}
+
+	func isEmpty() -> boolean = !this.iterator().hasNext()
+
+	func first() -> E? {
+		let it = this.iterator()
+		return it.hasNext() ? it.next() : null
+	}
+
+	func last() -> E? {
+		var last: E? = null
+		for e <- this {
+			last = e
+		}
+		return last
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Predicates ---------------
+
+	func allMatch(predicate: Predicate<-E>) -> boolean {
+		for e <- this {
+			if !predicate.test(e) {
+				return false
+			}
+		}
+		return true
+	}
+
+	func anyMatch(predicate: Predicate<-E>) -> boolean {
+		for e <- this {
+			if predicate.test(e) {
+				return true
+			}
+		}
+		return false
+	}
+
+	// --------------- Queries ---------------
+
+	/**
+	 * Returns true if and if only this query contains the given {@code element} . By default, 'contains' in defined
+	 * such that any element in this query matches the given element in a way so that {@code
+	 * element.equals(this.element)}.
+	 *
+	 * @param element
+	 * 	the element to find
+	 *
+	 * @return true, iff this query contains the element
+	 */
+	func contains(element: any!) -> boolean {
+		for e <- this {
+			if element == e {
+				return true
+			}
+		}
+		return false
+	}
+
+	func find(predicate: Predicate<-E>) -> E? {
+		for e <- this {
+			if predicate.test(e) {
+				return e
+			}
+		}
+		return null
+	}
+
+	func count(element: any!) -> int {
+		var count = 0
+		for e <- this {
+			if element == e {
+				count += 1
+			}
+		}
+		return count
+	}
+
+	func count(explicit where predicate: Predicate<-E>) -> int {
+		var count = 0
+		for e <- this {
+			if predicate.test(e) {
+				count += 1
+			}
+		}
+		return count
+	}
+
+	// --------------- Reduction ---------------
+
+	/**
+	 * Folds this iterable into a single value by repeatedly combining the elements of this iterable and the initial
+	 * value using the given {@code reducer}. If this iterable does not contain any elements, the initial value is simply
+	 * returned. Otherwise, it is repeatedly replaced with the result of {@code reducer.apply(initialValue, element)}
+	 * for every element in this iterable.
+	 *
+	 * @param initialValue the initial value
+	 * @param reducer the reducer function
+	 *
+	 * @return the folded value
+	 */
+	func fold<R>(initial: R, reducer: BiFunction<-R, -E, +R>) -> R {
+		for e <- this {
+			initial = reducer(initial, e)
+		}
+		return initial
+	}
+
+	/**
+	 * Reduces this iterable into a single value by repeatedly combining the elements using the given {@code reducer}
+	 * binary operator.
+	 *
+	 * @param reducer the reducer binary operator
+	 *
+	 * @return the reduced value
+	 */
+	func reduce(reducer: BiFunction<-E, -E, +E>) -> E? {
+		if this.isEmpty {
+			return null
+		}
+
+		let iterator = this.iterator
+		var initial = iterator.next
+		for e <- iterator {
+			initial = reducer(initial, e)
+		}
+		return initial
+	}
+
+	// --------------- Transformation ---------------
+
+	// TODO waiting for Iterators update
+
+	// func mapped<type R>(mapper: Function<-E, +R>) -> Iterable<R> = => this.iterator().mapped(mapper)
+
+	// func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Iterable<R> = ...
+
+	// func filtered(predicate: Predicate<-E>) -> Iterable<E> = => this.iterator().filtered(predicate)
+
+	// --------------- String Conversion ---------------
+
+	func toString() -> String = String.build { this.toString($0) }
+
+	func toString(builder: StringBuilder) -> void = this.toString(builder, '[', ', ', ']')
+
+	func toString(start: String, separator: String, end: String) -> String = String.build {
+		this.toString($0, start, separator, end)
+	}
+
+	func toString(builder: StringBuilder, start: String, separator: String, end: String) -> void {
+		builder.append(start)
+
+		if this.isEmpty {
+			builder.append(end)
+			return
+		}
+
+		let iterator = this.iterator()
+		builder.append(iterator.next()) // first
+		for e <- iterator {
+			builder.append(separator).append(e)
+		}
+		builder.append(end)
+	}
+}
