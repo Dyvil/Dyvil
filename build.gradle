@@ -10,14 +10,14 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // ---------------------------------------- Main Settings ----------------------------------------
 
 class Constants {
-	public static String version = '0.41.1'
-	public static String libraryVersion = '0.41.0'
-	public static String compilerVersion = '0.41.1'
-	public static String replVersion = '0.26.0'
+	public static String version = '0.42.0'
+	public static String libraryVersion = '0.42.0'
+	public static String compilerVersion = '0.42.0'
+	public static String replVersion = '0.26.1'
 	public static String dpfVersion = '0.16.0'
-	public static String genSrcVersion = '0.9.3'
+	public static String genSrcVersion = '0.9.4'
 
-	public static final String devStage = 'epsilon'
+	public static final String versionDir = 'v0.4x'
 
 	public static final String replMainClass = 'dyvilx.tools.repl.Main'
 	public static final String compilerMainClass = 'dyvilx.tools.compiler.Main'
@@ -584,7 +584,7 @@ task prepareRelease(type: Copy) {
 		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
 	}
 	else {
-		into "versions/$Constants.devStage"
+		into "versions/$Constants.versionDir"
 		include 'template.dyp'
 		rename 'template\\.dyp', "v${ Constants.version }.dyp"
 	}
