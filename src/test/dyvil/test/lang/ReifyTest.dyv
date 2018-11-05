@@ -96,19 +96,17 @@ class ReifyTest {
 		func get() -> T
 	}
 
-	static func captureAnon<@Reified(.OBJECT_CLASS) type T>() = new Generic<T>() {
+	static func newGeneric<@Reified(.OBJECT_CLASS) type T>() = new Generic<T>() {
 		override func get() -> T = class(T).newInstance()
 	}
 
 	@Test func captureAnonymousClass() -> void {
-		captureAnon<String>().get() =?= ""
+		newGeneric<String>().get() =?= ""
 	}
 
-	/*
-	static func captureLambda<@Reified(.OBJECT_CLASS) type T>() = => class(T).newInstance
+	static func newLambda<@Reified(.OBJECT_CLASS) type T>() = => class(T).newInstance
 
 	@Test func captureLambda() -> void {
-		captureLambda<String>().get() =?= ""
+		newLambda<String>().apply() =?= ""
 	}
-	*/
 }

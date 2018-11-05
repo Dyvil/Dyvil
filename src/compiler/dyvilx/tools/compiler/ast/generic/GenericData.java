@@ -83,6 +83,10 @@ public final class GenericData implements Resolvable, ITypeContext
 
 	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
+		if (this.member == null)
+		{
+			return false;
+		}
 		if (typeVar.getGeneric() == this.member)
 		{
 			return true;
