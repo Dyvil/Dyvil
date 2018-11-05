@@ -1,0 +1,39 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+import java.util.function.Function
+
+case class FlatMapIterator<type E, type R>(let base: Iterator<+E>, let mapper: Function<-E, +Iterator<+R>>)
+	implements Iterator<R> {
+
+	var current: Iterator<+R>?
+
+	override func hasNext() -> boolean {
+		if (let current = this.current, current.hasNext) {
+			return true
+		}
+
+		if !this.base.hasNext() {
+			return false
+		}
+		this.current = this.mapper(this.base.next())
+		return this.current!!.hasNext
+	}
+
+	override func next() -> R {
+		if !this.hasNext {
+			throw new NoSuchElementException
+		}
+
+		return this.current!!.next
+	}
+
+	override func remove() -> void {
+		if let current = this.current {
+			current.remove()
+		}
+		else {
+			throw new UnsupportedOperationException
+		}
+	}
+}

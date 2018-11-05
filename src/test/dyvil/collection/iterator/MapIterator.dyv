@@ -1,0 +1,12 @@
+package dyvil.collection.iterator
+
+import java.util.Iterator
+import java.util.function.Function
+
+case class MapIterator<type E, type R>(let base: Iterator<+E>, let mapper: Function<-E, +R>) implements Iterator<R> {
+	override func hasNext() -> boolean = this.base.hasNext()
+
+	override func next() -> R = this.mapper.apply(this.base.next())
+
+	override func remove() -> void = this.base.remove()
+}

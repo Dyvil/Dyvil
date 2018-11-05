@@ -1,0 +1,7 @@
+package dyvil.collection
+
+using dyvil.collection.Iterators._
+using dyvil.collection.Iterators2._
+
+class IteratorsTest {
+}

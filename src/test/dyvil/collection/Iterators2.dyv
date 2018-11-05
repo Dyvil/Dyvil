@@ -1,0 +1,13 @@
+package dyvil.collection
+
+import java.util.Iterator
+import java.util.function.{ Function, Predicate }
+import dyvil.collection.iterator._
+
+extension<type E> Iterator<E> {
+	func mapped<type R>(mapper: Function<-E, +R>) -> Iterator<R> = MapIterator<E, R>(this, e => mapper(e))
+
+	func filtered(predicate: Predicate<-E>) -> Iterator<E> = FilterIterator<E>(this, predicate.test(_))
+
+	func flatMapped<type R>(mapper: Function<-E, +Iterator<+R>>) -> Iterator<R> = FlatMapIterator<E, R>(this, mapper)
+}
