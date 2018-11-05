@@ -8,6 +8,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
+// TODO move to Lang header
+infix   operator --  { left,  2000 }
+
 @RunWith(class Parameterized)
 class IterablesTest {
 	// =============== Classes ===============
@@ -46,38 +49,57 @@ class IterablesTest {
 		[ emptyGeneric, intGeneric ] as [any!]
 	]
 
+	// =============== Operators ===============
+
+	infix func =?=(lhs: Iterable<+any!>, rhs: Iterable<+any!>) -> void {
+		(lhs.toArray as any!) =?= (rhs.toArray as any!)
+	}
+
 	// =============== Methods ===============
 
+	// --------------- Operators ---------------
+
 	@Test func concat() -> void {
-		(this.empty ++ this.empty).size =?= 0
-		(this.empty ++ this.ints).size =?= 3
-		(this.ints ++ this.empty).size =?= 3
-		(this.ints ++ this.ints).size =?= 6
+		(this.empty ++ this.empty) =?= List()
+		(this.empty ++ this.ints) =?= List(1, 2, 3)
+		(this.ints ++ this.empty) =?= List(1, 2, 3)
+		(this.ints ++ this.ints) =?= List(1, 2, 3, 1, 2, 3)
 	}
 
 	@Test func append() -> void {
-		let e1 = this.empty + 5
-		e1.size =?= 1
-		e1.first =?= 5
-		e1.last =?= 5
+		(this.empty + 5) =?= List(5)
 
-		let e2 = this.ints + 5
-		e2.size =?= 4
-		e2.first =?= 1
-		e2.last =?= 5
+		(this.ints + 5) =?= List(1, 2, 3, 5)
 	}
 
 	@Test func prepend() -> void {
-		let e1 = 0 + this.empty
-		e1.size =?= 1
-		e1.first =?= 0
-		e1.last =?= 0
+		(0 + this.empty) =?= List(0)
 
-		let e2 = 0 + this.ints
-		e2.size =?= 4
-		e2.first =?= 0
-		e2.last =?= 3
+		(0 + this.ints) =?= List(0, 1, 2, 3)
 	}
+
+	@Test func removedAll() -> void {
+		(this.empty -- this.empty) =?= List()
+		(this.empty -- this.ints) =?= List()
+
+		(this.ints -- this.empty) =?= List(1, 2, 3)
+		(this.ints -- this.ints) =?= List()
+
+		(this.ints -- List(1)) =?= List(2, 3)
+		(this.ints -- List(1, 3)) =?= List(2)
+		(this.ints -- List(2, 1)) =?= List(3)
+		(this.ints -- List(3, 1, 2)) =?= List()
+	}
+
+	@Test func removed() -> void {
+		(this.empty - 1) =?= List()
+		(this.ints - 1) =?= List(2, 3)
+		(this.ints - 2) =?= List(1, 3)
+		(this.ints - 3) =?= List(1, 2)
+		(this.ints - 4) =?= List(1, 2, 3)
+	}
+
+	// --------------- Properties ---------------
 
 	@Test func isEmpty() -> void {
 		this.empty.isEmpty =?= true
@@ -98,6 +120,8 @@ class IterablesTest {
 		this.empty.last =?= null
 		this.ints.last =?= 3
 	}
+
+	// --------------- Query Methods ---------------
 
 	@Test func allMatch() -> void {
 		this.empty.allMatch(x => true) =?= true
@@ -154,6 +178,8 @@ class IterablesTest {
 		this.ints.count("1") =?= 0
 	}
 
+	// --------------- Reduction Methods ---------------
+
 	@Test func fold() -> void {
 		this.empty.fold(0, (a, e) => a + 1) =?= 0 // count
 		this.empty.fold(0, _ + _) =?= 0 // sum
@@ -185,6 +211,44 @@ class IterablesTest {
 		this.ints.reduce((a, e) => 5) =?= 5
 		this.ints.reduce((a, e) => a + 1) =?= 3
 	}
+
+	// --------------- Transformation Methods ---------------
+
+	@Test func mapped() -> void {
+		this.empty.mapped(_ + 1) =?= List()
+
+		this.ints.mapped(_ + 1) =?= List(2, 3, 4)
+		this.ints.mapped(_ * 2) =?= List(2, 4, 6)
+	}
+
+	@Test func flatMapped() -> void {
+		this.empty.flatMapped(e => []) =?= List()
+		this.empty.flatMapped(e => [ e ]) =?= List()
+
+		this.ints.flatMapped(e => []) =?= List()
+		this.ints.flatMapped(e => [ 1 ]) =?= List(1, 1, 1)
+		this.ints.flatMapped(e => [ e ]) =?= List(1, 2, 3)
+		this.ints.flatMapped(e => [ e - 1, e, e + 1 ]) =?= List(0, 1, 2, 1, 2, 3, 2, 3, 4)
+	}
+
+	@Test func filtered() -> void {
+		this.empty.filtered(e => true) =?= List()
+		this.empty.filtered(e => false) =?= List()
+
+		this.ints.filtered(e => true) =?= List(1, 2, 3)
+		this.ints.filtered(e => false) =?= List()
+		this.ints.filtered(e => e > 1) =?= List(2, 3)
+		this.ints.filtered(e => e == 2) =?= List(2)
+	}
+
+	// --------------- Array Conversion Methods ---------------
+
+	@Test func toArray() -> void {
+		this.empty.toArray =?= [] as any!
+		this.ints.toArray =?= [1, 2, 3] as any!
+	}
+
+	// --------------- String Conversion Methods ---------------
 
 	@Test func toStringBuilder() -> void {
 		let builder1 = new StringBuilder

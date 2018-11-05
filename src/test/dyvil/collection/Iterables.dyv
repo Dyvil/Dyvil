@@ -1,6 +1,7 @@
 package dyvil.collection
 
 using dyvil.collection.Iterators._
+using dyvil.collection.Iterators2._
 
 import java.util.Iterator
 import java.util.function.{ Predicate, Function, BiFunction }
@@ -21,13 +22,11 @@ extension<type E> Iterable<E> {
 	@JavaName("prepend")
 	infix func + <type E>(lhs: E, rhs: Iterable<+E>) -> Iterable<E> = => lhs + rhs.iterator()
 
-	// TODO waiting for filtered
+	@JavaName("removedAll")
+	infix func -- <type E>(lhs: Iterable<+E>, rhs: Iterable<+any!>) -> Iterable<E> = lhs.filtered(e => !rhs.contains(e))
 
-	// @JavaName("removedAll")
-	// infix func -- <type E>(lhs: Iterable<+E>, rhs: Iterable<any!>) -> Iterable<E> = lhs.filtered(e => !rhs.contains(e))
-
-	// @JavaName("removed")
-	// infix func - <type E>(lhs: Iterable<+E>, rhs: any!) -> Iterable<E> = lhs.filtered(e => rhs != e)
+	@JavaName("removed")
+	infix func - <type E>(lhs: Iterable<+E>, rhs: any!) -> Iterable<E> = lhs.filtered(e => rhs != e)
 
 	// =============== Properties ===============
 
@@ -171,13 +170,42 @@ extension<type E> Iterable<E> {
 
 	// --------------- Transformation ---------------
 
-	// TODO waiting for Iterators update
+	func mapped<type R>(mapper: Function<-E, +R>) -> Iterable<R> = => this.iterator().mapped(mapper)
 
-	// func mapped<type R>(mapper: Function<-E, +R>) -> Iterable<R> = => this.iterator().mapped(mapper)
+	func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Iterable<R> {
+		=> this.iterator().flatMapped(e => mapper(e).iterator())
+	}
 
-	// func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Iterable<R> = ...
+	func filtered(predicate: Predicate<-E>) -> Iterable<E> = => this.iterator().filtered(predicate)
 
-	// func filtered(predicate: Predicate<-E>) -> Iterable<E> = => this.iterator().filtered(predicate)
+	// --------------- Array Conversion ---------------
+
+	// @JavaName"toArrayT"
+	// func toArray<@Reified(.ANY_CLASS) type T super E>() -> [T] inline = this.toArray(of: class(T))
+
+	func toArray() -> [any!] {
+		let size = this.size
+		let array = new [any!](size)
+		var index = 0
+		for e <- this {
+			array[index] = e
+			index += 1
+		}
+		return array
+	}
+
+	/*
+	func toArray(of componentType: Class<-E>) -> {
+		let size = this.size
+		let array = java.lang.reflect.Array.newInstance(componentType, size)
+		var index = 0
+		for e <- this {
+			java.lang.reflect.Array.set(array, index, e)
+			index += 1
+		}
+		return array
+	}
+	*/
 
 	// --------------- String Conversion ---------------
 
