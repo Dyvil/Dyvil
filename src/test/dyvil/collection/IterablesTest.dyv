@@ -8,9 +8,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
-// TODO move to Lang header
-infix   operator --  { left,  2000 }
-
 @RunWith(class Parameterized)
 class IterablesTest {
 	// =============== Classes ===============

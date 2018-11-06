@@ -136,3 +136,6 @@ infix   operator **  { right, 1300 }
 
 // Concatenation Operator
 infix   operator ++  { left,  2000 }
+
+// Set Difference Operator
+infix   operator --  { left,  2000 }
