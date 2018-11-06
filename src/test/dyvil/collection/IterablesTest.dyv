@@ -211,6 +211,16 @@ class IterablesTest {
 
 	// --------------- Transformation Methods ---------------
 
+	@Test func filtered() -> void {
+		this.empty.filtered(e => true) =?= List()
+		this.empty.filtered(e => false) =?= List()
+
+		this.ints.filtered(e => true) =?= List(1, 2, 3)
+		this.ints.filtered(e => false) =?= List()
+		this.ints.filtered(e => e > 1) =?= List(2, 3)
+		this.ints.filtered(e => e == 2) =?= List(2)
+	}
+
 	@Test func mapped() -> void {
 		this.empty.mapped(_ + 1) =?= List()
 
@@ -226,16 +236,6 @@ class IterablesTest {
 		this.ints.flatMapped(e => [ 1 ]) =?= List(1, 1, 1)
 		this.ints.flatMapped(e => [ e ]) =?= List(1, 2, 3)
 		this.ints.flatMapped(e => [ e - 1, e, e + 1 ]) =?= List(0, 1, 2, 1, 2, 3, 2, 3, 4)
-	}
-
-	@Test func filtered() -> void {
-		this.empty.filtered(e => true) =?= List()
-		this.empty.filtered(e => false) =?= List()
-
-		this.ints.filtered(e => true) =?= List(1, 2, 3)
-		this.ints.filtered(e => false) =?= List()
-		this.ints.filtered(e => e > 1) =?= List(2, 3)
-		this.ints.filtered(e => e == 2) =?= List(2)
 	}
 
 	// --------------- Array Conversion Methods ---------------

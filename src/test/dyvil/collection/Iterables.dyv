@@ -1,7 +1,6 @@
 package dyvil.collection
 
 using dyvil.collection.Iterators._
-using dyvil.collection.Iterators2._
 
 import java.util.Iterator
 import java.util.function.{ Predicate, Function, BiFunction }
@@ -170,13 +169,13 @@ extension<type E> Iterable<E> {
 
 	// --------------- Transformation ---------------
 
+	func filtered(predicate: Predicate<-E>) -> Iterable<E> = => this.iterator().filtered(predicate)
+
 	func mapped<type R>(mapper: Function<-E, +R>) -> Iterable<R> = => this.iterator().mapped(mapper)
 
 	func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Iterable<R> {
 		=> this.iterator().flatMapped(e => mapper(e).iterator())
 	}
-
-	func filtered(predicate: Predicate<-E>) -> Iterable<E> = => this.iterator().filtered(predicate)
 
 	// --------------- Array Conversion ---------------
 
