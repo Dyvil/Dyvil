@@ -152,8 +152,7 @@ dependencies {
 
 	// --------------- Compiler ---------------
 
-	compilerCompileOnly(libraryBootstrap)
-	compilerRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
+	compilerCompile(libraryBootstrap)
 
 	// --------------- DPF ---------------
 
@@ -165,14 +164,12 @@ dependencies {
 
 	// --------------- REPL ---------------
 
-	replCompileOnly(libraryBootstrap)
-	replRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
+	replCompile(libraryBootstrap)
 	replCompile(sourceSets.compiler.output)
 
 	// --------------- GenSrc ---------------
 
-	gensrcCompileOnly(libraryBootstrap)
-	gensrcRuntimeOnly(sourceSets.library.output, libraryDyvilClasses)
+	gensrcCompile(libraryBootstrap)
 	gensrcCompile(sourceSets.compiler.output)
 
 	// --------------- Test ---------------
