@@ -10,7 +10,6 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
-import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -135,7 +134,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.resolved |= THIS_TYPE;
 
-		this.setThisType(this.thisType.resolveType(null, Package.rootPackage));
+		this.setThisType(this.thisType.resolveType(null, this.getExternalContext()));
 	}
 
 	@Override
@@ -156,8 +155,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.resolved |= EXCEPTIONS;
 
-		final IContext context = this.getExternalContext();
-		this.exceptions.resolveTypes(null, context);
+		this.exceptions.resolveTypes(null, this.getExternalContext());
 	}
 
 	@Override
@@ -191,13 +189,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public IContext getExternalContext()
 	{
-		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
-	}
-
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return Package.rootPackage.resolveClass(name);
+		return Package.rootPackage.push(this.enclosingClass).push(this);
 	}
 
 	@Override
