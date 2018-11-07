@@ -19,11 +19,11 @@ import dyvilx.tools.compiler.ast.member.ClassMember;
 import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.raw.InternalType;
+import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
+import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
-import dyvilx.tools.compiler.backend.exception.BytecodeException;
-import dyvilx.tools.compiler.backend.annotation.AnnotationReader;
 
 public interface IParameter extends IVariable, ClassMember
 {
@@ -93,7 +93,11 @@ public interface IParameter extends IVariable, ClassMember
 	{
 		final IType type = this.getInternalType();
 
-		final int index = this.getIndex();
+		// #443
+		final ICallableMember method = this.getMethod();
+		final int index =
+			this.getIndex() + (method != null && method.hasModifier(Modifiers.EXTENSION) && !method.isStatic() ? 1 : 0);
+
 		final int localIndex = writer.localCount();
 
 		this.setLocalIndex(localIndex);
