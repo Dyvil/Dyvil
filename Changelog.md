@@ -1,3 +1,19 @@
+# Dyvil v0.42.1
+
+## Dyvil Library v0.42.0
+
+## Dyvil Compiler v0.42.1
+
+- Fixed an off-by-one index problem when compiling/decompiling extension method parameters. #443
+
+## Dyvil REPL v0.26.1
+
+## Dyvil Property Format v0.16.0
+
+## Dyvil GenSrc v0.9.4
+
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.42.0
 
 - Added support for generic extension classes. #422
