@@ -1,8 +1,9 @@
 package dyvilx.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Iterators;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.collection.iterator.FilterIterator;
+import dyvil.function.Function;
 import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
@@ -141,7 +142,9 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public Iterable<IField> enumConstants()
 	{
-		return () -> new FilterIterator<>(new ArrayIterator<>(this.fields, 0, this.fieldCount), IField::isEnumConstant);
+		//noinspection RedundantCast
+		return () -> Iterators.filtered(new ArrayIterator<>(this.fields, 0, this.fieldCount),
+		                                (Function.Of1<IField, Boolean>) IField::isEnumConstant);
 	}
 
 	public int fieldCount()
