@@ -1,12 +1,12 @@
 package dyvil.collection
 
-import java.util.Iterator
 import dyvil.collection.iterator._
+import java.util.Iterator
+import java.util.function.{ Function, Predicate }
 
 @JavaName("Iterators")
-extension Iterator
-{
-	// =============== Constructors ===============
+extension<type E> Iterator<E> {
+	// =============== Static Methods ===============
 
 	@JavaName("empty")
 	static func apply<type E>() -> Iterator<E> = EmptyIterator<E>()
@@ -16,14 +16,6 @@ extension Iterator
 
 	@JavaName("of")
 	static func apply<type E>(elements: E...) -> Iterator<E> = ArrayIterator<E>(elements)
-
-	// =============== Methods ===============
-
-	// TODO convert mapped and filtered to proper extension funcs when generic extension classes are implemented
-
-	infix func mapped<type E, type R>(_ base: Iterator<+E>, by mapper: E -> R) -> Iterator<R> = MappingIterator(base, mapper)
-
-	infix func filtered<type E>(_ base: Iterator<+E>, by filter: E -> boolean) -> Iterator<E> = FilterIterator(base, filter)
 
 	// =============== Operators ===============
 
@@ -35,4 +27,26 @@ extension Iterator
 
 	@JavaName("append")
 	infix func + <type E>(lhs: Iterator<+E>, rhs: E) -> Iterator<E> = AppendIterator(lhs, rhs)
+
+	// =============== Methods ===============
+
+	// --------------- Filter ---------------
+
+	@OverloadPriority
+	func filtered(predicate: Predicate<-E>) -> Iterator<E> = FilterIterator<E>(this, predicate)
+
+	@Deprecated
+	func filtered(by predicate: E -> boolean) -> Iterator<E> = FilterIterator<E>(this, predicate(_))
+
+	// --------------- Map ---------------
+
+	@OverloadPriority
+	func mapped<type R>(mapper: Function<-E, +R>) -> Iterator<R> = MapIterator<E, R>(this, mapper)
+
+	@Deprecated
+	func mapped<type R>(by mapper: E -> R) -> Iterator<R> = MapIterator<E, R>(this, mapper(_))
+
+	// --------------- Flat Map ---------------
+
+	func flatMapped<type R>(mapper: Function<-E, +Iterator<+R>>) -> Iterator<R> = FlatMapIterator<E, R>(this, mapper)
 }

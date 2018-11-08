@@ -1,7 +1,6 @@
 package dyvil.collection
 
 using dyvil.collection.Iterators._
-using dyvil.collection.Iterators2._
 
 import java.util.Iterator
 import java.util.function.{ Predicate, Function, BiFunction }

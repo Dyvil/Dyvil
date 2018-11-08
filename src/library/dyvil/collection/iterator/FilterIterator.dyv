@@ -1,46 +1,37 @@
 package dyvil.collection.iterator
 
-import java.util.{ Iterator, NoSuchElementException }
+import java.util.Iterator
+import java.util.NoSuchElementException
+import java.util.function.Predicate
 
-class FilterIterator<type E>(let base: Iterator<E>, let filter: E -> boolean) implements Iterator<E>
-{
-	// Apply Method
+case class FilterIterator<type E>(let base: Iterator<E>, let filter: Predicate<-E>) implements Iterator<E> {
 
-	static func apply<type E>(base: Iterator<E>, filter: E -> boolean) -> FilterIterator<E>
-	{
-		return new FilterIterator<E>(base, filter)
-	}
-
-	// Implementation
-
-	var hasNext: boolean
+	var nextAvailable: boolean
 	var next: E!
 
-	override func hasNext() -> boolean
-	{
-		if (this.hasNext) return true
+	override func hasNext() -> boolean {
+		if this.nextAvailable {
+			return true
+		}
 
-		while (this.base.hasNext())
-		{
+		while this.base.hasNext() {
 			let next = this.base.next()
-			if (this.filter.apply(next))
-			{
-				this.hasNext = true
+
+			if this.filter.test(next) {
 				this.next = next
+				this.nextAvailable = true
 				return true
 			}
 		}
 		return false
 	}
 
-	override func next() -> E
-	{
-		if (!this.hasNext()) throw new NoSuchElementException
-		let next = this.next
-		this.next = null
-		this.hasNext = false
-		return next
-	}
+	override func next() -> E {
+		if !this.hasNext() {
+			throw new NoSuchElementException
+		}
 
-	override func toString() -> String = "FilterIterator(\(this.base), filter: \(this.filter))"
+		this.nextAvailable = false
+		return this.next
+	}
 }
