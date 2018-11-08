@@ -20,16 +20,15 @@ import dyvilx.tools.compiler.ast.statement.control.Label;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
+import dyvilx.tools.compiler.transform.Names;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-
-import static dyvilx.tools.compiler.ast.statement.loop.ForStatement.*;
 
 public class ForEachStatement implements IForStatement, IDefaultContext
 {
@@ -43,14 +42,24 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	protected Label updateLabel;
 	protected Label endLabel;
 
+	public ForEachStatement()
+	{
+		this(null, null);
+	}
+
+	public ForEachStatement(SourcePosition position)
+	{
+		this(position, null);
+	}
+
 	public ForEachStatement(SourcePosition position, IVariable var)
 	{
 		this.position = position;
 		this.variable = var;
 
-		this.startLabel = new Label($forStart);
-		this.updateLabel = new Label($forUpdate);
-		this.endLabel = new Label($forEnd);
+		this.startLabel = new Label(Names.$forStart);
+		this.updateLabel = new Label(Names.$forUpdate);
+		this.endLabel = new Label(Names.$forEnd);
 	}
 
 	public ForEachStatement(SourcePosition position, IVariable var, IValue action)
@@ -139,15 +148,15 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@Override
 	public Label resolveLabel(Name name)
 	{
-		if (name == $forStart)
+		if (name == Names.$forStart)
 		{
 			return this.startLabel;
 		}
-		if (name == $forUpdate)
+		if (name == Names.$forUpdate)
 		{
 			return this.updateLabel;
 		}
-		if (name == $forEnd)
+		if (name == Names.$forEnd)
 		{
 			return this.endLabel;
 		}
@@ -264,8 +273,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return this;
 	}
 
-	@NonNull
-	public IValue toIteratorLoop(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
+	public @NonNull IValue toIteratorLoop(MarkerList markers, IContext context, IType varType, IValue value,
+		IType valueType)
 	{
 		final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE);
 		if (varType == Types.UNKNOWN)
@@ -287,8 +296,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return iterableForStatement;
 	}
 
-	@NonNull
-	public IValue toStringLoop(MarkerList markers, IContext context, IType varType, IValue value)
+	public @NonNull IValue toStringLoop(MarkerList markers, IContext context, IType varType, IValue value)
 	{
 		if (varType == Types.UNKNOWN)
 		{
@@ -307,8 +315,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return stringForStatement;
 	}
 
-	@NonNull
-	public IValue toIterable(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
+	public @NonNull IValue toIterable(MarkerList markers, IContext context, IType varType, IValue value,
+		IType valueType)
 	{
 		final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE);
 		if (varType == Types.UNKNOWN)

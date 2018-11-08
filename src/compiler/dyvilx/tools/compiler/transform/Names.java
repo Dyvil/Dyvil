@@ -30,8 +30,11 @@ public final class Names
 
 	// --------------- Special Names ---------------
 
-	public static final Name $0      = Name.fromRaw("$0");
-	public static final Name $VALUES = Name.fromRaw("$VALUES");
+	public static final Name $0         = Name.fromRaw("$0");
+	public static final Name $forStart  = Name.fromRaw("$forStart");
+	public static final Name $forUpdate = Name.fromRaw("$forCondition");
+	public static final Name $forEnd    = Name.fromRaw("$forEnd");
+	public static final Name $VALUES    = Name.fromRaw("$VALUES");
 
 	// --------------- Regular Names ---------------
 

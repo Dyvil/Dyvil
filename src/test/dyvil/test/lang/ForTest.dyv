@@ -5,19 +5,7 @@ using dyvil.test.JUnit
 using dyvil.Collections
 
 class ForTest {
-	@Test
-	func iterative() -> void {
-		let list = List<int>()
-
-		for (var i = 0; i < 3; i += 1) {
-			list += i
-		}
-
-		list =?= List(0, 1, 2)
-	}
-
-	@Test
-	func array() -> void {
+	@Test func array() -> void {
 		let array = [ 1, 2, 3 ]
 		let list = List<int>()
 
@@ -28,8 +16,7 @@ class ForTest {
 		list =?= List(1, 2, 3)
 	}
 
-	@Test
-	func iterable() -> void {
+	@Test func iterable() -> void {
 		let iterable: Iterable<int> = List(1, 2, 3)
 		let list = List<int>()
 
@@ -40,8 +27,7 @@ class ForTest {
 		list =?= iterable
 	}
 
-	@Test
-	func iterator() -> void {
+	@Test func iterator() -> void {
 		let iterable = List(1, 2, 3)
 		let iterator = iterable.iterator
 		let list = List<int>()
@@ -53,8 +39,7 @@ class ForTest {
 		list =?= iterable
 	}
 
-	@Test
-	func string() -> void {
+	@Test func string() -> void {
 		let testString = "abc"
 		var string = ""
 
@@ -65,7 +50,7 @@ class ForTest {
 		string =?= testString
 	}
 
-	func nested() -> void {
+	@Test func nested() -> void {
 		let results = List<(int, int)>()
 
 		for i <- 0 .. 1 {
