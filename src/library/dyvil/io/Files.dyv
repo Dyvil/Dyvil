@@ -74,7 +74,7 @@ extension File {
 	@JavaName("writeText")
 	func write(text: String) -> void throws IOException = this.write(text.getBytes)
 
-	@JavaName("writeText")
+	@JavaName("tryWriteText")
 	func tryWrite(text: String) -> boolean = IOAction.tryIO { this.write(text) }
 
 	@JavaName("writeLines")
