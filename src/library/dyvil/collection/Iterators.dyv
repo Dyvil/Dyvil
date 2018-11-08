@@ -35,7 +35,7 @@ extension<type E> Iterator<E> {
 	@OverloadPriority
 	func filtered(predicate: Predicate<-E>) -> Iterator<E> = FilterIterator<E>(this, predicate)
 
-	@Deprecated
+	@Deprecated(replacements: ["Iterator.filtered(Predicate)"], forRemoval: "v0.44.0")
 	func filtered(by predicate: E -> boolean) -> Iterator<E> = FilterIterator<E>(this, predicate(_))
 
 	// --------------- Map ---------------
@@ -43,7 +43,7 @@ extension<type E> Iterator<E> {
 	@OverloadPriority
 	func mapped<type R>(mapper: Function<-E, +R>) -> Iterator<R> = MapIterator<E, R>(this, mapper)
 
-	@Deprecated
+	@Deprecated(replacements: ["Iterator.mapped(Function)"], forRemoval: "v0.44.0")
 	func mapped<type R>(by mapper: E -> R) -> Iterator<R> = MapIterator<E, R>(this, mapper(_))
 
 	// --------------- Flat Map ---------------
