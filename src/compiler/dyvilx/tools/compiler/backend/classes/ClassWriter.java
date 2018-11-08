@@ -38,7 +38,7 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 	{
 		try
 		{
-			Files.create(file);
+			Files.createRecursively(file);
 
 			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 			{
@@ -87,7 +87,7 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 		final String fileName = config.getJarFileName();
 		final File output = new File(fileName);
 
-		Files.tryCreate(output);
+		Files.tryCreateRecursively(output);
 
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();

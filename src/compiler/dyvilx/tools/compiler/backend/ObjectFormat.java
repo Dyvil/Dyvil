@@ -21,7 +21,7 @@ public final class ObjectFormat
 	{
 		try
 		{
-			Files.create(file);
+			Files.createRecursively(file);
 
 			try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
 			{
