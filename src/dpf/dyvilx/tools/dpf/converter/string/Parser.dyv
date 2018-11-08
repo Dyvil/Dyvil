@@ -1,6 +1,7 @@
 package dyvilx.tools.dpf.converter.string
 
-import dyvil.io.FileUtils
+using dyvil.io.Files._
+
 import dyvilx.tools.dpf.ast.RootNode
 import dyvilx.tools.dpf.visitor._
 import dyvilx.tools.parsing.marker.BaseMarkers
@@ -32,7 +33,7 @@ public class Parser
 
 	static func apply(markers: MarkerList, tokens: TokenList) -> Parser = new Parser(markers, tokens.iterator)
 
-	static func parse(file: File) -> RootNode = parse(FileUtils.tryRead(file)!)
+	static func parse(file: File) -> RootNode = parse(file.tryReadText()!)
 
 	static func parse(code: String) -> RootNode
 	{

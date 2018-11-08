@@ -1,7 +1,7 @@
 package dyvilx.tools.compiler;
 
 import dyvil.io.Console;
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 import dyvilx.tools.BasicTool;
 import dyvilx.tools.compiler.ast.external.ExternalHeader;
 import dyvilx.tools.compiler.ast.structure.Package;
@@ -286,7 +286,7 @@ public class DyvilCompiler extends BasicTool
 
 		for (File file : files)
 		{
-			FileUtils.delete(file);
+			Files.deleteRecursively(file);
 		}
 	}
 

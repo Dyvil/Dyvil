@@ -1,7 +1,7 @@
 package dyvilx.tools.repl.context;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 import dyvil.reflect.ReflectUtils;
 import dyvilx.tools.compiler.ast.header.ICompilable;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
@@ -35,7 +35,7 @@ public class REPLClassLoader extends ClassLoader
 		final String fileName = compilable.getFileName();
 		try
 		{
-			FileUtils.write(new File(repl.getDumpDir(), fileName), bytes);
+			Files.writeData(new File(repl.getDumpDir(), fileName), bytes);
 		}
 		catch (IOException e)
 		{

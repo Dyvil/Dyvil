@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.backend.classes;
 
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.header.ICompilable;
 import dyvilx.tools.compiler.backend.ClassFormat;
@@ -38,7 +38,7 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 	{
 		try
 		{
-			FileUtils.create(file);
+			Files.create(file);
 
 			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 			{
@@ -87,7 +87,7 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 		final String fileName = config.getJarFileName();
 		final File output = new File(fileName);
 
-		FileUtils.tryCreate(output);
+		Files.tryCreate(output);
 
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();

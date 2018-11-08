@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
  * The <b>FileUtils</b> class can be used for several {@link File} -related operations
  * such as writing or reading the file both as a String or as a List of Strings or recursively deleting directories.
  */
+@Deprecated
+@dyvil.annotation.Deprecated(replacements = { "dyvil.io.Files" }, since = "v0.43.0", forRemoval = "v0.44.0")
 public final class FileUtils
 {
 	private FileUtils()

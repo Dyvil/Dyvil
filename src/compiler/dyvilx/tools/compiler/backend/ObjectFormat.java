@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.backend;
 
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 import dyvil.io.StringPoolReader;
 import dyvil.io.StringPoolWriter;
 import dyvilx.tools.compiler.DyvilCompiler;
@@ -21,7 +21,7 @@ public final class ObjectFormat
 	{
 		try
 		{
-			FileUtils.create(file);
+			Files.create(file);
 
 			try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
 			{

@@ -1,7 +1,7 @@
 package dyvil.runtime;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ public class BytecodeDump
 		if (dumpDirectory != null)
 		{
 			File dumpFile = new File(dumpDirectory, className.replace('/', File.separatorChar).concat(".class"));
-			FileUtils.tryWrite(dumpFile, bytes);
+			Files.tryWriteData(dumpFile, bytes);
 		}
 	}
 }

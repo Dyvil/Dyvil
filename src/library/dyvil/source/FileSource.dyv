@@ -1,6 +1,7 @@
 package dyvil.source
 
 import java.io.{ File, IOException }
+using dyvil.io.Files.readText
 
 case class FileSource(protected let file: File { @JavaName("file") public get }) implements Source
 {
@@ -8,7 +9,7 @@ case class FileSource(protected let file: File { @JavaName("file") public get })
 
 	func load() -> void throws IOException
 	{
-		this.textSource = new TextSource(dyvil.io.FileUtils.read(this.file))
+		this.textSource = new TextSource(this.file.readText())
 	}
 
 	private func getTextSource() -> TextSource

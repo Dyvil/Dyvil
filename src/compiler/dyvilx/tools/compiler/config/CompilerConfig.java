@@ -1,6 +1,6 @@
 package dyvilx.tools.compiler.config;
 
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
 import dyvil.lang.Strings;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
@@ -132,12 +132,12 @@ public class CompilerConfig
 
 	public void include(String pattern)
 	{
-		this.includePatterns.add(FileUtils.antToRegex(pattern));
+		this.includePatterns.add(Files.antPattern(pattern));
 	}
 
 	public void exclude(String pattern)
 	{
-		this.excludePatterns.add(FileUtils.antToRegex(pattern));
+		this.excludePatterns.add(Files.antPattern(pattern));
 	}
 
 	public boolean isIncluded(String name)
