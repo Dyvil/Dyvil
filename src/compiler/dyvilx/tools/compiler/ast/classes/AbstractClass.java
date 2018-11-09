@@ -155,7 +155,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public MemberKind getKind()
 	{
-		return this.metadata.getKind();
+		return this.getMetadata().getKind();
 	}
 
 	@Override
@@ -510,7 +510,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.metadata.getFunctionalMethod();
+		return this.getMetadata().getFunctionalMethod();
 	}
 
 	// --------------- Context ---------------
