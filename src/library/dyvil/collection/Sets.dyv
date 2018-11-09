@@ -33,11 +33,30 @@ extension<type E> Set<E> {
 
 	// =============== Static Methods ===============
 
+	// Set<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> @Immutable Set<E> = Collections.emptySet<E>()
 
+	// Set(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> @Immutable Set<E> = Collections.singleton(element)
 
+	// Set(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> @Immutable Set<E> = LinkedHashSet(elements...).unmodifiableView
+
+	// Set(withContentsOf: someCollection)
+	@JavaName("copyOf")
+	static func apply<type E>(withContentsOf collection: Collection<+E>) -> @Immutable Set<E>
+		= LinkedHashSet(withContentsOf: collection).unmodifiableView
+
+	// Set<String>() { add("a"); add("b") }
+	@JavaName("build")
+	static func apply<type E>(builtBy configure: Set<E>.() -> void) -> @Immutable Set<E> {
+		let set = new LinkedHashSet<E>()
+		configure(set)
+		return set.unmodifiableView
+	}
 
 	// static func apply<type E>(explicit fromMap map: Map<E, Boolean>) -> Set<E> = Collections.newSetFromMap<E>(map)
 
@@ -56,6 +75,7 @@ extension<type E> Set<E> {
 extension<type E> SortedSet<E> {
 	// =============== Static Methods ===============
 
+	@JavaName("empty")
 	static func apply<type E>() -> @Immutable SortedSet<E> = Collections.emptySortedSet<E>()
 
 	// =============== Methods ===============
@@ -73,6 +93,7 @@ extension<type E> SortedSet<E> {
 extension<type E> NavigableSet<E> {
 	// =============== Static Methods ===============
 
+	@JavaName("empty")
 	static func apply<type E>() -> @Immutable NavigableSet<E> = Collections.emptyNavigableSet<E>()
 
 	// =============== Methods ===============
@@ -86,6 +107,7 @@ extension<type E> NavigableSet<E> {
 
 // *************** HashSet ***************
 
+@JavaName("HashSets")
 extension HashSet {
 	// =============== Static Methods ===============
 
@@ -105,6 +127,7 @@ extension HashSet {
 
 // *************** LinkedHashSet ***************
 
+@JavaName("LinkedHashSets")
 extension LinkedHashSet {
 	// =============== Static Methods ===============
 
@@ -125,6 +148,7 @@ extension LinkedHashSet {
 
 // *************** TreeSet ***************
 
+@JavaName("TreeSets")
 extension TreeSet {
 	// =============== Static Methods ===============
 
@@ -158,6 +182,7 @@ extension TreeSet {
 
 // *************** EnumSet ***************
 
+@JavaName("EnumSets")
 extension EnumSet {
 	// =============== Static Methods ===============
 
