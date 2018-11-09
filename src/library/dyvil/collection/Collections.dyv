@@ -27,6 +27,11 @@ extension<type E> Collection<E> {
 
 	// func isDisjoint(with other: Collection<_>) -> boolean = Collections.disjoint(this, other)
 
+	// --------------- Mutation ---------------
+
+	@Mutating
+	func addAll(elements: E...) -> boolean = Collections.addAll(this, elements...)
+
 	// --------------- Views ---------------
 
 	func synchronizedView() -> Collection<E> = Collections.synchronizedCollection(this)
