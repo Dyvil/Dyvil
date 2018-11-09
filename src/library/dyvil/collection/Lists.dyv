@@ -1,6 +1,7 @@
 package dyvil.collection
 
 import java.util.{ Collection, List, ArrayList, LinkedList, concurrent.CopyOnWriteArrayList }
+import java.util.function.{ IntFunction, Supplier }
 import java.util.Comparator
 import java.util.Random
 
@@ -13,23 +14,55 @@ import dyvil.ref.ObjectRef
 extension<type E> List<E> {
 	// =============== Static Methods ===============
 
+	// List<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> @Immutable List<E> = Collections.emptyList<E>()
 
+	// List(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> @Immutable List<E> = Collections.singletonList(element)
 
+	// List(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> @Immutable List<E> = Arrays.asList(elements...).unmodifiableView
 
+	// List(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf c: Collection<+E>) -> @Immutable List<E>
 		= ArrayList(withContentsOf: c).unmodifiableView
 
-	static func apply<type E>(configure: List<E>.() -> void) -> @Immutable List<E> {
-		let list = List<E>()
+	// List<String>() { add("a"); add("b") }
+	@JavaName("build")
+	static func apply<type E>(builtBy configure: List<E>.() -> void) -> @Immutable List<E> {
+		let list = new ArrayList<E>()
 		configure(list)
 		return list.unmodifiableView
 	}
 
-	static func apply<type E>(explicit repeating element: E, times: int) -> @Immutable List<E>
-		= Collections.nCopies(times, element)
+	// List(with: 10, copiesOf: "a")
+	@JavaName("repeat")
+	static func apply<type E>(with n: int, explicit copiesOf element: E) -> @Immutable List<E>
+		= Collections.nCopies(n, element)
+
+	// List(with: 10, itemsGeneratedBy: i => i + 1)
+	@JavaName("generate")
+	static func apply<type E>(with n: int, explicit itemsGeneratedBy generator: IntFunction<+E>) -> @Immutable List<E> {
+		let list = new ArrayList<E>(n)
+		for i <- 0 ..< n {
+			list.add(generator(i))
+		}
+		return list
+	}
+
+	// List(with: 10, itemsGeneratedBy: => random.nextInt())
+	@JavaName("generate")
+	static func apply<type E>(with n: int, explicit itemsGeneratedBy supplier: Supplier<+E>) -> @Immutable List<E> {
+		let list = new ArrayList<E>(n)
+		for i <- 0 ..< n {
+			list.add(supplier.get())
+		}
+		return list
+	}
 
 	// =============== Methods ===============
 
