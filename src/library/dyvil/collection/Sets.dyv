@@ -1,0 +1,93 @@
+package dyvil.collection
+
+import java.util.{ Set, SortedSet, NavigableSet }
+import java.util.Map
+import java.util.Collections
+
+// *************** Set ***************
+
+@JavaName("Sets")
+extension<type E> Set<E> {
+	// =============== Operators ===============
+
+	infix func |= <type E>(lhs: Set<-E>, rhs: Set<+E>) -> void = lhs.addAll(rhs)
+
+	infix func &=         (lhs: Set<_>, rhs: Set<_>) -> void = lhs.retainAll(rhs)
+
+	infix func ^= <type E>(lhs: Set<-E>, rhs: Set<+E>) -> void {
+		for e <- rhs {
+			if lhs.contains(e) {
+				lhs.remove(e)
+			}
+			else {
+				lhs.add(e)
+			}
+		}
+	}
+
+	// =============== Static Methods ===============
+
+	static func apply<type E>() -> Set<E> = Collections.emptySet<E>()
+
+	static func apply<type E>(element: E) -> Set<E> = Collections.singleton(element)
+
+	// static func apply<type E>(explicit fromMap map: Map<E, Boolean>) -> Set<E> = Collections.newSetFromMap<E>(map)
+
+	// =============== Methods ===============
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> Set<E> = Collections.synchronizedSet(this)
+
+	func unmodifiableView() -> Set<E> = Collections.unmodifiableSet(this)
+}
+
+// *************** SortedSet ***************
+
+@JavaName("SortedSets")
+extension<type E> SortedSet<E> {
+	// =============== Static Methods ===============
+
+	static func apply<type E>() -> SortedSet<E> = Collections.emptySortedSet<E>()
+
+	// =============== Methods ===============
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> SortedSet<E> = Collections.synchronizedSortedSet(this)
+
+	func unmodifiableView() -> SortedSet<E> = Collections.unmodifiableSortedSet(this)
+}
+
+// *************** NavigableSet ***************
+
+@JavaName("NavigableSets")
+extension<type E> NavigableSet<E> {
+	// =============== Static Methods ===============
+
+	static func apply<type E>() -> NavigableSet<E> = Collections.emptyNavigableSet<E>()
+
+	// =============== Methods ===============
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> NavigableSet<E> = Collections.synchronizedNavigableSet(this)
+
+	func unmodifiableView() -> NavigableSet<E> = Collections.unmodifiableNavigableSet(this)
+}
+
+// *************** HashSet ***************
+
+// TODO HashSet extension
+
+// *************** LinkedHashSet ***************
+
+// TODO LinkedHashSet extension
+
+// *************** TreeSet ***************
+
+// TODO TreeSet extension
+
+// *************** EnumSet ***************
+
+// TODO EnumSet extension

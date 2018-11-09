@@ -1,0 +1,98 @@
+package dyvil.collection
+
+import java.util.{ Map, SortedMap, NavigableMap }
+import java.util.Collections
+import dyvil.ref.ObjectRef
+
+// *************** Map ***************
+
+@JavaName("Maps")
+extension<type K, type V> Map<K, V> {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> Map<K, V> = Collections.emptyMap<K, V>()
+
+	static func apply<type K, type V>(key: K, value: V) -> Map<K, V> = Collections.singletonMap(key, value)
+
+	static func apply<type K, type V>(tuple: (K, V)) -> Map<K, V> = Collections.singletonMap(tuple._1, tuple._2)
+
+	// =============== Methods ===============
+
+	// --------------- Key Subscript ---------------
+
+	func subscript(key: K) -> V! = this.get(key)
+
+	func subscript_=(key: K, newValue: V) -> void = this.put(key, newValue)
+
+	func subscript_&(key: K) -> V* = new ObjectRef<V>() {
+		override func get() -> V = this<Map<K, V>>.get(key)
+
+		override func set(value: V) -> void = this<Map<K, V>>.put(key, value)
+	}
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> Map<K, V> = Collections.synchronizedMap(this)
+
+	func unmodifiableView() -> Map<K, V> = Collections.unmodifiableMap(this)
+}
+
+// *************** SortedMap ***************
+
+@JavaName("SortedMaps")
+extension<type K, type V> SortedMap<K, V> {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> SortedMap<K, V> = Collections.emptySortedMap<K, V>()
+
+	// =============== Methods ===============
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> SortedMap<K, V> = Collections.synchronizedSortedMap(this)
+
+	func unmodifiableView() -> SortedMap<K, V> = Collections.unmodifiableSortedMap(this)
+}
+
+// *************** NavigableMap ***************
+
+@JavaName("NavigableMaps")
+extension<type K, type V> NavigableMap<K, V> {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> NavigableMap<K, V> = Collections.emptyNavigableMap<K, V>()
+
+	// =============== Methods ===============
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> NavigableMap<K, V> = Collections.synchronizedNavigableMap(this)
+
+	func unmodifiableView() -> NavigableMap<K, V> = Collections.unmodifiableNavigableMap(this)
+}
+
+// *************** HashMap ***************
+
+// TODO HashMap extension
+
+// *************** LinkedHashMap ***************
+
+// TODO LinkedHashMap extension
+
+// *************** IdentityHashMap ***************
+
+// TODO IdentityHashMap extension
+
+// *************** WeakHashMap ***************
+
+// TODO WeakHashMap extension
+
+// *************** TreeMap ***************
+
+// TODO TreeMap extension
+
+// *************** EnumMap ***************
+
+// TODO EnumMap extension
+
+
