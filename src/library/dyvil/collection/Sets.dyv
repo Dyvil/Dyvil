@@ -1,8 +1,11 @@
 package dyvil.collection
 
 import java.util.{ Set, SortedSet, NavigableSet }
+import java.util.{ HashSet, LinkedHashSet, TreeSet, EnumSet }
 import java.util.Map
-import java.util.Collections
+import java.util.Collection
+import java.util.{ Arrays, Collections }
+import java.util.Comparator
 
 // *************** Set ***************
 
@@ -83,16 +86,110 @@ extension<type E> NavigableSet<E> {
 
 // *************** HashSet ***************
 
-// TODO HashSet extension
+extension HashSet {
+	// =============== Static Methods ===============
+
+	static func apply<type E>() -> HashSet<E> = new HashSet<E>()
+
+	static func apply<type E>(element: E) -> HashSet<E> = new HashSet<E>().{ add(element); $0 }
+
+	static func apply<type E>(elements: E...) -> HashSet<E> = new HashSet<E>(Arrays.asList(elements...))
+
+	static func apply<type E>(withContentsOf collection: Collection<+E>) -> HashSet<E> = new HashSet<E>(collection)
+
+	static func apply<type E>(withCapacity capacity: int) -> HashSet<E> = new HashSet<E>(capacity)
+
+	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> HashSet<E>
+		= new HashSet<E>(capacity, loadFactor)
+}
 
 // *************** LinkedHashSet ***************
 
-// TODO LinkedHashSet extension
+extension LinkedHashSet {
+	// =============== Static Methods ===============
+
+	static func apply<type E>() -> LinkedHashSet<E> = new LinkedHashSet<E>()
+
+	static func apply<type E>(element: E) -> LinkedHashSet<E> = new LinkedHashSet<E>().{ add(element); $0 }
+
+	static func apply<type E>(elements: E...) -> LinkedHashSet<E> = new LinkedHashSet<E>(Arrays.asList(elements...))
+
+	static func apply<type E>(withContentsOf collection: Collection<+E>) -> LinkedHashSet<E>
+		= new LinkedHashSet<E>(collection)
+
+	static func apply<type E>(withCapacity capacity: int) -> LinkedHashSet<E> = new LinkedHashSet<E>(capacity)
+
+	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> LinkedHashSet<E>
+		= new LinkedHashSet<E>(capacity, loadFactor)
+}
 
 // *************** TreeSet ***************
 
-// TODO TreeSet extension
+extension TreeSet {
+	// =============== Static Methods ===============
+
+	// --------------- Comparable ---------------
+
+	static func apply<type E: Comparable<E>>() -> TreeSet<E> = new TreeSet<E>()
+
+	static func apply<type E: Comparable<E>>(element: E) -> TreeSet<E> = new TreeSet<E>().{ add(element); $0 }
+
+	static func apply<type E: Comparable<E>>(elements: E...) -> TreeSet<E> = new TreeSet<E>(Arrays.asList(elements...))
+
+	static func apply<type E: Comparable<E>>(withContentsOf collection: Collection<+E>) -> TreeSet<E>
+		= new TreeSet<E>(collection)
+
+	static func apply<type E: Comparable<E>>(withContentsOf sortedSet: SortedSet<+E>) -> TreeSet<E>
+		= new TreeSet<E>(sortedSet)
+
+	// --------------- Comparator ---------------
+
+	static func apply<type E>(comparingBy c: Comparator<-E>) -> TreeSet<E> = new TreeSet<E>(c)
+
+	static func apply<type E>(element: E, comparingBy c: Comparator<-E>) -> TreeSet<E>
+		= new TreeSet<E>(c).{ add(element); $0 }
+
+	static func apply<type E>(elements: E..., comparingBy c: Comparator<-E>) -> TreeSet<E>
+		= new TreeSet<E>(c).{ Collections.addAll(this, elements...); $0 }
+
+	static func apply<type E>(withContentsOf collection: Collection<+E>, comparingBy c: Comparator<-E>) -> TreeSet<E>
+		= new TreeSet<E>(c).{ addAll(collection); $0 }
+}
 
 // *************** EnumSet ***************
 
-// TODO EnumSet extension
+extension EnumSet {
+	// =============== Static Methods ===============
+
+	// --------------- Typed ---------------
+
+	// static func apply<@Reified(.OBJECT_CLASS) type E: Enum<E>>() -> EnumSet<E> = EnumSet.noneOf(class E)
+
+	@JavaName("noneOf")
+	static func apply<type E: Enum<E>>(of enumClass: Class<+E>) -> EnumSet<E> = EnumSet.noneOf(enumClass)
+
+	@JavaName("allOf")
+	static func apply<type E: Enum<E>>(explicit withAllOf enumClass: Class<+E>) -> EnumSet<E> = EnumSet.allOf(enumClass)
+
+	// --------------- Default ---------------
+
+	@JavaName("of")
+	static func apply<type E: Enum<E>>(element: E) -> EnumSet<E> = EnumSet.of(element)
+
+	@JavaName("of")
+	static func apply<type E: Enum<E>>(elements first: E, _ rest: E...) -> EnumSet<E> = EnumSet.of(first, rest...)
+
+	@JavaName("copyOf")
+	static func apply<type E: Enum<E>>(withContentsOf collection: Collection<+E>) -> EnumSet<E>
+		= EnumSet.copyOf(collection)
+
+	@JavaName("copyOf")
+	static func apply<type E: Enum<E>>(withContentsOf enumSet: EnumSet<+E>) -> EnumSet<E>
+		= EnumSet.copyOf(enumSet)
+
+	// --------------- Special ---------------
+
+	@JavaName("complementOf")
+	static func apply<type E: Enum<E>>(explicit complementing enumSet: EnumSet<+E>) -> EnumSet<E>
+		= EnumSet.complementOf(enumSet)
+}
