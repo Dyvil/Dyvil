@@ -1,0 +1,35 @@
+package dyvil.collection
+
+import java.util.{ Collection }
+import java.util.Collections
+
+@JavaName("Collections")
+extension<type E> Collection<E> {
+	// =============== Operators ===============
+
+	@Mutating
+	infix func += <type E>(lhs: Collection<-E>, rhs: E) -> void = lhs.add(rhs)
+
+	@Mutating
+	infix func ++= <type E>(lhs: Collection<-E>, rhs: Collection<+E>) -> void = lhs.addAll(rhs)
+
+	@Mutating
+	infix func -= <type E>(lhs: Collection<_>, rhs: any!) -> void = lhs.remove(rhs)
+
+	@Mutating
+	infix func --= <type E>(lhs: Collection<_>, rhs: Collection<_>) -> void = lhs.removeAll(rhs)
+
+	// =============== Methods ===============
+
+	// --------------- Predicates ---------------
+
+	// func intersects(other: Collection<_>) -> boolean = !Collections.disjoint(this, other)
+
+	// func isDisjoint(with other: Collection<_>) -> boolean = Collections.disjoint(this, other)
+
+	// --------------- Views ---------------
+
+	func synchronizedView() -> Collection<E> = Collections.synchronizedCollection(this)
+
+	func unmodifiableView() -> Collection<E> = Collections.unmodifiableCollection(this)
+}
