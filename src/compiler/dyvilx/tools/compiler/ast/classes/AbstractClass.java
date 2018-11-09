@@ -229,7 +229,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isTypeParametric()
 	{
-		return this.typeParameters != null && this.typeParameters.size() > 0;
+		return this.typeParameters != null && !this.typeParameters.isEmpty();
 	}
 
 	@Override
@@ -568,9 +568,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		final ClassGenericType type = new ClassGenericType(this);
 		final TypeList arguments = type.getArguments();
-		for (int i = 0; i < this.typeParameters.size(); i++)
+		for (ITypeParameter typeParameter : this.typeParameters)
 		{
-			arguments.add(new TypeVarType(this.typeParameters.get(i)));
+			arguments.add(new TypeVarType(typeParameter));
 		}
 		return this.thisType = type;
 	}
