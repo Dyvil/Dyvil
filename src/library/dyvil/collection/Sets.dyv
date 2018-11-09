@@ -10,10 +10,13 @@ import java.util.Collections
 extension<type E> Set<E> {
 	// =============== Operators ===============
 
+	@Mutating
 	infix func |= <type E>(lhs: Set<-E>, rhs: Set<+E>) -> void = lhs.addAll(rhs)
 
+	@Mutating
 	infix func &=         (lhs: Set<_>, rhs: Set<_>) -> void = lhs.retainAll(rhs)
 
+	@Mutating
 	infix func ^= <type E>(lhs: Set<-E>, rhs: Set<+E>) -> void {
 		for e <- rhs {
 			if lhs.contains(e) {
@@ -27,9 +30,11 @@ extension<type E> Set<E> {
 
 	// =============== Static Methods ===============
 
-	static func apply<type E>() -> Set<E> = Collections.emptySet<E>()
+	static func apply<type E>() -> @Immutable Set<E> = Collections.emptySet<E>()
 
-	static func apply<type E>(element: E) -> Set<E> = Collections.singleton(element)
+	static func apply<type E>(element: E) -> @Immutable Set<E> = Collections.singleton(element)
+
+	static func apply<type E>(elements: E...) -> @Immutable Set<E> = LinkedHashSet(elements...).unmodifiableView
 
 	// static func apply<type E>(explicit fromMap map: Map<E, Boolean>) -> Set<E> = Collections.newSetFromMap<E>(map)
 
@@ -48,7 +53,7 @@ extension<type E> Set<E> {
 extension<type E> SortedSet<E> {
 	// =============== Static Methods ===============
 
-	static func apply<type E>() -> SortedSet<E> = Collections.emptySortedSet<E>()
+	static func apply<type E>() -> @Immutable SortedSet<E> = Collections.emptySortedSet<E>()
 
 	// =============== Methods ===============
 
@@ -65,7 +70,7 @@ extension<type E> SortedSet<E> {
 extension<type E> NavigableSet<E> {
 	// =============== Static Methods ===============
 
-	static func apply<type E>() -> NavigableSet<E> = Collections.emptyNavigableSet<E>()
+	static func apply<type E>() -> @Immutable NavigableSet<E> = Collections.emptyNavigableSet<E>()
 
 	// =============== Methods ===============
 
