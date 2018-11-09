@@ -1,7 +1,10 @@
 package dyvil.collection
 
 import java.util.{ Map, SortedMap, NavigableMap }
+import java.util.{ HashMap, LinkedHashMap, IdentityHashMap, WeakHashMap, TreeMap, EnumMap }
 import java.util.Collections
+import java.util.Comparator
+
 import dyvil.ref.ObjectRef
 
 // *************** Map ***************
@@ -89,26 +92,102 @@ extension<type K, type V> NavigableMap<K, V> {
 
 // *************** HashMap ***************
 
-// TODO HashMap extension
+@JavaName("HashMaps")
+extension HashMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> HashMap<K, V> = new HashMap<K, V>()
+
+	static func apply<type K, type V>(withCapacity capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
+
+	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> HashMap<K, V>
+		= new HashMap<K, V>(capacity, loadFactor)
+
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
+}
 
 // *************** LinkedHashMap ***************
 
-// TODO LinkedHashMap extension
+@JavaName("LinkedHashMaps")
+extension LinkedHashMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> LinkedHashMap<K, V> = new LinkedHashMap<K, V>()
+
+	static func apply<type K, type V>(withCapacity capacity: int) -> LinkedHashMap<K, V>
+		= new LinkedHashMap<K, V>(capacity)
+
+	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> LinkedHashMap<K, V>
+		= new LinkedHashMap<K, V>(capacity, loadFactor)
+
+	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float, accessOrder: boolean) -> LinkedHashMap<K, V>
+		= new LinkedHashMap<K, V>(capacity, loadFactor, accessOrder)
+
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
+		= new LinkedHashMap<K, V>(map)
+}
 
 // *************** IdentityHashMap ***************
 
-// TODO IdentityHashMap extension
+@JavaName("IdentityHashMaps")
+extension IdentityHashMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> IdentityHashMap<K, V> = new IdentityHashMap<K, V>()
+
+	static func apply<type K, type V>(withCapacity capacity: int) -> IdentityHashMap<K, V>
+		= new IdentityHashMap<K, V>(capacity)
+
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> IdentityHashMap<K, V>
+		= new IdentityHashMap<K, V>(map)
+}
 
 // *************** WeakHashMap ***************
 
-// TODO WeakHashMap extension
+@JavaName("WeakHashMaps")
+extension WeakHashMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K, type V>() -> WeakHashMap<K, V> = new WeakHashMap<K, V>()
+
+	static func apply<type K, type V>(withCapacity capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
+
+	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> WeakHashMap<K, V>
+		= new WeakHashMap<K, V>(capacity, loadFactor)
+
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(map)
+}
 
 // *************** TreeMap ***************
 
-// TODO TreeMap extension
+@JavaName("TreeMaps")
+extension TreeMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K: Comparable<K>, type V>() -> TreeMap<K, V> = new TreeMap<K, V>()
+
+	static func apply<type K, type V>(comparingBy comparator: Comparator<-K>) -> TreeMap<K, V>
+		= new TreeMap<K, V>(comparator)
+
+	static func apply<type K: Comparable<K>, type V>(withContentsOf map: Map<+K, +V>) -> TreeMap<K, V>
+		= new TreeMap<K, V>(map)
+
+	static func apply<type K, type V>(withContentsOf map: SortedMap<+K, +V>) -> TreeMap<K, V> = new TreeMap<K, V>(map)
+}
 
 // *************** EnumMap ***************
 
-// TODO EnumMap extension
+@JavaName("EnumMaps")
+extension EnumMap {
+	// =============== Static Methods ===============
+
+	static func apply<type K: Enum<K>, type V>(of enumClass: Class<+K>) -> EnumMap<K, V> = new EnumMap<K, V>(enumClass)
+
+	static func apply<type K: Enum<K>, type V>(withContentsOf map: Map<+K, +V>) -> EnumMap<K, V>
+		= new EnumMap<K, V>(map)
+
+	static func apply<type K: Enum<K>, type V>(withContentsOf map: EnumMap<+K, +V>) -> EnumMap<K, V>
+		= new EnumMap<K, V>(map)
+}
 
 
