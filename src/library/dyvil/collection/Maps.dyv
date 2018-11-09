@@ -10,11 +10,23 @@ import dyvil.ref.ObjectRef
 extension<type K, type V> Map<K, V> {
 	// =============== Static Methods ===============
 
-	static func apply<type K, type V>() -> Map<K, V> = Collections.emptyMap<K, V>()
+	@JavaName("empty")
+	static func apply<type K, type V>() -> @Immutable Map<K, V> = Collections.emptyMap<K, V>()
 
-	static func apply<type K, type V>(key: K, value: V) -> Map<K, V> = Collections.singletonMap(key, value)
+	// static func apply<type K, type V>(key: K, value: V) -> @Immutable Map<K, V> = Collections.singletonMap(key, value)
 
-	static func apply<type K, type V>(tuple: (K, V)) -> Map<K, V> = Collections.singletonMap(tuple._1, tuple._2)
+	// static func apply<type K, type V>(tuple: (K, V)) -> @Immutable Map<K, V> = Collections.singletonMap(tuple._1, tuple._2)
+
+	@JavaName("copyOf")
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> @Immutable Map<K, V>
+		= LinkedHashMap(withContentsOf: map).unmodifiableView
+
+	@JavaName("build")
+	static func apply<type K, type V>(builtBy configure: Map<K, V>.() -> void) -> @Immutable Map<K, V> {
+		let map = new LinkedHashMap<K, V>()
+		configure(map)
+		return map.unmodifiableView
+	}
 
 	// =============== Methods ===============
 
@@ -22,8 +34,10 @@ extension<type K, type V> Map<K, V> {
 
 	func subscript(key: K) -> V! = this.get(key)
 
+	@Mutating
 	func subscript_=(key: K, newValue: V) -> void = this.put(key, newValue)
 
+	@Mutating
 	func subscript_&(key: K) -> V* = new ObjectRef<V>() {
 		override func get() -> V = this<Map<K, V>>.get(key)
 
@@ -43,6 +57,7 @@ extension<type K, type V> Map<K, V> {
 extension<type K, type V> SortedMap<K, V> {
 	// =============== Static Methods ===============
 
+	@JavaName("empty")
 	static func apply<type K, type V>() -> SortedMap<K, V> = Collections.emptySortedMap<K, V>()
 
 	// =============== Methods ===============
@@ -60,6 +75,7 @@ extension<type K, type V> SortedMap<K, V> {
 extension<type K, type V> NavigableMap<K, V> {
 	// =============== Static Methods ===============
 
+	@JavaName("empty")
 	static func apply<type K, type V>() -> NavigableMap<K, V> = Collections.emptyNavigableMap<K, V>()
 
 	// =============== Methods ===============
