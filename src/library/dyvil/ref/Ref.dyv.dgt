@@ -1,23 +1,59 @@
-#let(TYPE_NAME = spec['TYPE_NAME'])
-#let(PRIMITIVE = spec['PRIMITIVE'])
-#let(WRAPPER = spec['WRAPPER'])
-
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 package dyvil.ref
 
-import dyvil.ref.boxed.Boxed#(TYPE_NAME)Ref
+import dyvil.ref.boxed._
+import dyvil.ref.unboxed._
 
-interface #(TYPE_NAME)Ref
-{
-	func get() -> PRIMITIVE
+// *************** ObjectRef ***************
 
-	func set(value: PRIMITIVE) -> void
+interface ObjectRef<T> {
+	// =============== Methods ===============
 
-	prefix inline func *(ref: #(TYPE_NAME)Ref) -> PRIMITIVE = ref.get
+	func get() -> T
 
-	infix inline func *_=(ref: #(TYPE_NAME)Ref, value: PRIMITIVE) -> void = ref.set(value)
+	func set(value: T) -> void
 
-	postfix func boxed(ref: #(TYPE_NAME)Ref) -> ObjectRef<WRAPPER> = new Boxed#(TYPE_NAME)Ref(ref)
+	// --------------- Unboxing ---------------
+
+	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+		#let(TYPE_NAME = spec['TYPE_NAME'])
+		#let(WRAPPER = spec['WRAPPER'])
+
+		@JavaName("unbox#(TYPE_NAME)")
+		static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(ref)
+	}
+
+	// =============== Operators ===============
+
+	static inline func * <T>(ref: ObjectRef<T>) -> T = ref.get
+
+	infix inline func *_= <T>(ref: ObjectRef<T>, value: T) -> void = ref.set(value)
+}
+
+#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+	#let(TYPE_NAME = spec['TYPE_NAME'])
+	#let(PRIMITIVE = spec['PRIMITIVE'])
+	#let(WRAPPER = spec['WRAPPER'])
+
+	// *************** #(TYPE_NAME)Ref ***************
+
+	interface #(TYPE_NAME)Ref {
+		// =============== Methods ===============
+
+		func get() -> PRIMITIVE
+
+		func set(value: PRIMITIVE) -> void
+
+		// --------------- Boxing ---------------
+
+		postfix func boxed(ref: #(TYPE_NAME)Ref) -> ObjectRef<WRAPPER> = new Boxed#(TYPE_NAME)Ref(ref)
+
+		// =============== Operators ===============
+
+		prefix inline func *(ref: #(TYPE_NAME)Ref) -> PRIMITIVE = ref.get
+
+		infix inline func *_=(ref: #(TYPE_NAME)Ref, value: PRIMITIVE) -> void = ref.set(value)
+	}
 }

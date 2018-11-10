@@ -1,18 +1,20 @@
-#let(TYPE_NAME = spec['TYPE_NAME'])
-#let(PRIMITIVE = spec['PRIMITIVE'])
-#let(WRAPPER = spec['WRAPPER'])
-
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 package dyvil.ref.unboxed
 
-import dyvil.ref.#(TYPE_NAME)Ref
-import dyvil.ref.ObjectRef
+import dyvil.ref._
 
-class Unboxed#(TYPE_NAME)Ref(protected let ref: ObjectRef<WRAPPER>) implements #(TYPE_NAME)Ref
-{
-	override func get() -> PRIMITIVE = this.ref.get
+#for(spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+	#let(TYPE_NAME = spec['TYPE_NAME'])
+	#let(PRIMITIVE = spec['PRIMITIVE'])
+	#let(WRAPPER = spec['WRAPPER'])
 
-	override func set(value: PRIMITIVE) -> void = this.ref.set(value)
+	// *************** Unboxed#(TYPE_NAME)Ref ***************
+
+	class Unboxed#(TYPE_NAME)Ref(protected let ref: ObjectRef<WRAPPER>) implements #(TYPE_NAME)Ref {
+		override func get() -> PRIMITIVE = this.ref.get
+
+		override func set(value: PRIMITIVE) -> void = this.ref.set(value)
+	}
 }

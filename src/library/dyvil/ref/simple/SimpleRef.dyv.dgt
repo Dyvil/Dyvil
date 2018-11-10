@@ -1,26 +1,34 @@
-#let(TYPE_NAME = spec['TYPE_NAME'])
-#let(PRIMITIVE = spec['PRIMITIVE'])
-#let(FROM_LITERAL = spec['FROM_LITERAL'])
-
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 package dyvil.ref.simple
 
 import dyvil.lang.LiteralConvertible
-import dyvil.ref.#(TYPE_NAME)Ref
+import dyvil.ref._
 
-#if (TYPE_NAME == 'Object') {
-	class SimpleObjectRef<type T>(public var value: T) implements ObjectRef<T>
+// *************** SimpleObjectRef ***************
+
+class SimpleObjectRef<type T>(public var value: T) implements ObjectRef<T> {
+	override func get() -> T = this.value
+
+	override func set(value: T) -> void = this.value = value
+
+	override func toString() -> String = "SimpleObjectRef(\(this.value))"
 }
-#else {
+
+#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+	#let(TYPE_NAME = spec['TYPE_NAME'])
+	#let(PRIMITIVE = spec['PRIMITIVE'])
+	#let(FROM_LITERAL = spec['FROM_LITERAL'])
+
+	// *************** Simple#(TYPE_NAME)Ref ***************
+
 	@LiteralConvertible.FROM_LITERAL
-	class Simple#(TYPE_NAME)Ref(public var value: PRIMITIVE) implements #(TYPE_NAME)Ref
-}
-{
-	override func get() -> PRIMITIVE = this.value
+	class Simple#(TYPE_NAME)Ref(public var value: PRIMITIVE) implements #(TYPE_NAME)Ref {
+		override func get() -> PRIMITIVE = this.value
 
-	override func set(value: PRIMITIVE) -> void = this.value = value
+		override func set(value: PRIMITIVE) -> void = this.value = value
 
-	override func toString() -> String = "Simple#(TYPE_NAME)Ref(\(this.value))"
+		override func toString() -> String = "Simple#(TYPE_NAME)Ref(\(this.value))"
+	}
 }

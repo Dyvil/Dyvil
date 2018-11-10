@@ -1,21 +1,27 @@
-#let(TYPE_NAME = spec['TYPE_NAME'])
-#let(PRIMITIVE = spec['PRIMITIVE'])
-
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
 package dyvil.ref.array
 
-import dyvil.ref.#(TYPE_NAME)Ref
+import dyvil.ref._
 
-#if (TYPE_NAME == 'Object') {
-	class ObjectArrayRef<type T>(protected let array: [T], protected let index: int) implements ObjectRef
-}
-#else {
-	class #(TYPE_NAME)ArrayRef(protected let array: [PRIMITIVE], protected let index: int) implements #(TYPE_NAME)Ref
-}
-{
-	override func get() -> PRIMITIVE = this.array[this.index]
+// *************** ObjectArrayRef ***************
 
-	override func set(value: PRIMITIVE) -> void = this.array[this.index] = value
+class ObjectArrayRef<type T>(protected let array: [T], protected let index: int) implements ObjectRef<T> {
+	override func get() -> T = this.array[this.index]
+
+	override func set(value: T) -> void = this.array[this.index] = value
+}
+
+#for(spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
+	#let(TYPE_NAME = spec['TYPE_NAME'])
+	#let(PRIMITIVE = spec['PRIMITIVE'])
+
+	// *************** #(TYPE_NAME)ArrayRef ***************
+
+	class #(TYPE_NAME)ArrayRef(protected let array: [PRIMITIVE], protected let index: int) implements #(TYPE_NAME)Ref {
+		override func get() -> PRIMITIVE = this.array[this.index]
+
+		override func set(value: PRIMITIVE) -> void = this.array[this.index] = value
+	}
 }
