@@ -3,16 +3,15 @@ package dyvil.reflect;
 import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FieldReflection
 {
-	@Nullable
-	private static final Field modifiersField;
+	private static final @Nullable Field modifiersField;
 
 	static
 	{
@@ -75,24 +74,22 @@ public class FieldReflection
 			field.setAccessible(true);
 			modifiersField.setInt(field, field.getModifiers() & ~Modifiers.FINAL);
 		}
-		catch (Exception ex)
+		catch (Exception ignored)
 		{
 		}
 	}
 
 	// Fields
 
-	@NonNull
-	public static <T> T[] getStaticObjects(@NonNull Class clazz, @NonNull Class<T> fieldType, boolean subtypes)
+	public static @NonNull <T> T[] getStaticObjects(@NonNull Class clazz, @NonNull Class<T> fieldType, boolean subtypes)
 	{
 		return getObjects(clazz, null, fieldType, subtypes);
 	}
 
-	@NonNull
-	public static <T> T[] getObjects(@NonNull Class clazz, Object instance, @NonNull Class<T> fieldType,
-		                                boolean subtypes)
+	public static @NonNull <T> T[] getObjects(@NonNull Class clazz, Object instance, @NonNull Class<T> fieldType,
+		boolean subtypes)
 	{
-		List list = new ArrayList();
+		List<T> list = new ArrayList<>();
 		Field[] fields = clazz.getDeclaredFields();
 
 		for (Field field : fields)
@@ -103,15 +100,15 @@ public class FieldReflection
 				Object o = field.get(instance);
 				if (c == fieldType || subtypes && fieldType.isAssignableFrom(c))
 				{
-					list.add(o);
+					list.add((T) o);
 				}
 			}
-			catch (Exception ex)
+			catch (Exception ignored)
 			{
 			}
 		}
 
-		return (T[]) list.toArray();
+		return list.toArray((T[]) Array.newInstance(fieldType, 0));
 	}
 
 	// Fields
@@ -162,9 +159,6 @@ public class FieldReflection
 				}
 			}
 		}
-		System.err.println(
-			new NoSuchFieldException("Field not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(
-				fieldNames)));
 		return null;
 	}
 
@@ -187,20 +181,17 @@ public class FieldReflection
 
 	// Reference
 
-	@Nullable
-	public static <T, R> R getStaticValue(@NonNull Class<? super T> clazz, String... fieldNames)
+	public static @Nullable <T, R> R getStaticValue(@NonNull Class<? super T> clazz, String... fieldNames)
 	{
 		return getValue(clazz, null, fieldNames);
 	}
 
-	@Nullable
-	public static <T, R> R getValue(@NonNull T instance, String... fieldNames)
+	public static @Nullable <T, R> R getValue(@NonNull T instance, String... fieldNames)
 	{
 		return getValue((Class<T>) instance.getClass(), instance, fieldNames);
 	}
 
-	@Nullable
-	public static <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, String... fieldNames)
+	public static @Nullable <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, String... fieldNames)
 	{
 		Field f = getField(clazz, fieldNames);
 		return getValue(f, instance);
@@ -208,20 +199,17 @@ public class FieldReflection
 
 	// Field ID
 
-	@Nullable
-	public static <T, R> R getStaticValue(@NonNull Class<? super T> clazz, int fieldID)
+	public static @Nullable <T, R> R getStaticValue(@NonNull Class<? super T> clazz, int fieldID)
 	{
 		return getValue(clazz, null, fieldID);
 	}
 
-	@Nullable
-	public static <T, R> R getValue(@NonNull T instance, int fieldID)
+	public static @Nullable <T, R> R getValue(@NonNull T instance, int fieldID)
 	{
 		return getValue((Class<? super T>) instance.getClass(), instance, fieldID);
 	}
 
-	@Nullable
-	public static <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, int fieldID)
+	public static @Nullable <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, int fieldID)
 	{
 		Field f = getField(clazz, fieldID);
 		return getValue(f, instance);
