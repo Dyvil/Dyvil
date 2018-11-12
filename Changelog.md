@@ -1,3 +1,20 @@
+# Dyvil v0.42.2
+
+## Dyvil Library v0.42.0
+
+## Dyvil Compiler v0.42.2
+
+- Fixed incorrect decompilation for receiver types referring to type parameters. #444
+- Fixed a possible NPE in the `AbstractClass.getKind` and `.getFunctionalMethod` methods. #449
+
+## Dyvil REPL v0.26.1
+
+## Dyvil Property Format v0.16.0
+
+## Dyvil GenSrc v0.9.4
+
+------------------------------------------------------------------------------------------------------------------------
+
 # Dyvil v0.42.1
 
 ## Dyvil Library v0.42.0
