@@ -1,7 +1,8 @@
 package dyvil.util
 
-interface I18n
-{
+interface I18n {
+	public const identity: I18n = s => s
+
 	func getString(key: String) -> String
 
 	func getString(key: String, args: Object!) -> String = String.format(this.getString(key), args)
