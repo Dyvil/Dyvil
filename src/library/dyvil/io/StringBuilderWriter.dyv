@@ -1,0 +1,14 @@
+package dyvil.io
+
+import java.io.Writer
+import java.io.IOException
+
+case class StringBuilderWriter(let builder: StringBuilder) extends Writer {
+	override func write(cbuf: [char]!, off: int, len: int) -> void throws IOException {
+		this.builder.append(cbuf, off, len)
+	}
+
+	override func flush() -> void {}
+
+	override func close() -> void {}
+}
