@@ -2,6 +2,8 @@ package dyvilx.tools.compiler.transform;
 
 import dyvil.annotation.Deprecated.Reason;
 import dyvil.annotation.Experimental.Stage;
+import dyvil.collection.Iterators;
+import dyvil.function.Function;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -22,6 +24,10 @@ import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public final class Deprecation
 {
@@ -144,36 +150,27 @@ public final class Deprecation
 		// Until
 
 		// Reasons
-		final Reason[] reasons = getReasons(arguments);
-		if (reasons != null)
+		final List<Reason> reasons = getReasons(arguments);
+		if (!reasons.isEmpty())
 		{
-			final int reasonCount = reasons.length;
-
-			// more than one reason
-			if (reasonCount == 1)
-			{
-				marker.addInfo(Markers.getSemantic("deprecated.reason", reasonName(reasons[0])));
-			}
-			else if (reasonCount > 0)
-			{
-				final StringBuilder builder = new StringBuilder(reasonName(reasons[0]));
-				for (int i = 1; i < reasonCount; i++)
-				{
-					builder.append(", ").append(reasonName(reasons[i]));
-				}
-				marker.addInfo(Markers.getSemantic("deprecated.reasons", builder.toString()));
-			}
+			// TODO after v0.43.0: use Iterables.mapped
+			//noinspection RedundantCast
+			final Iterable<CharSequence> reasonNames = () -> Iterators.mapped(reasons.iterator(),
+			                                                                  (Function.Of1<Reason, CharSequence>) //
+				                                                                  Deprecation::reasonName);
+			marker.addInfo(Markers.getSemantic(reasons.size() == 1 ? "deprecated.reason" : "deprecated.reasons",
+			                                   String.join(", ", reasonNames)));
 		}
 
 		// Replacements
-		final String[] replacements = getReplacements(arguments);
-		if (replacements != null)
+		final List<String> replacements = getReplacements(arguments);
+		if (!replacements.isEmpty())
 		{
+			marker.addInfo(Markers.getSemantic("deprecated.replacements"));
 			for (String replacement : replacements)
 			{
 				marker.addInfo("\t\t" + replacement);
 			}
-			marker.addInfo(Markers.getSemantic("deprecated.replacements"));
 		}
 
 		markers.add(marker);
@@ -196,7 +193,7 @@ public final class Deprecation
 	}
 
 	private static void checkExperimental(Member member, SourcePosition position, MarkerList markers,
-		                                     Annotation annotation)
+		Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
 		final MarkerLevel markerLevel = EnumValue.eval(arguments.getOrDefault(EXP_LEVEL_PARAM), MarkerLevel.class);
@@ -207,13 +204,22 @@ public final class Deprecation
 		}
 
 		String value = arguments.getOrDefault(EXP_VALUE_PARAM).stringValue();
+		value = replaceMember(member, value);
+
 		final String description = arguments.getOrDefault(EXP_DESC_PARAM).stringValue();
 		final Stage stage = EnumValue.eval(arguments.getOrDefault(EXP_STAGE_PARAM), Stage.class);
-		assert stage != null;
+		final String stageName;
+		if (stage != null)
+		{
+			stageName = Markers.getSemantic("experimental.stage." + stage.name());
 
-		final String stageName = Markers.getSemantic("experimental.stage." + stage.name());
-
-		value = replaceMember(member, value).replace("{stage}", stageName);
+			value = value.replace("{stage}", stageName);
+		}
+		else
+		{
+			stageName = "";
+			value = value.replace("{stage}", "<invalid>");
+		}
 
 		final Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
@@ -225,13 +231,16 @@ public final class Deprecation
 		}
 
 		// Stage
-		marker.addInfo(Markers.getSemantic("experimental.stage", stageName));
+		if (stage != null && !stageName.isEmpty())
+		{
+			marker.addInfo(Markers.getSemantic("experimental.stage", stageName));
+		}
 
 		markers.add(marker);
 	}
 
 	private static void checkUsageInfo(Member member, SourcePosition position, MarkerList markers,
-		                                  Annotation annotation)
+		Annotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
 		final MarkerLevel markerLevel = EnumValue.eval(arguments.getOrDefault(INF_LEVEL_PARAM), MarkerLevel.class);
@@ -258,15 +267,13 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static Reason[] getReasons(ArgumentList arguments)
+	private static List<Reason> getReasons(ArgumentList arguments)
 	{
 		final IValue value = arguments.get(DEP_REASONS_PARAM);
-		if (value == null)
+		if (!(value instanceof ArrayExpr))
 		{
-			return null;
+			return Collections.emptyList();
 		}
-
-		assert value.valueTag() == IValue.ARRAY;
 
 		final ArrayExpr array = (ArrayExpr) value;
 		final ArgumentList values = array.getValues();
@@ -274,27 +281,29 @@ public final class Deprecation
 
 		if (size <= 0)
 		{
-			return null;
+			return Collections.emptyList();
 		}
 
-		final Reason[] reasons = new Reason[size];
+		final List<Reason> reasons = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 		{
-			reasons[i] = EnumValue.eval(values.get(i), Reason.class);
+			final Reason reason = EnumValue.eval(values.get(i), Reason.class);
+			if (reason != null)
+			{
+				reasons.add(reason);
+			}
 		}
 
 		return reasons;
 	}
 
-	private static String[] getReplacements(ArgumentList arguments)
+	private static List<String> getReplacements(ArgumentList arguments)
 	{
 		IValue value = arguments.get(DEP_REPLACE_PARAM);
-		if (value == null)
+		if (!(value instanceof ArrayExpr))
 		{
-			return null;
+			return Collections.emptyList();
 		}
-
-		assert value.valueTag() == IValue.ARRAY;
 
 		final ArrayExpr array = (ArrayExpr) value;
 		final ArgumentList values = array.getValues();
@@ -302,15 +311,18 @@ public final class Deprecation
 
 		if (size == 0)
 		{
-			return null;
+			return Collections.emptyList();
 		}
 
-		String[] replacements = new String[size];
+		final List<String> replacements = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 		{
-			IValue element = values.get(i);
-			assert element.valueTag() == IValue.STRING;
-			replacements[i] = element.stringValue();
+			final IValue element = values.get(i);
+			final int valueTag = element.valueTag();
+			if (valueTag == IValue.STRING || valueTag == IValue.CHAR)
+			{
+				replacements.add(element.stringValue());
+			}
 		}
 
 		return replacements;
