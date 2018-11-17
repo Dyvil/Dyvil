@@ -1,0 +1,65 @@
+package dyvilx.tools.parsing.marker
+
+import dyvil.util.MarkerLevel
+import dyvil.source.Source
+import dyvil.source.position.SourcePosition
+
+import java.util.List
+import java.util.ArrayList
+
+case class Marker(
+	let position: SourcePosition
+	let level:    MarkerLevel
+	let message:  String
+) implements Comparable<Marker> {
+	// =============== Constructors ===============
+
+	public init(position: SourcePosition!, message: String) : this(posOrOrigin(position), .ERROR, message)
+
+	// TODO remove this workaround for #453
+	private static func posOrOrigin(position: SourcePosition!) -> SourcePosition = position ?? SourcePosition.ORIGIN
+
+	// =============== Properties ===============
+
+	let info: List<String> = new ArrayList<String>() { public get }
+
+	@Deprecated
+	var isIgnored: boolean { get: this.level == MarkerLevel.IGNORE }
+
+	var isError: boolean { get: this.level.isError }
+
+	var isWarning: boolean { get: this.level.isWarning }
+
+	var color: String! { get: this.level.color }
+
+	// =============== Methods ===============
+
+	@JavaName("addInfo")
+	func add(info: String) -> void = this.info.add(info)
+
+	@JavaName("addError")
+	func add(error: Throwable) -> void {
+		let builder = new StringBuilder()
+		error.printStackTrace(new dyvil.io.AppendablePrintStream(builder))
+		this.info.addAll(java.util.Arrays.asList((builder.toString().split("\n") as [String])...))
+	}
+
+	override func compareTo(that: Marker) -> int {
+		let byPos = this.position.compareTo(that.position)
+		if byPos != 0 {
+			return byPos
+		}
+		let byLevel = -this.level.compareTo(that.level)
+		if byLevel != 0 {
+			return byLevel
+		}
+		return this.message.compareTo(that.message)
+	}
+
+	@Deprecated
+	func log(source: Source, indent: String, buffer: StringBuilder, colors: boolean) -> void {
+		let list = new MarkerList()
+		list.add(this)
+		list.log(source, buffer, colors)
+	}
+}

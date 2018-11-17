@@ -1,0 +1,117 @@
+package dyvilx.tools.parsing.marker
+
+import dyvil.source.Source
+
+import java.io.Writer
+import java.util.BitSet
+
+case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors: boolean) {
+	func print(markers: MarkerList, into writer: Writer) -> void {
+		// TODO check style and implement the other styles
+		this.printHuman(markers, writer)
+	}
+
+	private func printHuman(markers: MarkerList, writer: Writer) -> void {
+		markers.sort()
+		let lines = new BitSet(this.source.lineCount)
+		var lastLine = 0
+
+		var i = markers.size - 1
+		while i >= 0 {
+			let marker = markers[i]
+			let position = marker.position
+			let endLine = position.endLine
+
+			lines.set(position.startLine, endLine + 1)
+
+			if endLine > lastLine {
+				lastLine = endLine
+			}
+
+			i -= 1
+		}
+
+		let nBits = Math.log10(lastLine) as int + 1
+		let formatString = "%\(nBits)d | %s\n"
+		let indent = ("." * nBits) ++ " | "
+
+		var markerIndex = 0
+		var line = lines.nextSetBit(0)
+		while line >= 0 {
+			writer.write(String.format(formatString, line, this.source.line(line)))
+
+			while markerIndex < markers.size && line == markers[markerIndex].position.endLine {
+				this.printHuman(markers[markerIndex], indent, writer)
+
+				// spacing
+				writer.write(indent)
+				writer.write('\n')
+
+				markerIndex += 1
+			}
+
+			line = lines.nextSetBit(line + 1)
+		}
+	}
+
+	private func printHuman(marker: Marker, indent: String, writer: Writer) -> void {
+		let position = marker.position
+		let startColumn = position.startColumn
+		let endColumn = position.endColumn
+
+		let line = this.source.line(position.endLine)
+		let limit = Math.min(startColumn, line.length)
+
+		// does not append the actual line, only the indicator
+
+
+		// --- Indicator ---
+		writer.write(indent)
+
+		for i <- 0 ..< limit {
+			writer.write((line[i] == '\t') ? '\t' : ' ')
+		}
+
+		if this.colors {
+			writer.write(marker.level.color)
+		}
+
+		for i <- startColumn ..< endColumn {
+			writer.write('^')
+		}
+		if startColumn == endColumn {
+			writer.write('^')
+		}
+
+		if this.colors {
+			writer.write(Console.ANSI_RESET)
+		}
+
+		writer.write('\n')
+
+		// --- Marker Level and Message ---
+		writer.write(indent)
+
+		if this.colors {
+			writer.write(marker.level.color)
+		}
+
+		writer.write(BaseMarkers.INSTANCE.getString("marker_level.\(marker.level.name.toLowerCase())"))
+		writer.write(": ")
+		writer.write(marker.message)
+
+		if this.colors {
+			writer.write(Console.ANSI_RESET)
+		}
+
+		writer.write('\n')
+
+		// --- Info ---
+		for infoLine <- marker.info {
+			writer.write(indent)
+			writer.write('\t')
+			writer.write(infoLine)
+			writer.write('\n')
+		}
+	}
+}

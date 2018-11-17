@@ -1,6 +1,7 @@
 package dyvilx.tools.parsing.marker
 
 using dyvil.test.JUnit
+import dyvil.source.position.SourcePosition
 
 import dyvil.util.MarkerLevel
 
@@ -8,9 +9,10 @@ class MarkerPrinterTest {
 	@Test func print() -> void {
 		let source = new dyvil.source.TextSource("example \nsource \nfile")
 		let markers = new MarkerList()
-		let marker = new Marker(dyvil.source.position.SourcePosition(1, 1, 1, 5), .ERROR, "test")
+		let marker = new Marker(SourcePosition(line: 1, startColumn: 1, endColumn: 5), .ERROR, "test")
 		marker.add("info")
 		markers.add(marker)
+		markers.add(new Marker(SourcePosition(line: 3, startColumn: 0, endColumn: 1), .WARNING, "test 2"))
 
 		let builder = new StringBuilder
 
@@ -18,6 +20,16 @@ class MarkerPrinterTest {
 
 		let result = builder.toString()
 
-		print(result)
+		// uses \(' ') in place of whitespace at the end of a line
+		result =?= "1 | example\(' ')
+					. |  \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
+					. | \(Console.ANSI_RED)error: test\(Console.ANSI_RESET)
+					. | \tinfo
+					. |\(' ')
+					3 | file
+					. | \(Console.ANSI_YELLOW)^\(Console.ANSI_RESET)
+					. | \(Console.ANSI_YELLOW)warning: test 2\(Console.ANSI_RESET)
+					. |\(' ')
+		"
 	}
 }

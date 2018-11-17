@@ -1,0 +1,29 @@
+package dyvilx.tools.parsing.marker
+
+import dyvil.util.I18n
+import dyvil.source.Source
+
+import java.util.ArrayList
+
+class MarkerList(let i18n: I18n { public get }) extends ArrayList<Marker> {
+	// =============== Static Fields ===============
+
+	public const BLACKHOLE: MarkerList = new MarkerList()
+
+	// =============== Constructors ===============
+
+	public init() : this(I18n.identity)
+
+	// =============== Properties ===============
+
+	var errors: int { get: this.count(where: _.isError()) }
+
+	var warnings: int { get: this.count(where: _.isError()) }
+
+	// =============== Methods ===============
+
+	@Deprecated
+	func log(source: Source, buffer: StringBuilder, colors: boolean) -> void {
+		MarkerPrinter(source, MarkerStyle.HUMAN, colors).print(this, into: new dyvil.io.StringBuilderWriter(buffer))
+	}
+}
