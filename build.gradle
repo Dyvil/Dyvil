@@ -182,8 +182,8 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
 	testRuntimeOnly(testDyvilClasses)
-	testCompile(sourceSets.library.output, libraryDyvilClasses)
-	testCompile(sourceSets.dpf.output, dpfDyvilClasses)
+	testCompile(libraryDyvilClasses, sourceSets.library.output)
+	testCompile(dpfDyvilClasses, sourceSets.dpf.output)
 }
 
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
