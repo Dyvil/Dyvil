@@ -1,0 +1,23 @@
+package dyvilx.tools.parsing.marker
+
+using dyvil.test.JUnit
+
+import dyvil.util.MarkerLevel
+
+class MarkerPrinterTest {
+	@Test func print() -> void {
+		let source = new dyvil.source.TextSource("example \nsource \nfile")
+		let markers = new MarkerList()
+		let marker = new Marker(dyvil.source.position.SourcePosition(1, 1, 1, 5), .ERROR, "test")
+		marker.add("info")
+		markers.add(marker)
+
+		let builder = new StringBuilder
+
+		MarkerPrinter(source, style: .HUMAN, colors: true).print(markers, into: new dyvil.io.StringBuilderWriter(builder))
+
+		let result = builder.toString()
+
+		print(result)
+	}
+}

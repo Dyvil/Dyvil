@@ -5,8 +5,11 @@ package dyvil
 // Base imports for language features
 import dyvil.lang._
 
-// Import useful utility classes
+// Collections
 import dyvil.collection._
+using dyvil.collection.{ Iterables._, Collections._, Lists._, Sets._, Maps._ }
+
+// Import useful utility classes
 import dyvil.io.Console
 import dyvil.random.Random
 import dyvil.function.PartialFunction
