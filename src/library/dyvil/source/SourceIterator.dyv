@@ -1,0 +1,17 @@
+package dyvil.source
+
+import java.util.Iterator
+
+case class SourceIterator(let source: Source) implements Iterator<String> {
+	// Source lines are 1-indexed
+	var currentLineNumber = 1
+
+	override func hasNext() -> boolean = this.currentLineNumber <= this.source.lineCount
+
+	override func next() -> String {
+		if !this.hasNext() {
+			throw new java.util.NoSuchElementException
+		}
+		return this.source.line(at: this.currentLineNumber)
+	}
+}

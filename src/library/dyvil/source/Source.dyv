@@ -1,10 +1,19 @@
 package dyvil.source
 
-interface Source
-{
+import java.util.Iterator
+
+interface Source extends Iterable<String> {
+	// =============== Properties ===============
+
+	var filePath: String! { get: null }
+
 	var lineCount: int { @JavaName("lineCount") get }
 
 	var text: String { @JavaName("text") get }
 
+	// =============== Methods ===============
+
 	func line(at index: int) -> String!
+
+	override func iterator() -> Iterator<String> = new SourceIterator(this)
 }

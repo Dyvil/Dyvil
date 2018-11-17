@@ -1,72 +1,81 @@
 package dyvil.source
 
-case class TextSource(protected let text: String { @JavaName("text") public override get }) implements Source
-{
+case class TextSource(
+	protected let text: String { @JavaName("text") public override get }
+) implements Source {
+	// =============== Constants ===============
+
 	protected const EXPECTED_LINE_LENGTH: int = 80
 
-	var lineStarts: [int]! // 0-based, i.e. the line start of line 1 is at index 0 of this array
+	// =============== Properties ===============
 
-	override var lineCount: int { @JavaName("lineCount") get: this.getLineStarts().size }
+	var _lineStarts: [int]! // 0-based, i.e. the line start of line 1 is at index 0 of this array
 
-	override func line(at index: int) -> String!
-	{
-		let lineStarts = this.getLineStarts()
-		let lineCount = lineStarts.size
-
-		if (index > lineCount) return null
-		if (index == lineCount)
-		{
-			return this.text.substring(lineStarts[index - 1])
+	var lineStarts: [int] { get {
+		if let lineStarts = this._lineStarts {
+			return lineStarts
 		}
-		return this.text.substring(lineStarts[index - 1], lineEnd(this.text, lineStarts[index]))
-	}
-
-	private func getLineStarts() -> [int]
-	{
-		if (let lineStarts = this.lineStarts) return lineStarts
 
 		let length = this.text.length
 		var lineStarts = new [int](length _/ EXPECTED_LINE_LENGTH + 1)
 		var lineCount = 1
 
-		for (i <- 0 ..< length) match (this.text.charAt(i))
-		{
-			case '\r'
-			{
-				if (i + 1 < length && this.text.charAt(i + 1) == '\n')
-				{
-					i += 1
+		for i <- 0 ..< length {
+			this.text.charAt(i) match {
+				case '\r' {
+					if i + 1 < length && this.text.charAt(i + 1) == '\n' {
+						i += 1
+					}
+					lineStarts = add(lineStarts, lineCount, i + 1)
+					lineCount += 1
 				}
-				lineStarts = add(lineStarts, lineCount, i + 1)
-				lineCount += 1
+				case '\n' {
+					lineStarts = add(lineStarts, lineCount, i + 1)
+					lineCount += 1
+				}
+				case _ {}
 			}
-			case '\n'
-			{
-				lineStarts = add(lineStarts, lineCount, i + 1)
-				lineCount += 1
-			}
-			case _ {}
 		}
 
-		this.lineStarts = lineStarts.trim(lineCount)
-	}
+		this._lineStarts = lineStarts.trim(lineCount)
+	}}
 
-	private static func add(array: [int], index: int, value: int) -> [int]
-	{
-		if (index >= array.size) array = array.copy(withSize: index << 1)
+	override var lineCount: int { @JavaName("lineCount") get: this.lineStarts.size }
+
+	// =============== Static Methods ===============
+
+	private static func add(array: [int], index: int, value: int) -> [int] {
+		if index >= array.size {
+			array = array.copy(withSize: index << 1)
+		}
 		array[index] = value
 		return array
 	}
 
-	private static func lineEnd(text: String, textIndex index: int) -> int
-	{
-		if (index <= 0) return 0
+	private static func lineEnd(text: String, index: int) -> int {
+		if index <= 0 {
+			return 0
+		}
 
-		match (text.charAt(index - 1))
-		{
+		text.charAt(index - 1) match {
 			case '\n' => index - ((index >= 1 && text.charAt(index - 1) == '\r') ? 2 : 1)
 			case '\r' => index - 1
 			case _    => index
 		}
+	}
+
+	// =============== Methods ===============
+
+	override func line(at index: int) -> String! {
+		let lineStarts = this.lineStarts
+		let lineCount = lineStarts.size
+
+		if index > lineCount {
+			return null
+		}
+		if index == lineCount {
+			return this.text.substring(lineStarts[index - 1])
+		}
+		return this.text.substring(lineStarts[index - 1], lineEnd(this.text, lineStarts[index]))
 	}
 }

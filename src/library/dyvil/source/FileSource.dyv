@@ -1,26 +1,35 @@
 package dyvil.source
 
-import java.io.{ File, IOException }
 using dyvil.io.Files.readText
 
-case class FileSource(protected let file: File { @JavaName("file") public get }) implements Source
-{
-	private var textSource: TextSource! = null
+import java.io.File
+import java.io.IOException
 
-	func load() -> void throws IOException
-	{
-		this.textSource = new TextSource(this.file.readText())
-	}
+case class FileSource(
+	protected let file: File { @JavaName("file") public get }
+) implements Source {
+	// =============== Properties ===============
 
-	private func getTextSource() -> TextSource
-	{
-		if let textSource = this.textSource { return textSource }
+	private var _textSource: TextSource! = null
+
+	private var textSource: TextSource { get {
+		if let textSource = this._textSource {
+			return textSource
+		}
 		throw new RuntimeException('FileSource not yet loaded')
+	}}
+
+	override var filePath: String { get: this.file.getPath }
+
+	override var lineCount: int { @JavaName("lineCount") get: this.textSource.lineCount }
+
+	override var text: String { @JavaName("text") get: this.textSource.text }
+
+	// =============== Methods ===============
+
+	override func line(at index: int) -> String = this.textSource.line(at: index)
+
+	func load() -> void throws IOException {
+		this._textSource = new TextSource(this.file.readText())
 	}
-
-	override var lineCount: int { @JavaName("lineCount") get: this.getTextSource().lineCount }
-
-	override var text: String { @JavaName("text") get: this.getTextSource().text }
-
-	override func line(at index: int) -> String = this.getTextSource().line(at: index)
 }
