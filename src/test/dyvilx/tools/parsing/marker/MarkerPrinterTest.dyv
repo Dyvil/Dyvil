@@ -16,7 +16,7 @@ class MarkerPrinterTest {
 
 		let builder = new StringBuilder
 
-		MarkerPrinter(source, style: .HUMAN, colors: true).print(markers, into: new dyvil.io.StringBuilderWriter(builder))
+		MarkerPrinter(source, style: .DYVIL, colors: true).print(markers, into: new dyvil.io.StringBuilderWriter(builder))
 
 		let result = builder.toString()
 

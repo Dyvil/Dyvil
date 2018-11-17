@@ -11,7 +11,7 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		this.printHuman(markers, writer)
 	}
 
-	private func printHuman(markers: MarkerList, writer: Writer) -> void {
+	package private func printHuman(markers: MarkerList, writer: Writer) -> void {
 		markers.sort()
 		let lines = new BitSet(this.source.lineCount)
 		var lastLine = 0
@@ -42,11 +42,6 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 
 			while markerIndex < markers.size && line == markers[markerIndex].position.endLine {
 				this.printHuman(markers[markerIndex], indent, writer)
-
-				// spacing
-				writer.write(indent)
-				writer.write('\n')
-
 				markerIndex += 1
 			}
 
@@ -54,7 +49,7 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		}
 	}
 
-	private func printHuman(marker: Marker, indent: String, writer: Writer) -> void {
+	package private func printHuman(marker: Marker, indent: String, writer: Writer) -> void {
 		let position = marker.position
 		let startColumn = position.startColumn
 		let endColumn = position.endColumn
@@ -113,5 +108,9 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 			writer.write(infoLine)
 			writer.write('\n')
 		}
+
+		// --- Spacing ---
+		writer.write(indent)
+		writer.write('\n')
 	}
 }

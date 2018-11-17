@@ -22,8 +22,23 @@ class MarkerList(let i18n: I18n { public get }) extends ArrayList<Marker> {
 
 	// =============== Methods ===============
 
-	@Deprecated
+	@Deprecated(replacements: [ "MarkerList.add(Marker)" ], forRemoval: "v0.44.0")
+	@java.lang.Deprecated
+	@JavaName("add")
+	func add_bridge(marker: Marker!) -> void {
+		if (let marker = marker, !marker.isIgnored) {
+			this.add(marker)
+		}
+	}
+
+	@Deprecated(replacements: [ "MarkerList.addAll(Collection<Marker>)" ], forRemoval: "v0.44.0")
+	@java.lang.Deprecated
+	@JavaName("addAll")
+	func addAll_bridge(markers: MarkerList) -> void = this.addAll(markers)
+
+	@Deprecated(replacements: [ "MarkerPrinter.print(MarkerList, Writer)" ], forRemoval: "v0.44.0")
+	@java.lang.Deprecated
 	func log(source: Source, buffer: StringBuilder, colors: boolean) -> void {
-		MarkerPrinter(source, MarkerStyle.HUMAN, colors).print(this, into: new dyvil.io.StringBuilderWriter(buffer))
+		MarkerPrinter(source, .DYVIL, colors).printHuman(this, new dyvil.io.StringBuilderWriter(buffer))
 	}
 }
