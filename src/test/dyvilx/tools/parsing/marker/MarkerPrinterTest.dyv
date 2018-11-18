@@ -52,6 +52,7 @@ class MarkerPrinterTest {
 		let result = builder.toString()
 
 		result =?= "<input>:1.1-5: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
+					<input>:1.1-5: note: extra information
 					<input>:2.3-3.4: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
 					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
 		"

@@ -132,8 +132,9 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 	}
 
 	private func printMachine(marker: Marker, writer: Writer) -> void {
-		this.printPosition(marker.position, writer)
-		writer.write(": ")
+		let location = "\(sourcePath(this.source)):\(marker.position.toPositionString()): "
+
+		writer.write(location)
 
 		if this.colors {
 			writer.write(marker.level.color)
@@ -148,28 +149,24 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		}
 
 		writer.write('\n')
+
+		for info <- marker.info {
+			writer.write(location)
+			writer.write(levelName("note"))
+			writer.write(": ")
+			writer.write(info)
+			writer.write('\n')
+		}
 	}
 
 	// --------------- Helper Methods ---------------
-
-	private func printPosition(position: SourcePosition, writer: Writer) -> void {
-		writer.write(sourcePath(this.source))
-		writer.write(':')
-
-		if position.startLine != position.endLine {
-			writer.write("\(position.startLine).\(position.startColumn)-\(position.endLine).\(position.endColumn)")
-		}
-		else if position.startColumn != position.endColumn {
-			writer.write("\(position.startLine).\(position.startColumn)-\(position.endColumn)")
-		}
-		else {
-			writer.write("\(position.startLine).\(position.startColumn)")
-		}
-	}
 
 	private static func sourcePath(source: Source) -> String
 		= source.filePath ?? BaseMarkers.INSTANCE.getString("marker.input_source")
 
 	private static func levelName(level: MarkerLevel) -> String
-		= BaseMarkers.INSTANCE.getString("marker_level.\(level.name.toLowerCase())")
+		= levelName(level.name.toLowerCase())
+
+	private static func levelName(levelID: String) -> String
+		= BaseMarkers.INSTANCE.getString("marker_level.\(levelID)")
 }
