@@ -2,11 +2,12 @@ package dyvilx.tools.parsing.marker
 
 using dyvil.test.JUnit
 import dyvil.source.position.SourcePosition
-
 import dyvil.util.MarkerLevel
 
+import java.io.StringWriter
+
 class MarkerPrinterTest {
-	const TEST_SOURCE = new dyvil.source.TextSource("example \nsource\nfile\n \t .")
+	const TEST_SOURCE = new dyvil.source.TextSource("example\nsource\nfile\n \t .")
 	const TEST_MARKERS: MarkerList = {
 		let markers = new MarkerList()
 		let marker = new Marker(SourcePosition(inLine: 1, fromColumn: 1, toColumn: 5), .ERROR, "test error")
@@ -18,15 +19,15 @@ class MarkerPrinterTest {
 	}
 
 	@Test func printDyvil() -> void {
-		let builder = new StringBuilder
+		let writer = new StringWriter
 		let printer = MarkerPrinter(TEST_SOURCE, style: .DYVIL, colors: true)
 
-		printer.print(TEST_MARKERS, into: new dyvil.io.StringBuilderWriter(builder))
+		printer.print(TEST_MARKERS, into: writer)
 
-		let result = builder.toString()
+		let result = writer.toString()
 
 		// uses \(' ') in place of whitespace at the end of a line
-		result =?= "1 | example\(' ')
+		result =?= "1 | example
 					. |  \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
 					. | \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
 					. | \textra information
@@ -44,17 +45,38 @@ class MarkerPrinterTest {
 	}
 
 	@Test func printMachine() -> void {
-		let builder = new StringBuilder
+		let writer = new StringWriter
 		let printer = MarkerPrinter(TEST_SOURCE, style: .MACHINE, colors: true)
 
-		printer.print(TEST_MARKERS, into: new dyvil.io.StringBuilderWriter(builder))
+		printer.print(TEST_MARKERS, into: writer)
 
-		let result = builder.toString()
+		let result = writer.toString()
 
 		result =?= "<input>:1.1-5: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
 					<input>:1.1-5: note: extra information
 					<input>:2.3-3.4: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
 					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
+		"
+	}
+
+	@Test func printGCC() -> void {
+		let writer = new StringWriter
+		let printer = MarkerPrinter(TEST_SOURCE, style: .GCC, colors: true)
+
+		printer.print(TEST_MARKERS, into: writer)
+
+		let result = writer.toString()
+
+		result =?= "<input>:1.1-5: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
+					<input>:1.1-5: note: extra information
+					example
+					 \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
+					<input>:2.3-3.4: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
+					file
+					   \(Console.ANSI_CYAN)^\(Console.ANSI_RESET)
+					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
+					 \t .
+					 \t  \(Console.ANSI_YELLOW)^\(Console.ANSI_RESET)
 		"
 	}
 }

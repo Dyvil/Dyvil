@@ -4,6 +4,6 @@ import dyvil.source.Source
 
 enum MarkerStyle {
 	case DYVIL
-	// case GCC
+	case GCC
 	case MACHINE
 }

@@ -14,6 +14,7 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		this.style match {
 			case .DYVIL => this.printHuman(markers, writer)
 			case .MACHINE => this.printMachine(markers, writer)
+			case .GCC => this.printGCC(markers, writer)
 		}
 	}
 
@@ -58,37 +59,12 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 	}
 
 	package private func printHuman(marker: Marker, indent: String, writer: Writer) -> void {
-		let position = marker.position
-		let startColumn = position.startColumn
-		let endColumn = position.endColumn
-
-		let line = this.source.line(position.endLine)
-		let limit = Math.min(startColumn, line.length)
-
 		// does not append the actual line, only the indicator
-
 
 		// --- Indicator ---
 		writer.write(indent)
 
-		for i <- 0 ..< limit {
-			writer.write((line[i] == '\t') ? '\t' : ' ')
-		}
-
-		if this.colors {
-			writer.write(marker.level.color)
-		}
-
-		for i <- startColumn ..< endColumn {
-			writer.write('^')
-		}
-		if startColumn == endColumn {
-			writer.write('^')
-		}
-
-		if this.colors {
-			writer.write(Console.ANSI_RESET)
-		}
+		this.printIndicator(marker, writer)
 
 		writer.write('\n')
 
@@ -120,6 +96,34 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		// --- Spacing ---
 		writer.write(indent)
 		writer.write('\n')
+	}
+
+	private func printIndicator(marker: Marker, writer: Writer) -> void {
+		let position = marker.position
+		let startColumn = position.startColumn
+		let endColumn = position.endColumn
+
+		let line = this.source.line(position.endLine)
+		let limit = Math.min(startColumn, line.length)
+
+		for i <- 0 ..< limit {
+			writer.write((line[i] == '\t') ? '\t' : ' ')
+		}
+
+		if this.colors {
+			writer.write(marker.level.color)
+		}
+
+		for i <- startColumn ..< endColumn {
+			writer.write('^')
+		}
+		if startColumn == endColumn {
+			writer.write('^')
+		}
+
+		if this.colors {
+			writer.write(Console.ANSI_RESET)
+		}
 	}
 
 	// --------------- Machine Format ---------------
@@ -157,6 +161,25 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 			writer.write(info)
 			writer.write('\n')
 		}
+	}
+
+	// --------------- GCC Format ---------------
+
+	private func printGCC(markers: MarkerList, writer: Writer) -> void {
+		markers.sort()
+		for marker <- markers {
+			this.printGCC(marker, writer)
+		}
+	}
+
+	private func printGCC(marker: Marker, writer: Writer) -> void {
+		this.printMachine(marker, writer)
+
+		writer.write(this.source.line(at: marker.position.endLine))
+		writer.write('\n')
+
+		this.printIndicator(marker, writer)
+		writer.write('\n')
 	}
 
 	// --------------- Helper Methods ---------------
