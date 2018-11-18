@@ -15,10 +15,10 @@ infix operator =!= { associativity none, precedence 1 }
 extension any
 {
 	// "should be equal to"
-	infix func =?=(actual: any!, expected: any!) -> void = assertThat(expected, equalTo(actual))
+	infix func =?=(actual: any!, expected: any!) -> void = assertThat(actual, equalTo(expected))
 
 	// "should not be equal to"
-	infix func =!=(actual: any!, expected: any!) -> void = assertThat(expected, not(actual))
+	infix func =!=(actual: any!, expected: any!) -> void = assertThat(actual, not(expected))
 
 	static func pass() -> void {}
 
