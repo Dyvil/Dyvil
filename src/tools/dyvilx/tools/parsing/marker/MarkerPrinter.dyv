@@ -1,15 +1,23 @@
 package dyvilx.tools.parsing.marker
 
 import dyvil.source.Source
+import dyvil.source.position.SourcePosition
+import dyvil.util.MarkerLevel
 
 import java.io.Writer
 import java.util.BitSet
 
 case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors: boolean) {
+	// =============== Methods ===============
+
 	func print(markers: MarkerList, into writer: Writer) -> void {
-		// TODO check style and implement the other styles
-		this.printHuman(markers, writer)
+		this.style match {
+			case .DYVIL => this.printHuman(markers, writer)
+			case .MACHINE => this.printMachine(markers, writer)
+		}
 	}
+
+	// --------------- Dyvil Format ---------------
 
 	package private func printHuman(markers: MarkerList, writer: Writer) -> void {
 		markers.sort()
@@ -91,7 +99,7 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 			writer.write(marker.level.color)
 		}
 
-		writer.write(BaseMarkers.INSTANCE.getString("marker_level.\(marker.level.name.toLowerCase())"))
+		writer.write(levelName(marker.level))
 		writer.write(": ")
 		writer.write(marker.message)
 
@@ -113,4 +121,55 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		writer.write(indent)
 		writer.write('\n')
 	}
+
+	// --------------- Machine Format ---------------
+
+	private func printMachine(markers: MarkerList, writer: Writer) -> void {
+		markers.sort()
+		for marker <- markers {
+			this.printMachine(marker, writer)
+		}
+	}
+
+	private func printMachine(marker: Marker, writer: Writer) -> void {
+		this.printPosition(marker.position, writer)
+		writer.write(": ")
+
+		if this.colors {
+			writer.write(marker.level.color)
+		}
+
+		writer.write(levelName(marker.level))
+		writer.write(": ")
+		writer.write(marker.message)
+
+		if this.colors {
+			writer.write(Console.ANSI_RESET)
+		}
+
+		writer.write('\n')
+	}
+
+	// --------------- Helper Methods ---------------
+
+	private func printPosition(position: SourcePosition, writer: Writer) -> void {
+		writer.write(sourcePath(this.source))
+		writer.write(':')
+
+		if position.startLine != position.endLine {
+			writer.write("\(position.startLine).\(position.startColumn)-\(position.endLine).\(position.endColumn)")
+		}
+		else if position.startColumn != position.endColumn {
+			writer.write("\(position.startLine).\(position.startColumn)-\(position.endColumn)")
+		}
+		else {
+			writer.write("\(position.startLine).\(position.startColumn)")
+		}
+	}
+
+	private static func sourcePath(source: Source) -> String
+		= source.filePath ?? BaseMarkers.INSTANCE.getString("marker.input_source")
+
+	private static func levelName(level: MarkerLevel) -> String
+		= BaseMarkers.INSTANCE.getString("marker_level.\(level.name.toLowerCase())")
 }

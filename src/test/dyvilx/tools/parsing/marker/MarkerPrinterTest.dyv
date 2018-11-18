@@ -6,30 +6,54 @@ import dyvil.source.position.SourcePosition
 import dyvil.util.MarkerLevel
 
 class MarkerPrinterTest {
-	@Test func print() -> void {
-		let source = new dyvil.source.TextSource("example \nsource \nfile")
+	const TEST_SOURCE = new dyvil.source.TextSource("example \nsource\nfile\n \t .")
+	const TEST_MARKERS: MarkerList = {
 		let markers = new MarkerList()
-		let marker = new Marker(SourcePosition(line: 1, startColumn: 1, endColumn: 5), .ERROR, "test")
+		let marker = new Marker(SourcePosition(line: 1, startColumn: 1, endColumn: 5), .ERROR, "test error")
 		marker.add("info")
 		markers.add(marker)
-		markers.add(new Marker(SourcePosition(line: 3, startColumn: 0, endColumn: 1), .WARNING, "test 2"))
+		markers.add(new Marker(SourcePosition(line: 4, startColumn: 5, endColumn: 5), .WARNING, "test warning"))
+		markers.add(new Marker(SourcePosition(startLine: 2, endLine: 3, startColumn: 3, endColumn: 4), .INFO, "test info"))
+		markers
+	}
 
+	@Test func printDyvil() -> void {
 		let builder = new StringBuilder
+		let printer = MarkerPrinter(TEST_SOURCE, style: .DYVIL, colors: true)
 
-		MarkerPrinter(source, style: .DYVIL, colors: true).print(markers, into: new dyvil.io.StringBuilderWriter(builder))
+		printer.print(TEST_MARKERS, into: new dyvil.io.StringBuilderWriter(builder))
 
 		let result = builder.toString()
 
 		// uses \(' ') in place of whitespace at the end of a line
 		result =?= "1 | example\(' ')
 					. |  \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
-					. | \(Console.ANSI_RED)error: test\(Console.ANSI_RESET)
+					. | \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
 					. | \tinfo
 					. |\(' ')
+					2 | source
 					3 | file
-					. | \(Console.ANSI_YELLOW)^\(Console.ANSI_RESET)
-					. | \(Console.ANSI_YELLOW)warning: test 2\(Console.ANSI_RESET)
+					. |    [36m^[0m
+					. | [36minfo: test info[0m
 					. |\(' ')
+					4 |  \t .
+					. |  \t  \(Console.ANSI_YELLOW)^\(Console.ANSI_RESET)
+					. | \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
+					. |\(' ')
+		"
+	}
+
+	@Test func printMachine() -> void {
+		let builder = new StringBuilder
+		let printer = MarkerPrinter(TEST_SOURCE, style: .MACHINE, colors: true)
+
+		printer.print(TEST_MARKERS, into: new dyvil.io.StringBuilderWriter(builder))
+
+		let result = builder.toString()
+
+		result =?= "<input>:1.1-5: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
+					<input>:2.3-3.4: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
+					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
 		"
 	}
 }
