@@ -11,42 +11,57 @@ class ExtensionTest {
 	static class B extends A
 
 	static class C extends B {
-		public func custom() -> String = "custom"
+		func foo() -> String = "C.foo"
+
+		func bar() -> String = "C.bar"
 	}
 
 	static class D extends C
 
 	extension A {
-		func custom() -> String = "fallback"
+		func foo() -> String = "extension A.foo"
+
+		final func bar() -> String = "extension A.bar"
 	}
 
-	@Test
-	func sourceFallback() -> void {
+	@Test func sourceExtensionOfSourceClass() -> void {
 		let a = new A
 		let b = new B
-
-		a.custom =?= "fallback"
-		b.custom =?= "fallback"
-	}
-
-	@Test
-	func sourceOverride() -> void {
+		let bA: A = b
 		let c = new C
-		let d = new D
-
 		let cA: A = c
 		let cB: B = c
+		let d = new D
+		let dA: A = d
+		let dB: B = d
+		let dC: C = d
 
-		c.custom =?= "custom"
-		cA.custom =?= "custom"
-		cB.custom =?= "custom"
-		d.custom =?= "custom"
+		a.foo =?= "extension A.foo"
+		bA.foo =?= "extension A.foo"
+		b.foo =?= "extension A.foo"
+		cA.foo =?= "C.foo"
+		cB.foo =?= "C.foo"
+		c.foo =?= "C.foo"
+		dA.foo =?= "C.foo"
+		dB.foo =?= "C.foo"
+		dC.foo =?= "C.foo"
+		d.foo =?= "C.foo"
+
+		a.bar =?= "extension A.bar"
+		bA.bar =?= "extension A.bar"
+		b.bar =?= "extension A.bar"
+		cA.bar =?= "extension A.bar"
+		cB.bar =?= "extension A.bar"
+		c.bar =?= "C.bar"
+		dA.bar =?= "extension A.bar"
+		dB.bar =?= "extension A.bar"
+		dC.bar =?= "C.bar"
+		d.bar =?= "C.bar"
 	}
 
 	// --------------- External Extension of External Class ---------------
 
-	@Test
-	func externalStrings() -> void {
+	@Test func externalExtensionOfExternalClass() -> void {
 		"aaaba".count('a') =?= 4
 
 		"A" * 4 =?= "AAAA"
@@ -68,8 +83,7 @@ class ExtensionTest {
 		func mySize() -> int = this.length
 	}
 
-	@Test
-	func sourceStrings() -> void {
+	@Test func sourceExtensionOfExternalClass() -> void {
 		String.myEmpty =?= ""
 
 		"abc".mySize =?= 3
@@ -93,8 +107,7 @@ class ExtensionTest {
 		func myAdd(element: T) -> void = this.add(element)
 	}
 
-	@Test
-	func generic() -> void {
+	@Test func genericExtensionOfExternalClass() -> void {
 		let list = MutableList(1, 2, 3)
 
 		list.first =?= 1

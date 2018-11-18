@@ -736,9 +736,9 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			{
 				// normal instance method access
 
-				receiver = TypeChecker
-					           .convertValue(receiver, this.getReceiverType(), genericData, markers, context,
-					                         TypeChecker.markerSupplier("method.access.receiver_type", this.name));
+				receiver = TypeChecker.convertValue(receiver, this.getReceiverType(), genericData, markers, context,
+				                                    TypeChecker
+					                                    .markerSupplier("method.access.receiver_type", this.name));
 			}
 
 			if (receiver != null)
@@ -1224,9 +1224,12 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
-		if (this.hasModifier(Modifiers.EXTENSION) && !this.hasModifier(Modifiers.STATIC))
+		if (this.hasModifier(Modifiers.EXTENSION) // extension
+		    && !this.isStatic() // non-static
+		    && !this.hasModifier(Modifiers.FINAL) // non-final
+		)
 		{
-			// extension method invocation
+			// dynamic invocation of non-static non-final extension method
 			final Handle handle = new Handle(ClassFormat.H_INVOKESTATIC, this.enclosingClass.getInternalName(),
 			                                 mangledName, descriptor);
 			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM, handle);
