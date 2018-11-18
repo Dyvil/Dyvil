@@ -9,11 +9,11 @@ class MarkerPrinterTest {
 	const TEST_SOURCE = new dyvil.source.TextSource("example \nsource\nfile\n \t .")
 	const TEST_MARKERS: MarkerList = {
 		let markers = new MarkerList()
-		let marker = new Marker(SourcePosition(line: 1, startColumn: 1, endColumn: 5), .ERROR, "test error")
-		marker.add("info")
+		let marker = new Marker(SourcePosition(inLine: 1, fromColumn: 1, toColumn: 5), .ERROR, "test error")
+		marker.add("extra information")
 		markers.add(marker)
-		markers.add(new Marker(SourcePosition(line: 4, startColumn: 5, endColumn: 5), .WARNING, "test warning"))
-		markers.add(new Marker(SourcePosition(startLine: 2, endLine: 3, startColumn: 3, endColumn: 4), .INFO, "test info"))
+		markers.add(new Marker(SourcePosition(inLine: 4, fromColumn: 5, toColumn: 5), .WARNING, "test warning"))
+		markers.add(new Marker(SourcePosition(fromLine: 2, fromColumn: 3, toLine: 3, toColumn: 4), .INFO, "test info"))
 		markers
 	}
 
@@ -29,7 +29,7 @@ class MarkerPrinterTest {
 		result =?= "1 | example\(' ')
 					. |  \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
 					. | \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
-					. | \tinfo
+					. | \textra information
 					. |\(' ')
 					2 | source
 					3 | file

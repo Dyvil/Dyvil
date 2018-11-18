@@ -1,48 +1,52 @@
 package dyvil.source.position
 
-interface SourcePosition extends Comparable<SourcePosition>
-{
+interface SourcePosition extends Comparable<SourcePosition> {
 	public const ORIGIN: SourcePosition = new Base(1, 1, 0, 1)
 
-	// Constructors
-
-	static func apply(startLine: int, endLine: int, startColumn: int, endColumn: int) -> SourcePosition
-		= new Base(startLine, endLine, startColumn, endColumn)
-
-	static func apply(line: int, startColumn: int, endColumn: int) -> SourcePosition
-		= new Base(line, line, startColumn, endColumn)
+	// =============== Operators ===============
 
 	infix func ..(lhs: SourcePosition, rhs: SourcePosition) -> SourcePosition
 		= new Base(lhs.startLine, rhs.endLine, lhs.startColumn, rhs.endColumn)
 
-	static func before(position: SourcePosition) -> SourcePosition
-	{
+	// =============== Static Methods ===============
+
+	// SourcePosition(fromLine: 2, fromColumn: 3, toLine: 3, toColumn: 4)
+	static func apply(fromLine startLine: int, toLine endLine: int, fromColumn startColumn: int, toColumn endColumn: int) -> SourcePosition
+		= new Base(startLine, endLine, startColumn, endColumn)
+
+	// SourcePosition(inLine: 1, fromColumn: 1, to: 3)
+	static func apply(inLine line: int, fromColumn startColumn: int, toColumn endColumn: int) -> SourcePosition
+		= new Base(line, line, startColumn, endColumn)
+
+	// SourcePosition(before: next)
+	@JavaName("before")
+	static func apply(before position: SourcePosition) -> SourcePosition {
 		let line = position.startLine
 		let column = position.startColumn
-		if (column == 0) return Base(line, line, column, column + 1)
-		return new Base(line, line, column - 1, column)
+		return (column == 0) ? new Base(line, line, column, column + 1) : new Base(line, line, column - 1, column)
 	}
 
-	static func after(position: SourcePosition) -> SourcePosition
-	{
+	// SourcePosition(after: prev)
+	@JavaName("after")
+	static func apply(after position: SourcePosition) -> SourcePosition {
 		let line = position.endLine
 		let column = position.endColumn
 		return new Base(line, line, column, column + 1)
 	}
 
-	static func between(start: SourcePosition, end: SourcePosition) -> SourcePosition
-	{
+	// SourcePosition(between: start, and: end)
+	@JavaName("between")
+	static func apply(between start: SourcePosition, and end: SourcePosition) -> SourcePosition {
 		var startColumn = start.endColumn
 		var endColumn = end.startColumn
-		if (startColumn == endColumn)
-		{
+		if (startColumn == endColumn) {
 			startColumn += 1
 			endColumn -= 1
 		}
 		return new Base(start.endLine, end.startLine, startColumn, endColumn)
 	}
 
-	// Instance Methods
+	// =============== Properties ===============
 
 	var startLine:   int { @JavaName("startLine") get }
 
@@ -54,13 +58,18 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	func raw() -> SourcePosition = new Base(this.startLine, this.endLine, this.startColumn, this.endColumn)
 
-	@Deprecated // in Dyvil only
+	// =============== Methods ===============
+
+	@Deprecated(replacements: [ "SourcePosition.`..`(SourcePosition)" ]) // in Dyvil only
 	func to(end: SourcePosition) -> SourcePosition = this .. end
 
-	override func compareTo(o: SourcePosition) -> int
-	{
+	// --------------- Comparison ---------------
+
+	override func compareTo(o: SourcePosition) -> int {
 		let byLine = this.startLine.compareTo(o.startLine)
-		if (byLine != 0) return byLine
+		if (byLine != 0) {
+			return byLine
+		}
 		return this.startColumn.compareTo(o.startColumn)
 	}
 
@@ -72,23 +81,35 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	func isNeighboring(position: SourcePosition) -> boolean = this.endColumn == position.startColumn
 
+	// --------------- Formatting ---------------
+
+	func toPositionString() -> String {
+		if this.startLine != this.endLine {
+			return "\(this.startLine).\(this.startColumn)-\(this.endLine).\(this.endColumn)"
+		}
+		else if this.startColumn != this.endColumn {
+			return "\(this.startLine).\(this.startColumn)-\(this.endColumn)"
+		}
+		else {
+			return "\(this.startLine).\(this.startColumn)"
+		}
+	}
+
 	// Base Implementation
 
-	private static case class Base
-	(
+	private static case class Base (
 		let startLine:   int { @JavaName("startLine") override get }
 		let endLine:     int { @JavaName("endLine") override get }
 		let startColumn: int { @JavaName("startColumn") override get }
 		let endColumn:   int { @JavaName("endColumn") override get }
 	)
-	implements SourcePosition
-	{
+	implements SourcePosition {
 		override func raw() -> SourcePosition = this
 
-		override func equals(obj: any!) -> boolean = this === obj || obj is SourcePosition && this.equals(obj as SourcePosition)
+		override func equals(obj: any!) -> boolean
+			= this === obj || obj is SourcePosition && this.equals(obj as SourcePosition)
 
-		func equals(that: SourcePosition) -> boolean
-		{
+		func equals(that: SourcePosition) -> boolean {
 			if (this === that) return true
 			if (this.startLine != that.startLine) return false
 			if (this.endLine != that.endLine) return false
@@ -97,7 +118,7 @@ interface SourcePosition extends Comparable<SourcePosition>
 			return true
 		}
 
-		override func toString() -> String = "SourcePosition(\(this.startLine), \(this.endLine), \(this.startColumn), \(this.endColumn))"
+		override func toString() -> String = this.toPositionString()
 	}
 }
 
