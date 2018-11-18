@@ -1,0 +1,158 @@
+package dyvil.collection
+
+import java.util.{ Collection, SortedSet, Queue, Deque }
+import java.util.{ ArrayDeque, PriorityQueue }
+
+import java.util.Comparator
+
+import java.util.Collections
+import java.util.Arrays
+
+// *************** Queue ***************
+
+@JavaName("Queues")
+extension<type E> Queue<E> {
+	// =============== Static Methods ===============
+
+	// Queues are inherently mutable, so no @Immutable return type annotations
+
+	// Queue<Int>()
+	@JavaName("empty")
+	static func apply<type E>() -> Queue<E> = ArrayDeque<E>()
+
+	// Queue(1)
+	@JavaName("of")
+	static func apply<type E>(element: E) -> Queue<E> = ArrayDeque<E>(element)
+
+	// Queue(1, 2, 3)
+	@JavaName("of")
+	static func apply<type E>(elements: E...) -> Queue<E> = ArrayDeque<E>(elements...)
+
+	// Queue(withContentsOf: someCollection)
+	@JavaName("copyOf")
+	static func apply<type E>(withContentsOf c: Collection<+E>) -> Queue<E> = ArrayDeque(withContentsOf: c)
+}
+
+// *************** Deque ***************
+
+@JavaName("Deques")
+extension<type E> Deque<E> {
+	// =============== Static Methods ===============
+
+	// Deques are inherently mutable, so no @Immutable return type annotations
+
+	// Deque<Int>()
+	@JavaName("empty")
+	static func apply<type E>() -> Deque<E> = ArrayDeque<E>()
+
+	// Deque(1)
+	@JavaName("of")
+	static func apply<type E>(element: E) -> Deque<E> = ArrayDeque<E>(element)
+
+	// Deque(1, 2, 3)
+	@JavaName("of")
+	static func apply<type E>(elements: E...) -> Deque<E> = ArrayDeque<E>(elements...)
+
+	// Deque(withContentsOf: someCollection)
+	@JavaName("copyOf")
+	static func apply<type E>(withContentsOf c: Collection<+E>) -> Deque<E> = ArrayDeque(withContentsOf: c)
+}
+
+// *************** ArrayDeque ***************
+
+@JavaName("ArrayDeques")
+extension ArrayDeque {
+	// =============== Static Methods ===============
+
+	// ArrayDeque<Int>()
+	@JavaName("empty")
+	static func apply<type E>() -> ArrayDeque<E> = ArrayDeque<E>()
+
+	// ArrayDeque(1)
+	@JavaName("of")
+	static func apply<type E>(element: E) -> ArrayDeque<E> = new ArrayDeque<E>().{ add(element); $0 }
+
+	// ArrayDeque(1, 2, 3)
+	@JavaName("of")
+	static func apply<type E>(elements: E...) -> ArrayDeque<E> = new ArrayDeque<E>(Arrays.asList(elements...))
+
+	// ArrayDeque(withContentsOf: someCollection)
+	@JavaName("copyOf")
+	static func apply<type E>(withContentsOf c: Collection<+E>) -> ArrayDeque<E> = new ArrayDeque(c)
+
+	// ArrayDeque(withCapacity: 5)
+	@JavaName("withCapacity")
+	static func apply<type E>(withCapacity capacity: int) -> ArrayDeque<E> = new ArrayDeque<E>(capacity)
+}
+
+// *************** PriorityQueue ***************
+
+@JavaName("PriorityQueues")
+extension PriorityQueue {
+	// =============== Static Methods ===============
+
+	// --------------- Comparable ---------------
+
+	// PriorityQueue<Int>()
+	@JavaName("empty")
+	static func apply<type E: Comparable<E>>() -> PriorityQueue<E> = new PriorityQueue<E>()
+
+	// PriorityQueue(1)
+	@JavaName("of")
+	static func apply<type E: Comparable<E>>(element: E) -> PriorityQueue<E>
+		= new PriorityQueue<E>().{ add(element); $0 }
+
+	// PriorityQueue(1, 2, 3)
+	@JavaName("of")
+	static func apply<type E: Comparable<E>>(elements: E...) -> PriorityQueue<E>
+		= new PriorityQueue<E>(Arrays.asList(elements...))
+
+	// PriorityQueue(withContentsOf: someCollection)
+	@JavaName("copyOf")
+	static func apply<type E: Comparable<E>>(withContentsOf collection: Collection<+E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(collection)
+
+	// PriorityQueue(withContentsOf: someSortedSet)
+	@JavaName("copyOf")
+	static func apply<type E: Comparable<E>>(withContentsOf sortedSet: SortedSet<+E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(sortedSet)
+
+	// PriorityQueue(withContentsOf: somePriorityQueue)
+	@JavaName("copyOf")
+	static func apply<type E: Comparable<E>>(withContentsOf priorityQueue: PriorityQueue<+E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(priorityQueue)
+
+	// PriorityQueue(withCapacity: 5)
+	@JavaName("withCapacity")
+	static func apply<type E: Comparable<E>>(withCapacity capacity: int) -> PriorityQueue<E>
+		= new PriorityQueue<E>(capacity)
+
+	// --------------- Comparator ---------------
+
+	// PriorityQueue(withComparator: someComparator)
+	@JavaName("empty")
+	static func apply<type E>(withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp)
+
+	// PriorityQueue(1, withComparator: someComparator)
+	@JavaName("of")
+	static func apply<type E>(element: E, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ add(element); $0 }
+
+	// PriorityQueue(1, 2, 3, withComparator: someComparator)
+	@JavaName("of")
+	static func apply<type E>(elements: E..., withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ Collections.addAll(this, elements...); $0 }
+
+	// PriorityQueue(withContentsOf: someCollection, withComparator: someComparator)
+	@JavaName("copyOf")
+	static func apply<type E>(withContentsOf col: Collection<+E>, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ addAll(col); $0 }
+
+	// PriorityQueue(withCapacity: 5, withComparator: someComparator)
+	@JavaName("withCapacity")
+	static func apply<type E>(withCapacity capacity: int, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(capacity, comp)
+
+	// withContentsOf SortedSet and PriorityQueue are not needed
+}
