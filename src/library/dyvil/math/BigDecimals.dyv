@@ -49,17 +49,17 @@ extension BigDecimal
 @JavaName("BigDecimals$LongSyntax")
 extension long
 {
-	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
+	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
 @JavaName("BigDecimals$DoubleSyntax")
 extension double
 {
-	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
+	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
 @JavaName("BigDecimals$BigIntegerSyntax")
 extension java.math.BigInteger
 {
-	func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
+	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }

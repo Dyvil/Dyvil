@@ -61,5 +61,5 @@ extension BigInt
 @JavaName("BigIntegers$LongSyntax")
 extension long
 {
-	func toBigInt() -> BigInt inline = BigInt(this)
+	final func toBigInt() -> BigInt inline = BigInt(this)
 }

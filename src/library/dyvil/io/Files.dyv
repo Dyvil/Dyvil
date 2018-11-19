@@ -40,11 +40,11 @@ extension File {
 
 	// --------------- File Creation ---------------
 
-	func create() -> void throws IOException inline = this.createNewFile()
+	final func create() -> void throws IOException inline = this.createNewFile()
 
-	func tryCreate() -> boolean = IOAction.tryIO { this.create() }
+	final func tryCreate() -> boolean = IOAction.tryIO { this.create() }
 
-	func createRecursively() -> void throws IOException {
+	final func createRecursively() -> void throws IOException {
 		if this.exists() {
 			return
 		}
@@ -58,53 +58,53 @@ extension File {
 		this.createNewFile()
 	}
 
-	func tryCreateRecursively() -> boolean = IOAction.tryIO { this.createRecursively() }
+	final func tryCreateRecursively() -> boolean = IOAction.tryIO { this.createRecursively() }
 
 	// --------------- Writing to a File ---------------
 
 	@JavaName("writeData")
-	func write(data: [byte]) -> void throws IOException {
+	final func write(data: [byte]) -> void throws IOException {
 		this.createRecursively()
 		Files.write(this.toPath(), data)
 	}
 
 	@JavaName("tryWriteData")
-	func tryWrite(data: [byte]) -> boolean = IOAction.tryIO { this.write(data) }
+	final func tryWrite(data: [byte]) -> boolean = IOAction.tryIO { this.write(data) }
 
 	@JavaName("writeText")
-	func write(text: String) -> void throws IOException = this.write(text.getBytes)
+	final func write(text: String) -> void throws IOException = this.write(text.getBytes)
 
 	@JavaName("tryWriteText")
-	func tryWrite(text: String) -> boolean = IOAction.tryIO { this.write(text) }
+	final func tryWrite(text: String) -> boolean = IOAction.tryIO { this.write(text) }
 
 	@JavaName("writeLines")
-	func write(lines: List<String>) -> void throws IOException {
+	final func write(lines: List<String>) -> void throws IOException {
 		this.createRecursively()
 		Files.write(this.toPath(), lines, Charset.defaultCharset)
 	}
 
 	@JavaName("tryWriteLines")
-	func tryWrite(lines: List<String>) -> boolean = IOAction.tryIO { this.write(lines) }
+	final func tryWrite(lines: List<String>) -> boolean = IOAction.tryIO { this.write(lines) }
 
 	// --------------- Reading from a File ---------------
 
-	func readData() -> [byte] throws IOException inline = Files.readAllBytes(this.toPath())
+	final func readData() -> [byte] throws IOException inline = Files.readAllBytes(this.toPath())
 
-	func tryReadData() -> [byte]? = IOSupplier.tryIO { this.readData() }
+	final func tryReadData() -> [byte]? = IOSupplier.tryIO { this.readData() }
 
-	func readText() -> String throws IOException inline = new String(this.readData())
+	final func readText() -> String throws IOException inline = new String(this.readData())
 
-	func tryReadText() -> String? = IOSupplier.tryIO { this.readText() }
+	final func tryReadText() -> String? = IOSupplier.tryIO { this.readText() }
 
-	func readLines() -> List<String> throws IOException inline = Files.readAllLines(this.toPath()) as List<String>
+	final func readLines() -> List<String> throws IOException inline = Files.readAllLines(this.toPath()) as List<String>
 
-	func tryReadLines() -> List<String>? = IOSupplier.tryIO { this.readLines() }
+	final func tryReadLines() -> List<String>? = IOSupplier.tryIO { this.readLines() }
 
 	// --------------- File Deletion ---------------
 
-	func deleteRecursively() -> boolean = this.deleteRecursively(Int.MAX_VALUE)
+	final func deleteRecursively() -> boolean = this.deleteRecursively(Int.MAX_VALUE)
 
-	func deleteRecursively(maxDepth: int) -> boolean {
+	final func deleteRecursively(maxDepth: int) -> boolean {
 		if (maxDepth > 0 && this.isDirectory) {
 			if let files = this.listFiles() {
 				for subFile <- files {
