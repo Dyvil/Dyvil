@@ -3,44 +3,50 @@ package dyvil.lang
 import java.util.regex.{ Pattern, Matcher }
 
 @JavaName("Strings")
-extension String
-{
-	private const STRING_VALUE_OFFSET: long = dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
+extension String {
+	private const STRING_VALUE_OFFSET: long
+		= dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
 
 	// =============== Static Methods ===============
 
-	static func build(with closure: StringBuilder -> void) -> String inline = new StringBuilder().use(closure).toString!!
+	static func build(with closure: StringBuilder -> void) -> String inline
+		= new StringBuilder().use(closure).toString!!
 
-	static func build(withCapacity capacity: int, closure: StringBuilder -> void) -> String inline = new StringBuilder(capacity).use(closure).toString!!
+	static func build(withCapacity capacity: int, closure: StringBuilder -> void) -> String inline
+		= new StringBuilder(capacity).use(closure).toString!!
 
-	static func fromShared(array: [final char]) -> String = dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
+	static func fromShared(array: [final char]) -> String
+		= dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
 
 	// =============== Methods ===============
 
-	func getCharArray() -> [final char] = dyvil.reflect.ReflectUtils.UNSAFE.getObject(this, STRING_VALUE_OFFSET) as [final char]
+	final func getCharArray() -> [final char]
+		= dyvil.reflect.ReflectUtils.UNSAFE.getObject(this, STRING_VALUE_OFFSET) as [final char]
 
-	func contains(character: char) -> boolean inline = this.indexOf(character) >= 0
+	final func contains(character: char) -> boolean inline = this.indexOf(character) >= 0
 
-	func count(character: char) -> int
-	{
+	final func count(character: char) -> int {
 		var count = 0
-		for (c <- this) if (c == character) count += 1
+		for c <- this {
+			if c == character {
+				count += 1
+			}
+		}
 		return count
 	}
 
-	func split(by delimiter: char) -> [String]
-	{
+	final func split(by delimiter: char) -> [String] {
 		let count = this.count(delimiter)
-		if (count == 0) return [this]
+		if count == 0 {
+			return [this]
+		}
 
 		let array = new [String](count + 1)
 		var start = 0
 		var arrayIndex = 0
 
-		for (i <- 0 ..< this.length)
-		{
-			if (this[i] == delimiter)
-			{
+		for i <- 0 ..< this.length {
+			if this[i] == delimiter {
 				array[arrayIndex] = this.substring(start, i)!!
 				arrayIndex += 1
 				start = i + 1
@@ -50,28 +56,33 @@ extension String
 		return array
 	}
 
-	func format(args: Object! ...) -> String inline = String.format(this, args...)!!
+	final func format(args: Object! ...) -> String inline = String.format(this, args...)!!
 
-	func distance(to that: String) -> int
-	{
-		if (this == that) return 0
+	final func distance(to that: String) -> int {
+		if this == that {
+			return 0
+		}
 
 		let size1 = this.length
 		let size2 = that.length
 
-		if (size1 == 0) return size2
-		if (size2 == 0) return size1
+		if size1 == 0 {
+			return size2
+		}
+		if size2 == 0 {
+			return size1
+		}
 
 		let arraySize = size2 + 1
 		let array1 = new [int](arraySize)
 		let array2 = new [int](arraySize)
 
-		for (i <- 0 ..< arraySize) array1[i] = i
-		for (i <- 0 ..< size1)
-		{
+		for i <- 0 ..< arraySize {
+			array1[i] = i
+		}
+		for i <- 0 ..< size1 {
 			array2[0] = i + 1
-			for (j <- 0 ..< size2)
-			{
+			for j <- 0 ..< size2 {
 				let offset = (this[i] != that[j]) ? 1 : 0
 				array2[j + 1] = Math.min(array2[j] + 1, Math.min(array1[j + 1] + 1, array1[j] + offset))
 			}
@@ -80,15 +91,14 @@ extension String
 		return array2[size2]
 	}
 
-	func replaceAll(regex: String, by replacer: String -> String) -> String inline = this.replaceAll(Pattern(from: regex), replacer)
+	final func replaceAll(regex: String, by replacer: String -> String) -> String inline
+		= this.replaceAll(Pattern(from: regex), replacer)
 
-	func replaceAll(pattern: Pattern, by replacer: String -> String) -> String
-	{
+	final func replaceAll(pattern: Pattern, by replacer: String -> String) -> String {
 		let matcher = pattern.matcher(this)!!
 		let buffer = new StringBuffer
 
-		while (matcher.find())
-		{
+		while matcher.find() {
 			matcher.appendReplacement(buffer, replacer(matcher.group()!!))
 		}
 
@@ -97,11 +107,11 @@ extension String
 	}
 
 	@JavaName("repeat")
-	func repeated(times: int) -> String = times match {
+	final func repeated(times: int) -> String = times match {
 		case 0 => return ""
 		case 1 => return this
 		case 2 => return this.concat(this)!!
-		case _ => build(this.length * times) { for (i <- 0 ..< times) $0.append(this) }
+		case _ => build(this.length * times) { for i <- 0 ..< times { $0.append(this) } }
 	}
 }
 
@@ -109,26 +119,7 @@ extension String
 // they are practically useless in Java code.
 
 @JavaName("Strings$StringSyntax")
-extension String
-{
-	// =============== Static Methods ===============
-
-	// --------------- apply ---------------
-
-	static func apply(from value: any!) -> String inline = "\(value)"
-
-	static func apply(from sequence: CharSequence) implicit -> String inline = "\(sequence)"
-
-	static func apply(fromShared array: [final char]) -> String inline = String.fromShared(array)
-
-	// =============== Methods ===============
-
-	func size() -> int inline = this.length
-
-	func subscript(index: int) -> char inline = this.charAt(index)
-
-	func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
-
+extension String {
 	// =============== Operators ===============
 
 	// --------------- Pattern Matching ---------------
@@ -155,26 +146,40 @@ extension String
 	// --------------- Length ---------------
 
 	static func |_|(string: CharSequence) -> int inline = string.length
+
+	// =============== Static Methods ===============
+
+	// --------------- apply ---------------
+
+	static func apply(from value: any!) -> String inline = "\(value)"
+
+	static func apply(from sequence: CharSequence) implicit -> String inline = "\(sequence)"
+
+	static func apply(fromShared array: [final char]) -> String inline = String.fromShared(array)
+
+	// =============== Methods ===============
+
+	final func size() -> int inline = this.length
+
+	final func subscript(index: int) -> char inline = this.charAt(index)
+
+	final func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
 }
 
 @JavaName("Strings$CharSequenceSyntax")
-extension CharSequence
-{
+extension CharSequence {
 	// =============== Methods ===============
 
-	func subscript(index: int) -> char inline = this.charAt(index)
+	final func subscript(index: int) -> char inline = this.charAt(index)
 
-	func subscript(range: Range<int>) -> CharSequence inline = this.subSequence(range.first, range.last + 1)
+	final func subscript(range: Range<int>) -> CharSequence inline = this.subSequence(range.first, range.last + 1)
 }
 
 @JavaName("Strings$CharSyntax")
-extension char
-{
+extension char {
 	// =============== Static Methods ===============
 
-	// --------------- char ---------------
-
-	static func char(_ c: char) -> char inline = c
+	static func apply(_ c: char) -> char inline = c
 
 	/**
 	 * This method only exists to provide the user with a useful warning message when trying to pass an invalid char
@@ -182,22 +187,20 @@ extension char
 	 * with zero or more than one characters.
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: .WARNING)
-	static func char(_ c: String) -> char inline = c[0]
+	static func apply(_ c: String) -> char inline = c[0]
 }
 
 @JavaName("Strings$PatternSyntax")
-extension Pattern
-{
+extension Pattern {
 	// =============== Methods ===============
 
 	static func apply(from string: String) implicit -> Pattern inline = Pattern.compile(string)!!
 
-	func matches(string: String) -> boolean = this.matcher(string).matches()
+	final func matches(string: String) -> boolean = this.matcher(string).matches()
 }
 
 @JavaName("Strings$AnyToStringBuilder")
-extension any
-{
+extension any {
 	// =============== Methods ===============
 
 	func toString(builder: StringBuilder) -> void inline = builder.append(this)
