@@ -80,7 +80,7 @@ extension ArrayDeque {
 	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf c: Collection<+E>) -> ArrayDeque<E> = new ArrayDeque(c)
 
-	// ArrayDeque(withCapacity: 5)
+	// ArrayDeque<Int>(withCapacity: 5)
 	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int) -> ArrayDeque<E> = new ArrayDeque<E>(capacity)
 }
@@ -122,7 +122,7 @@ extension PriorityQueue {
 	static func apply<type E: Comparable<E>>(withContentsOf priorityQueue: PriorityQueue<+E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(priorityQueue)
 
-	// PriorityQueue(withCapacity: 5)
+	// PriorityQueue<Int>(withCapacity: 5)
 	@JavaName("withCapacity")
 	static func apply<type E: Comparable<E>>(withCapacity capacity: int) -> PriorityQueue<E>
 		= new PriorityQueue<E>(capacity)
@@ -149,7 +149,7 @@ extension PriorityQueue {
 	static func apply<type E>(withContentsOf col: Collection<+E>, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(comp).{ addAll(col); $0 }
 
-	// PriorityQueue(withCapacity: 5, withComparator: someComparator)
+	// PriorityQueue<Int>(withCapacity: 5, withComparator: someComparator)
 	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(capacity, comp)

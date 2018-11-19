@@ -64,9 +64,9 @@ extension<type E> Set<E> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> Set<E> = Collections.synchronizedSet(this)
+	final func synchronizedView() -> Set<E> = Collections.synchronizedSet(this)
 
-	func unmodifiableView() -> Set<E> = Collections.unmodifiableSet(this)
+	final func unmodifiableView() -> Set<E> = Collections.unmodifiableSet(this)
 }
 
 // *************** SortedSet ***************
@@ -75,6 +75,7 @@ extension<type E> Set<E> {
 extension<type E> SortedSet<E> {
 	// =============== Static Methods ===============
 
+	// SortedSet<Int>()
 	@JavaName("empty")
 	static func apply<type E>() -> @Immutable SortedSet<E> = Collections.emptySortedSet<E>()
 
@@ -82,9 +83,9 @@ extension<type E> SortedSet<E> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> SortedSet<E> = Collections.synchronizedSortedSet(this)
+	final func synchronizedView() -> SortedSet<E> = Collections.synchronizedSortedSet(this)
 
-	func unmodifiableView() -> SortedSet<E> = Collections.unmodifiableSortedSet(this)
+	final func unmodifiableView() -> SortedSet<E> = Collections.unmodifiableSortedSet(this)
 }
 
 // *************** NavigableSet ***************
@@ -93,6 +94,7 @@ extension<type E> SortedSet<E> {
 extension<type E> NavigableSet<E> {
 	// =============== Static Methods ===============
 
+	// NavigableSet<Int>()
 	@JavaName("empty")
 	static func apply<type E>() -> @Immutable NavigableSet<E> = Collections.emptyNavigableSet<E>()
 
@@ -100,9 +102,9 @@ extension<type E> NavigableSet<E> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> NavigableSet<E> = Collections.synchronizedNavigableSet(this)
+	final func synchronizedView() -> NavigableSet<E> = Collections.synchronizedNavigableSet(this)
 
-	func unmodifiableView() -> NavigableSet<E> = Collections.unmodifiableNavigableSet(this)
+	final func unmodifiableView() -> NavigableSet<E> = Collections.unmodifiableNavigableSet(this)
 }
 
 // *************** HashSet ***************
@@ -111,16 +113,28 @@ extension<type E> NavigableSet<E> {
 extension HashSet {
 	// =============== Static Methods ===============
 
+	// HashSet<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> HashSet<E> = new HashSet<E>()
 
+	// HashSet(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> HashSet<E> = new HashSet<E>().{ add(element); $0 }
 
+	// HashSet(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> HashSet<E> = new HashSet<E>(Arrays.asList(elements...))
 
+	// HashSet(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> HashSet<E> = new HashSet<E>(collection)
 
+	// HashSet<Int>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int) -> HashSet<E> = new HashSet<E>(capacity)
 
+	// HashSet<Int>(withCapacity: 5, loadFactor: 0.75)
+	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> HashSet<E>
 		= new HashSet<E>(capacity, loadFactor)
 }
@@ -131,17 +145,29 @@ extension HashSet {
 extension LinkedHashSet {
 	// =============== Static Methods ===============
 
+	// LinkedHashSet<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> LinkedHashSet<E> = new LinkedHashSet<E>()
 
+	// LinkedHashSet(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> LinkedHashSet<E> = new LinkedHashSet<E>().{ add(element); $0 }
 
+	// LinkedHashSet(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> LinkedHashSet<E> = new LinkedHashSet<E>(Arrays.asList(elements...))
 
+	// LinkedHashSet(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> LinkedHashSet<E>
 		= new LinkedHashSet<E>(collection)
 
+	// LinkedHashSet<Int>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int) -> LinkedHashSet<E> = new LinkedHashSet<E>(capacity)
 
+	// LinkedHashSet<Int>(withCapacity: 5, loadFactor: 0.75)
+	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> LinkedHashSet<E>
 		= new LinkedHashSet<E>(capacity, loadFactor)
 }
@@ -154,28 +180,46 @@ extension TreeSet {
 
 	// --------------- Comparable ---------------
 
+	// TreeSet<Int>()
+	@JavaName("empty")
 	static func apply<type E: Comparable<E>>() -> TreeSet<E> = new TreeSet<E>()
 
+	// TreeSet(1)
+	@JavaName("of")
 	static func apply<type E: Comparable<E>>(element: E) -> TreeSet<E> = new TreeSet<E>().{ add(element); $0 }
 
+	// TreeSet(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E: Comparable<E>>(elements: E...) -> TreeSet<E> = new TreeSet<E>(Arrays.asList(elements...))
 
+	// TreeSet(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E: Comparable<E>>(withContentsOf collection: Collection<+E>) -> TreeSet<E>
 		= new TreeSet<E>(collection)
 
+	// TreeSet(withContentsOf: someSortedSet)
+	@JavaName("copyOf")
 	static func apply<type E: Comparable<E>>(withContentsOf sortedSet: SortedSet<+E>) -> TreeSet<E>
 		= new TreeSet<E>(sortedSet)
 
 	// --------------- Comparator ---------------
 
+	// TreeSet<Int>(comparingBy: someComparator)
+	@JavaName("empty")
 	static func apply<type E>(comparingBy c: Comparator<-E>) -> TreeSet<E> = new TreeSet<E>(c)
 
+	// TreeSet(1, comparingBy: someComparator)
+	@JavaName("of")
 	static func apply<type E>(element: E, comparingBy c: Comparator<-E>) -> TreeSet<E>
 		= new TreeSet<E>(c).{ add(element); $0 }
 
+	// TreeSet(1, 2, 3, comparingBy: someComparator)
+	@JavaName("of")
 	static func apply<type E>(elements: E..., comparingBy c: Comparator<-E>) -> TreeSet<E>
 		= new TreeSet<E>(c).{ Collections.addAll(this, elements...); $0 }
 
+	// TreeSet(withContentsOf: someCollection, comparingBy: someComparator)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>, comparingBy c: Comparator<-E>) -> TreeSet<E>
 		= new TreeSet<E>(c).{ addAll(collection); $0 }
 }
@@ -190,30 +234,37 @@ extension EnumSet {
 
 	// static func apply<@Reified(.OBJECT_CLASS) type E: Enum<E>>() -> EnumSet<E> = EnumSet.noneOf(class E)
 
+	// EnumSet(of: class SomeEnum)
 	@JavaName("noneOf")
 	static func apply<type E: Enum<E>>(of enumClass: Class<+E>) -> EnumSet<E> = EnumSet.noneOf(enumClass)
 
+	// EnumSet(withAllOf: class SomeEnum)
 	@JavaName("allOf")
 	static func apply<type E: Enum<E>>(explicit withAllOf enumClass: Class<+E>) -> EnumSet<E> = EnumSet.allOf(enumClass)
 
 	// --------------- Default ---------------
 
+	// EnumSet(SomeEnum.C1)
 	@JavaName("of")
 	static func apply<type E: Enum<E>>(element: E) -> EnumSet<E> = EnumSet.of(element)
 
+	// EnumSet(SomeEnum.C1, SomeEnum.C2, SomeEnum.C3)
 	@JavaName("of")
 	static func apply<type E: Enum<E>>(elements first: E, _ rest: E...) -> EnumSet<E> = EnumSet.of(first, rest...)
 
+	// EnumSet(withContentsOf: someCollection)
 	@JavaName("copyOf")
 	static func apply<type E: Enum<E>>(withContentsOf collection: Collection<+E>) -> EnumSet<E>
 		= EnumSet.copyOf(collection)
 
+	// EnumSet(withContentsOf: someEnumSet)
 	@JavaName("copyOf")
 	static func apply<type E: Enum<E>>(withContentsOf enumSet: EnumSet<+E>) -> EnumSet<E>
 		= EnumSet.copyOf(enumSet)
 
 	// --------------- Special ---------------
 
+	// EnumSet(complementing: someEnumSet)
 	@JavaName("complementOf")
 	static func apply<type E: Enum<E>>(explicit complementing enumSet: EnumSet<+E>) -> EnumSet<E>
 		= EnumSet.complementOf(enumSet)

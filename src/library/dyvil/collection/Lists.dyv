@@ -69,24 +69,24 @@ extension<type E> List<E> {
 	// --------------- Search ---------------
 
 	@JavaName("indexOfSubList")
-	func indexOf(subList: List<_>) -> int = Collections.indexOfSubList(this, subList)
+	final func indexOf(subList: List<_>) -> int = Collections.indexOfSubList(this, subList)
 
 	@JavaName("lastIndexOfSubList")
-	func lastIndexOf(subList: List<_>) -> int = Collections.lastIndexOfSubList(this, subList)
+	final func lastIndexOf(subList: List<_>) -> int = Collections.lastIndexOfSubList(this, subList)
 
 	// func binarySearch(this: List<+Comparable<-E>>, key: E) -> int = Collections.binarySearch(this, key)
 
-	func binarySearch(key: E, comparator: Comparator<-E>) -> int = Collections.binarySearch(this, key, comparator)
+	final func binarySearch(key: E, comparator: Comparator<-E>) -> int = Collections.binarySearch(this, key, comparator)
 
 	// --------------- Indexed Subscript ---------------
 
-	func subscript(index: int) -> E = this.get(index)
+	final func subscript(index: int) -> E = this.get(index)
 
 	@Mutating
-	func subscript_=(index: int, element: E) -> void = this.set(index, element)
+	final func subscript_=(index: int, element: E) -> void = this.set(index, element)
 
 	@Mutating
-	func subscript_&(index: int) -> E* = new ObjectRef<E>() {
+	final func subscript_&(index: int) -> E* = new ObjectRef<E>() {
 		override func get() -> E = this<List<E>>.get(index)
 
 		override func set(value: E) -> void = this<List<E>>.set(index, value)
@@ -94,10 +94,10 @@ extension<type E> List<E> {
 
 	// --------------- Range Subscript ---------------
 
-	func subscript(range: Range<Int>) -> List<E> = this.subList(range.first, range.size)
+	final func subscript(range: Range<Int>) -> List<E> = this.subList(range.first, range.size)
 
 	@Mutating
-	func subscript_=(range: Range<Int>, values: List<+E>) -> void {
+	final func subscript_=(range: Range<Int>, values: List<+E>) -> void {
 		if values.size != range.size {
 			throw new IllegalArgumentException("range size and list size must be equal")
 		}
@@ -106,38 +106,39 @@ extension<type E> List<E> {
 	}
 
 	@Mutating
-	func subscript_=(range: Range<Int>, values: [E]) -> void = this[range] = Arrays.asList(values...)
+	final func subscript_=(range: Range<Int>, values: [E]) -> void = this[range] = Arrays.asList(values...)
 
 	// --------------- Mutation ---------------
 
 	@Mutating
-	func replaceAll(occurrencesOf oldVal: any!, with newVal: E) -> void = Collections.replaceAll(this, oldVal, newVal)
+	final func replaceAll(occurrencesOf oldVal: any!, with newVal: E) -> void
+		= Collections.replaceAll(this, oldVal, newVal)
 
 	@Mutating
-	func swap(i: int, j: int) -> void = Collections.swap(this, i, j)
+	final func swap(i: int, j: int) -> void = Collections.swap(this, i, j)
 
 	// --------------- Order ---------------
 
 	@Mutating
-	func reverse() -> void = Collections.reverse(this)
+	final func reverse() -> void = Collections.reverse(this)
 
 	@Mutating
-	func rotate(distance: int) -> void = Collections.rotate(this, distance)
+	final func rotate(distance: int) -> void = Collections.rotate(this, distance)
 
 	@Mutating
-	func shuffle() -> void = Collections.shuffle(this)
+	final func shuffle() -> void = Collections.shuffle(this)
 
 	@Mutating
-	func shuffle(random: Random) -> void = Collections.shuffle(this, random)
+	final func shuffle(random: Random) -> void = Collections.shuffle(this, random)
 
 	@Mutating
-	func sort() -> void = this.sort(null)
+	final func sort() -> void = this.sort(null)
 
 	// --------------- Views ---------------
 
-	func unmodifiableView() -> List<E> = Collections.unmodifiableList(this)
+	final func unmodifiableView() -> List<E> = Collections.unmodifiableList(this)
 
-	func synchronizedView() -> List<E> = Collections.synchronizedList(this)
+	final func synchronizedView() -> List<E> = Collections.synchronizedList(this)
 
 	// func checked(withType: Class<-E>) -> List<E> = Collections.checkedList(this, withType)
 }
@@ -148,14 +149,24 @@ extension<type E> List<E> {
 extension ArrayList {
 	// =============== Static Methods ===============
 
+	// ArrayList<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> ArrayList<E> = new ArrayList<E>()
 
+	// ArrayList(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> ArrayList<E> = new ArrayList<E>().{ add(element); $0 }
 
+	// ArrayList(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> ArrayList<E> = new ArrayList<E>(Arrays.asList(elements...))
 
+	// ArrayList<Int>(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> ArrayList<E> = new ArrayList<E>(collection)
 
+	// ArrayList<Int>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type E>(withCapacity capacity: int) -> ArrayList<E> = new ArrayList<E>(capacity)
 }
 
@@ -165,12 +176,20 @@ extension ArrayList {
 extension LinkedList {
 	// =============== Static Methods ===============
 
+	// LinkedList<Int>()
+	@JavaName("empty")
 	static func apply<type E>() -> LinkedList<E> = new LinkedList<E>()
 
+	// LinkedList(1)
+	@JavaName("of")
 	static func apply<type E>(element: E) -> LinkedList<E> = new LinkedList<E>().{ add(element); $0 }
 
+	// LinkedList(1, 2, 3)
+	@JavaName("of")
 	static func apply<type E>(elements: E...) -> LinkedList<E> = new LinkedList<E>(Arrays.asList(elements...))
 
+	// LinkedList(withContentsOf: someCollection)
+	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> LinkedList<E> = new LinkedList<E>(collection)
 }
 

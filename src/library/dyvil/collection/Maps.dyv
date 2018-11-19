@@ -13,6 +13,7 @@ import dyvil.ref.ObjectRef
 extension<type K, type V> Map<K, V> {
 	// =============== Static Methods ===============
 
+	// Map<Int, String>()
 	@JavaName("empty")
 	static func apply<type K, type V>() -> @Immutable Map<K, V> = Collections.emptyMap<K, V>()
 
@@ -20,10 +21,12 @@ extension<type K, type V> Map<K, V> {
 
 	// static func apply<type K, type V>(tuple: (K, V)) -> @Immutable Map<K, V> = Collections.singletonMap(tuple._1, tuple._2)
 
+	// Map(withContentsOf: someMap)
 	@JavaName("copyOf")
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> @Immutable Map<K, V>
 		= LinkedHashMap(withContentsOf: map).unmodifiableView
 
+	// Map<Int, String>() { put(1, "a"); put(2, "b") }
 	@JavaName("build")
 	static func apply<type K, type V>(builtBy configure: Map<K, V>.() -> void) -> @Immutable Map<K, V> {
 		let map = new LinkedHashMap<K, V>()
@@ -35,13 +38,13 @@ extension<type K, type V> Map<K, V> {
 
 	// --------------- Key Subscript ---------------
 
-	func subscript(key: K) -> V! = this.get(key)
+	final func subscript(key: K) -> V! = this.get(key)
 
 	@Mutating
-	func subscript_=(key: K, newValue: V) -> void = this.put(key, newValue)
+	final func subscript_=(key: K, newValue: V) -> void = this.put(key, newValue)
 
 	@Mutating
-	func subscript_&(key: K) -> V* = new ObjectRef<V>() {
+	final func subscript_&(key: K) -> V* = new ObjectRef<V>() {
 		override func get() -> V = this<Map<K, V>>.get(key)
 
 		override func set(value: V) -> void = this<Map<K, V>>.put(key, value)
@@ -49,9 +52,9 @@ extension<type K, type V> Map<K, V> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> Map<K, V> = Collections.synchronizedMap(this)
+	final func synchronizedView() -> Map<K, V> = Collections.synchronizedMap(this)
 
-	func unmodifiableView() -> Map<K, V> = Collections.unmodifiableMap(this)
+	final func unmodifiableView() -> Map<K, V> = Collections.unmodifiableMap(this)
 }
 
 // *************** SortedMap ***************
@@ -60,6 +63,7 @@ extension<type K, type V> Map<K, V> {
 extension<type K, type V> SortedMap<K, V> {
 	// =============== Static Methods ===============
 
+	// SortedMap<Int, String>()
 	@JavaName("empty")
 	static func apply<type K, type V>() -> SortedMap<K, V> = Collections.emptySortedMap<K, V>()
 
@@ -67,9 +71,9 @@ extension<type K, type V> SortedMap<K, V> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> SortedMap<K, V> = Collections.synchronizedSortedMap(this)
+	final func synchronizedView() -> SortedMap<K, V> = Collections.synchronizedSortedMap(this)
 
-	func unmodifiableView() -> SortedMap<K, V> = Collections.unmodifiableSortedMap(this)
+	final func unmodifiableView() -> SortedMap<K, V> = Collections.unmodifiableSortedMap(this)
 }
 
 // *************** NavigableMap ***************
@@ -78,6 +82,7 @@ extension<type K, type V> SortedMap<K, V> {
 extension<type K, type V> NavigableMap<K, V> {
 	// =============== Static Methods ===============
 
+	// NavigableMap<Int, String>()
 	@JavaName("empty")
 	static func apply<type K, type V>() -> NavigableMap<K, V> = Collections.emptyNavigableMap<K, V>()
 
@@ -85,9 +90,9 @@ extension<type K, type V> NavigableMap<K, V> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> NavigableMap<K, V> = Collections.synchronizedNavigableMap(this)
+	final func synchronizedView() -> NavigableMap<K, V> = Collections.synchronizedNavigableMap(this)
 
-	func unmodifiableView() -> NavigableMap<K, V> = Collections.unmodifiableNavigableMap(this)
+	final func unmodifiableView() -> NavigableMap<K, V> = Collections.unmodifiableNavigableMap(this)
 }
 
 // *************** HashMap ***************
@@ -96,14 +101,22 @@ extension<type K, type V> NavigableMap<K, V> {
 extension HashMap {
 	// =============== Static Methods ===============
 
+	// HashMap<Int, String>()
+	@JavaName("empty")
 	static func apply<type K, type V>() -> HashMap<K, V> = new HashMap<K, V>()
 
+	// HashMap(withContentsOf: someMap)
+	@JavaName("copyOf")
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
+
+	// HashMap<Int, String>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
 
+	// HashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> HashMap<K, V>
 		= new HashMap<K, V>(capacity, loadFactor)
-
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
 }
 
 // *************** LinkedHashMap ***************
@@ -112,19 +125,29 @@ extension HashMap {
 extension LinkedHashMap {
 	// =============== Static Methods ===============
 
+	// LinkedHashMap<Int, String>()
+	@JavaName("empty")
 	static func apply<type K, type V>() -> LinkedHashMap<K, V> = new LinkedHashMap<K, V>()
 
+	// LinkedHashMap(withContentsOf: someMap)
+	@JavaName("copyOf")
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
+		= new LinkedHashMap<K, V>(map)
+
+	// LinkedHashMap<Int, String>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity)
 
+	// LinkedHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor)
 
+	// LinkedHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75, accessOrder: true)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float, accessOrder: boolean) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor, accessOrder)
-
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
-		= new LinkedHashMap<K, V>(map)
 }
 
 // *************** IdentityHashMap ***************
@@ -133,13 +156,19 @@ extension LinkedHashMap {
 extension IdentityHashMap {
 	// =============== Static Methods ===============
 
+	// IdentityHashMap<Int, String>()
+	@JavaName("empty")
 	static func apply<type K, type V>() -> IdentityHashMap<K, V> = new IdentityHashMap<K, V>()
 
-	static func apply<type K, type V>(withCapacity capacity: int) -> IdentityHashMap<K, V>
-		= new IdentityHashMap<K, V>(capacity)
-
+	// IdentityHashMap<Int, String>(withContentsOf: someMap)
+	@JavaName("copyOf")
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> IdentityHashMap<K, V>
 		= new IdentityHashMap<K, V>(map)
+
+	// IdentityHashMap<Int, String>(withCapacity: 5)
+	@JavaName("withCapacity")
+	static func apply<type K, type V>(withCapacity capacity: int) -> IdentityHashMap<K, V>
+		= new IdentityHashMap<K, V>(capacity)
 }
 
 // *************** WeakHashMap ***************
@@ -148,14 +177,22 @@ extension IdentityHashMap {
 extension WeakHashMap {
 	// =============== Static Methods ===============
 
+	// WeakHashMap<Int, String>()
+	@JavaName("empty")
 	static func apply<type K, type V>() -> WeakHashMap<K, V> = new WeakHashMap<K, V>()
 
+	// WeakHashMap(withContentsOf: someMap)
+	@JavaName("copyOf")
+	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(map)
+
+	// WeakHashMap<Int, String>(withCapacity: 5)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
 
+	// WeakHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	@JavaName("withCapacity")
 	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> WeakHashMap<K, V>
 		= new WeakHashMap<K, V>(capacity, loadFactor)
-
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(map)
 }
 
 // *************** TreeMap ***************
@@ -164,15 +201,26 @@ extension WeakHashMap {
 extension TreeMap {
 	// =============== Static Methods ===============
 
+	// TreeMap<Int, String>()
+	@JavaName("empty")
 	static func apply<type K: Comparable<K>, type V>() -> TreeMap<K, V> = new TreeMap<K, V>()
 
-	static func apply<type K, type V>(comparingBy comparator: Comparator<-K>) -> TreeMap<K, V>
-		= new TreeMap<K, V>(comparator)
-
+	// TreeMap(withContentsOf: someMap)
+	@JavaName("copyOf")
 	static func apply<type K: Comparable<K>, type V>(withContentsOf map: Map<+K, +V>) -> TreeMap<K, V>
 		= new TreeMap<K, V>(map)
 
-	static func apply<type K, type V>(withContentsOf map: SortedMap<+K, +V>) -> TreeMap<K, V> = new TreeMap<K, V>(map)
+	// TreeMap(withContentsOf: someSortedMap)
+	@JavaName("copyOf")
+	static func apply<type K: Comparable<K>, type V>(withContentsOf map: SortedMap<+K, +V>) -> TreeMap<K, V>
+		= new TreeMap<K, V>(map)
+
+	// --------------- Comparator ---------------
+
+	// TreeMap<Int, String>(comparingBy: someComparator)
+	@JavaName("empty")
+	static func apply<type K, type V>(comparingBy comparator: Comparator<-K>) -> TreeMap<K, V>
+		= new TreeMap<K, V>(comparator)
 }
 
 // *************** EnumMap ***************
@@ -181,11 +229,17 @@ extension TreeMap {
 extension EnumMap {
 	// =============== Static Methods ===============
 
+	// EnumMap<SomeEnum, String>(of: class SomeEnum)
+	@JavaName("of")
 	static func apply<type K: Enum<K>, type V>(of enumClass: Class<+K>) -> EnumMap<K, V> = new EnumMap<K, V>(enumClass)
 
+	// EnumMap(withContentsOf: someMap)
+	@JavaName("copyOf")
 	static func apply<type K: Enum<K>, type V>(withContentsOf map: Map<+K, +V>) -> EnumMap<K, V>
 		= new EnumMap<K, V>(map)
 
+	// EnumMap(withContentsOf: someEnumMap)
+	@JavaName("copyOf")
 	static func apply<type K: Enum<K>, type V>(withContentsOf map: EnumMap<+K, +V>) -> EnumMap<K, V>
 		= new EnumMap<K, V>(map)
 }

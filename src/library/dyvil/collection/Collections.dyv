@@ -34,7 +34,7 @@ extension<type E> Collection<E> {
 
 	// --------------- Views ---------------
 
-	func synchronizedView() -> Collection<E> = Collections.synchronizedCollection(this)
+	final func synchronizedView() -> Collection<E> = Collections.synchronizedCollection(this)
 
-	func unmodifiableView() -> Collection<E> = Collections.unmodifiableCollection(this)
+	final func unmodifiableView() -> Collection<E> = Collections.unmodifiableCollection(this)
 }
