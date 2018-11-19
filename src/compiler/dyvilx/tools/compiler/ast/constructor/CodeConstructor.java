@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
@@ -321,8 +322,10 @@ public class CodeConstructor extends AbstractConstructor
 			methodWriter.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 
-		// Write Parameters
-		methodWriter.setLocalType(0, this.enclosingClass.getInternalName());
+		// fix #453
+		// first local is "uninitialized this" before the super() or this() call
+		methodWriter.setLocalType(0, ClassFormat.UNINITIALIZED_THIS);
+
 		this.parameters.write(methodWriter);
 
 		// Write Code
@@ -336,6 +339,9 @@ public class CodeConstructor extends AbstractConstructor
 		{
 			this.initializerCall.writeExpression(methodWriter, Types.VOID);
 		}
+
+		// after that, the first local type is the enclosing class / this type as usual
+		methodWriter.setLocalType(0, this.enclosingClass.getInternalName());
 
 		if (this.initializerCall == null || this.initializerCall.isSuper())
 		{
