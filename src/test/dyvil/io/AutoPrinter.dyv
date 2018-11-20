@@ -1,14 +1,12 @@
-package dyvil.syntax
+package dyvil.io
 
-object AutoPrinter
-{
-	static func print(closure: AutoPrinter.() -> void) -> void inline = closure(AutoPrinter)
+object AutoPrinter {
+	static func apply(closure: AutoPrinter.() -> void) -> void inline = closure(AutoPrinter)
 
 	func applyStatement(value: any!) -> void = print value
 }
 
 @JavaName("AutoPrinter$OutputSyntax")
-extension Output
-{
+extension Output {
 	static func print(closure: AutoPrinter.() -> void) -> void inline = closure(AutoPrinter)
 }

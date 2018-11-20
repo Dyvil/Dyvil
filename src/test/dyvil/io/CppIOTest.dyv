@@ -1,0 +1,15 @@
+package dyvil.io
+
+using dyvil.test.JUnit
+using dyvil.io.CppIO._
+
+class CppIOTest {
+	@Test func CppIO() -> void {
+		let result = String {
+			let stream = new AppendablePrintStream($0)
+			stream << "Hello" << ' ' << "World" << ' ' << 123 << '!' << System.endl
+		}
+
+		result =?= "Hello World 123!\(System.lineSeparator)"
+	}
+}
