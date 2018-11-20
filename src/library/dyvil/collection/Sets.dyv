@@ -129,13 +129,13 @@ extension HashSet {
 	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> HashSet<E> = new HashSet<E>(collection)
 
-	// HashSet<Int>(withCapacity: 5)
+	// HashSet<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E>(withCapacity capacity: int) -> HashSet<E> = new HashSet<E>(capacity)
+	static func apply<type E>(capacity: int) -> HashSet<E> = new HashSet<E>(capacity)
 
-	// HashSet<Int>(withCapacity: 5, loadFactor: 0.75)
+	// HashSet<Int>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> HashSet<E>
+	static func apply<type E>(capacity: int, loadFactor: float) -> HashSet<E>
 		= new HashSet<E>(capacity, loadFactor)
 }
 
@@ -162,13 +162,13 @@ extension LinkedHashSet {
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> LinkedHashSet<E>
 		= new LinkedHashSet<E>(collection)
 
-	// LinkedHashSet<Int>(withCapacity: 5)
+	// LinkedHashSet<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E>(withCapacity capacity: int) -> LinkedHashSet<E> = new LinkedHashSet<E>(capacity)
+	static func apply<type E>(capacity: int) -> LinkedHashSet<E> = new LinkedHashSet<E>(capacity)
 
-	// LinkedHashSet<Int>(withCapacity: 5, loadFactor: 0.75)
+	// LinkedHashSet<Int>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type E>(withCapacity capacity: int, loadFactor: float) -> LinkedHashSet<E>
+	static func apply<type E>(capacity: int, loadFactor: float) -> LinkedHashSet<E>
 		= new LinkedHashSet<E>(capacity, loadFactor)
 }
 

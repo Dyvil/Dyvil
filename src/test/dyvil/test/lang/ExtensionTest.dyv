@@ -66,9 +66,9 @@ class ExtensionTest {
 
 		"A" * 4 =?= "AAAA"
 
-		String(fromShared: [ 'a', 'b', 'c' ]) =?= "abc"
+		String(sharing: [ 'a', 'b', 'c' ]) =?= "abc"
 
-		let lambda1 = () => String(fromShared: [])
+		let lambda1 = () => String(sharing: [])
 		let lambda2 = (s: String, c: char) => s.contains(c)
 
 		lambda1() =?= ""

@@ -109,13 +109,13 @@ extension HashMap {
 	@JavaName("copyOf")
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
 
-	// HashMap<Int, String>(withCapacity: 5)
+	// HashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
+	static func apply<type K, type V>(capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
 
-	// HashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	// HashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> HashMap<K, V>
+	static func apply<type K, type V>(capacity: int, loadFactor: float) -> HashMap<K, V>
 		= new HashMap<K, V>(capacity, loadFactor)
 }
 
@@ -134,19 +134,19 @@ extension LinkedHashMap {
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(map)
 
-	// LinkedHashMap<Int, String>(withCapacity: 5)
+	// LinkedHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(capacity: int) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity)
 
-	// LinkedHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	// LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(capacity: int, loadFactor: float) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor)
 
-	// LinkedHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75, accessOrder: true)
+	// LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.75, accessOrder: true)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float, accessOrder: boolean) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(capacity: int, loadFactor: float, accessOrder: boolean) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor, accessOrder)
 }
 
@@ -165,9 +165,9 @@ extension IdentityHashMap {
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> IdentityHashMap<K, V>
 		= new IdentityHashMap<K, V>(map)
 
-	// IdentityHashMap<Int, String>(withCapacity: 5)
+	// IdentityHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int) -> IdentityHashMap<K, V>
+	static func apply<type K, type V>(capacity: int) -> IdentityHashMap<K, V>
 		= new IdentityHashMap<K, V>(capacity)
 }
 
@@ -185,13 +185,13 @@ extension WeakHashMap {
 	@JavaName("copyOf")
 	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(map)
 
-	// WeakHashMap<Int, String>(withCapacity: 5)
+	// WeakHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
+	static func apply<type K, type V>(capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
 
-	// WeakHashMap<Int, String>(withCapacity: 5, loadFactor: 0.75)
+	// WeakHashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(withCapacity capacity: int, loadFactor: float) -> WeakHashMap<K, V>
+	static func apply<type K, type V>(capacity: int, loadFactor: float) -> WeakHashMap<K, V>
 		= new WeakHashMap<K, V>(capacity, loadFactor)
 }
 

@@ -208,11 +208,11 @@ extension<type E> Iterable<E> {
 
 	// --------------- String Conversion ---------------
 
-	func toString() -> String = String.build { this.toString($0) }
+	func toString() -> String = String { this.toString($0) }
 
 	func toString(builder: StringBuilder) -> void = this.toString(builder, '[', ', ', ']')
 
-	func toString(start: String, separator: String, end: String) -> String = String.build {
+	func toString(start: String, separator: String, end: String) -> String = String {
 		this.toString($0, start, separator, end)
 	}
 

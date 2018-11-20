@@ -165,9 +165,9 @@ extension ArrayList {
 	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf collection: Collection<+E>) -> ArrayList<E> = new ArrayList<E>(collection)
 
-	// ArrayList<Int>(withCapacity: 5)
+	// ArrayList<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E>(withCapacity capacity: int) -> ArrayList<E> = new ArrayList<E>(capacity)
+	static func apply<type E>(capacity: int) -> ArrayList<E> = new ArrayList<E>(capacity)
 }
 
 // *************** LinkedList ***************

@@ -7,18 +7,58 @@ extension String {
 	private const STRING_VALUE_OFFSET: long
 		= dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
 
+	// =============== Operators ===============
+
+	// --------------- Pattern Matching ---------------
+
+	// here so the compiler does not use the Pattern-based method with an implicit conversion
+	infix func ~=(pattern: String, value: String) = pattern == value
+
+	infix func ~=(pattern: Pattern, value: String) = pattern.matches(value)
+
+	// --------------- Concatenation ---------------
+
+	infix func +(lhs: char, rhs: String) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs + rhs
+
+	infix func +(lhs: String, rhs: char) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs + rhs
+
+	infix func ++(lhs: String, rhs: String) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs ++ rhs
+
+	// --------------- Repetition ---------------
+
+	infix func *(lhs: int, rhs: String) -> String inline = rhs.repeated(lhs)
+
+	infix func *(lhs: String, rhs: int) -> String inline = lhs.repeated(rhs)
+
+	// --------------- Length ---------------
+
+	static func |_|(string: CharSequence) -> int inline = string.length
+
 	// =============== Static Methods ===============
 
-	static func build(with closure: StringBuilder -> void) -> String inline
+	static func apply(from value: any!) -> String inline = "\(value)"
+
+	static func apply(from sequence: CharSequence) implicit -> String inline = "\(sequence)"
+
+	@JavaName("build")
+	static func apply(builtBy closure: StringBuilder.() -> void) -> String inline
 		= new StringBuilder().use(closure).toString!!
 
-	static func build(withCapacity capacity: int, closure: StringBuilder -> void) -> String inline
+	@JavaName("build")
+	static func apply(capacity: int, builtBy closure: StringBuilder.() -> void) -> String inline
 		= new StringBuilder(capacity).use(closure).toString!!
 
-	static func fromShared(array: [final char]) -> String
+	@JavaName("fromShared")
+	static func apply(sharing array: [final char]) -> String
 		= dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
 
 	// =============== Methods ===============
+
+	final func size() -> int inline = this.length
+
+	final func subscript(index: int) -> char inline = this.charAt(index)
+
+	final func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
 
 	final func getCharArray() -> [final char]
 		= dyvil.reflect.ReflectUtils.UNSAFE.getObject(this, STRING_VALUE_OFFSET) as [final char]
@@ -111,62 +151,14 @@ extension String {
 		case 0 => return ""
 		case 1 => return this
 		case 2 => return this.concat(this)!!
-		case _ => build(this.length * times) { for i <- 0 ..< times { $0.append(this) } }
+		case _ => String(this.length * times) { for i <- 0 ..< times { $0.append(this) } }
 	}
 }
 
 // The following classes only have syntactic meaning in the Dyvil language,
 // they are practically useless in Java code.
 
-@JavaName("Strings$StringSyntax")
-extension String {
-	// =============== Operators ===============
-
-	// --------------- Pattern Matching ---------------
-
-	// here so the compiler does not use the Pattern-based method with an implicit conversion
-	infix func ~=(pattern: String, value: String) = pattern == value
-
-	infix func ~=(pattern: Pattern, value: String) = pattern.matches(value)
-
-	// --------------- Concatenation ---------------
-
-	infix func +(lhs: char, rhs: String) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs + rhs
-
-	infix func +(lhs: String, rhs: char) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs + rhs
-
-	infix func ++(lhs: String, rhs: String) -> String @Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT) = lhs ++ rhs
-
-	// --------------- Repetition ---------------
-
-	infix func *(lhs: int, rhs: String) -> String inline = rhs.repeated(lhs)
-
-	infix func *(lhs: String, rhs: int) -> String inline = lhs.repeated(rhs)
-
-	// --------------- Length ---------------
-
-	static func |_|(string: CharSequence) -> int inline = string.length
-
-	// =============== Static Methods ===============
-
-	// --------------- apply ---------------
-
-	static func apply(from value: any!) -> String inline = "\(value)"
-
-	static func apply(from sequence: CharSequence) implicit -> String inline = "\(sequence)"
-
-	static func apply(fromShared array: [final char]) -> String inline = String.fromShared(array)
-
-	// =============== Methods ===============
-
-	final func size() -> int inline = this.length
-
-	final func subscript(index: int) -> char inline = this.charAt(index)
-
-	final func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
-}
-
-@JavaName("Strings$CharSequenceSyntax")
+@JavaName("CharSequences")
 extension CharSequence {
 	// =============== Methods ===============
 
@@ -190,7 +182,7 @@ extension char {
 	static func apply(_ c: String) -> char inline = c[0]
 }
 
-@JavaName("Strings$PatternSyntax")
+@JavaName("Patterns")
 extension Pattern {
 	// =============== Methods ===============
 

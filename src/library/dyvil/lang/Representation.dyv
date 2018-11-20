@@ -29,7 +29,7 @@ abstract class Representation
 	 * Values that have already been formatted are displayed as `...` to avoid infinite recursion for arrays or classes
 	 * containing references to themselves or other types of cyclic references.
 	 */
-	static func reflect(value: any!) -> String = String.build(reflect(value, appendedTo: _))
+	static func reflect(value: any!) -> String = String(builtBy: reflect(value, appendedTo: _))
 
 	static func reflect(value: any!, appendedTo builder: StringBuilder) -> void
 	{
@@ -142,7 +142,7 @@ interface CustomRepresentable
 	 * Returns the custom representation of this object.
 	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
 	 */
-	func representation() -> String = String.build(this.representation(appendedTo: _))
+	func representation() -> String = String(builtBy: this.representation(appendedTo: _))
 
 	/**
 	 * Appends the representation of this object to the specified {@link StringBuilder}.
@@ -157,7 +157,7 @@ extension any
 	 * Returns the representation of this object.
 	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
 	 */
-	func representation() -> String = String.build(this.representation(appendedTo: _))
+	func representation() -> String = String(builtBy: this.representation(appendedTo: _))
 
 	/**
 	 * Appends the representation of this object to the specified {@link StringBuilder}.
