@@ -9,12 +9,16 @@ import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.optional.OptionalChainAware;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.Named;
+import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAccess, OptionalChainAware
+import java.util.function.Supplier;
+
+public abstract class AbstractFieldAccess
+	implements IValue, Named, IReceiverAccess, OptionalChainAware, WildcardLambdaAware
 {
 	// =============== Fields ===============
 
@@ -154,6 +158,12 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		final IValue wildcardLambda = WildcardLambdaAware.transform(this);
+		if (wildcardLambda != null)
+		{
+			return wildcardLambda.resolve(markers, context);
+		}
+
 		this.resolveReceiver(markers, context);
 
 		if (this.field != null)
@@ -177,6 +187,26 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 
 		return OptionalChainAware.transform(this);
 	}
+
+	// --------------- Wildcard Lambdas ---------------
+
+	@Override
+	public int wildcardCount()
+	{
+		return this.receiver != null && this.receiver.isPartialWildcard() ? 1 : 0;
+	}
+
+	@Override
+	public IValue replaceWildcards(Supplier<IParameter> nextParameter)
+	{
+		if (this.receiver != null && this.receiver.isPartialWildcard())
+		{
+			this.receiver = this.receiver.withLambdaParameter(nextParameter.get());
+		}
+		return this;
+	}
+
+	// --------------- Resolution ---------------
 
 	@Override
 	public void resolveReceiver(MarkerList markers, IContext context)

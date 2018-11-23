@@ -11,6 +11,7 @@ import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
+import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -20,6 +21,8 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
+
+import java.util.function.Supplier;
 
 public class FieldAssignment extends AbstractFieldAccess
 {
@@ -131,6 +134,29 @@ public class FieldAssignment extends AbstractFieldAccess
 
 		return super.resolve(markers, context);
 	}
+
+	// --------------- Wildcard Lambdas ---------------
+
+	@Override
+	public int wildcardCount()
+	{
+		return super.wildcardCount() + (this.value.isPartialWildcard() ? 1 : 0);
+	}
+
+	@Override
+	public IValue replaceWildcards(Supplier<IParameter> nextParameter)
+	{
+		super.replaceWildcards(nextParameter);
+
+		if (this.value.isPartialWildcard())
+		{
+			this.value = this.value.withLambdaParameter(nextParameter.get());
+		}
+
+		return this;
+	}
+
+	// --------------- Resolution ---------------
 
 	@Override
 	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)

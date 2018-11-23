@@ -1,0 +1,96 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class WildcardLambdaTest {
+	static class Holder {
+		public var value: int = 0
+
+		public init() {}
+
+		public init(value: int) {
+			this.value = value
+		}
+
+		public init(value: int, property: int) {
+			this.value = value
+			this.property = property
+		}
+
+		var propertyValue: int = 0
+		var property: int {
+			get: this.propertyValue
+			set: this.propertyValue = newValue
+		}
+	}
+
+	// --------------- Method Calls ---------------
+
+	@Test func methodCalls() -> void {
+		let cB: String -> int = _.compareTo("B")
+		cB("A") =?= -1
+
+		let c: (String, String) -> int = _.compareTo(_)
+		c("D", "C") =?= 1
+	}
+
+	@Test func constructorCalls() -> void {
+		let ctor1: int -> Holder = new Holder(_)
+		let ctor2: (int, int) -> Holder = new Holder(_, _)
+
+		ctor1(10).value =?= 10
+		ctor2(20, 30).propertyValue =?= 30
+	}
+
+	// --------------- Access ---------------
+
+	@Test func fieldAccess() -> void {
+		let h = new Holder
+
+		let f: Holder -> int = _.value
+		h.value = 10
+		f(h) =?= 10
+	}
+
+	@Test func propertyAccess() -> void {
+		let h = new Holder
+
+		let f: Holder -> int = _.property
+		h.property = 10
+		f(h) =?= 10
+	}
+
+	// --------------- Assignment ---------------
+
+	@Test func localAssignment() -> void {
+		var local = 0
+		let f: int -> void = local = _
+
+		f(10)
+		local =?= 10
+	}
+
+	@Test func fieldAssignment() -> void {
+		let h = new Holder
+
+		let f: (Holder, int) -> void = _.value = _
+		f(h, 20)
+		h.value =?= 20
+
+		let g: int -> void = h.value = _
+		g(30)
+		h.value =?= 30
+	}
+
+	@Test func propertyAssignment() -> void {
+		let h = new Holder
+
+		let f: (Holder, int) -> void = _.property = _
+		f(h, 20)
+		h.property =?= 20
+
+		let g: int -> void = h.property = _
+		g(30)
+		h.property =?= 30
+	}
+}

@@ -118,17 +118,6 @@ class LambdaTest {
 		test("abc") { name => name =?= "abc" } // was "error - test(String) cannot be resolved"
 	}
 
-	// --------------- Partial Functions ---------------
-
-	@Test func partialFunctions() -> void {
-		let compareInts: (int, int) -> int = _.compareTo _
-		let testFun: any! -> void = _ =?= -1
-
-		testFun(compareInts(1, 2))
-
-		with("A", _ =?= "A")
-	}
-
 	// --------------- Currying ---------------
 
 	@Test func curried() -> void {
