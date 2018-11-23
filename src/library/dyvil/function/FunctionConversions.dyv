@@ -2,27 +2,23 @@ package dyvil.function
 
 import	java.util.concurrent.Callable
 
-abstract class FunctionConversions
-{
-	private init() {} // no instances
-
-	// Functions
-
-	static inline func function<R>(f: -> R) -> -> R = f
-
-	static inline func function1<P1, R>(f: P1 -> R) -> P1 -> R = f
-
-	static inline func function2<P1, P2, R>(f: (P1, P2) -> R) -> (P1, P2) -> R = f
-
-	static inline func function3<P1, P2, P3, R>(f: (P1, P2, P3) -> R) -> (P1, P2, P3) -> R = f
-
-	// Function Conversions
-
-	static func runnable(f: -> void) -> Runnable = => f()
-
-	static func callable<T>(f: -> T) -> Callable<T> = => f()
-
-	static func thread(f: -> void) = new Thread {
-		override func run() -> void = f()
-	}
+@JavaName("Runnables")
+extension Runnable {
+	static func apply(f: -> void) implicit -> Runnable = => f()
 }
+
+@JavaName("Callables")
+extension Callable {
+	static func apply<type T>(f: -> T) implicit -> Callable<T> = => f()
+}
+
+//@JavaName("Threads")
+//extension Thread {
+//	static func apply(f: -> void) -> Thread = new Thread() {
+//		override func run() -> void = f()
+//	}
+//
+//	static func apply(named name: String, f: -> void) -> Thread = new Thread() {
+//		override func run() -> void = f()
+//	}
+//}
