@@ -18,8 +18,8 @@ import dyvilx.tools.compiler.ast.reference.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
@@ -28,13 +28,10 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class FieldAccess extends AbstractFieldAccess
 {
+	// =============== Constructors ===============
+
 	public FieldAccess()
 	{
-	}
-
-	public FieldAccess(SourcePosition position)
-	{
-		this.position = position;
 	}
 
 	public FieldAccess(IDataMember field)
@@ -49,10 +46,12 @@ public class FieldAccess extends AbstractFieldAccess
 
 	public FieldAccess(SourcePosition position, IValue receiver, Name name)
 	{
-		this.position = position;
-		this.receiver = receiver;
-		this.name = name;
+		super(position, receiver, name);
 	}
+
+	// =============== Properties ===============
+
+	// --------------- Misc. Expression Properties ---------------
 
 	@Override
 	public int valueTag()
@@ -77,6 +76,10 @@ public class FieldAccess extends AbstractFieldAccess
 	{
 		return this.field != null && this.field.getType().isResolved();
 	}
+
+	// =============== Methods ===============
+
+	// --------------- AST Conversion ---------------
 
 	@Override
 	public IValue toAssignment(IValue rhs, SourcePosition position)
@@ -131,33 +134,6 @@ public class FieldAccess extends AbstractFieldAccess
 	}
 
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (this.field == null)
-		{
-			return this; // don't create an extra type error
-		}
-
-		return Types.isSuperType(type, this.getType()) ? this : null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return this.field != null && Types.isSuperType(type, this.getType());
-	}
-
-	@Override
-	public int getTypeMatch(IType type, IImplicitContext implicitContext)
-	{
-		if (this.field == null)
-		{
-			return MISMATCH;
-		}
-		return super.getTypeMatch(type, implicitContext);
-	}
-
-	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		if (this.field == null)
@@ -184,6 +160,37 @@ public class FieldAccess extends AbstractFieldAccess
 	{
 		return Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name);
 	}
+
+	// --------------- Type Checking ---------------
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.field != null && Types.isSuperType(type, this.getType());
+	}
+
+	@Override
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
+	{
+		if (this.field == null)
+		{
+			return MISMATCH;
+		}
+		return super.getTypeMatch(type, implicitContext);
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (this.field == null)
+		{
+			return this; // don't create an extra type error
+		}
+
+		return Types.isSuperType(type, this.getType()) ? this : null;
+	}
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
@@ -252,6 +259,8 @@ public class FieldAccess extends AbstractFieldAccess
 		this.field = this.field.capture(context);
 	}
 
+	// --------------- Pre-Compilation Phases ---------------
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -277,6 +286,8 @@ public class FieldAccess extends AbstractFieldAccess
 		}
 		return this;
 	}
+
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException

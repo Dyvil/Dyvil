@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
+import dyvil.lang.Name;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -10,19 +11,25 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvil.lang.Name;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAccess, OptionalChainAware
 {
+	// =============== Fields ===============
+
+	// --------------- Source ---------------
+
 	protected IValue receiver;
 	protected Name   name;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected SourcePosition position;
 	protected IDataMember    field;
 	protected IType          type;
+
+	// =============== Constructors ===============
 
 	public AbstractFieldAccess()
 	{
@@ -45,6 +52,17 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 		this.receiver = receiver;
 	}
 
+	public AbstractFieldAccess(SourcePosition position, IValue receiver, Name name)
+	{
+		this.position = position;
+		this.receiver = receiver;
+		this.name = name;
+	}
+
+	// =============== Properties ===============
+
+	// --------------- Position ---------------
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -56,6 +74,8 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 	{
 		this.position = position;
 	}
+
+	// --------------- Receiver ---------------
 
 	@Override
 	public IValue getReceiver()
@@ -69,6 +89,8 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 		this.receiver = receiver;
 	}
 
+	// --------------- Name ---------------
+
 	@Override
 	public Name getName()
 	{
@@ -81,10 +103,14 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 		this.name = name;
 	}
 
+	// --------------- Name ---------------
+
 	public IDataMember getField()
 	{
 		return this.field;
 	}
+
+	// --------------- Type ---------------
 
 	@Override
 	public IType getType()
@@ -111,21 +137,16 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 		this.type = type;
 	}
 
+	// =============== Methods ===============
+
+	// --------------- Resolution Phases ---------------
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.receiver != null)
 		{
 			this.receiver.resolveTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void resolveReceiver(MarkerList markers, IContext context)
-	{
-		if (this.receiver != null)
-		{
-			this.receiver = this.receiver.resolve(markers, context);
 		}
 	}
 
@@ -157,9 +178,14 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 		return OptionalChainAware.transform(this);
 	}
 
-	protected abstract void capture(MarkerList markers, IContext context);
-
-	protected abstract void reportResolve(MarkerList markers);
+	@Override
+	public void resolveReceiver(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver = this.receiver.resolve(markers, context);
+		}
+	}
 
 	protected IValue resolveAccess(MarkerList markers, IContext context)
 	{
@@ -233,6 +259,12 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 
 	protected abstract IValue resolveAsType(IContext context);
 
+	protected abstract void reportResolve(MarkerList markers);
+
+	protected abstract void capture(MarkerList markers, IContext context);
+
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -260,6 +292,8 @@ public abstract class AbstractFieldAccess implements IValue, Named, IReceiverAcc
 			markers.add(Markers.semanticError(this.position, "field.access.unresolved_type", this.name));
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()

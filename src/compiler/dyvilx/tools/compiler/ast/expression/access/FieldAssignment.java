@@ -23,21 +23,14 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class FieldAssignment extends AbstractFieldAccess
 {
-	protected IValue value;
+	// =============== Fields ===============
+
+	protected @NonNull IValue value;
+
+	// =============== Constructors ===============
 
 	public FieldAssignment()
 	{
-	}
-
-	public FieldAssignment(SourcePosition position)
-	{
-		this.position = position;
-	}
-
-	public FieldAssignment(IDataMember field, IValue value)
-	{
-		super(field);
-		this.value = value;
 	}
 
 	public FieldAssignment(SourcePosition position, IValue receiver, Name name, IValue value)
@@ -53,6 +46,22 @@ public class FieldAssignment extends AbstractFieldAccess
 		super(position, receiver, field);
 		this.value = value;
 	}
+
+	// =============== Properties ===============
+
+	// --------------- Value ---------------
+
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+
+	// --------------- Misc. Expression Properties ---------------
 
 	@Override
 	public int valueTag()
@@ -70,6 +79,22 @@ public class FieldAssignment extends AbstractFieldAccess
 	public boolean isResolved()
 	{
 		return this.field != null && this.value.isResolved();
+	}
+
+	// =============== Methods ===============
+
+	// --------------- Type Checking ---------------
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return Types.isVoid(type) || this.value.isType(type);
+	}
+
+	@Override
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
+	{
+		return this.value.getTypeMatch(type, implicitContext);
 	}
 
 	@Override
@@ -90,45 +115,19 @@ public class FieldAssignment extends AbstractFieldAccess
 		return this;
 	}
 
-	@Override
-	public boolean isType(IType type)
-	{
-		return Types.isVoid(type) || this.value.isType(type);
-	}
-
-	@Override
-	public int getTypeMatch(IType type, IImplicitContext implicitContext)
-	{
-		return this.value.getTypeMatch(type, implicitContext);
-	}
-
-	public IValue getValue()
-	{
-		return this.value;
-	}
-
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		if (this.value != null)
-		{
-			this.value.resolveTypes(markers, context);
-		}
+		this.value.resolveTypes(markers, context);
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-		}
+		this.value = this.value.resolve(markers, context);
 
 		return super.resolve(markers, context);
 	}
@@ -158,17 +157,9 @@ public class FieldAssignment extends AbstractFieldAccess
 	}
 
 	@Override
-	protected void capture(MarkerList markers, IContext context)
+	protected IValue resolveAsType(IContext context)
 	{
-		this.field = this.field.capture(context);
-
-		// in case the field was captured, this ensures reference capture takes place
-		if (!this.field.setAssigned())
-		{
-			final Marker marker = Markers.semanticError(this.position, "reference.variable.assignment",
-			                                            Util.memberNamed(this.field));
-			markers.add(marker);
-		}
+		return null;
 	}
 
 	@Override
@@ -184,10 +175,20 @@ public class FieldAssignment extends AbstractFieldAccess
 	}
 
 	@Override
-	protected IValue resolveAsType(IContext context)
+	protected void capture(MarkerList markers, IContext context)
 	{
-		return null;
+		this.field = this.field.capture(context);
+
+		// in case the field was captured, this ensures reference capture takes place
+		if (!this.field.setAssigned())
+		{
+			final Marker marker = Markers.semanticError(this.position, "reference.variable.assignment",
+			                                            Util.memberNamed(this.field));
+			markers.add(marker);
+		}
 	}
+
+	// --------------- Diagnostic Phases ---------------
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
@@ -203,21 +204,17 @@ public class FieldAssignment extends AbstractFieldAccess
 			this.value = this.field.checkAssign(markers, context, this.position, this.receiver, this.value);
 		}
 
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, context);
-		}
+		this.value.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-		if (this.value != null)
-		{
-			this.value.check(markers, context);
-		}
+		this.value.check(markers, context);
 	}
+
+	// --------------- Pre-Compilation Phases ---------------
 
 	@Override
 	public IValue foldConstants()
@@ -226,10 +223,7 @@ public class FieldAssignment extends AbstractFieldAccess
 		{
 			this.receiver = this.receiver.foldConstants();
 		}
-		if (this.value != null)
-		{
-			this.value = this.value.foldConstants();
-		}
+		this.value = this.value.foldConstants();
 		return this;
 	}
 
@@ -244,6 +238,8 @@ public class FieldAssignment extends AbstractFieldAccess
 		return this;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -257,15 +253,13 @@ public class FieldAssignment extends AbstractFieldAccess
 		this.field.writeSetCopy(writer, this.receiver, this.value, lineNumber);
 	}
 
+	// --------------- Formatting ---------------
+
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		super.toString(indent, buffer);
-
-		if (this.value != null)
-		{
-			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.value.toString(indent, buffer);
-		}
+		Formatting.appendSeparator(buffer, "field.assignment", '=');
+		this.value.toString(indent, buffer);
 	}
 }
