@@ -84,10 +84,10 @@ class LambdaTest {
 		let result = List<String>()
 
 		// capturing
-		let function1: -> void = function { result += "a" }
+		let function1: -> void = => result += "a"
 
 		// non-capturing
-		let function2: -> String = function { "b" }
+		let function2: -> String = => "b"
 
 		// capturing another closure
 		repeatClosure(3) { result += function2() }
