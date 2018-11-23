@@ -1,26 +1,26 @@
 package dyvilx.tools.compiler.ast.expression.constant;
 
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.access.WildcardAccess;
+import dyvilx.tools.compiler.ast.expression.access.FieldAccess;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class WildcardValue implements IConstantValue
 {
 	// Metadata
 
 	private SourcePosition position;
-	private IType type = Types.UNKNOWN;
+	private IType          type = Types.UNKNOWN;
 
 	public WildcardValue(SourcePosition position)
 	{
@@ -55,7 +55,7 @@ public class WildcardValue implements IConstantValue
 	public IValue withLambdaParameter(IParameter parameter)
 	{
 		parameter.setPosition(this.position);
-		return new WildcardAccess(parameter);
+		return new FieldAccess(parameter);
 	}
 
 	@Override
