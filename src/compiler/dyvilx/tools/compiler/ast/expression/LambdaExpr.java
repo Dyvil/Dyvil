@@ -127,6 +127,12 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		this.parameters = new ParameterList(params, paramCount);
 	}
 
+	public LambdaExpr(SourcePosition position, ParameterList parameters)
+	{
+		this.position = position;
+		this.parameters = parameters;
+	}
+
 	@Override
 	public SourcePosition getPosition()
 	{

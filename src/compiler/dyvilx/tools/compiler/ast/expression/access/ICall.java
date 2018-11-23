@@ -1,24 +1,22 @@
 package dyvilx.tools.compiler.ast.expression.access;
 
 import dyvil.lang.Name;
-import dyvil.source.position.SourcePosition;
-import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.LambdaExpr;
 import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
 
-public interface ICall extends IValue
+import java.util.function.Supplier;
+
+public interface ICall extends IValue, WildcardLambdaAware
 {
 	default IValue getReceiver()
 	{
@@ -42,10 +40,10 @@ public interface ICall extends IValue
 	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
-		final int wildcards = this.wildcardCount();
-		if (wildcards > 0)
+		final IValue wildcardLambda = WildcardLambdaAware.transform(this);
+		if (wildcardLambda != null)
 		{
-			return this.toLambda(markers, context, wildcards);
+			return wildcardLambda.resolve(markers, context);
 		}
 
 		this.resolveReceiver(markers, context);
@@ -67,6 +65,7 @@ public interface ICall extends IValue
 		return this.resolveCall(markers, context, true);
 	}
 
+	@Override
 	default int wildcardCount()
 	{
 		int count = 0;
@@ -88,39 +87,26 @@ public interface ICall extends IValue
 		return count;
 	}
 
-	default IValue toLambda(MarkerList markers, IContext context, int wildcards)
+	@Override
+	default IValue replaceWildcards(Supplier<IParameter> nextParameter)
 	{
-		SourcePosition position = this.getPosition();
-
-		final IParameter[] parameters = new IParameter[wildcards];
-		for (int i = 0; i < wildcards; i++)
-		{
-			parameters[i] = new CodeParameter(null, position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
-			                                  new AttributeList());
-		}
-
-		int parIndex = 0;
-
 		final IValue receiver = this.getReceiver();
 		if (receiver != null && receiver.isPartialWildcard())
 		{
-			this.setReceiver(receiver.withLambdaParameter(parameters[parIndex++]));
+			this.setReceiver(receiver.withLambdaParameter(nextParameter.get()));
 		}
 
 		final ArgumentList arguments = this.getArguments();
 		for (int i = 0, size = arguments.size(); i < size; i++)
 		{
-			final IValue argument = arguments.get(i, null);
+			final IValue argument = arguments.get(i);
 			if (argument.isPartialWildcard())
 			{
-				arguments.set(i, null, argument.withLambdaParameter(parameters[parIndex++]));
+				arguments.set(i, argument.withLambdaParameter(nextParameter.get()));
 			}
 		}
 
-		final LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
-		lambdaExpr.setImplicitParameters(true);
-		lambdaExpr.setValue(this);
-		return lambdaExpr.resolve(markers, context);
+		return this;
 	}
 
 	default void resolveReceiver(MarkerList markers, IContext context)
