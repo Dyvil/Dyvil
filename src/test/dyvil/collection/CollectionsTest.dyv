@@ -1,0 +1,42 @@
+package dyvil.collection
+
+using dyvil.test.JUnit
+
+import java.util.List
+import java.util.ArrayList
+
+class CollectionsTest {
+	// =============== Operators ===============
+
+	@Test func +=() -> void {
+		let collection = ArrayList(1, 2, 3)
+		collection += 4
+		collection =?= List(1, 2, 3, 4)
+	}
+
+	@Test func ++=() -> void {
+		let collection = ArrayList(1, 2, 3)
+		collection ++= List(4, 5, 6)
+		collection =?= List(1, 2, 3, 4, 5, 6)
+	}
+
+	@Test func -=() -> void {
+		let collection = ArrayList(1, 2, 3, 1)
+		collection -= 1
+		collection =?= List(2, 3)
+	}
+
+	@Test func --=() -> void {
+		let collection = ArrayList(1, 2, 3, 2, 1)
+		collection --= List(1, 2)
+		collection =?= List(3)
+	}
+
+	// =============== Methods ===============
+
+	@Test func addAll() -> void {
+		let collection = ArrayList(1, 2, 3)
+		collection.addAll(4, 5, 6)
+		collection =?= List(1, 2, 3, 4, 5, 6)
+	}
+}

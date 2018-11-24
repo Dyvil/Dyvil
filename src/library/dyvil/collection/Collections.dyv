@@ -13,8 +13,9 @@ extension<type E> Collection<E> {
 	@Mutating
 	infix func ++= <type E>(lhs: Collection<-E>, rhs: Collection<+E>) -> void = lhs.addAll(rhs)
 
+	// differs from remove in that it removes all occurences in Lists instead of only the first
 	@Mutating
-	infix func -= <type E>(lhs: Collection<_>, rhs: any!) -> void = lhs.remove(rhs)
+	infix func -= <type E>(lhs: Collection<_>, rhs: any!) -> void = lhs.removeAll(Collections.singleton(rhs))
 
 	@Mutating
 	infix func --= <type E>(lhs: Collection<_>, rhs: Collection<_>) -> void = lhs.removeAll(rhs)
