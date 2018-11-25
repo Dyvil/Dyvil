@@ -11,6 +11,8 @@ import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
 import dyvilx.tools.compiler.ast.field.capture.CaptureParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
+import dyvilx.tools.compiler.ast.header.IClassCompilableList;
+import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.util.Markers;
@@ -18,18 +20,28 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class NestedMethod extends CodeMethod
 {
+	// =============== Fields ===============
+
 	private CaptureHelper<CaptureParameter> captureHelper = new CaptureHelper<>(CaptureParameter.factory(this));
+
+	// =============== Constructors ===============
 
 	public NestedMethod(SourcePosition position, Name name, IType type, AttributeList attributes)
 	{
 		super(position, name, type, attributes);
 	}
 
+	// =============== Properties ===============
+
 	@Override
 	public boolean isNested()
 	{
 		return true;
 	}
+
+	// =============== Methods ===============
+
+	// --------------- Context ---------------
 
 	@Override
 	public boolean isMember(IVariable variable)
@@ -38,15 +50,17 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public IDataMember capture(IVariable variable)
 	{
-		if (!context.isThisAvailable())
+		if (this.isMember(variable))
 		{
-			this.attributes.addFlag(Modifiers.STATIC);
+			return variable;
 		}
 
-		super.resolveTypes(markers, context);
+		return this.captureHelper.capture(variable);
 	}
+
+	// --------------- Resolution ---------------
 
 	@Override
 	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
@@ -60,14 +74,26 @@ public class NestedMethod extends CodeMethod
 		super.checkCall(markers, position, context, instance, arguments, typeContext);
 	}
 
+	// --------------- Resolution Phases ---------------
+
 	@Override
-	public IDataMember capture(IVariable variable)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.isMember(variable))
+		if (!context.isThisAvailable())
 		{
-			return variable;
+			this.attributes.addFlag(Modifiers.STATIC);
 		}
 
-		return this.captureHelper.capture(variable);
+		super.resolveTypes(markers, context);
+	}
+
+	// --------------- Pre-Compilation Phases ---------------
+
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	{
+		this.setInternalName(this.getInternalName() + "$" + classCompilableList.classCompilableCount());
+
+		super.cleanup(compilableList, classCompilableList);
 	}
 }

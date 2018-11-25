@@ -21,5 +21,16 @@ class NestedMethodTest {
 		testI("After Set", 2)
 		setI2(3)
 		testI("After Set 2", 3)
+
+		// for nameCollision (has to be in a different method)
+		func a() -> String = "apply"
+	}
+
+	@Test func nameCollision() {
+		// #458 Nested methods can have name collisions
+
+		func a() -> String = "nameCollision"
+
+		a() =?= "nameCollision"
 	}
 }
