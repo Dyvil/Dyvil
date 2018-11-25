@@ -3,6 +3,7 @@ package dyvilx.tools.compiler.ast.member;
 import dyvilx.tools.compiler.ast.attribute.Attribute;
 import dyvilx.tools.compiler.ast.attribute.modifiers.BaseModifiers;
 import dyvilx.tools.compiler.ast.field.IField;
+import dyvilx.tools.compiler.ast.method.IMethod;
 
 import static dyvil.reflect.Modifiers.*;
 
@@ -63,6 +64,10 @@ public enum MemberKind
 		if (this == FIELD && ((IField) member).getEnclosingClass().isInterface())
 		{
 			return PUBLIC;
+		}
+		if (this == METHOD && ((IMethod) member).isNested())
+		{
+			return PRIVATE;
 		}
 		return this.defaultAccess;
 	}
