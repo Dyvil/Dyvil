@@ -609,7 +609,7 @@ extension Void
 		@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
 		static func apply(value: PRIMITIVE) -> WRAPPER = WRAPPER.valueOf(value)!!
 
-		static func unapply(value: WRAPPER) -> Tupled<PRIMITIVE> = Tupled(this.value)
+		static func unapply(wrapper: WRAPPER) -> Tupled<PRIMITIVE> = Tupled(wrapper.value)
 
 		// =============== Methods ===============
 
