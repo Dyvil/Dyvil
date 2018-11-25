@@ -36,7 +36,11 @@ class CollectionsTest {
 
 	@Test func addAll() -> void {
 		let collection = ArrayList(1, 2, 3)
-		collection.addAll(4, 5, 6)
+		let array: [Int] = [ 4, 5, 6 ]
+		collection.addAll(array)
 		collection =?= List(1, 2, 3, 4, 5, 6)
+
+		collection.addAll(List(7, 8, 9))
+		collection =?= List(1, 2, 3, 4, 5, 6, 7, 8, 9)
 	}
 }

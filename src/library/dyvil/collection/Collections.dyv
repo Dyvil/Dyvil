@@ -15,10 +15,10 @@ extension<type E> Collection<E> {
 
 	// differs from remove in that it removes all occurences in Lists instead of only the first
 	@Mutating
-	infix func -= <type E>(lhs: Collection<_>, rhs: any!) -> void = lhs.removeAll(Collections.singleton(rhs))
+	infix func -= (lhs: Collection<_>, rhs: any!) -> void = lhs.removeAll(Collections.singleton(rhs))
 
 	@Mutating
-	infix func --= <type E>(lhs: Collection<_>, rhs: Collection<_>) -> void = lhs.removeAll(rhs)
+	infix func --= (lhs: Collection<_>, rhs: Collection<_>) -> void = lhs.removeAll(rhs)
 
 	// =============== Methods ===============
 
@@ -31,7 +31,7 @@ extension<type E> Collection<E> {
 	// --------------- Mutation ---------------
 
 	@Mutating
-	func addAll(elements: E...) -> boolean = Collections.addAll(this, elements...)
+	func addAll(elements: [E]) -> boolean = Collections.addAll(this, elements...)
 
 	// --------------- Views ---------------
 
