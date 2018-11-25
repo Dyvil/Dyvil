@@ -9,10 +9,12 @@ class OverloadTest {
 
 	// --------------- Nullary ---------------
 
-	static func f() -> String = "f()"
+	static func f() -> Object = "f(): Object"
+	static func f() -> String = "f(): String"
 
 	@Test func nullary() -> void {
-		f() =?= "f()"
+		// more specific return type is better
+		f() =?= "f(): String"
 	}
 
 	// --------------- Unary ---------------

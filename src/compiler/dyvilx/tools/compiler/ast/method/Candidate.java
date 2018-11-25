@@ -61,24 +61,23 @@ public final class Candidate<T extends IOverloadable> implements Comparable<Cand
 		return this.values[arg];
 	}
 
+	/**
+	 * A candidate compares less than another if it is better, and greater if it is worse.
+	 *
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int compareTo(@NonNull Candidate<T> o)
 	{
+		// Compare invalidity (valid is better)
+		final int byInvalid = Boolean.compare(this.invalid, o.invalid);
+		if (byInvalid != 0)
+		{
+			return byInvalid;
+		}
+
 		int better = 0;
 		int worse = 0;
-
-		// Compare invalidity (the valid methods are always preferred
-		if (this.invalid)
-		{
-			if (!o.invalid)
-			{
-				return 1;
-			}
-		}
-		else if (o.invalid)
-		{
-			return -1;
-		}
 
 		for (int i = 0, length = this.values.length; i < length; i++)
 		{
@@ -94,61 +93,62 @@ public final class Candidate<T extends IOverloadable> implements Comparable<Cand
 		}
 		if (better > worse)
 		{
+			// this has more better than worse argument conversions, so this is better
 			return -1;
 		}
 		if (better < worse)
 		{
+			// this has more worse and better argument conversions, so this is worse
 			return 1;
 		}
 
 		// Compare return types (more specific is better)
-		final int returnType = MemberSorter.compareTypes(this.member.getType(), o.member.getType());
-		if (returnType != 0)
+		final int byReturnType = MemberSorter.compareTypes(this.member.getType(), o.member.getType());
+		if (byReturnType != 0)
 		{
-			return returnType;
+			return byReturnType;
 		}
 
 		// Compare number of defaulted parameters (less is better)
-		final int defaults = Integer.compare(this.defaults, o.defaults);
-		if (defaults != 0)
+		final int byDefaults = Integer.compare(this.defaults, o.defaults);
+		if (byDefaults != 0)
 		{
-			return defaults;
+			return byDefaults;
 		}
 
 		// Compare number of varargs-applied arguments (less is better)
-		final int varargsArguments = Integer.compare(this.varargs, o.varargs);
-		if (varargsArguments != 0)
+		final int byVarargs = Integer.compare(this.varargs, o.varargs);
+		if (byVarargs != 0)
 		{
-			return varargsArguments;
+			return byVarargs;
 		}
 
-		// Compare varargs (the non-variadic method is preferred)
-		if (this.member.isVariadic())
+		// Compare varargs (not variadic is better)
+		final int byVariadic = Boolean.compare(this.member.isVariadic(), o.member.isVariadic());
+		if (byVariadic != 0)
 		{
-			if (!o.member.isVariadic())
-			{
-				return 1;
-			}
-		}
-		else if (o.member.isVariadic())
-		{
-			return -1;
+			return byVariadic;
 		}
 
-		// Compare overload priority (more is better)
-		return Integer.compare(o.member.getOverloadPriority(), this.member.getOverloadPriority());
+		// Compare overload priority (greater is better)
+		return -Integer.compare(this.member.getOverloadPriority(), o.member.getOverloadPriority());
 	}
 
-	private static int compare(int value1, IType type1, int value2, IType type2)
+	private static int compare(int thisMatch, IType type1, int thatMatch, IType type2)
 	{
-		if (value1 < value2)
+		// for thisMatch and thatMatch, greater is better
+		if (thisMatch < thatMatch)
 		{
+			// thisMatch is less, so this is worse
 			return 1;
 		}
-		if (value1 > value2)
+		if (thisMatch > thatMatch)
 		{
+			// thisMatch is greater, so this is better
 			return -1;
 		}
+
+		// compare parameter type (more specific is better)
 		return MemberSorter.compareTypes(type1, type2);
 	}
 

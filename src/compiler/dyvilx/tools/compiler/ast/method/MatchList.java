@@ -5,9 +5,7 @@ import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.type.IType;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 public class MatchList<T extends IOverloadable> implements IImplicitContext, Iterable<Candidate<T>>
 {
@@ -103,6 +101,9 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 
 	public boolean isAmbigous()
 	{
+		// faster version of:
+		// return this.getAmbiguousCandidates().size() != 1
+
 		if (this.size <= 1 || this.skipSort)
 		{
 			return false;
@@ -125,26 +126,30 @@ public class MatchList<T extends IOverloadable> implements IImplicitContext, Ite
 		return false;
 	}
 
-	public Iterable<Candidate<T>> getAmbiguousCandidates()
+	public List<Candidate<T>> getAmbiguousCandidates()
 	{
-		return () -> {
-			if (this.isEmpty())
+		if (this.size <= 1 || this.skipSort)
+		{
+			return Collections.emptyList();
+		}
+
+		this.sort();
+
+		final List<Candidate<T>> result = new ArrayList<>();
+		final Candidate<T> first = this.candidates[0];
+		result.add(first);
+
+		for (int i = 1; i < this.size; i++)
+		{
+			final Candidate<T> candidate = this.candidates[i];
+			if (candidate.member != first.member && first.equals(candidate))
 			{
-				return Collections.emptyIterator();
+				// if two candidates have the same rank but different members, its ambiguous
+				// sometimes the same member is added twice, but we don't count that as ambiguous.
+				result.add(candidate);
 			}
-
-			this.sort();
-
-			final Candidate<T> first = this.candidates[0];
-			int count = 1;
-
-			while (count < this.size && first.equals(this.candidates[count]))
-			{
-				count++;
-			}
-
-			return new ArrayIterator<>(this.candidates, 0, count);
-		};
+		}
+		return Collections.unmodifiableList(result);
 	}
 
 	// --------------- Adding Candidates ---------------
