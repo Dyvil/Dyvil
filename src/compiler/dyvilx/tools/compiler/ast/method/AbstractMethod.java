@@ -334,7 +334,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 	@Override
 	public boolean isThisAvailable()
 	{
-		return !this.isStatic() || this.hasModifier(Modifiers.EXTENSION);
+		return !this.isStatic();
 	}
 
 	@Override
