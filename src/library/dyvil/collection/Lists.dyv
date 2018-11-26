@@ -29,7 +29,7 @@ extension<type E> List<E> {
 	// List(withContentsOf: someCollection)
 	@JavaName("copyOf")
 	static func apply<type E>(withContentsOf c: Collection<+E>) -> @Immutable List<E>
-		= ArrayList(withContentsOf: c).unmodifiableView
+		= new ArrayList(c).unmodifiableView
 
 	// List<String>() { add("a"); add("b") }
 	@JavaName("build")
@@ -61,7 +61,7 @@ extension<type E> List<E> {
 		for i <- 0 ..< n {
 			list.add(supplier.get())
 		}
-		return list
+		return list.unmodifiableView
 	}
 
 	// =============== Methods ===============
@@ -86,10 +86,13 @@ extension<type E> List<E> {
 	final func subscript_=(index: int, element: E) -> void = this.set(index, element)
 
 	@Mutating
-	final func subscript_&(index: int) -> E* = new ObjectRef<E>() {
-		override func get() -> E = this<List<E>>.get(index)
+	final func subscript_&(index: int) -> E* = new ListRef<E>(this, index)
 
-		override func set(value: E) -> void = this<List<E>>.set(index, value)
+	// TODO use an anonymous class when #462 is fixed
+	private static class ListRef<type E>(let list: List<E>, let index: int) implements ObjectRef<E> {
+		override func get() -> E = this.list.get(index)
+
+		override func set(value: E) -> void = this.list.set(index, value)
 	}
 
 	// --------------- Range Subscript ---------------
@@ -155,7 +158,7 @@ extension ArrayList {
 
 	// ArrayList(1)
 	@JavaName("of")
-	static func apply<type E>(element: E) -> ArrayList<E> = new ArrayList<E>().{ add(element); $0 }
+	static func apply<type E>(element e: E) -> ArrayList<E> = new ArrayList<E>().{ $0.add(e); $0 }
 
 	// ArrayList(1, 2, 3)
 	@JavaName("of")
@@ -163,11 +166,12 @@ extension ArrayList {
 
 	// ArrayList<Int>(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf collection: Collection<+E>) -> ArrayList<E> = new ArrayList<E>(collection)
+	static func apply<type E>(explicit withContentsOf collection: Collection<+E>) -> ArrayList<E>
+		= new ArrayList<E>(collection)
 
 	// ArrayList<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E>(capacity: int) -> ArrayList<E> = new ArrayList<E>(capacity)
+	static func apply<type E>(explicit capacity: int) -> ArrayList<E> = new ArrayList<E>(capacity)
 }
 
 // *************** LinkedList ***************
@@ -182,7 +186,7 @@ extension LinkedList {
 
 	// LinkedList(1)
 	@JavaName("of")
-	static func apply<type E>(element: E) -> LinkedList<E> = new LinkedList<E>().{ add(element); $0 }
+	static func apply<type E>(element e: E) -> LinkedList<E> = new LinkedList<E>().{ $0.add(e); $0 }
 
 	// LinkedList(1, 2, 3)
 	@JavaName("of")
@@ -190,7 +194,8 @@ extension LinkedList {
 
 	// LinkedList(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf collection: Collection<+E>) -> LinkedList<E> = new LinkedList<E>(collection)
+	static func apply<type E>(explicit withContentsOf collection: Collection<+E>) -> LinkedList<E>
+		= new LinkedList<E>(collection)
 }
 
 /*
