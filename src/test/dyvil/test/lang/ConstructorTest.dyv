@@ -104,4 +104,15 @@ class ConstructorTest
 		let initOrder = new InitOrder
 		initOrder.order =?= List("init s", "init block", "init(int) body", "init() body")
 	}
+
+	// --------------- Stack Frames ---------------
+
+	// see #453: Null Coalescing Operator in Initializer Call causes verification error
+	static class StackFrames(let s: String) {
+		init(s: String!, i: int) : this(s ?? "")
+	}
+
+	@Test func stackFrames() {
+		new StackFrames(null, 1).s =?= ""
+	}
 }

@@ -59,27 +59,24 @@ public class DynamicLinker
 		}
 	}
 
-	@NonNull
-	public static CallSite linkMethod(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type)
+	public static @NonNull CallSite linkMethod(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type)
 	{
 		return link(lookup, name, type, null, INVOKE_DYNAMIC);
 	}
 
-	@NonNull
-	public static CallSite linkExtension(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type,
-		@NonNull MethodHandle fallback)
+	public static @NonNull CallSite linkExtension(@NonNull Lookup lookup, @NonNull String name,
+		@NonNull MethodType type, @NonNull MethodHandle fallback)
 	{
 		return link(lookup, name, type, fallback, INVOKE_DYNAMIC);
 	}
 
-	@NonNull
-	public static CallSite linkClassMethod(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type)
+	public static @NonNull CallSite linkClassMethod(@NonNull Lookup lookup, @NonNull String name,
+		@NonNull MethodType type)
 	{
 		return link(lookup, name, type, null, INVOKE_CLASSMETHOD);
 	}
 
-	@NonNull
-	private static CallSite link(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type,
+	private static @NonNull CallSite link(@NonNull Lookup lookup, @NonNull String name, @NonNull MethodType type,
 		MethodHandle fallback, @NonNull MethodHandle dynamicTarget)
 	{
 		final InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type, fallback);
@@ -174,6 +171,8 @@ public class DynamicLinker
 	{
 		MethodHandle test = receiverCheck.bindTo(receiverClass);
 		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
+
+		target = target.asFixedArity();
 
 		// Creates a method that, when called, first tests the type of the first argument (the receiver) to be the
 		// required receiver type. If that succeeds, the target is called. Otherwise, this invokeDynamic method is

@@ -334,7 +334,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 	@Override
 	public boolean isThisAvailable()
 	{
-		return !this.isStatic() || this.hasModifier(Modifiers.EXTENSION);
+		return !this.isStatic();
 	}
 
 	@Override
@@ -491,8 +491,8 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 		{
 			// Static access to static method
 
-			final IType receiverType = receiver.getType();
-			if (!Types.isSuperType(this.getReceiverType(), receiverType))
+			final IType receiverType = this.getReceiverType();
+			if (!Types.isSuperType(receiverType, receiver.getType()))
 			{
 				// Disallow access from the wrong type
 				return;
