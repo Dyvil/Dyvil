@@ -1,0 +1,66 @@
+package dyvil.collection
+
+using dyvil.test.JUnit
+
+import java.util.{ Queue, Deque }
+import java.util.{ ArrayDeque, PriorityQueue }
+import java.util.{ Collections, Arrays }
+
+class QueuesTest {
+	const emptyDeque: Deque<Int> = new ArrayDeque<Int>
+	const deque1: Deque<Int> = new ArrayDeque(Arrays.asList(1))
+	const deque123: Deque<Int> = new ArrayDeque(Arrays.asList(1, 2, 3))
+	const deque312: Deque<Int> = new ArrayDeque(Arrays.asList(3, 1, 2))
+
+	// Queues don't support equals so use their String representation
+	infix func =?=(lhs: any!, rhs: any!) -> void = lhs.toString.shouldEqual(rhs.toString)
+	infix func =!=(lhs: any!, rhs: any!) -> void = lhs.toString.shouldNotEqual(rhs.toString)
+
+	// =============== Static Methods ===============
+
+	@Test func applyQueue() -> void {
+		Queue<Int>() =?= emptyDeque
+		Queue(1) =?= deque1
+		Queue(1, 2, 3) =?= deque123
+		Queue(deque123) =!= deque123
+		Queue(withContentsOf: emptyDeque) =?= emptyDeque
+		Queue(withContentsOf: deque1) =?= deque1
+		Queue(withContentsOf: deque123) =?= deque123
+	}
+
+	@Test func applyDeque() -> void {
+		Deque<Int>() =?= emptyDeque
+		Deque(1) =?= deque1
+		Deque(1, 2, 3) =?= deque123
+		Deque(deque123) =!= deque123
+		Deque(withContentsOf: emptyDeque) =?= emptyDeque
+		Deque(withContentsOf: deque1) =?= deque1
+		Deque(withContentsOf: deque123) =?= deque123
+	}
+
+	@Test func applyArrayDeque() -> void {
+		ArrayDeque<Int>() =?= emptyDeque
+		ArrayDeque(1) =?= deque1
+		ArrayDeque(1, 2, 3) =?= deque123
+		ArrayDeque(deque123) =!= deque123
+		ArrayDeque(withContentsOf: emptyDeque) =?= emptyDeque
+		ArrayDeque(withContentsOf: deque1) =?= deque1
+		ArrayDeque(withContentsOf: deque123) =?= deque123
+		ArrayDeque<Int>(capacity: 5) =?= emptyDeque
+	}
+
+	@Test func applyPriorityQueue() -> void {
+		// TODO test Comparable versions
+
+		let comparator = java.util.Comparator.reverseOrder<Int>()
+
+		PriorityQueue(comparingWith: comparator) =?= emptyDeque
+		PriorityQueue(1, comparingWith: comparator) =?= deque1
+		PriorityQueue(1, 2, 3, comparingWith: comparator) =?= deque312
+		// PriorityQueue(deque123, comparingWith: comparator)
+		PriorityQueue(withContentsOf: emptyDeque, comparingWith: comparator) =?= emptyDeque
+		PriorityQueue(withContentsOf: deque1, comparingWith: comparator) =?= deque1
+		PriorityQueue(withContentsOf: deque123, comparingWith: comparator) =?= deque312
+		PriorityQueue(capacity: 5, comparingWith: comparator) =?= emptyDeque
+	}
+}

@@ -18,19 +18,19 @@ extension<type E> Queue<E> {
 
 	// Queue<Int>()
 	@JavaName("empty")
-	static func apply<type E>() -> Queue<E> = ArrayDeque<E>()
+	static func apply<type E>() -> Queue<E> = new ArrayDeque<E>()
 
 	// Queue(1)
 	@JavaName("of")
-	static func apply<type E>(element: E) -> Queue<E> = ArrayDeque<E>(element)
+	static func apply<type E>(element: E) -> Queue<E> = new ArrayDeque<E>(Collections.singleton(element))
 
 	// Queue(1, 2, 3)
 	@JavaName("of")
-	static func apply<type E>(elements: E...) -> Queue<E> = ArrayDeque<E>(elements...)
+	static func apply<type E>(elements: E...) -> Queue<E> = new ArrayDeque<E>(Arrays.asList(elements...))
 
 	// Queue(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf c: Collection<+E>) -> Queue<E> = ArrayDeque(withContentsOf: c)
+	static func apply<type E>(explicit withContentsOf c: Collection<+E>) -> Queue<E> = new ArrayDeque<E>(c)
 }
 
 // *************** Deque ***************
@@ -43,19 +43,19 @@ extension<type E> Deque<E> {
 
 	// Deque<Int>()
 	@JavaName("empty")
-	static func apply<type E>() -> Deque<E> = ArrayDeque<E>()
+	static func apply<type E>() -> Deque<E> = new ArrayDeque<E>()
 
 	// Deque(1)
 	@JavaName("of")
-	static func apply<type E>(element: E) -> Deque<E> = ArrayDeque<E>(element)
+	static func apply<type E>(element: E) -> Deque<E> = new ArrayDeque<E>(Collections.singleton(element))
 
 	// Deque(1, 2, 3)
 	@JavaName("of")
-	static func apply<type E>(elements: E...) -> Deque<E> = ArrayDeque<E>(elements...)
+	static func apply<type E>(elements: E...) -> Deque<E> = new ArrayDeque<E>(Arrays.asList(elements...))
 
 	// Deque(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf c: Collection<+E>) -> Deque<E> = ArrayDeque(withContentsOf: c)
+	static func apply<type E>(explicit withContentsOf c: Collection<+E>) -> Deque<E> = new ArrayDeque<E>(c)
 }
 
 // *************** ArrayDeque ***************
@@ -66,11 +66,11 @@ extension ArrayDeque {
 
 	// ArrayDeque<Int>()
 	@JavaName("empty")
-	static func apply<type E>() -> ArrayDeque<E> = ArrayDeque<E>()
+	static func apply<type E>() -> ArrayDeque<E> = new ArrayDeque<E>()
 
 	// ArrayDeque(1)
 	@JavaName("of")
-	static func apply<type E>(element: E) -> ArrayDeque<E> = new ArrayDeque<E>().{ add(element); $0 }
+	static func apply<type E>(element: E) -> ArrayDeque<E> = new ArrayDeque<E>(Collections.singleton(element))
 
 	// ArrayDeque(1, 2, 3)
 	@JavaName("of")
@@ -78,11 +78,11 @@ extension ArrayDeque {
 
 	// ArrayDeque(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf c: Collection<+E>) -> ArrayDeque<E> = new ArrayDeque(c)
+	static func apply<type E>(explicit withContentsOf c: Collection<+E>) -> ArrayDeque<E> = new ArrayDeque<E>(c)
 
 	// ArrayDeque<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E>(capacity: int) -> ArrayDeque<E> = new ArrayDeque<E>(capacity)
+	static func apply<type E>(explicit capacity: int) -> ArrayDeque<E> = new ArrayDeque<E>(capacity)
 }
 
 // *************** PriorityQueue ***************
@@ -100,7 +100,7 @@ extension PriorityQueue {
 	// PriorityQueue(1)
 	@JavaName("of")
 	static func apply<type E: Comparable<E>>(element: E) -> PriorityQueue<E>
-		= new PriorityQueue<E>().{ add(element); $0 }
+		= new PriorityQueue<E>(Collections.singleton(element))
 
 	// PriorityQueue(1, 2, 3)
 	@JavaName("of")
@@ -109,49 +109,50 @@ extension PriorityQueue {
 
 	// PriorityQueue(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E: Comparable<E>>(withContentsOf collection: Collection<+E>) -> PriorityQueue<E>
+	static func apply<type E: Comparable<E>>(explicit withContentsOf collection: Collection<+E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(collection)
 
 	// PriorityQueue(withContentsOf: someSortedSet)
 	@JavaName("copyOf")
-	static func apply<type E: Comparable<E>>(withContentsOf sortedSet: SortedSet<+E>) -> PriorityQueue<E>
+	static func apply<type E: Comparable<E>>(explicit withContentsOf sortedSet: SortedSet<+E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(sortedSet)
 
 	// PriorityQueue(withContentsOf: somePriorityQueue)
 	@JavaName("copyOf")
-	static func apply<type E: Comparable<E>>(withContentsOf priorityQueue: PriorityQueue<+E>) -> PriorityQueue<E>
+	static func apply<type E: Comparable<E>>(explicit withContentsOf priorityQueue: PriorityQueue<+E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(priorityQueue)
 
 	// PriorityQueue<Int>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type E: Comparable<E>>(capacity: int) -> PriorityQueue<E>
+	static func apply<type E: Comparable<E>>(explicit capacity: int) -> PriorityQueue<E>
 		= new PriorityQueue<E>(capacity)
 
 	// --------------- Comparator ---------------
 
-	// PriorityQueue(withComparator: someComparator)
+	// PriorityQueue(comparingWith: someComparator)
 	@JavaName("empty")
-	static func apply<type E>(withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+	static func apply<type E>(explicit comparingWith comp: Comparator<-E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(comp)
 
-	// PriorityQueue(1, withComparator: someComparator)
+	// PriorityQueue(1, comparingWith: someComparator)
 	@JavaName("of")
-	static func apply<type E>(element: E, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
-		= new PriorityQueue<E>(comp).{ add(element); $0 }
+	static func apply<type E>(element e: E, explicit comparingWith comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ $0.add(e); $0 }
 
-	// PriorityQueue(1, 2, 3, withComparator: someComparator)
+	// PriorityQueue(1, 2, 3, comparingWith: someComparator)
 	@JavaName("of")
-	static func apply<type E>(elements: E..., withComparator comp: Comparator<-E>) -> PriorityQueue<E>
-		= new PriorityQueue<E>(comp).{ Collections.addAll(this, elements...); $0 }
+	static func apply<type E>(elements: E..., explicit comparingWith comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ Collections.addAll($0, elements...); $0 }
 
-	// PriorityQueue(withContentsOf: someCollection, withComparator: someComparator)
+	// PriorityQueue(withContentsOf: someCollection, comparingWith: someComparator)
 	@JavaName("copyOf")
-	static func apply<type E>(withContentsOf col: Collection<+E>, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
-		= new PriorityQueue<E>(comp).{ addAll(col); $0 }
+	static func apply<type E>(explicit withContentsOf col: Collection<+E>
+	                          explicit comparingWith comp: Comparator<-E>) -> PriorityQueue<E>
+		= new PriorityQueue<E>(comp).{ $0.addAll(col); $0 }
 
-	// PriorityQueue<Int>(capacity: 5, withComparator: someComparator)
+	// PriorityQueue<Int>(capacity: 5, comparingWith: someComparator)
 	@JavaName("withCapacity")
-	static func apply<type E>(capacity: int, withComparator comp: Comparator<-E>) -> PriorityQueue<E>
+	static func apply<type E>(explicit capacity: int, explicit comparingWith comp: Comparator<-E>) -> PriorityQueue<E>
 		= new PriorityQueue<E>(capacity, comp)
 
 	// withContentsOf SortedSet and PriorityQueue are not needed

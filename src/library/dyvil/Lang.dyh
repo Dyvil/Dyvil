@@ -7,7 +7,7 @@ import dyvil.lang._
 
 // Collections
 import dyvil.collection._
-using dyvil.collection.{ Iterables._, Collections._, Lists._, Sets._, Maps._ }
+using dyvil.collection.{ Iterables._, Collections._, Lists._, Sets._, Queues._, Maps._ }
 
 // Import useful utility classes
 import dyvil.io.Console
