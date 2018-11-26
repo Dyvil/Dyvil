@@ -1,0 +1,153 @@
+package dyvil.collection
+
+using dyvil.test.JUnit
+
+import java.util.{ Set, SortedSet, NavigableSet }
+import java.util.{ HashSet, LinkedHashSet, TreeSet, EnumSet }
+import java.util.{ Arrays, Collections }
+
+class SetsTest {
+	const emptySet: Set<Int> = Collections.emptySet<Int>()
+	const set1: Set<Int> = Collections.singleton(1)
+	const set123: Set<Int> = Collections.unmodifiableSet(new HashSet<Int>(Arrays.asList(1, 2, 3)))
+
+	// =============== Operators ===============
+
+	@Test func |=() -> void {
+		let set = HashSet(1, 2, 3)
+		set |= Set(3, 4, 5)
+		set =?= Set(1, 2, 3, 4, 5)
+	}
+
+	@Test func &=() -> void {
+		let set = HashSet(1, 2, 3)
+		set &= Set(2, 3, 4)
+		set =?= Set(2, 3)
+	}
+
+	@Test func ^=() -> void {
+		let set = HashSet(1, 2, 3)
+		set ^= Set(2, 3, 4)
+		set =?= Set(1, 4)
+	}
+
+	// =============== Static Methods ===============
+
+	@Test func applySet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<Set>()
+			lhs.shouldEqual(rhs)
+		}
+
+		Set<Int>() =?= emptySet
+		Set(1) =?= set1
+		Set(1, 2, 3) =?= set123
+		Set(set123) =!= set123
+		Set(withContentsOf: emptySet) =?= emptySet
+		Set(withContentsOf: set1) =?= set1
+		Set(withContentsOf: set123) =?= set123
+		Set<Int>() { add(1); add(2); add(3) } =?= set123
+	}
+
+	@Test func applySortedSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<SortedSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		SortedSet<Int>() =?= emptySet
+	}
+
+	@Test func applyNavigableSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<NavigableSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		NavigableSet<Int>() =?= emptySet
+	}
+
+	@Test func applyHashSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<HashSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		HashSet<Int>() =?= emptySet
+		HashSet(1) =?= set1
+		HashSet(1, 2, 3) =?= set123
+		HashSet(set123) =!= set123
+		HashSet(withContentsOf: emptySet) =?= emptySet
+		HashSet(withContentsOf: set1) =?= set1
+		HashSet(withContentsOf: set123) =?= set123
+		HashSet<Int>(capacity: 5) =?= emptySet
+		HashSet<Int>(capacity: 5, loadFactor: 0.75F) =?= emptySet
+	}
+
+	@Test func applyLinkedHashSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<LinkedHashSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		LinkedHashSet<Int>() =?= emptySet
+		LinkedHashSet(1) =?= set1
+		LinkedHashSet(1, 2, 3) =?= set123
+		LinkedHashSet(set123) =!= set123
+		LinkedHashSet(withContentsOf: emptySet) =?= emptySet
+		LinkedHashSet(withContentsOf: set1) =?= set1
+		LinkedHashSet(withContentsOf: set123) =?= set123
+		LinkedHashSet<Int>(capacity: 5) =?= emptySet
+		LinkedHashSet<Int>(capacity: 5, loadFactor: 0.75F) =?= emptySet
+	}
+
+	enum E { case A; case B; case C }
+
+	const setNone: EnumSet<E> = EnumSet.noneOf(class E)
+	const setA: EnumSet<E> = EnumSet.of(E.A)
+	const setABC: EnumSet<E> = EnumSet.allOf(class E)
+
+	@Test func applyTreeSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<TreeSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		TreeSet<E>() =?= setNone
+		// TreeSet(E.A) =?= setA
+		TreeSet(E.A, E.B, E.C) =?= setABC
+		// TreeSet(setABC) =!= setABC
+		// TreeSet(withContentsOf: setNone) =?= setNone
+		// TreeSet(withContentsOf: setA) =?= setA
+		// TreeSet(withContentsOf: setABC) =?= setABC
+
+		let comparator = java.util.Comparator.reverseOrder<E>()
+
+		TreeSet(comparingWith: comparator) =?= setNone
+		TreeSet(E.A, comparingWith: comparator) =?= setA
+		TreeSet(E.A, E.B, E.C, comparingWith: comparator) =?= setABC
+		// TreeSet(setABC, comparingWith: comparator) =!= setABC
+		// TreeSet(withContentsOf: setNone, comparingWith: comparator) =?= emptyNone
+		TreeSet(withContentsOf: setA, comparingWith: comparator) =?= setA
+		TreeSet(withContentsOf: setABC, comparingWith: comparator) =?= setABC
+	}
+
+	@Test func applyEnumSet() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<EnumSet>()
+			lhs.shouldEqual(rhs)
+		}
+
+		EnumSet(of: class E) =?= setNone
+		EnumSet(withAllOf: class E) =?= setABC
+		// EnumSet(E.A) =?= setA
+		// EnumSet<E>(.A) =?= setA
+		EnumSet(E.A, E.B, E.C) =?= setABC
+		// EnumSet(setA) =?= setA
+		// EnumSet(Set(E.A)) =?= setA
+		EnumSet(withContentsOf: setA) =?= setA
+		// EnumSet(withContentsOf: Set(E.A)) =?= setA
+		EnumSet(complementing: setABC) =?= setNone
+		EnumSet(complementing: setA) =?= Set(E.B, E.C)
+	}
+}
