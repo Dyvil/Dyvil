@@ -23,8 +23,8 @@ extension<type K, type V> Map<K, V> {
 
 	// Map(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> @Immutable Map<K, V>
-		= LinkedHashMap(withContentsOf: map).unmodifiableView
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>) -> @Immutable Map<K, V>
+		= new LinkedHashMap(map).unmodifiableView
 
 	// Map<Int, String>() { put(1, "a"); put(2, "b") }
 	@JavaName("build")
@@ -44,10 +44,12 @@ extension<type K, type V> Map<K, V> {
 	final func subscript_=(key: K, newValue: V) -> void = this.put(key, newValue)
 
 	@Mutating
-	final func subscript_&(key: K) -> V* = new ObjectRef<V>() {
-		override func get() -> V = this<Map<K, V>>.get(key)
+	final func subscript_&(key: K) -> V* = new MapRef<K, V>(this, key)
 
-		override func set(value: V) -> void = this<Map<K, V>>.put(key, value)
+	private static class MapRef<type K, type V>(let map: Map<K, V>, let key: K) implements ObjectRef<V> {
+		override func get() -> V = this.map.get(this.key)
+
+		override func set(value: V) -> void = this.map.put(this.key, value)
 	}
 
 	// --------------- Views ---------------
@@ -107,15 +109,15 @@ extension HashMap {
 
 	// HashMap(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>) -> HashMap<K, V> = new HashMap<K, V>(map)
 
 	// HashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
+	static func apply<type K, type V>(explicit capacity: int) -> HashMap<K, V> = new HashMap<K, V>(capacity)
 
 	// HashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int, loadFactor: float) -> HashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int, explicit loadFactor: float) -> HashMap<K, V>
 		= new HashMap<K, V>(capacity, loadFactor)
 }
 
@@ -131,22 +133,23 @@ extension LinkedHashMap {
 
 	// LinkedHashMap(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(map)
 
 	// LinkedHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity)
 
 	// LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int, loadFactor: float) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int, explicit loadFactor: float) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor)
 
 	// LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.75, accessOrder: true)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int, loadFactor: float, accessOrder: boolean) -> LinkedHashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int, explicit loadFactor: float,
+	                                  explicit accessOrder: boolean) -> LinkedHashMap<K, V>
 		= new LinkedHashMap<K, V>(capacity, loadFactor, accessOrder)
 }
 
@@ -162,12 +165,12 @@ extension IdentityHashMap {
 
 	// IdentityHashMap<Int, String>(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> IdentityHashMap<K, V>
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>) -> IdentityHashMap<K, V>
 		= new IdentityHashMap<K, V>(map)
 
 	// IdentityHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int) -> IdentityHashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int) -> IdentityHashMap<K, V>
 		= new IdentityHashMap<K, V>(capacity)
 }
 
@@ -183,15 +186,16 @@ extension WeakHashMap {
 
 	// WeakHashMap(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K, type V>(withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(map)
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>) -> WeakHashMap<K, V>
+		= new WeakHashMap<K, V>(map)
 
 	// WeakHashMap<Int, String>(capacity: 5)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
+	static func apply<type K, type V>(explicit capacity: int) -> WeakHashMap<K, V> = new WeakHashMap<K, V>(capacity)
 
 	// WeakHashMap<Int, String>(capacity: 5, loadFactor: 0.75)
 	@JavaName("withCapacity")
-	static func apply<type K, type V>(capacity: int, loadFactor: float) -> WeakHashMap<K, V>
+	static func apply<type K, type V>(explicit capacity: int, explicit loadFactor: float) -> WeakHashMap<K, V>
 		= new WeakHashMap<K, V>(capacity, loadFactor)
 }
 
@@ -207,20 +211,25 @@ extension TreeMap {
 
 	// TreeMap(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K: Comparable<K>, type V>(withContentsOf map: Map<+K, +V>) -> TreeMap<K, V>
+	static func apply<type K: Comparable<K>, type V>(explicit withContentsOf map: Map<+K, +V>) -> TreeMap<K, V>
 		= new TreeMap<K, V>(map)
 
 	// TreeMap(withContentsOf: someSortedMap)
 	@JavaName("copyOf")
-	static func apply<type K: Comparable<K>, type V>(withContentsOf map: SortedMap<+K, +V>) -> TreeMap<K, V>
+	static func apply<type K: Comparable<K>, type V>(explicit withContentsOf map: SortedMap<+K, +V>) -> TreeMap<K, V>
 		= new TreeMap<K, V>(map)
 
 	// --------------- Comparator ---------------
 
-	// TreeMap<Int, String>(comparingBy: someComparator)
+	// TreeMap<Int, String>(comparingWith: someComparator)
 	@JavaName("empty")
-	static func apply<type K, type V>(comparingBy comparator: Comparator<-K>) -> TreeMap<K, V>
+	static func apply<type K, type V>(explicit comparingWith comparator: Comparator<-K>) -> TreeMap<K, V>
 		= new TreeMap<K, V>(comparator)
+
+	@JavaName("copyOf")
+	static func apply<type K, type V>(explicit withContentsOf map: Map<+K, +V>,
+	                                  explicit comparingWith comparator: Comparator<-K>) -> TreeMap<K, V>
+		= new TreeMap<K, V>(comparator).{ $0.putAll(map); $0 }
 }
 
 // *************** EnumMap ***************
@@ -235,12 +244,12 @@ extension EnumMap {
 
 	// EnumMap(withContentsOf: someMap)
 	@JavaName("copyOf")
-	static func apply<type K: Enum<K>, type V>(withContentsOf map: Map<+K, +V>) -> EnumMap<K, V>
+	static func apply<type K: Enum<K>, type V>(explicit withContentsOf map: Map<+K, +V>) -> EnumMap<K, V>
 		= new EnumMap<K, V>(map)
 
 	// EnumMap(withContentsOf: someEnumMap)
 	@JavaName("copyOf")
-	static func apply<type K: Enum<K>, type V>(withContentsOf map: EnumMap<+K, +V>) -> EnumMap<K, V>
+	static func apply<type K: Enum<K>, type V>(explicit withContentsOf map: EnumMap<+K, +V>) -> EnumMap<K, V>
 		= new EnumMap<K, V>(map)
 }
 

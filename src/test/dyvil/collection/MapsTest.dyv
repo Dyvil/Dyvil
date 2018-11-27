@@ -1,0 +1,152 @@
+package dyvil.collection
+
+using dyvil.test.JUnit
+
+import java.util.{ Map, SortedMap, NavigableMap }
+import java.util.{ HashMap, LinkedHashMap, IdentityHashMap, WeakHashMap, TreeMap, EnumMap }
+import java.util.Collections
+import java.util.Comparator
+
+class MapsTest {
+	const emptyMap: Map<String, Int> = Collections.emptyMap<String, Int>()
+	const mapA1: Map<String, Int> = new HashMap<String, Int>().{ put("A", 1); $0 }
+	const mapA1B2: Map<String, Int> = new HashMap<String, Int>().{ put("A", 1); put("B", 2); $0 }
+
+	// =============== Static Methods ===============
+
+	@Test func applyMap() -> void {
+		Map<String, Int>() =?= emptyMap
+		Map(withContentsOf: mapA1) =?= mapA1
+		Map<String, Int>() { put("A", 1); put("B", 2) } =?= mapA1B2
+	}
+
+	@Test func applySortedMap() -> void {
+		SortedMap<String, Int>() =?= emptyMap
+	}
+
+	@Test func applyNavigableMap() -> void {
+		NavigableMap<String, Int>() =?= emptyMap
+	}
+
+	@Test func applyHashMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<HashMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		HashMap<Int, String>() =?= emptyMap
+		HashMap(withContentsOf: emptyMap) =?= emptyMap
+		HashMap(withContentsOf: mapA1) =?= mapA1
+		HashMap(withContentsOf: mapA1B2) =?= mapA1B2
+		HashMap<Int, String>(capacity: 5) =?= emptyMap
+		HashMap<Int, String>(capacity: 5, loadFactor: 0.5f) =?= emptyMap
+	}
+
+	@Test func applyLinkedHashMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<LinkedHashMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		LinkedHashMap<Int, String>() =?= emptyMap
+		LinkedHashMap(withContentsOf: emptyMap) =?= emptyMap
+		LinkedHashMap(withContentsOf: mapA1) =?= mapA1
+		LinkedHashMap(withContentsOf: mapA1B2) =?= mapA1B2
+		LinkedHashMap<Int, String>(capacity: 5) =?= emptyMap
+		LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.5f) =?= emptyMap
+		LinkedHashMap<Int, String>(capacity: 5, loadFactor: 0.5f, accessOrder: true) =?= emptyMap
+	}
+
+	@Test func applyIdentityHashMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<IdentityHashMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		IdentityHashMap<Int, String>() =?= emptyMap
+		IdentityHashMap(withContentsOf: emptyMap) =?= emptyMap
+		IdentityHashMap(withContentsOf: mapA1) =?= mapA1
+		IdentityHashMap(withContentsOf: mapA1B2) =?= mapA1B2
+		IdentityHashMap<Int, String>(capacity: 5) =?= emptyMap
+	}
+
+	@Test func applyWeakHashMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<WeakHashMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		WeakHashMap<Int, String>() =?= emptyMap
+		WeakHashMap(withContentsOf: emptyMap) =?= emptyMap
+		WeakHashMap(withContentsOf: mapA1) =?= mapA1
+		WeakHashMap(withContentsOf: mapA1B2) =?= mapA1B2
+		WeakHashMap<Int, String>(capacity: 5) =?= emptyMap
+		WeakHashMap<Int, String>(capacity: 5, loadFactor: 0.5f) =?= emptyMap
+	}
+
+	enum E { case A; case B; case C }
+
+	const emptyEMap: Map<E, Int> = Collections.emptyMap<E, Int>()
+	const mapEA1: Map<E, Int> = new HashMap<E, Int>().{ put(E.A, 1); $0 }
+	const mapEA1B2: Map<E, Int> = new HashMap<E, Int>().{ put(E.A, 1); put(E.B, 2); $0 }
+
+	@Test func applyTreeMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<TreeMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		// TODO fix and uncomment
+
+		TreeMap<E, String>() =?= emptyMap
+		// TreeMap(withContentsOf: emptyEMap) =?= emptyEMap
+		// TreeMap(withContentsOf: mapEA1) =?= mapEA1
+		// TreeMap(withContentsOf: mapEA1B2) =?= mapEA1B2
+
+		let comparator = java.util.Comparator.reverseOrder<String>()
+
+		TreeMap<String, Int>(comparingWith: comparator) =?= emptyMap
+		TreeMap(withContentsOf: emptyMap, comparingWith: comparator) =?= emptyMap
+		TreeMap(withContentsOf: mapA1, comparingWith: comparator) =?= mapA1
+		TreeMap(withContentsOf: mapA1B2, comparingWith: comparator) =?= mapA1B2
+	}
+
+	@Test func applyEnumMap() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<EnumMap>()
+			lhs.shouldEqual(rhs)
+		}
+
+		// TODO fix and uncomment
+
+		EnumMap<E, Int>(of: class E) =?= emptyEMap
+		// EnumMap(withContentsOf: emptyEMap) =?= emptyEMap
+		// EnumMap(withContentsOf: mapEA1) =?= mapEA1
+		// EnumMap(withContentsOf: mapEA1B2) =?= mapEA1B2
+	}
+
+	// =============== Methods ===============
+
+	@Test func subscript() -> void {
+		mapA1["A"] =?= 1
+		mapA1["C"] =?= null
+	}
+
+	@Test func subscript_=() -> void {
+		let map = new HashMap<String, Int>()
+		map["A"] = 1
+		map["B"] = 2
+		map =?= mapA1B2
+	}
+
+	@Test func subscript_&() -> void {
+		let map = new HashMap<String, Int>()
+		map.put("A", 1)
+		let ref = &map["A"]
+		*ref =?= 1
+		*ref = 2
+		map["A"] =?= 2
+		map["A"] = 3
+		*ref =?= 3
+	}
+}
