@@ -14,10 +14,7 @@ case class Marker(
 ) implements Comparable<Marker> {
 	// =============== Constructors ===============
 
-	public init(position: SourcePosition!, message: String) : this(posOrOrigin(position), .ERROR, message)
-
-	// TODO remove this workaround for #453
-	private static func posOrOrigin(position: SourcePosition!) -> SourcePosition = position ?? SourcePosition.ORIGIN
+	public init(position: SourcePosition!, message: String) : this(position ?? SourcePosition.ORIGIN, .ERROR, message)
 
 	// =============== Properties ===============
 
@@ -39,6 +36,7 @@ case class Marker(
 
 	@JavaName("addError")
 	func add(error: Throwable) -> void {
+		// TODO optimize / avoid unnecessary temp objects
 		let builder = new StringBuilder()
 		error.printStackTrace(new dyvil.io.AppendablePrintStream(builder))
 		this.info.addAll(java.util.Arrays.asList((builder.toString().split("\n") as [String])...))
