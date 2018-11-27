@@ -99,6 +99,7 @@ class ListsTest {
 	@Test func subscript_&() -> void {
 		let list = Arrays.asList(1, 2, 3)
 		let ref = &list[1]
+		*ref =?= 2
 		*ref = 4
 		list =?= List(1, 4, 3)
 		list[1] = 0

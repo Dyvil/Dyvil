@@ -113,6 +113,8 @@ class SetsTest {
 			lhs.shouldEqual(rhs)
 		}
 
+		// TODO fix and uncomment
+
 		TreeSet<E>() =?= setNone
 		// TreeSet(E.A) =?= setA
 		TreeSet(E.A, E.B, E.C) =?= setABC
@@ -137,6 +139,8 @@ class SetsTest {
 			lhs.shouldBe<EnumSet>()
 			lhs.shouldEqual(rhs)
 		}
+
+		// TODO fix and uncomment
 
 		EnumSet(of: class E) =?= setNone
 		EnumSet(withAllOf: class E) =?= setABC

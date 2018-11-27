@@ -51,7 +51,7 @@ extension<type E> List<E> {
 		for i <- 0 ..< n {
 			list.add(generator(i))
 		}
-		return list
+		return list.unmodifiableView
 	}
 
 	// List(with: 10, itemsGeneratedBy: => random.nextInt())
@@ -88,11 +88,10 @@ extension<type E> List<E> {
 	@Mutating
 	final func subscript_&(index: int) -> E* = new ListRef<E>(this, index)
 
-	// TODO use an anonymous class when #462 is fixed
 	private static class ListRef<type E>(let list: List<E>, let index: int) implements ObjectRef<E> {
-		override func get() -> E = this.list.get(index)
+		override func get() -> E = this.list.get(this.index)
 
-		override func set(value: E) -> void = this.list.set(index, value)
+		override func set(value: E) -> void = this.list.set(this.index, value)
 	}
 
 	// --------------- Range Subscript ---------------
@@ -166,8 +165,7 @@ extension ArrayList {
 
 	// ArrayList<Int>(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(explicit withContentsOf collection: Collection<+E>) -> ArrayList<E>
-		= new ArrayList<E>(collection)
+	static func apply<type E>(explicit withContentsOf c: Collection<+E>) -> ArrayList<E> = new ArrayList<E>(c)
 
 	// ArrayList<Int>(capacity: 5)
 	@JavaName("withCapacity")
@@ -194,8 +192,7 @@ extension LinkedList {
 
 	// LinkedList(withContentsOf: someCollection)
 	@JavaName("copyOf")
-	static func apply<type E>(explicit withContentsOf collection: Collection<+E>) -> LinkedList<E>
-		= new LinkedList<E>(collection)
+	static func apply<type E>(explicit withContentsOf c: Collection<+E>) -> LinkedList<E> = new LinkedList<E>(c)
 }
 
 /*

@@ -13,12 +13,16 @@ class QueuesTest {
 	const deque312: Deque<Int> = new ArrayDeque(Arrays.asList(3, 1, 2))
 
 	// Queues don't support equals so use their String representation
-	infix func =?=(lhs: any!, rhs: any!) -> void = lhs.toString.shouldEqual(rhs.toString)
 	infix func =!=(lhs: any!, rhs: any!) -> void = lhs.toString.shouldNotEqual(rhs.toString)
 
 	// =============== Static Methods ===============
 
 	@Test func applyQueue() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<Queue>()
+			lhs.toString.shouldEqual(rhs.toString)
+		}
+
 		Queue<Int>() =?= emptyDeque
 		Queue(1) =?= deque1
 		Queue(1, 2, 3) =?= deque123
@@ -29,6 +33,11 @@ class QueuesTest {
 	}
 
 	@Test func applyDeque() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<Deque>()
+			lhs.toString.shouldEqual(rhs.toString)
+		}
+
 		Deque<Int>() =?= emptyDeque
 		Deque(1) =?= deque1
 		Deque(1, 2, 3) =?= deque123
@@ -39,6 +48,11 @@ class QueuesTest {
 	}
 
 	@Test func applyArrayDeque() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<ArrayDeque>()
+			lhs.toString.shouldEqual(rhs.toString)
+		}
+
 		ArrayDeque<Int>() =?= emptyDeque
 		ArrayDeque(1) =?= deque1
 		ArrayDeque(1, 2, 3) =?= deque123
@@ -50,6 +64,11 @@ class QueuesTest {
 	}
 
 	@Test func applyPriorityQueue() -> void {
+		infix func =?=(lhs: any!, rhs: any!) -> void {
+			lhs.shouldBe<PriorityQueue>()
+			lhs.toString.shouldEqual(rhs.toString)
+		}
+
 		// TODO test Comparable versions
 
 		let comparator = java.util.Comparator.reverseOrder<Int>()
