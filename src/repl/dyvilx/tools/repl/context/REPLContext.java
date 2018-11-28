@@ -1,5 +1,6 @@
 package dyvilx.tools.repl.context;
 
+import dyvil.io.StringBuilderWriter;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.TextSource;
@@ -33,6 +34,8 @@ import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
+import dyvilx.tools.parsing.marker.MarkerPrinter;
+import dyvilx.tools.parsing.marker.MarkerStyle;
 import dyvilx.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
@@ -233,8 +236,11 @@ public class REPLContext extends AbstractHeader implements IDefaultContext, IMem
 		}
 
 		boolean colors = this.getCompilationContext().config.useAnsiColors();
+		final MarkerStyle style = this.getCompilationContext().config.getMarkerStyle();
 		StringBuilder buffer = new StringBuilder();
-		this.markers.log(this.currentSource, buffer, colors);
+
+		new MarkerPrinter(this.currentSource, style, colors)
+			.print(this.markers, new StringBuilderWriter(buffer));
 
 		this.repl.getOutput().println(buffer.toString());
 	}

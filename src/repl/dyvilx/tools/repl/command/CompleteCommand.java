@@ -1,5 +1,6 @@
 package dyvilx.tools.repl.command;
 
+import dyvil.io.StringBuilderWriter;
 import dyvil.reflect.Modifiers;
 import dyvil.source.LineSource;
 import dyvil.util.Qualifier;
@@ -26,6 +27,8 @@ import dyvilx.tools.parsing.ParserManager;
 import dyvilx.tools.parsing.TokenList;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
+import dyvilx.tools.parsing.marker.MarkerPrinter;
+import dyvilx.tools.parsing.marker.MarkerStyle;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.context.REPLContext;
 import dyvilx.tools.repl.lang.I18n;
@@ -94,8 +97,11 @@ public class CompleteCommand implements ICommand
 				{
 					// Print Errors, if any
 					final boolean colors = repl.getCompiler().config.useAnsiColors();
+					final MarkerStyle style = repl.getCompiler().config.getMarkerStyle();
 					final StringBuilder buffer = new StringBuilder();
-					markers.log(new LineSource(expression), buffer, colors);
+
+					new MarkerPrinter(new LineSource(expression), style, colors)
+						.print(markers, new StringBuilderWriter(buffer));
 
 					repl.getOutput().println(buffer);
 				}
