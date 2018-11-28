@@ -164,6 +164,9 @@ dependencies {
 
 	// --------------- REPL ---------------
 
+	// https://mvnrepository.com/artifact/org.jline/jline
+	replCompile group: 'org.jline', name: 'jline', version: '3.9.0'
+
 	replCompile(libraryBootstrap)
 	replCompile(sourceSets.compiler.output)
 
@@ -507,6 +510,10 @@ task buildREPL(type: Jar, dependsOn: 'replClasses') {
 	from sourceSets.repl.output
 	from sourceSets.repl.resources
 
+	from {
+		configurations.replCompile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+
 	archiveName = "dyvil-repl-${ Constants.replVersion }.jar"
 
 	manifest.attributes("Main-Class": Constants.replMainClass)
@@ -524,24 +531,12 @@ task buildGenSrc(type: Jar, dependsOn: 'gensrcClasses') {
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
-task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses',
-                                      'dpfClasses', 'compileDPFDyvil', 'gensrcClasses' ]) {
-	from sourceSets.library.output
-	from sourceSets.library.resources
-	from sourceSets.compiler.output
-	from sourceSets.compiler.resources
-	from sourceSets.repl.output
-	from sourceSets.repl.resources
-	from sourceSets.dpf.output
-	from sourceSets.gensrc.output
-	from sourceSets.gensrc.resources
-
-	from("$buildDir/classes/dyvil/library") {
-		include Constants.binaryFilters
-	}
-	from("$buildDir/classes/dyvil/dpf") {
-		include Constants.binaryFilters
-	}
+task buildAll(type: Jar, dependsOn: [ 'buildLibrary', 'buildDPF', 'buildCompiler', 'buildREPL', 'buildGenSrc' ]) {
+	from zipTree(buildLibrary.getArchivePath())
+	from zipTree(buildDPF.getArchivePath())
+	from zipTree(buildCompiler.getArchivePath())
+	from zipTree(buildREPL.getArchivePath())
+	from zipTree(buildGenSrc.getArchivePath())
 
 	archiveName = "dyvil-${ Constants.version }.jar"
 
