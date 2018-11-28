@@ -450,6 +450,18 @@ task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
 test.dependsOn 'testDyvil', 'testGenSrc'
 test.testClassesDirs = sourceSets.test.runtimeClasspath
 
+task runRepl(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) { JavaExec exec ->
+	setupCompiler(exec,
+			libraries: sourceSets.test.compileClasspath.toList()
+	)
+
+	standardOutput = System.out
+	standardInput = System.in
+	
+	main = Constants.replMainClass
+	classpath = sourceSets.test.runtimeClasspath + sourceSets.repl.runtimeClasspath
+}
+
 // ---------------------------------------- Build Tasks ----------------------------------------
 
 /**
