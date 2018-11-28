@@ -4,3 +4,68 @@ compiler.version = "0.34.0"
 repl.version = "0.21.0"
 dpf.version = "0.14.0"
 gensrc.version = "0.7.0"
+
+changelog = """
+# Dyvil v0.34.0
+
+- Added support for implicit parameter values. #353
+- Added support for Optional Binding in If Statements. #356
+
+## Dyvil Library v0.34.0
+
+- Added the `Objects.implicitly<T>(implicit T)` method.
+- Converted the `Set` class to Dyvil.
+- Fixed an issue that caused the `**` operator for Longs to work incorrectly for large values.
+- Moved the `dyvil.tools.parsing.Name` class to `dyvil.lang`.
+- Moved the `dyvil.tools.parsing.name.Qualified` class to `dyvil.util`.
+- Removed deprecated Array class methods.
+- Removed deprecated concat methods from the `Strings` class.
+- Removed redundant `abstract` modifiers in the `Collection` class.
+- Renamed the `dyvil.tools` package to `dyvilx.tools`.
+- The Power Operators `**` for Ints and Floats no longer return the respective extended type, but the operand type itself.
+- Updated the `Array.dyv.dgt` template.
+- Updated the `Tuple.dyv.dgt` file.
+
+## Dyvil Compiler v0.34.0
+
+- Added an error diagnostic for Binding If Statements with Variables of primitive types.
+- Added parser support for binding If Statements. #356
+- Added support for Implicit Parameters in the Method Matching System. #353
+- Added support for Implicit Variable Resolution for Statement Lists.
+- Added support for `implicit` instance and static fields.
+- Added the `AbstractFieldAccess` class as a superclass for `FieldAccess` and `FieldAssignment`.
+- Class Parameters can now be `implicit` or `explicit`. #353
+- Cleaned up the If Statement Parser.
+- Cleaned up the `IfStatement` class.
+- Dropped support for the Colon Statement Syntax.
+- Dropped support for the old Initializer Call syntax.
+- Fixed an issue that caused Enums to generate bytecode that could not be read by some decompilers.
+- Fixed an issue that caused Implicit, Varargs and Default Values to be unavailable for Postfix Calls and Constructor Calls without argument lists.
+- Fixed an issue that caused Method Type Parameters to be resolved incorrectly.
+- Fixed formatting for super-interfaces of interfaces using `implements` instead of `extends`.
+- Fixed wildcard types being formatted as `+any!` when they should be `_`.
+- Implemented bytecode generation for Binding If Statements. #356
+- Minor improvements to the Method Match system.
+- Moved some `is<MODIFIER>` methods to the `IModified` class.
+- Moved the `dyvil.tools` package to `dyvilx.tools`.
+- Removed unnecessary `final` modifiers of some AST classes.
+- Removed unused Initializer Call diagnostics.
+- Replaced the `IContext.getImplicit()` method with `resolveImplicit(IType)`.
+- The `implicit` Modifier can now by applied to Variables, Fields and Method Parameters. #353
+- Updated the `AndPattern` class.
+- Updated the `ClassDeclarationParser` to allow a line break between the class name and the generic argument list.
+- Updated the `DummyValue` class.
+
+## Dyvil REPL v0.21.0
+
+- Added support for Implicit Variable Resolution.
+- Renamed the `dyvil.tools` package to `dyvilx.tools`.
+
+## Dyvil Property Format v0.14.0
+
+- Updated references to tools classes.
+
+## Dyvil GenSrc v0.7.0
+
+- Renamed the `dyvil.tools` package to `dyvilx.tools`.
+"""

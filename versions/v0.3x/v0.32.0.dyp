@@ -4,3 +4,106 @@ compiler.version = "0.32.0"
 repl.version = "0.20.0"
 dpf.version = "0.13.0"
 gensrc.version = "0.6.0"
+
+changelog = """
+# Dyvil v0.32.0
+
+## Dyvil Library v0.32.0
+
+- Added Nullability Annotations for all Token Classes.
+- Added custom `unapply` methods for all Tuple types.
+- Added the Function Composition `*` operator overload.
+- Added the `++` String Concatenation Operator.
+- Added the `Modifiers.GENERATED` field.
+- Added the `Some.unapply(Option<T>!)` method.
+- Added the `_` and `#` symbols to the `BaseSymbols` class.
+- Changed the `Collection.toArray(Class)` signature.
+- Changed the `reducer` calling convention for `BidiQueryable.foldRight`, `.reduceRight` and `.reduceRightOption` methods.
+- Converted the `BidiQueryable` class to Dyvil.
+- Converted the `Collection` class to Dyvil.
+- Converted the `Queryable` and `SizedIterable` classes to Dyvil.
+- Converted the `Stack`, `Queue` and `Deque` classes to Dyvil.
+- Converted various `parsing` classes to Dyvil and moved and renamed them.
+- Deprecated the `+` Operators for String Concatenation.
+- Extracted the `Lexer` base class from the `DyvilLexer` class.
+- Extracted the `TokenList` class from the `TokenIterator` class.
+- Fixed an issue that caused the `!=` operator to work incorrectly for nullable lhs.
+- Removed deprecated methods from the `Assert` and `Output` classes.
+- Removed the `DateExtensions` class.
+- Removed the `IToken.hasNext` and `.hasPrev` methods.
+- Removed the `UnknownType` class.
+- Updated Dyvil files to use the latest style recommendations.
+- Updated all `.dgt` files to the new GenSrc syntax.
+- Updated parameter labels in collection class methods.
+- Updated the `Range` class and subclasses.
+- Updated the `TokenIterator` class.
+
+## Dyvil Compiler v0.32.0
+
+- Added a syntax deprecation warning for C-style declarations (type before name).
+- Added support for Property Getter and Setter annotations. #345
+- Added the `AnnotationList.addAll` method.
+- Added the `AnnotationList.toInlineString` method.
+- Added the `IAnnotated.setAnnotations` method.
+- Case Classes now generate two static unapply methods. #167
+- Cleaned up the AST classes for jump statements (`goto`, `break`, `continue`).
+- Dropped support for the `auto` Type. #209
+- Fixed an NPE in the `TypeChecker` class.
+- Fixed an issue that caused Closure Lambdas with type ascripted Parameters to parse incorrectly.
+- Fixed an issue that caused Deprecation Warnings to be omitted for compiler intrinsic methods.
+- Fixed an issue that prevented Wildcard Types from correctly compiling `@NonNull` annotations.
+- Implemented Override Caching for External Methods.
+- Method override warnings are now suppressed for auto-generated Class Parameter Properties.
+- Reduced duplicate compilation errors for compiler-generated members like class parameter properties or property accessor methods.
+- Removed some unused `IHeaderUnit` methods.
+- Removed the `IType.asReturnType` method and fixed an issue with the `WildcardType.asParameterType` method.
+- Unapply Patterns now use the `unapply` methods of case classes and custom classes. #167
+- Updated path resolution rules for Config Files.
+- Updated the `DummyValue` class.
+- Updated the `TupleType.MAX_ARITY` constant.
+- Updated the compiler for parsing API changes.
+- Updated usages of `TokenIterator`.
+
+## Dyvil REPL v0.20.0
+
+- Updated the REPL for parsing API changes.
+- Updated the `Colorizer` class to adapt to parsing API changes.
+- Updated usages of `TokenIterator`.
+
+## Dyvil Property Format v0.13.0
+
+- Updated Dyvil files to use the latest style recommendations.
+- Updated `PrimitiveValue.dyv.dgt` to new GenSrc syntax.
+- Updated the `converter.string.Parser` class.
+
+## Dyvil GenSrc v0.6.0
+
+- Added `<-` as a reserved symbol.
+- Added an error for `delete`/`undefine` directives with a body.
+- Added support for List Expressions using `[]`.
+- Added support for the Range operator in For Directive Argument Lists.
+- Added support for the `define`, `local`, `delete`, `undefine` and `name` directives.
+- Added the `BasicDirective` class.
+- Added the `BlockParser` class.
+- Added the `DirectiveParser` class.
+- Added the `ExpressionListParser` class.
+- Added the `ExpressionList` class.
+- Added the `Expression` and `ExpressionParser` classes.
+- Added the `ForDirectiveParser` class.
+- Added the `GenSrcSymbols` class.
+- Added the `LongValue`, `DoubleValue`, `StringValue` and `VarAccess` classes.
+- Added the `NamedDirective` class.
+- Added the new `GenSrcLexer` class.
+- Implemented basic functionality of the `ExpressionParser` class.
+- Removed the `Parser` class.
+- Removed unused `Util` methods.
+- The `Scope` class now operates on `Directive`s instead of raw Strings.
+- Updated GenSrc for parsing API changes.
+- Updated the `DirectiveList` class.
+- Updated the `Directive` class.
+- Updated the `ForDirective` class and removed the `ForEachDirective` class.
+- Updated the `IfDirective` class and added the `IfDirectiveParser` class.
+- Updated the `ImportDirective`, `IncludeDirective` and `ScopeDirective` classes.
+- Updated the `LiteralText` and `ProcessedText` classes.
+- Updated the `Template` class to use the new parser.
+"""

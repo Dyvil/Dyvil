@@ -2,3 +2,39 @@ version = "0.3.0"
 library.version = "0.2.0"
 compiler.version = "0.3.0"
 repl.version = "0.1.1"
+
+changelog = """
+# Dyvil v0.3.0
+
+## Dyvil Library v0.2.0
+
+- Added Half-Open Ranges.
+- Added missing FloatArray.range method.
+- Added missing ShortArray.range method.
+- Added Boolean.compareTo and made it implement Comparable.
+- Added ImmutableList.apply(count, repeatedValue) and .apply(count, generator).
+- Inlined the implementations of Ordered.compareTo for all Number classes.
+- Fixed ObjectArray.range generating an invalid output.
+- Fixed Ordered.next and .previous for Number subclasses being implemented incorrectly.
+- Removed String Ranges.
+
+## Dyvil Compiler v0.3.0
+
+- Added argument-based return type inference for Constructors.
+- Added support for Half-Open Ranges using the '..<' operator.
+- Improved Method Overload resolution system for Generic Types.
+- Improved Array and String ForEach bytecode output.
+- Fixed the action blocks of ForEach statements being discarded.
+- Fixed ForEach statements over strings using incorrect variable names.
+- Fixed Direct Reference Lambdas generating invalid bytecode in some cases.
+- Fixed withType not being called on Method Call / Field Access receivers.
+- Fixed Intrinsic Primitive method calls being compiled incorrectly.
+- Fixed Type Match calculation for Lambda Expressions with Object working incorrectly.
+- Fixed missing parameter values in annotations not being reported as errors.
+- Fixed parameter values in annotations with incompatible types being reported incorrectly.
+- Fixed Match Case Conditions not being type-checked properly.
+- Fixed classes with multiple abstract methods being usable as FunctionalInterface SAM types.
+- Fixed Lambda Expressions causing Compiler errors in some edge cases.
+
+## Dyvil REPL v0.1.1
+"""

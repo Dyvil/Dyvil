@@ -4,3 +4,141 @@ compiler.version = "0.28.0"
 repl.version = "0.17.2"
 dpf.version = "0.9.0"
 gensrc.version = "0.3.0"
+
+changelog = """
+# Dyvil v0.28.0
+
+- Added support for Optional and Implicitly Unwrapped Optional Types. #298
+- Added the bottom type `none`. #310
+- Binding Patterns with `var` and `let` can now specify the type using ascription syntax. #311
+- Repurposed the `const` keyword as a variable kind indicator similar to `let` and `var`. #312
+
+## Dyvil Library v0.28.0
+
+- Added Nullity annotations for all Java classes.
+- Added primitive unwrap methods with nullable parameters.
+- Added the `!` and `??` operators for optionals.
+- Added the `Output.print(*)` methods.
+- Added the `Output.print(Object!..., String =, String =)` method.
+- Added the `dyvil.lang.None` and `dyvilx.lang.model.type.NoneType` class. #310
+- Added the `dyvil.lang.Optionals.unsafeUnwrap<T>(T?): T` method.
+- Added the `dyvil.lang.Optionals` class and moved related methods from `ObjectExtensions`.
+- Added the unsafe unwrap operator `!!`.
+- Converted `dyvil.collection.Range` and most `dyvil.collection.range` classes to Dyvil.
+- Converted all primitive Array classes to Dyvil.
+- Converted all `dyvil.ref` classes to Dyvil.
+- Converted most `dyvil.annotation` classes to Dyvil.
+- Converted the `PrimitiveObjectArray` class to Dyvil.
+- Deprecated all `Output.println(*)` methods.
+- Fixed a compilation error in the `dyvil.lang.Primitives` class.
+- Fixed bytecode and runtime errors in the `ReferenceFactory` class.
+- Fixed the pointer assignment operator `*_=` working incorrectly for `ObjectRef`s.
+- Intrinsified the unwrap operator `!` by adding an `unwrapNullCheck` helper method.
+- Moved a common replacements to the `Base.dgs` spec file.
+- Moved the `dyvil.lang.Null` and `.None` classes to the `dyvil.lang.internal` package. #310
+- Updated the `@Nullable` and `@NotNull` annotation classes.
+- Updated the `AbstractBitSet` class.
+- Updated the `AutoPrinter` class.
+- Updated the `I18n` and `StringExtensions` classes.
+- Updated the `StringExtensions` class.
+- Updated the `dyvil.collection.Entry` class to fix an infinite recursion issue.
+- Updated the `dyvil.util.None` class to make use of the `none` bottom type. #310
+- Updated the equality operators in the `dyvil.lang.ObjectExtensions` class to support nullable values.
+- Updated various usages of `const` as a modifier.
+
+## Dyvil Compiler v0.28.0
+
+- Added the `OptionalType` and `ImplicitOptionalType` classes. #298
+- Added additional checks to ensure non-null fields are not default-initialized to `null`.
+- Added references to `@Nullable` and `@NotNull` to the `AnnotationUtil` class.
+- Added support for LOAD and STORE instructions in Intrinsic Annotations.
+- Added support for the builtin `none` type via the `NoneType` class. #310
+- Added the `CompleteCommand.toString()` implementationl.
+- Added the `IBuiltinType` class as a common super type for `AnyType` and `NullType`.
+- Added the `IPattern.isWildcard` method.
+- Added the `IType.extract(Class)` method family to allow dynamic `IType` object casts.
+- Added the `IType.withAnnotation(IType, IAnnotation, TypePath)` method and directed usages of `IType.withAnnotation(IType, IAnnotation, TypePath, int, int)` to it.
+- Added the `IType.writeAnnotations(IType, TypeAnnotatableVisitor, int, String)` method and directed usages of `IType.writeAnnotations(TypeAnnotatableVisitor, int, String)` to it.
+- Added the `ObjectArray.deepToString(Object!): String` method.
+- Added the `Pattern.toString()` method.
+- Added the option to skip sorting in the `MatchList` class.
+- Cleaned up the `*IntrinsicData` classes.
+- FIxed an issue that caused `TypeCheckPattern`s to generate invalid bytecode when used with primitive types.
+- Fixed Or Patterns not resetting local variable slots and causing verify errors in some cases.
+- Fixed Subtyping Relations for Nullable Types.
+- Fixed an NPE that was caused by invalid `TypePath`s of type annotations.
+- Fixed an issue that caused Array Types to be decompiled as non-nullable types instead of implicitly unwrapped nullable types.
+- Fixed an issue that caused External Class Parameters to use invalid descriptors.
+- Fixed an issue that caused Jump Instructions in Intrinsic Annotations to work incorrectly.
+- Fixed an issue that caused Overload Resolution to fail when invoking an overload with the same name as the enclosing method.
+- Fixed an issue that caused Override Checks and synthetic bridge methods to work incorrectly for Methods with a mismatching number of Type Parameters.
+- Fixed an issue that caused Statement Lists not to use implicit conversions for the last expression.
+- Fixed an issue that caused Tuple and Case Class Patterns to check for type correctness incorrectly.
+- Fixed an issue that caused `@NonNull` annotation to be generated for Type Variable Types.
+- Fixed an issue that caused `null` patterns to work incorrectly when used within tuple or case class patterns.
+- Fixed an issue that caused annotations on wildcard type bounds to behave incorrectly.
+- Fixed an issue that caused certain expressions  to be compiled incorrectly in annotation value contexts.
+- Fixed an issue that caused incorrect overload behaviour with variadic methods and named argument lists.
+- Fixed an issue that caused methods with a variadic non-last parameter to generate an `ACC_VARARGS` modifier flag.
+- Fixed an issue that caused overload resolution to fail with variadic methods in rare cases.
+- Fixed an issue that caused parameter type signatures to be compiled incorrectly.
+- Fixed an issue that caused static Fields to be omitted from compiled annotation classes.
+- Fixed an issue that caused synthetic bridge methods in Interfaces to generate invalid bytecode.
+- Fixed an issue that caused the SAME-TYPE relation to work incorrectly for Nullable Types.
+- Fixed an issue that caused the `IType.writeCast(...)` implementations to handle a cast to `void` incorrectly.
+- Fixed an issue that caused variables to leak out of Brace Access Expressions.
+- Fixed an issue that caused variables used for side-effects to be captured incorrectly.
+- Fixed error reporting for uninitialized variables.
+- Fixed incorrect `@NotNull` annotation decompilation.
+- Fixed nullity annotations for `Collection.toArray(*)` and other methods.
+- Fixed wildcard type comparisons working incorrectly in some cases.
+- Improved Binding Pattern parsing and cleaned up the `BindingPattern` class. #311
+- Improved error reporting and exhaustiveness checks for AND and OR patterns.
+- Improved exhaustiveness checks for Tuple and Case Class Patterns.
+- Improved the scoping rules for implicit receiver values. #313
+- Improved the way `SpecialIntrinsicData` handles `INVOKE*` instructions and minimized the amount of class lookups required.
+- Intrinsic Methods with generic return types no longer generate unnecessary CHECKCAST instructions.
+- Misc. cleanups.
+- Moved and renamed the `dyvil.annotation.analysis.NotNull` class to `dyvil.annotation.internal.NonNull`.
+- Moved the `Nullable` annotation from the `dyvil.annotation.analysis` package to `dyvil.annotation.internal`.
+- Nullable primitive types are now automatically converted to their boxed equivalent.
+- Removed Cast Optimization for Intrinsic Methods.
+- Removed subtype-specific `IType` methods.
+- Removed the `ICallableSignature` class.
+- Removed the `IType.clone(): IType` and all overriding methods.
+- Removed the `IValue.isPrimitive()` method and all overriding methods.
+- Removed the `OptionType` and `ImplicitOptionType` classes. #298
+- Replaced references to `OptionType` and `ImplicitOptionType` classes with `NullableType` and `ImplicitNullableType`.
+- Updated For Each Statements to properly support implicitly unwrapped optional types.
+- Updated Type Parameter Type Checks to properly support Nullable Types.
+- Updated `try` and `throw` statements to properly comply to the type system.
+- Updated compiler support for `Simple*Ref` classes.
+- Updated implicit conversion checking to properly support implicitly unwrapped optional types.
+- Updated the Union and Intersection Type implementation to properly support `null` and `none` types. #310
+- Updated the `ImplicitNullableType` reference to the `!` method.
+- Updated the `MemberParser` class to correctly support `const`.
+- Updated the `NullType` implementation to be only a subtype of nullable types.
+- Updated the `NullValue` and `NullPattern` classes to delegate assignability behaviour to the `NullType` class.
+- Updated the `Types.isAssignable` method signature.
+- Updated the compiler for new `Null` and `None` class locations. #310
+- Updated the decompiler to produce `ImplicitNullableTypes` in most contexts.
+
+## Dyvil REPL v0.27.2
+
+- Fixed an error that was caused by declaring an uninitialized variable.
+- Updated the `:complete` implementation to skip `MatchList` sorting.
+
+## Dyvil Property Format v0.9.0
+
+- Updated DPF classes to adapt to new language changes.
+- Updated all DPF classes to use new optional features.
+- Updated some DPF classes that relied on default-null initialization.
+- Updated the `Value` class.
+
+## Dyvil GenSrc v0.3.0
+
+- Added support for the `#import` directive. #314
+- Added the `#local` and `#delete` directives. #315
+- Removed the `ForReplacementMap` class.
+- Updated `#define`, `#undefine` and `#import` to operate on file-level scope. #315
+"""

@@ -4,3 +4,82 @@ compiler.version = "0.38.0"
 repl.version = "0.24.0"
 dpf.version = "0.15.2"
 gensrc.version = "0.9.0"
+
+changelog = """
+# Dyvil v0.38.0
+
+## Dyvil Library v0.38.0
+
+- Added covariance annotations for the `T` type parameter of the `Option` and `Some` classes.
+- Added group-based generic `MathUtils.sum` and `.product` methods.
+- Added spec memoization in the `dyvilx.tools.gensrc.Builtins` class.
+- Added the `dyvil.math.group.Group*` and `.Ring*` classes.
+- Added the `dyvil.math.group.GroupImplicits` class.
+- Added the `dyvilx.tools.gensrc` package and classes.
+- Fixed an `AbstractArrayList.addAll` implementation bug.
+- Made the `dyvilx.tools.gensrc.Specialization.subscript` method return type optional.
+- Removed the `dyvil.Strings` and `dyvil.Utilities` headers.
+- Renamed the `dyvil.JavaUtils` header to `JavaCollections`.
+- Updated all templates to new GenSrc syntax.
+- Updated the `BigIntegerOperators` and `BigDecimalOperators` classes.
+- Updated the `Builtins`, `Runner` and `Template` classes to allow relative file resolution to source dirs.
+- Updated the `dyvil.lang.internal.None` and `.Null` classes to remove redundant `final` modifier.
+- Updated the `dyvilx.tools.gensrc.Template` class to change the meaning of the `name` field.
+
+## Dyvil Compiler v0.38.0
+
+- Added an error diagnostic when Nested Methods are used before their declaration.
+- Added the `DataMemberParser.PARSE_VALUE` flag.
+- Added the `IMethodConsumer` interface.
+- Added the `SourceHeader.setNameFromFile` method.
+- Added the `test_dir` config option for the working directory of the `test` command.
+- Fixed Import Parser producing syntax errors when imports are placed withing parentheses (possible in GenSrc).
+- Fixed Imports not supporting Implicit Value Resolution. #384
+- Fixed Inner Class resolution for External Classes.
+- Fixed `StringInterpolationExpr` constructor without arguments.
+- Fixed `abstract` modifiers being inferred too early, causing issues with Field Properties.
+- Fixed `include` and `exclude` options being ignored without trailing `s`.
+- Fixed a false positive Type Error in Super Expressions by allowing generic types as the target type of the super expression.
+- Fixed a possible `IllegalArgumentException` in the `AnnotationUtil` method.
+- Fixed an issue that caused Nested Methods to be compiled incorrectly in non-static contexts.
+- Fixed an issue that caused a verify errors for lambda expressions targeting methods with reified type parameters. #379
+- Fixed an issue that caused external type parameters referencing other type parameters to be resolved incorrectly.
+- Fixed an issue that disabled Error Diagnostics for unresolved Import Declarations.
+- Fixed false positive Invalid Instance Check warning.
+- Fixed incorrect type checking for Implicit Class Parameter resolution.
+- Fixed incorrect type checking of generic types against non-generic (raw) types.
+- Generic Arguments are now locked before implicit resolution.
+- Implicit Parameters are now available for Implicit Resolution in the method body. #380
+- Improved Error Diagnostics for missing arguments in method calls.
+- Improved `DyvilFileType` API.
+- Improved allowed modifiers for different class kinds.
+- Improved and fixed an issue in the `ArgumentList.resolveMissing` method implementation.
+- Made the `ImportDeclaration` class implement `IImportConsumer`.
+- Made the `TypeParameterList` class implement `Iterable<ITypeParameter>`.
+- Renamed the `IContext.hasStaticAccess` method to `isStaticOnly`.
+- Split the `MemberKind.CLASS` constant into one member kind for each kind of class.
+- Statement Lists no longer produce Variable Shadowing Warnings for variables with the GENERATED modifier.
+- Subclasses of `DyvilCompiler` can now create their own `CompilerConfig`.
+- The `instance` field of an Object Class with the `implicit` modifier now also has that modifier.
+- The test runner now spawns a new process to run the test.
+- Unqualified access to nested methods no longer produces a warning.
+- Updated APIs in the `DyvilCompiler` and `CompileConfig` classes.
+- Updated Implicit Resolution in class bodies to support Implicit Objects. #382
+- Updated the `CompilerConfig` and the `ConfigParser` system to allow `list+=value` arguments.
+- Updated the `MethodParser` API.
+
+## Dyvil REPL v0.24.0
+
+- Updated Implicit Resolution in the `REPLContext` class to support Implicit Objects. #382
+- Updated the `LibraryCommand` class to adapt to `CompilerConfig` API changes.
+- Updated the `REPLContext` class to support all class member kinds.
+
+## Dyvil Property Format v0.15.2
+
+- Removed redundant `final` modifier from the `IgnoreVisitor` class.
+- Updated all templates to new GenSrc syntax.
+
+## Dyvil GenSrc v0.9.0
+
+- Rewrote GenSrc to use the compiler API and compiled templates for source generation. #352
+"""

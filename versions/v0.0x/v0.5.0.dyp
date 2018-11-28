@@ -2,3 +2,48 @@ version = "0.5.0"
 library.version = "0.4.0"
 compiler.version = "0.5.0"
 repl.version = "0.2.0"
+
+changelog = """
+# Dyvil v0.5.0
+
+- Added special type treatment for the names `Tuple` and `Function`.
+- Added prefix and postfix operator precedence.
+- Added support for primitive type promotion.
+
+## Dyvil Library v0.4.0
+
+- Moved the MathUtils.sinTable to a holder class for lazy evaluation.
+- Added the AbstractHashSet base class for Hash Set implementations.
+- Added the ImmutableHashSet class for hash-based implementations of immutable sets.
+- Added a JUnit test class for the Dyvil Collections Framework.
+- Improved `Predef.println` implementations.
+- Improved the `ImmutableArrayList.flatMapped(Function)` implementation.
+- Improved the implementation of various methods in the ImmutableHashMap class by introducing helper methods to the AbstractHashMap class.
+- Improved copying for HashMaps by introducing a constructor that takes an AbstractHashMap argument.
+- Fixed various bugs in the Collection classes.
+- Fixed `MathUtils.sqrt(int)` causing exceptions for large values.
+
+## Dyvil Compiler v0.5.0
+- Renamed `ParserUtil.isTerminator2(int)` to `isExpressionTerminator` and improved the implementation.
+- Improved `ParserUtil.isTerminator(int)`.
+- Improved Token toString implementations.
+- Improved the declaration and implementation of `IParserManager.report`.
+- Improved the way type errors are reported.
+- Improved and documented `ExpressionParser`.
+- Improved Operator Definition syntax with named attributes.
+- Improved Operator parsing in combination with parenthesis.
+- Improved `this` resolution and error handling in static contexts (including the REPL).
+- Fixed Compiler Errors being produced in certain situations when the parser tries to parse a compound assignment.
+- Fixed Compound Assignments working incorrectly in Lambda Expressions.
+- Fixed Resolution Errors being reported twice in Statement Lists.
+- Fixed the action of enhanced For statements being resolved incorrectly in a way such that the special variables in the for statement (`$iterator`, `$index`, ...) are not available.
+- Fixed the `$iterator` variable in For-Iterable statements having the incorrect type `Iterable[T]` instead of `Iterator[T]`.
+- Fixed Case Classes generating invalid bytecode.
+- Fixed compiler error with invalid arguments in `@Retention` and `@Target` annotations.
+- Fixed annotations not being pretty-printed with classes.
+
+## Dyvil REPL v0.2.0
+
+- Improved synthetic REPL variable names. They now have more meaningful names that are directly based on the type of the variable.
+- Improved REPL result computation in anonymous classes to support `return` statements.
+"""

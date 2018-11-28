@@ -4,3 +4,94 @@ compiler.version = "0.26.0"
 repl.version = "0.17.0"
 dpf.version = "0.6.4"
 gensrc.version = "0.1.0"
+
+changelog = """
+# Dyvil v0.26.0
+
+- Added support for infix, prefix and postfix type operators. #303
+
+## Dyvil Library v0.26.0
+
+-  Added the `@base` property for all `Base-*.dgs` files.
+-  Updated all GenSrc template and specialization files for the new syntax.
+-  Updated all `.dgs` files to use `@fileName` and `@enabled`.
+-  Updated all `.dgs` files to use `@inheritFrom`.
+-  Updated the `Array.java.dgt` file to use `#if/endif` directives for `Range` methods. #305
+-  Updated the `FileUtils` class.
+-  Updated the `FileUtils` class.
+-  Updated the `StringExtensions` class.
+-  Updated the `StringUtils` class.
+-  Fixed the `FileUtils.write(File, byte[])` method working incorrectly if the file does not exist.
+-  Removed the `SubRangeArray.java.dgt` file.
+
+## Dyvil Compiler v0.26.0
+
+-  Added parser support for infix, prefix and postfix type operators. #303
+-  Added intrinsics for the prefix `+` and `-` type operators. #303
+-  Added intrinsics for the postfix `*` and `^`, `?` and `!` type operators. #303
+-  Added intrinsics for the infix `|` and `&` type operators. #163 #164 #303
+-  Added the `CodeTypeParameter` and `ExternalTypeParameter` classes.
+-  Added the `ICompilableList` interface for headers.
+-  Added the `IResolvable` interface.
+-  Added the `IUnresolvedType` interface.
+-  Added the `InfixType`, `PrefixType` and `PostfixType` classes.
+-  Added the `NamedGenericType(ICodePosition, Name, IType[], int)` constructor.
+-  Improved Error Reporting for missing or misplaced `>` or `)` in `type` and `class` operators.
+-  Improved Operator Parsing to treat more expressions as juxtaposition.
+-  Improved Syntax errors for Colon and Assignment Operators.
+-  Improved the `ParserManager.split(IToken, int)` implementation.
+-  Improved the `type` operator for primitive type operands.
+-  Improved the distinction between `any` and `Object` by generating a `@Primitive` type annotation for the former.
+-  Updated `cleanup` methods.
+-  Updated and fixed the `FieldThis` class.
+-  Updated the `ExternalMethod` class.
+-  Updated the `ITypeParameter` interface.
+-  Updated the `TypeParameter` class to use `IntersectionType`s for their upper bound representation.
+-  Updated the `TypePosition` class to use int flags instead of an enum.
+-  Made `IUnresolvedType` a super-interface of the `NamedType`, `NamedGenericType` and `UnknownType` classes.
+-  Made the `TypeParameter` class `abstract`.
+-  Fixed the Operator Declaration Parser not accepting EOFs in REPL input.
+-  Cleaned up the `TypeParameterParser` class.
+-  Cleaned up type-related `SemanticMarkers` entries.
+-  Deprecated the `<:` and `>:` symbols for type parameter bounds.
+-  Dropped support for manual name mangling using `_$_`. #302
+-  Moved parts of `OperatorChain` functionality to the abstract `OperatorStack` class.
+-  Renamed the `OperatorChain` class to `InfixCallChain`.
+-  Separated the `ICompilable` interface from the `IClassCompilable` interface.
+
+## Dyvil REPL v0.17.0
+
+-  Updated the REPL for compiler API changes.
+-  Changed the prefix for result classes to `Result_<n>`
+-  Replaced the `REPLCompiler` class with the `REPLClassLoader` class.
+-  Fixed REPL Variables not generating bytecode for (type-) annotations.
+-  Fixed nested classes causing verification errors.
+-  Renamed the package for generated classes to `repl_classes`.
+
+## Dyvil GenSrc v0.1.0
+
+-  Initial Alpha Release.
+-  Added support for custom output streams.
+-  Added support for the `#define` and `#undefine/#undef` directives. #305
+-  Added support for the `#if`, `#else` and `#endif` directives. #305
+-  Added support for the `#ifdef` and `#ifndef` directives. #305
+-  Added support for the `#process` and `#literal` directives. #305
+-  Added support for the `-t`, `--target`, `-s` and `--source` arguments.
+-  Added support for the `@base` property for specializations that work without templates.
+-  Added a localization file and the `I18n` class.
+-  Added a scoping mechanism using the `ReplacementMap` interface and the `LazyReplacementMap` class.
+-  Added a way to construct and use the `GenSrc` class in code.
+-  Added the `##` token separator and concatenation operator.
+-  Added the `Specialization.template` property.
+-  Updated the specializer to replace all identifiers, even without leading and trailing `$`.
+-  Made the `GenSources` class instance-based instead of using only `static` methods.
+-  Moved specialization code to the new `Specializer` class.
+-  Restructured the package layout.
+-  Cleaned up the `Template` class.
+-  Renamed the `GenSources` class to `GenSrc` and added the `Main` class.
+-  Renamed the `fileName` and `enabled` properties to `@fileName` and `@enabled`.
+-  Renamed the `genNotice` and `timeStamp` properties to `GEN_NOTICE` and `TIME_STAMP`.
+-  Renamed the `inheritFrom` property to `@inheritFrom`.
+
+## Dyvil Property Format v0.6.4
+"""

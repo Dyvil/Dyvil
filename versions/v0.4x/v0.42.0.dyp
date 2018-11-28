@@ -4,3 +4,75 @@ compiler.version = "0.42.0"
 repl.version = "0.26.1"
 dpf.version = "0.16.0"
 gensrc.version = "0.9.4"
+
+changelog = """
+# Dyvil v0.42.0
+
+- Added support for generic extension classes. #422
+
+## Dyvil Library v0.42.0
+
+- Added the `dyvil.io.IOAction` and `.IOSupplier` classes.
+- Added the `Files` class as a drop-in replacement for `FileUtils`.
+- The `Marker`, `MarkerList`, `TryParserManager` and `StringPoolWriter` classes now use Java collection classes internally.
+- Updated the `Polynomial`, `Representation` and `ObjectRange` implementations to replace C-style for loops with while loops.
+
+## Dyvil Compiler v0.42.0
+
+- Added a syntax warning for C-style for loops. #440
+- Added support for extension classes with type parameters. #422
+- Added the `ITypeParameter.copy` method and the `CodeTypeParameter` implementation.
+- Added the `ITypeParametric.prependTypeParameters` and `.copyTypeParameters` methods.
+- Added the `Pattern.forEachAtom` method.
+- Added the `ResolvableList` trait.
+- Added the `TypeParameterList.elementCopy` method.
+- Char patterns no longer generate useless if safeguards. #438
+- Cleaned up the `AttributeList` class.
+- Cleaned up the `ITypeParameter`, `TypeParameter`, `CodeTypeParameter` and `ExternalTypeParameter` classes.
+- Cleaned up the `Pattern`, `AndPattern` and `OrPattern` classes.
+- Cleaned up the `Resolvable` interface.
+- Cleaned up the `TypeParameterList` class.
+- Cleaned up the `upperBound`-related properties and methods in the `*TypeParameter` classes.
+- Fixed a possible `IndexOutOfBoundsException` in the `GenericData.isMethodTypeVariable` implementation.
+- Fixed a potential bug in the `MatchExpr.generateSwitch` method that would produce incorrect bytecode with mixed hash values.
+- Fixed a typo in the `method.access.ambiguous` error message.
+- Fixed an issue in the `CharPattern` class that caused it to retain its type incorrectly.
+- Fixed an issue that caused parameter default values to be resolved/type-checked incorrectly.
+- Fixed an issue that caused syntax errors for attributes after throws lists. #436
+- Fixed an NPE in the `GenericData.isMethodTypeVariable` implementation. #441
+- Fixed case-insensitive package resolution. #429
+- Fixed incorrect path resolution the `FileLibrary.listPaths` method.
+- Fixed trailing `/` in `JarLibrary.listPackageNames` result.
+- Improved `ExtensionMetadata` phases.
+- Made the `AttributeList` class extend `ArrayList` and `ResolvableList` and removed the manual list implementation. #439
+- Made the `TypeParameterList` class extend `ArrayList` and `ResolvableList` and removed the manual list implementation. #439
+- Match Expressions no longer consider conditional cases for the duplicate pattern diagnostic. #437
+- Non-static methods in extension classes now inherit the class type parameters. #422
+- Removed the `Library.isSubPackage` method.
+- Removed the `Pattern.getMinSwitchHashValue` and `.getMaxSwitchHashValue` methods.
+- Removed the `Pattern.getSubPatternCount` and `.getSubPattern` methods.
+- Removed the `TypeParameter.erasure` field.
+- Removed the error diagnostic for extension classes with type parameters. #422
+- Renamed switch hash related `Pattern` methods.
+- Renamed the `IClassMetadata.resolveTypes{Pre,Header,Body}` methods to `resolveTypes{AfterAttributes,BeforeBody,AfterBody}`.
+- Replaced all usages of Dyvil collection classes with their Java equivalent. #433
+- Replaced the "library not found" error with a warning.
+- The `AttributeList` class now distinguishes between attribute-derived and custom flags.
+- The `Library.load` method now returns `null` for non-existing and invalid paths.
+- The this type of methods can now refer to its type parameters.
+- Type Parameter indices are now computed using `indexOf` instead of a field.
+- Updated and improved the `MatchExpr.generateSwitch` method with fewer passes and more invariants.
+- Updated and refactored the `KeyCache` class, now using a `TreeSet` instead of a hand-written hash set.
+- Updated the `TypeListParser` class to use `flags`.
+
+## Dyvil REPL v0.26.1
+
+- Replaced all usages of Dyvil collection classes with their Java equivalent. #433
+- The `:library` command now outputs a warning when attempting to load a non-existing or invalid path.
+
+## Dyvil Property Format v0.16.0
+
+## Dyvil GenSrc v0.9.4
+
+- Replaced all usages of Dyvil collection classes with their Java equivalent. #433
+"""

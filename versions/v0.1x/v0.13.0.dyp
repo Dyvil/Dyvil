@@ -3,3 +3,67 @@ library.version = "0.13.0"
 compiler.version = "0.13.0"
 repl.version = "0.7.0"
 dpf.version = "0.3.2"
+
+changelog = """
+# Dyvil v0.13.0
+
+- Added extension Lambda Parameters for Closures with Implicit Values.
+- Closures in the context of an Extension Lambda Type now provide an implicit value pointing to the first parameter of the resulting Lambda Expression.
+- Added List Types, with support for mutability modifiers. #120
+- Added mutability modifiers for Array Types. #158
+- Added support for mutability modifiers in Map Types. #159
+- Implemented Operator Precedence rules for the `|` and `&` operators in Patterns. #156
+
+## Dyvil Library v0.13.0
+
+- Added the `dyvilx.LangModel` header.
+- Added `@Mutating` Annotations for the `Array.subscript_=` methods.
+- Added the `dyvil.annotation.Mutable` annotation.
+- Added `@Immutable` and `@Mutating` annotations for the Iterator classes in the `dyvil.collection.iterator` package.
+- Made the `Immutable` Interface an Annotation and updated all depending library classes accordingly.
+- Made the `Predef.run(any, any => any)` and `Predef.use(any, any => void)` methods use the new Extension Lambda Type Parameters.
+- Updated the `dyvil.annotation.Immutable` documentation and meta-annotations.
+- Moved classes and subpackages from the `dyvil.lang.ref` package to the `dyvil.ref` package.
+- Moved the `dyvil.runtime.ReferenceFactory` class to the `dyvil.ref` package.
+- Moved classes from the `dyvil.reflect.types` package to the `dyvilx.lang.model.type` package.
+- Moved the `dyvil.lang.Type` class to the `dyvilx.lang.model.type` package.
+- Moved `dyvil.util.Immutable` to the dyvil.annotation package.
+- Renamed the `dyvil.annotation.mutating` annotation to `Mutating`.
+- Renamed some methods in the `dyvil.lang.Type` class.
+
+## Dyvil Compiler v0.13.0
+
+- Added the Mutability enum in the compiler for mutability modifiers in Array, Map and List Types.
+- Added the `IType.getMutability()` interface method.
+- Added the `CaptureHelper` class.
+- Added syntax support for Nested Methods.
+- Added the `extension` boolean flag for Lambda Types, available via getters and setters in the IType interface.
+- Updated the compiler to support the new ref class locations.
+- Updated the Capture System to work correctly for Anonymous Classes.
+- Updated the `Types.combine(IType, IType)` method.
+- Updated the Compiler to adapt to changes to the Immutable Annotation / class.
+- Updated the Modifier Parsing mechanism to recognize all modifiers in all contexts.
+- Improved behavior of Captures and Reference Variables in Inc Operators.
+- Improved Try Statement type checking and error reporting.
+- Improved Try Statement parsing.
+- Improved Try Statement formatting.
+- Fixed the Field Assignment type mismatch marker info.
+- Fixed Or Patterns generating invalid bytecode sequences.
+- Fixed Field Type and Method Return Type Annotations being compiled incorrectly.
+- Fixed empty (null) Type Paths for Type Annotations causing compiler errors.
+- Fixed the `SimpleMethodVisitor` not reading basic non-Dyvil parameter modifiers.
+- Fixed Case Classes looking for existing Apply Methods incorrectly.
+- Cleaned up the `TypeParser` class.
+- Cleaned up the `MethodWriterImpl` class.
+- Cleaned up the `MapType` class.
+- Cleaned up the `ClassBodyParser` class.
+- Replaced the `IContext.getAccessibleImplicit():IAccessible` method with the new `.getImplicit():IValue` method.
+- Removed the `Types.findCommonSuperType(IType, IType)` method.
+- Moved the `MapTypes` class from `MapExpr` to `MapType`.
+- Renamed the `MethodWriter.writeInsn(int, int)` method to `writeInsnAtLine`.
+- Renamed the `MapExpr.Types` class to `MapTypes`.
+
+## Dyvil REPL v0.7.0
+
+## Dyvil Property Format v0.3.2
+"""

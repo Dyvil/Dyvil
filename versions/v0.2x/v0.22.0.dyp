@@ -3,3 +3,155 @@ library.version = "0.22.0"
 compiler.version = "0.22.0"
 repl.version = "0.15.0"
 dpf.version = "0.6.0"
+
+changelog = """
+# Dyvil v0.22.0
+
+- Added Verbatim Char Literals. #263
+- Class and Type Operators can now use Angle Brackets around their type. #275
+- Improved Juxtaposition of Expressions. #265
+- Dropped support for Double Arrows in Lambda Types.
+- Dropped support for Square Brackets for Generic Types and Declarations.
+- Dropped support for the old Wildcard Type syntax.
+- Match Expressions can now have the `match` keyword before the matched expression. #270
+- The Hash Symbol can now be used at the end of a line to bypass Semicolon inference. #276
+- This and Super Expressions can now use Angle Brackets to declare their type explicitly.
+
+## Dyvil Library v0.22.0
+
+- The `Map` and `Queryable` classes now implement `SizedIterable`.
+- Added the `Configure<T>` type alias to the Lang Header.
+- Added the `IParserManager.splitReparse(IToken, int)` method.
+- Added the `LanguageFeatures.milliTimed<R>(-> R)` and `.nanoTimed<R>(-> R)` methods.
+- Added the `SizedIterable` class.
+- Added the `dyvil.tools.parsing.Name.apply(String)` and `.wrap(Object)` methods.
+- Added the `dyvil.util.Configurable` marker interface.
+- Updated all Collection and Map constructors and factory methods to be more consistent and convenient.
+- Updated and cleaned up the `d.c.impl.AbstractArraySet`, `d.c.mutable.ArraySet`, `d.c.immutable.ArraySet` and `d.c.immutable.ArraySet.Builder` classes.
+- Updated the `dyvil.Math` header to support juxtaposition multiplication.
+- Improved some `LanguageFeatures` method implementations.
+- Made `AutoPrinter` an `object`.
+- Made the `dyvil.tools.parsing.Name` class `StringConvertible`.
+- Fixed Array Set having duplicate entries when initialized via the `apply` methods.
+- Fixed Method Type Arguments not going through all compiler phases.
+- Fixed Underscore Tokens becoming Identifiers instead of reserved Symbols when split.
+- Fixed the `AbstractMapBasedSet.toString()` implementation.
+- Fixed the `ParserManager.splitJump(IToken, int)` method ignoring the `length` parameter.
+
+## Dyvil Compiler v0.22.0
+
+- For Each Statements with C-Style Variables and `:` now produce a Syntax Warning instead of multiple errors.
+- Parameter Default Value Type Checking now uses the `TypeChecker` system.
+- The Type Parser can now handle Java-style Array Types gracefully. #272
+- Type Parameters now check and produce an error if they have multiple `class` Upper Bounds.
+- Verbatim Char Literals can now be used in Expressions and Pattern Matching. #263
+- Wrapped Parameter List Arrays for Methods, Constructors, Classes and Lambdas into a proper `ParameterList` class.
+- Added a dummy `IValue` implementation.
+- Added an error for Array Expression with element type `void`.
+- Added the `AbstractParameter` class.
+- Added the `ExternalClassParameter` class.
+- Added the `ExternalParameter` class to represent External Method Parameters.
+- Added the `ICaseConsumer` class.
+- Added the `IType.getSubTypeDistance(IType)` for special types such as type variable references or union/intersection types.
+- Added the `MemberSorter` class.
+- Added the `Types.isExactType(IType, IType)` method to check if one types equals the other without special type checks.
+- Added the `Types.isVoid(IType)` method to check if a type is `void`.
+- Added the `Util.startsWithSymbol(Name)` and `.endsWithSymbol(Name)` methods.
+- Added the `d.t.c.a.operator.InfixCall` class to represent binary operators.
+- Implemented the Juxtaposition Parsing rules in the Expression Parser. #265
+- Implemented the `InitializerCall.toString()` and `TupleExpr.toString()` methods.
+- Updated Initializer Resolution to avoid misleading generic warnings.
+- Updated Modifier Checks to be performed by the `ModifierSet` implementation.
+- Updated Type Inference for Constructors of Generic Classes.
+- Updated `ExternalClass` lazy parameter resolution.
+- Updated `this` Statement resolution.
+- Updated loop resolution for `break` and `continue` statements.
+- Updated the `Invalid Dot Access` syntax error message.
+- Updated the `PatternParser` and `PatternListParser` classes.
+- Updated the `Types.getDistance(IType, IType)` implementation.
+- Improved Compiler initialization messages.
+- Improved Error Diagnostics for invalid Dot Accesses.
+- Improved Error handling for malformed Member declarations. #272
+- Improved Error reporting for unresolved types.
+- Improved Lambda Expression Type Inference Checks.
+- Improved Method Match Resolution for Varargs expansion operators.
+- Improved Operator Resolution for different scopes with overloaded operators.
+- Improved compiler errors for Java-style Static Imports and Wildcard Imports. #272
+- Improved parsing for symbolic Types within Generic Angle Brackets. #273
+- Improved type inference error messages in Closures.
+- Inlined the Operator Chain Resolution Algorithm for the special case of two operators and three operands.
+- Merged the `d.t.c.a.parameter.Parameter` and `.MethodParameter` classes.
+- Extracted a Case Statement Parser from the Match Expression Parser.
+- Fixed Anonymous Classes not compiling their initialization code.
+- Fixed Array Expression Type Inference.
+- Fixed Array creation generating invalid Stack Frames in some cases.
+- Fixed Control Flow Statements like `break` and `continue` not being resolved in Repeat Statements.
+- Fixed Exceptions being checked incorrectly for being unhandled.
+- Fixed Generic Classes and Methods with Symbolic Names being formatted incorrectly.
+- Fixed Lambda Expressions inferring Wildcard Types incorrectly.
+- Fixed Lambda Type Inference causing runtime errors in some cases.
+- Fixed Lambda Types not serializing their `extension` flag into Type Alias object code.
+- Fixed OR and AND Patterns being parsed incorrectly when preceded by identifiers.
+- Fixed Parameter Type Annotations using incorrect indices and causing compilation errors.
+- Fixed Parameters using incorrect Type Positions arguments for `CHECK_TYPES`.
+- Fixed Prefix Operators without operands causing compiler errors.
+- Fixed Return Statements type-checking their value incorrectly in some cases.
+- Fixed Semicolons not being inferred after the `null` keyword.
+- Fixed Super / Sub Typing checks between Covariant Type Var Types and ordinary Type Var Types.
+- Fixed Try Statements behaving incorrectly and causing compilation errors in some cases.
+- Fixed Type errors appearing in the wrong location in some cases.
+- Fixed Variable Capture working incorrectly if the same Variable or Parameter is captured more than once.
+- Fixed Warning Messages being displayed incorrectly in some cases.
+- Fixed Wildcard Types causing compiler errors in some cases.
+- Fixed Wildcard Types not implementing Position methods. #274
+- Fixed `ArrayExpr.isResolved()` returning an incorrect result in some cases.
+- Fixed `ClassConstructor`s causing compiler errors with unresolved types.
+- Fixed `CodeMethod` type inference causing compiler errors.
+- Fixed `ReturnStatement` type error reporting for unresolved expressions.
+- Fixed `UnionType.getTheClass` causing compiler errors in some cases.
+- Fixed `continue` statements working like `break` statements. #278
+- Fixed `inline` Methods never being inlined.
+- Fixed a compiler Error caused during compilation of Inlined Method Arguments.
+- Fixed fields being captured incorrectly in nested Anonymous Classes.
+- Fixed incorrect Member Access (`.`) precedence.
+- Fixed infix associativity errors being reported for misplaced prefix and postfix operators in infix position.
+- Fixed the `BraceAccessExpr.withType(…)` method setting the `statement` field to `null` when the type mismatches, causing a compiler error later.
+- Fixed the `CHECK_TYPES` phase not being applied for `else` branches of If Statements.
+- Fixed the `NamedArgumentList.withLastValue(Name, IValue)` method being implemented incorrectly.
+- Fixed the `applyStatement` method not being applied for the last Statement in a Statement List in all cases.
+- Fixed unresolved Apply Call error messages being misleading.
+- Cleaned up the `ExpressionParser` class.
+- Misc. API changes.
+- Removed the `IArguments.dropFirstValue()` method.
+- Removed the `IArguments.inferType(int, IParameter, ITypeContext)` method.
+- Removed the `dotless` fields for `MethodCall` and `FieldAccess` AST nodes.
+- Renamed the `MethodParameter` class to `CodeParameter`.
+- Moved Intrinsic Operator Resolution to the respective AST classes instead of handling it in `MethodCall`.
+- Moved the `ExternalParameter` class to the `d.t.c.a.external` package.
+
+## Dyvil REPL v0.15.0
+
+- REPL Variables now highlight their name in blue when they are displayed and ANSI colors are enabled.
+- The `:complete` command now prints `Variables:`  instead of `Fields:` for REPL completions.
+- The `:methods` and `:variables` commands now display a message when there are no members to show.
+- The outputs of the `:complete`, `:variables` and `:methods` commands are now sorted correctly.
+- Added the `:m` alias for the `:methods` command.
+- Added the `:v` and `:vars` aliases for the `:variables` command.
+- Improved REPL initialization messages.
+- Localized all Compiler Messages in the `Compiler.properties` file. #264
+- Localized all REPL Messages in the `REPL.properties` file. #264
+- Fixed REPL variables generating misleading errors when the `toString` method of their value causes an exception.
+- Fixed the `:complete` command displaying REPL method completions incorrectly.
+
+## Dyvil Property Format v0.6.0
+
+- Converted the DPF source files to Dyvil.
+- Verbatim Char and String Literals can now be used in DPF files. #263
+- The `Value.wrap(any)` method now respects the `DPFConvertible` interface.
+- Added the `dyvil.tools.dpf.DPFConvertible` interface.
+- Added the `dyvil.tools.dpf.DSL` class for easy DPF integration in Dyvil source code.
+- Updated the DPF `Parser` class to work correctly. #277
+- Updated the `Printer` class to support `Builder`s and be more structured.
+- Fixed the DPF compilation tasks being executed in incorrect order.
+- Removed the `Value.toPropertyValue(any)` extension method.
+"""

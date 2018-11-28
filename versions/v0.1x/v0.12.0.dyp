@@ -3,3 +3,93 @@ library.version = "0.12.0"
 compiler.version = "0.12.0"
 repl.version = "0.7.0"
 dpf.version = "0.3.2"
+
+changelog = """
+# Dyvil v0.12.0
+
+- Added Reference Types.
+- Added Variable, Field and Array References.
+- Added by-reference Method Parameters using the `var` modifier.
+- Added And Patterns using the `&` operator. #152
+- Added Or Patterns using the `|` operator. #151
+- Added Object Patterns for matching Object Class Instances.
+- Added Expression (non-jump) Opcodes for the 0-based `IF*` jump opcodes.
+- Binding Patterns can now be directly declared with a type as if they were a variable.
+- Type Check Patterns now accept primitive types.
+- Unhandled Throwables are now only reported as an error when they are subtypes of `java.lang.Exception`.
+
+## Dyvil Library v0.12.0
+
+- Added Inc Methods for the `int`, `long`, `float` and `double` data types to `Predef`.
+- Added the `@DyvilModifiers` annotation
+- Added the `Option.??` operator as a delegate to `.orElse`.
+- Added the `Predef.assert(boolean)` method.
+- Added the `Predef.assert(boolean, => any)` method.
+- Added getters for `Marker.message` and `Marker.position`.
+- Updated the `DyvilLexer.parseInteger` implementation under the assumption that numbers can never be negative.
+- Improved the symbols used to mark the location of Markers in a line.
+- Fixed the Intrinsic annotations for `subscript_=`, `lenght` and `isEmpty` in all array classes.
+- Removed the `.toString()` methods in all `Simple*Ref` classes.
+- Removed old Dyvil-specific modifier annotations.
+- Removed the error for Marker Messages without a position.
+- Removed the `Marker()` and `Marker(ICodePosition)` constructors.
+- Moved the `dyvil.tools.compiler.library.Library.getClassLocation(Class)` method to `dyvil.reflect.ReflectUtils`.
+- Renamed the `Option.!` and `.?` operators to `.get` and `.isPresent` and added the previous names as delegate methods.
+
+## Dyvil Compiler v0.12.0
+
+- Added compiler support for the new @DyvilModifers annotation.
+- Added support for qualified type names in expressions.
+- Added an analysis to check for effectively final variables and parameters.
+- Added the `IType.getRefClass()` interface method.
+- Added an error for Lambda Types with missing Return Types.
+- Added the `PackageDeclaration.toString()` implementation.
+- Inc Operator Assignment Resolution now happens in the `RESOLVE` phase, as intended.
+- Updated Variable Capture to be more consistent for non-final variables. #154
+- Updated the way Class Parameters are read from external classes.
+- Updated Lambda Expression -> Method Reference conversion not working for primitives.
+- Improved intrinsic infix and postfix operator resolution.
+- Improved the Pattern Parser implementation for negative numbers.
+- Improved Method Override Checking to not check the same class multiple times.
+- Improved If, While and Do-While semantic error messages.
+- Internationalized all Syntax Error Messages in the Dyvil Parsers.
+- Case Class Patterns can now match correctly for non-public class parameters as long as a getter method is available.
+- Fixed the `AUTO_DUP` instruction being implemented incorrectly for 2Word-1Word and 1Word-2Word variations.
+- Fixed Parameters Indexes being set incorrectly in some cases.
+- Fixed Parameters compiling annotations incorrectly.
+- Fixed Capture in Statements Lists without variables causing compiler NPEs.
+- Fixed Subscripts not being converted to Arrays in some cases.
+- Fixed References to unresolved fields causing compiler errors.
+- Fixed intrinsic prefix operators being resolved incorrectly.
+- Fixed primitive values that need to be wrapped for instance methods being allowed for use in Lambda -> Function Reference conversion.
+- Fixed Match Expressions generating incorrect type casts for the matched value.
+- Fixed Binding Patterns generating special switch check variables when they are not needed.
+- Fixed empty Match Expressions causing compiler errors upon bytecode generation when trying to generate empty LookupSwitches.
+- Fixed Tuple Patterns with only one Pattern not being extraced automatically.
+- Fixed a missing word in the type parameter bound syntax error message.
+- Fixed Method Override Checking causing compiler errors with unresolved interface types.
+- Fixed Field Assignments generating casts when used as statements.
+- Fixed the `Property.toString()` implementation causing NPEs when either getter or setter modifiers are null.
+- Fixed Variables causing JVM verification errors when the initial value is a match expression or creates variables.
+- Fixed Match Expressions with invalid Patterns causing compiler errors.
+- Fixed Increment / Decrement Operators being captured incorrectly. #150
+- Dropped compiler support for old modifier annotations.
+- Removed redundand Class Parameter local index setters.
+- Removed Unbox Patterns.
+- Removed the unused `IValue.COMPOUND_CALL` constant.
+- Cleaned up the `PrimitiveType`, `IObjectType` and `LambdaType` classes.
+- Cleaned up the `PatternParser` class.
+- Cleanup up the `MatchCase` class.
+- Renamed the `I18n` class to `MarkerMessages`.
+- Renamed the `IVariable.isCapturable()` method to `isReferenceCapturable` for clarity.
+
+## Dyvil REPL v0.7.0
+
+- Added the `:javap` REPL Command.
+- Fixed the REPL Parser generating NPEs on invalid expressions.
+- Fixed Input Errors being caused when quitting the REPL.
+
+## Dyvil Property Format v0.3.2
+
+- Fixed the accept method implementation for DPF String Interpolations.
+"""

@@ -4,3 +4,127 @@ compiler.version = "0.41.0"
 repl.version = "0.26.0"
 dpf.version = "0.16.0"
 gensrc.version = "0.9.3"
+
+changelog = """
+# Dyvil v0.41.0
+
+- Added varargs fences. #412
+
+## Dyvil Library v0.41.0
+
+- Added `JavaName` annotations to `Iterators` functions.
+- Added the `dyvil.annotation.JavaName` annotation class. #405
+- Added the `EXTENSION` flag to the `CLASS_TYPE_MODIFIERS` constant.
+- Added the `Marker.getInfo` method.
+- Added the `Marker.isIgnored` property.
+- Cleaned up GenSrc classes in the Library module.
+- Cleaned up the `Iterators` class.
+- Converted the `dyvil.collection.Iterators` class to an extension class.
+- Fixed an issue that caused lines with ignored markers to be displayed, but without the marker.
+- Fixed markers with zero-width positions (at EOF) being printed incorrectly. #421
+- Ignored `Marker`s are no longer added to `MarkerList`s.
+- Improved the `Marker.addError` method to display stack traces more nicely.
+- Improved the `Marker.equals` and `.hashCode` implementations.
+- Removed the `Primitives` class.
+- Renamed the `Iterators.filter` method to `filtered`.
+- Renamed the `Iterators.map` method to `mapped`.
+- Replaced functions in various classes with properties.
+- Replaced usages of `BytecodeName` with `JavaName`.
+- Updated some properties to retain their pre-#414 bytecode name.
+- Updated the lang header to make `BytecodeName` refer to `JavaName`.
+
+## Dyvil Compiler v0.41.0
+
+- Added a syntax error diagnostic for expected patterns. #420
+- Added a syntax error diagnostic for missing expressions. #418
+- Added parser and method matching support for varargs fences. #412
+- Added support for the `JavaName` annotation. #405
+- Added the `ClassBody.resolveImplicit{Field,Value}` methods.
+- Added the `ClassList.objectClasses`, `.objectClassInstanceFields` and `.resolveImplicitObjectInstanceField` methods.
+- Added the `Closure.isTrailingClosure` method.
+- Added the `DummyValue.INSTANCE` constant.
+- Added the `MatchList.getAmbiguousCandidates` method.
+- Added the `OPTIONAL` flag to the `ExpressionParser` class.
+- Added the `ParameterList.clear` method.
+- Cleaned up Implicit Field resolution in the `ClassBody` class.
+- Cleaned up the `AnnotationReader` and `AnnotationValueReader` class.
+- Cleaned up the `BraceAccessExpr` class.
+- Cleaned up the `ExpressionListParser`, `TypeListParser` and `TypeParser` classes.
+- Cleaned up the `ImportParser` and `ImportDeclaration` classes.
+- Cleaned up the `LiteralConversion` class.
+- Cleaned up the `MatchCase` class.
+- Cleaned up the `MatchExpr` class.
+- Cleaned up the `MatchExpressionParser` and `CaseParser` classes.
+- Cleaned up the `MatchList` class.
+- Cleaned up the `PackageDeclaration` class.
+- Cleaned up the `PatternParser` and `PatternListParser` classes.
+- Cleaned up the `{Repeat,Sync,Try,While}StatementParser` and `StringInterpolationParser` classes and removed `IValueConsumer` dependency. #419
+- Cleaned up the remaining `*Parser` that depended on `IValueConsumer`. #419
+- Dropped support for the `DyvilName` annotation in Dyvil source code. #416
+- Fixed a possible NPE in the `ArrayType.get{Method,Implicit}Matches` implementations. #404
+- Fixed an issue that omitted stack map frame required by the JVM in Match Expressions. #430
+- Fixed an issue where implicit conversions would not be resolved correctly. #410
+- Fixed an issue where trailing closures with explicit parameters would not merged into the previous argument list. #408
+- Fixed extension method resolution not considering extension classes in class bodies. #423
+- Fixed implicit receivers not being resolved and captured. #415
+- Fixed lambda expressions with constructor references causing a verification error. #411
+- Fixed the `AbstractConstructor.getInternalName` method incorrectly returning `init` instead of `<init>`.
+- Improved method matching for varargs argument lists by correctly counting varargs lengths.
+- Improved package declaration diagnostic messages.
+- Improved the `AbstractCall.reportResolve` and `ConstructorCall.reportResolve` implementations.
+- Improved the `AnnotationReader` constructors and updated usages.
+- Improved the `ClassList.getExtension{Method,Implicit}Matches` methods.
+- Improved the diagnostic for duplicate argument list labels by using an `IdentityHashSet` and moving it to the `check` phase.
+- Made the `CaseParser` and `PatternParser` implementations more robust against syntax errors.
+- Made the `Closure` class a subclass of the `LambdaExpr` class.
+- Made the `LambdaExpr` class not final.
+- Moved code for package declaration diagnostics from `Package` to `PackageDeclaration`.
+- Moved the `Closure` class from the `ast.statement` package to `ast.expression`.
+- Properties now use standard Java names with `get` and `set` prefix as the bytecode name. #414
+- Refactored method and constructor matching into one implementation for both.
+- Removed the `Consumer<Annotation>` super-interface from the `AnnotationExpr` class.
+- Removed the `IArgumentsConsumer` class.
+- Removed the `ICaseConsumer` class.
+- Removed the `IImportConsumer` class.
+- Removed the `IPatternConsumer` class.
+- Removed the `IValueConsumer` class. #419
+- Removed the `ParameterList.setParameter` method.
+- Removed the `Types.PRIMITIVES_CLASS` field.
+- Removed the `ValueAnnotationVisitor` class.
+- Renamed the `TupleExpr.setArguments` method to `setValues`.
+- Replaced calls to `Positioned.position` with `getPosition`.
+- Replaced usages of `IArgumentsConsumer` with `Consumer<ArgumentList>`.
+- The `AnnotationValueReader` class now uses `Consumer<IValue>` instead of `IValueConsumer`.
+- The `ApplyAccess` implementation for trailing closure merging no longer manually resolved the trailing closure expression.
+- The Type Parser now properly reports when it couldn't parse a type. #373, #407, #417
+- The warning for non-static nested classes is no longer shown for extension classes. #424
+- Updated many AST classes to remove the `IValueConsumer` super-interface.
+- Updated parses classes to use lambdas in place of `IValueConsumer` objects.
+- Updated the `ArrayLiteralParser` class to be more robust against syntax errors.
+- Void box and unbox operations now use the methods in `Primitives.extension Void` instead of `Primitives`.
+
+## Dyvil REPL v0.26.0
+
+- Cleaned up the `REPLContext.resolveImplicit` implementation.
+- Fixed an issue that caused Implicit Conversions in Extension Classes defined in the REPL being unavailable. #426
+- Improved the `CompleteCommand.findConversions` implementation.
+- Removed the `:rename` command. #427
+- Renamed the `REPLContext.setValue` method to `addValue`.
+- The REPL now resolves the method ambiguities by newest first. #413
+- The REPL now returns the youngest class definition when multiple definitions share a name. #425
+
+## Dyvil Property Format v0.16.0
+
+- Improved the `DPFSyntax.apply(...) -> Builder` method implementation.
+- Moved DPF classes from the `dyvil.tools.dpf` package to `dyvilx.tools.dpf`. #409
+- Moved the `DPF` header from the `dyvil` package to `dyvilx.tools`. #409
+- Replaced functions in various classes with properties.
+- Replaced usages of `BytecodeName` with `JavaName`.
+- Updated the `DPFSyntax` class to disallow builders with multiple nodes.
+
+## Dyvil GenSrc v0.9.3
+
+- Updated the `CallDirectiveParser` implementation to adapt to compiler API changes.
+- Updated the `ForDirectiveParser` implementation to adapt to compiler API changes.
+- Updated the `ImportDirectiveParser` implementation to adapt to compiler API changes.
+"""

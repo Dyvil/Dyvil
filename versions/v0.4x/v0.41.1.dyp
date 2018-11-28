@@ -4,3 +4,28 @@ compiler.version = "0.41.1"
 repl.version = "0.26.0"
 dpf.version = "0.16.0"
 gensrc.version = "0.9.3"
+
+changelog = """
+# Dyvil v0.41.1
+
+## Dyvil Library v0.41.0
+
+## Dyvil Compiler v0.41.1
+
+- Added the missing localization entry for the key `try.catch.type`. #435
+- Char patterns no longer generate useless if safeguards. #438
+- Fixed a trailing `/` in `JarLibrary.listPackageNames` results.
+- Fixed an issue in the `CharPattern` class that caused it to retain its type incorrectly.
+- Fixed an issue that caused syntax errors for attributes after throws lists. #436
+- Fixed an NPE caused by package types in the `AbstractMethod.checkMatch` and `checkCall` implementations. #428
+- Fixed incorrect path resolution in the `FileLibrary.listPaths` method.
+- Fixed package resolution being case-insensitive. #429
+- The duplicate pattern diagnostic no longer considers conditional match cases. #437
+- Updated the `TypeListParser` class to use `flags`.
+
+## Dyvil REPL v0.26.0
+
+## Dyvil Property Format v0.16.0
+
+## Dyvil GenSrc v0.9.3
+"""

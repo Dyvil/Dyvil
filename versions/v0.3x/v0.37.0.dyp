@@ -4,3 +4,80 @@ compiler.version = "0.37.0"
 repl.version = "0.23.0"
 dpf.version = "0.15.1"
 gensrc.version = "0.8.0"
+
+changelog = """
+# Dyvil v0.37.0
+
+- Added the Optional Cast Operator `as?`. #360
+
+## Dyvil Library v0.37.0
+
+- Added deprecated null coalescing overload to the `Optionals` class.
+- Added missing method return types in the `Queryable` and `Polynomial` classes.
+- Added the `@SwitchOptimized` annotation.
+- Added the `Opcodes.AUTO_LOAD` and `Opcodes.AUTO_STORE` constants.
+- Converted the `dyvil.source.*Source` classes to Dyvil.
+- Deprecated the `\` (int div) operator and replaced it with the `_/` (floordiv) operator.
+- Made the Primitive Wrapper `apply` methods `implicit`.
+- Minor changes to the `Big*Operators`, `Random` and `Qualifier` classes.
+- Renamed the `Source.getText` method to `text` and the `Source.getLine` method to `line`.
+- Renamed the specialized `*Array.flatMapped` method for primitives to `flatMappedTo*`.
+- Renamed the specialized `*Array.mapped` method for primitives to `mappedTo*`.
+- Updated some Dyvil files to use the Optional Cast Operator.
+- Updated the `Console` class to add more ANSI escape sequences.
+
+## Dyvil Compiler v0.37.0
+
+- Added a bytecode optimization for Enum Patterns. #378
+- Added an optimization for Optional Casts in Binding If Statements.
+- Added automatic conversion from Field Patterns to Enum Patterns where possible. #378
+- Added bytecode optimization for Unapply Patterns using the `@SwitchOptimized` annotation. #378
+- Added compiler support for Optional Cast Operators. #360
+- Added support for the `AUTO_LOAD` and `AUTO_STORE` opcodes.
+- Added the `IMethodConsumer` interface.
+- Added the `PrimitiveType.fromFrameType` method.
+- Cleaned up some comments in `toCompoundAssignment` methods.
+- Cleaned up the `DyvilFileType` class.
+- Cleaned up the `InstanceOfOperator` class and associated diagnostic messages.
+- Cleaned up the `SideEffectHelper` class.
+- Fixed Method Resolution on Receivers with type `any`.
+- Fixed Variable Formatting for For Each Statements.
+- Fixed `ForEachStatement.withType` implementation not accepting `void` correctly.
+- Fixed a `StackOverflowError` during compilation caused by merging `StringInterpolationExpr`s incorrectly.
+- Fixed an issue that caused Match Expressions to ignore the type from `withType`.
+- Fixed code class compilation using the legacy extension `.dyvil` for debug info.
+- Implicit Resolution now allows builtin type-based conversions (e.g. implicit nullable unwrapping).
+- Improved Parsing and Warnings for Compiler Arguments.
+- Improved diagnostic errors for method calls with unresolved types.
+- Improved the Cast Operator Implementation and cleaned up the file.
+- Improved the `Pattern.min` and `.max` default implementations.
+- Match Expressions now check for cases with duplicate values. #377
+- Optimized Access to Final Variables where an additional variable is required.
+- Optimized String Pattern Compilation by removing unnecessary type-checks. #378
+- Refactored Pattern Compilation by renaming the `Pattern.writeInvJump` method to `writeJumpOnMismatch` and removing the `matchedType: IType` parameter. #378
+- Refactored the `IType.convert` system.
+- Renamed the `IFileType` class to `FileType`.
+- Renamed the `IPatternList` class to `PatternList`.
+- Renamed the `IPattern` class to `Pattern`.
+- Renamed the `Pattern` class to `AbstractPattern`.
+- Updated primitive default constants.
+- Updated the `ICompilationUnit` and `SourceHeader` classes to improve diagnostic output.
+- Updated the `MethodParser` API.
+- Updated type checking for Literal Values and Literal Patterns to improve primitive conversion support.
+- Updated usages of `Source` to adapt to library API changes.
+
+## Dyvil REPL v0.23.0
+
+- Added support for the `load` command line argument. #374
+- Added the `:load` command for loading REPL input from a file. #374
+- Improved output for the `:help` command.
+- Updated and improved the `Colorizer` class.
+- Updated usages of `Source` to adapt to library API changes.
+
+## Dyvil Property Format v0.15.1
+
+- Added missing method return type in the `BinaryReader` class.
+- Updated some Dyvil files to use the Optional Cast Operator.
+
+## Dyvil GenSrc v0.8.0
+"""
