@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.header;
 
 import dyvil.io.Console;
+import dyvil.io.StringBuilderWriter;
 import dyvil.lang.Name;
 import dyvil.source.FileSource;
 import dyvilx.tools.compiler.DyvilCompiler;
@@ -8,6 +9,8 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.sources.FileType;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
+import dyvilx.tools.parsing.marker.MarkerPrinter;
+import dyvilx.tools.parsing.marker.MarkerStyle;
 
 public interface ICompilationUnit extends ASTNode
 {
@@ -49,11 +52,10 @@ public interface ICompilationUnit extends ASTNode
 
 		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
+		final MarkerStyle style = compiler.config.getMarkerStyle();
 		final boolean colors = compiler.config.useAnsiColors();
 
-		markers.log(source, builder, colors);
-
-		builder.append('\n');
+		new MarkerPrinter(source, style, colors).print(markers, new StringBuilderWriter(builder));
 
 		if (errors > 0)
 		{

@@ -5,6 +5,7 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
 import dyvilx.tools.compiler.phase.PrintPhase;
 import dyvilx.tools.compiler.util.Util;
+import dyvilx.tools.parsing.marker.MarkerStyle;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,16 @@ public final class ArgumentParser
 			return;
 		case "--ansi":
 			config.setAnsiColors(true);
+			return;
+		case "-Mg":
+		case "-Mgcc":
+		case "--gcc-markers":
+			config.setMarkerStyle(MarkerStyle.GCC);
+			return;
+		case "-Mm":
+		case "-Mmachine":
+		case "--machine-markers":
+			config.setMarkerStyle(MarkerStyle.MACHINE);
 			return;
 		}
 

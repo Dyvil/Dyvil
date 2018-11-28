@@ -5,6 +5,7 @@ import dyvil.lang.Strings;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
+import dyvilx.tools.parsing.marker.MarkerStyle;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,8 +32,9 @@ public class CompilerConfig
 
 	private File logFile;
 
-	private boolean debug;
-	private boolean ansiColors;
+	private boolean     debug;
+	private boolean     ansiColors;
+	private MarkerStyle markerStyle = MarkerStyle.DYVIL;
 
 	// - - - - - - - - Sources - - - - - - - -
 
@@ -111,6 +113,16 @@ public class CompilerConfig
 	public void setAnsiColors(boolean ansiColors)
 	{
 		this.ansiColors = ansiColors;
+	}
+
+	public MarkerStyle getMarkerStyle()
+	{
+		return this.markerStyle;
+	}
+
+	public void setMarkerStyle(MarkerStyle markerStyle)
+	{
+		this.markerStyle = markerStyle;
 	}
 
 	// - - - - - - - - Sources - - - - - - - -

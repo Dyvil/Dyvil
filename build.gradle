@@ -348,7 +348,7 @@ private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 		exec.args 'test'
 	}
 
-	exec.args 'compile', '--ansi'
+	exec.args 'compile', '--ansi', '--machine-markers'
 }
 
 private void setupCompiler(Map args, JavaExec exec) {
@@ -457,7 +457,7 @@ task runRepl(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) { JavaExec exec 
 
 	standardOutput = System.out
 	standardInput = System.in
-	
+
 	main = Constants.replMainClass
 	classpath = sourceSets.test.runtimeClasspath + sourceSets.repl.runtimeClasspath
 }
