@@ -3,8 +3,13 @@ package dyvilx.tools.repl.command;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
+import org.jline.builtins.Completers;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
+import static org.jline.builtins.Completers.TreeCompleter.node;
 
 public class LibraryCommand implements ICommand
 {
@@ -24,6 +29,13 @@ public class LibraryCommand implements ICommand
 	public String getUsage()
 	{
 		return ":<library|lib|loadlibrary|cp> <path>";
+	}
+
+	@Override
+	public List<Completers.TreeCompleter.Node> getCompletionNodes()
+	{
+		return Collections.singletonList(
+			node(":library", ":lib", ":loadlibrary", ":cp", node(new Completers.FileNameCompleter())));
 	}
 
 	@Override

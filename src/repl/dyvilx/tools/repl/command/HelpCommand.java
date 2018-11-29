@@ -2,8 +2,11 @@ package dyvilx.tools.repl.command;
 
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
+import org.jline.builtins.Completers;
 
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -19,6 +22,14 @@ public class HelpCommand implements ICommand
 	public String getUsage()
 	{
 		return ":help [command]";
+	}
+
+	@Override
+	public List<Completers.TreeCompleter.Node> getCompletionNodes()
+	{
+		final Object[] commandNames = DyvilREPL.getCommands().values().stream().flatMap(ICommand::nameStream).toArray();
+		return Collections
+			       .singletonList(Completers.TreeCompleter.node(":help", Completers.TreeCompleter.node(commandNames)));
 	}
 
 	@Override

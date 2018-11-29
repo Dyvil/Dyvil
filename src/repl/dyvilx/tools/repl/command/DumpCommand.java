@@ -2,9 +2,14 @@ package dyvilx.tools.repl.command;
 
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
+import org.jline.builtins.Completers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import static org.jline.builtins.Completers.TreeCompleter.node;
 
 public class DumpCommand implements ICommand
 {
@@ -21,6 +26,12 @@ public class DumpCommand implements ICommand
 	}
 
 	@Override
+	public List<Completers.TreeCompleter.Node> getCompletionNodes()
+	{
+		return Collections.singletonList(node(":dump", node(new Completers.FileNameCompleter())));
+	}
+
+	@Override
 	public void execute(DyvilREPL repl, String argument)
 	{
 		if (argument == null)
@@ -29,10 +40,10 @@ public class DumpCommand implements ICommand
 			repl.setDumpDir(null);
 			return;
 		}
-		
+
 		File dumpDir = new File(argument);
 		repl.setDumpDir(dumpDir);
-		
+
 		try
 		{
 			repl.getOutput().println(I18n.get("command.dump.enabled", dumpDir.getCanonicalPath()));

@@ -3,6 +3,12 @@ package dyvilx.tools.repl.command;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.lang.I18n;
+import org.jline.builtins.Completers;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.jline.builtins.Completers.TreeCompleter.node;
 
 public class DebugCommand implements ICommand
 {
@@ -16,6 +22,13 @@ public class DebugCommand implements ICommand
 	public String getUsage()
 	{
 		return ":debug [on|off|true|false|enable|disable]";
+	}
+
+	@Override
+	public List<Completers.TreeCompleter.Node> getCompletionNodes()
+	{
+		return Collections
+			       .singletonList(node(":debug", node("on", "off", "true", "false", "enable", "disable")));
 	}
 
 	@Override
