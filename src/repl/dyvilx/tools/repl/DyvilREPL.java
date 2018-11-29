@@ -1,5 +1,6 @@
 package dyvilx.tools.repl;
 
+import dyvil.io.Files;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
@@ -15,11 +16,12 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.repl.command.*;
 import dyvilx.tools.repl.context.REPLClassLoader;
 import dyvilx.tools.repl.context.REPLContext;
-import dyvilx.tools.repl.input.InputManager;
 import dyvilx.tools.repl.input.REPLParser;
 import dyvilx.tools.repl.lang.I18n;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -174,14 +176,9 @@ public final class DyvilREPL
 
 	public void processFile(File file)
 	{
-		try (InputStream fileInput = new FileInputStream(file))
+		try
 		{
-			InputManager input = new InputManager(null, fileInput);
-			String line;
-			while ((line = input.readInput()) != null)
-			{
-				this.processInput(line);
-			}
+			this.processInput(Files.readText(file));
 		}
 		catch (IOException e)
 		{

@@ -1,6 +1,14 @@
 package dyvilx.tools.repl.input;
 
-import java.io.*;
+import dyvil.lang.Strings;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
+import java.io.IOException;
 
 public class InputManager
 {
@@ -9,40 +17,42 @@ public class InputManager
 	public static final int DOUBLE_STRING = 4;
 	public static final int SINGLE_STRING = 8;
 
-	private final PrintStream    output;
-	private final BufferedReader input;
+	private final LineReader reader;
 
-	public InputManager(PrintStream output, InputStream input)
+	public InputManager() throws IOException
 	{
-		this.output = output;
-		this.input = new BufferedReader(new InputStreamReader(input));
+		this.reader = createLineReader();
 	}
 
-	public String readInput() throws IOException
+	private static LineReader createLineReader() throws IOException
 	{
-		if (this.output != null)
-		{
-			this.output.print("> ");
-		}
+		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal()).build();
+	}
 
+	private static Terminal createTerminal() throws IOException
+	{
+		return TerminalBuilder.terminal();
+	}
+
+	public String readInput()
+	{
 		final StringBuilder buffer = new StringBuilder();
 
 		int braceDepth = 0;
 		int parenDepth = 0;
 		int bracketDepth = 0;
 		byte mode = 0;
+		String prompt = "> ";
+		String input;
 
 		while (true)
 		{
-			final String input = this.input.readLine();
-
-			if (input == null)
+			try
 			{
-				if (buffer.length() > 0)
-				{
-					continue;
-				}
-
+				input = this.reader.readLine(prompt);
+			}
+			catch (EndOfFileException | UserInterruptException ex)
+			{
 				return null;
 			}
 
@@ -132,23 +142,9 @@ public class InputManager
 				break;
 			}
 
-			this.printIndent(braceDepth);
+			prompt = "| " + Strings.repeat("    ", braceDepth); // 4 spaces
 		}
 
 		return buffer.toString();
-	}
-
-	private void printIndent(int indent)
-	{
-		if (this.output == null)
-		{
-			return;
-		}
-
-		this.output.print("| ");
-		for (int j = 0; j < indent; j++)
-		{
-			this.output.print("    "); // 4 spaces
-		}
 	}
 }

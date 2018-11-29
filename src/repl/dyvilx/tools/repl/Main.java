@@ -2,8 +2,6 @@ package dyvilx.tools.repl;
 
 import dyvilx.tools.repl.input.InputManager;
 
-import java.io.IOException;
-
 public final class Main
 {
 	protected static final long SLEEP_TIME = 4L;
@@ -14,14 +12,9 @@ public final class Main
 
 		instance.launch(args);
 
-		final InputManager inputManager = new InputManager(System.out, System.in);
-		do
+		final InputManager inputManager = new InputManager();
+		while (readAndProcess(instance, inputManager))
 		{
-			if (!readAndProcess(instance, inputManager))
-			{
-				break;
-			}
-
 			// Wait to make sure the output isn't messed up in IDE consoles.
 			try
 			{
@@ -31,7 +24,6 @@ public final class Main
 			{
 			}
 		}
-		while (true);
 
 		instance.shutdown();
 	}
@@ -39,15 +31,8 @@ public final class Main
 	private static boolean readAndProcess(DyvilREPL repl, InputManager inputManager)
 	{
 		final String currentCode;
-		try
-		{
-			currentCode = inputManager.readInput();
-			if (currentCode == null)
-			{
-				return false;
-			}
-		}
-		catch (IOException ignored)
+		currentCode = inputManager.readInput();
+		if (currentCode == null)
 		{
 			return false;
 		}
