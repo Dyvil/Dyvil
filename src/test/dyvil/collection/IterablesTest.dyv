@@ -57,7 +57,7 @@ class IterablesTest {
 	// --------------- Operators ---------------
 
 	@Test func concat() -> void {
-		(this.empty ++ this.empty) =?= List()
+		(this.empty ++ this.empty) =?= List<Int>()
 		(this.empty ++ this.ints) =?= List(1, 2, 3)
 		(this.ints ++ this.empty) =?= List(1, 2, 3)
 		(this.ints ++ this.ints) =?= List(1, 2, 3, 1, 2, 3)
@@ -76,20 +76,20 @@ class IterablesTest {
 	}
 
 	@Test func removedAll() -> void {
-		(this.empty -- this.empty) =?= List()
-		(this.empty -- this.ints) =?= List()
+		(this.empty -- this.empty) =?= List<Int>()
+		(this.empty -- this.ints) =?= List<Int>()
 
 		(this.ints -- this.empty) =?= List(1, 2, 3)
-		(this.ints -- this.ints) =?= List()
+		(this.ints -- this.ints) =?= List<Int>()
 
 		(this.ints -- List(1)) =?= List(2, 3)
 		(this.ints -- List(1, 3)) =?= List(2)
 		(this.ints -- List(2, 1)) =?= List(3)
-		(this.ints -- List(3, 1, 2)) =?= List()
+		(this.ints -- List(3, 1, 2)) =?= List<Int>()
 	}
 
 	@Test func removed() -> void {
-		(this.empty - 1) =?= List()
+		(this.empty - 1) =?= List<Int>()
 		(this.ints - 1) =?= List(2, 3)
 		(this.ints - 2) =?= List(1, 3)
 		(this.ints - 3) =?= List(1, 2)
@@ -212,27 +212,27 @@ class IterablesTest {
 	// --------------- Transformation Methods ---------------
 
 	@Test func filtered() -> void {
-		this.empty.filtered(e => true) =?= List()
-		this.empty.filtered(e => false) =?= List()
+		this.empty.filtered(e => true) =?= List<Int>()
+		this.empty.filtered(e => false) =?= List<Int>()
 
 		this.ints.filtered(e => true) =?= List(1, 2, 3)
-		this.ints.filtered(e => false) =?= List()
+		this.ints.filtered(e => false) =?= List<Int>()
 		this.ints.filtered(e => e > 1) =?= List(2, 3)
 		this.ints.filtered(e => e == 2) =?= List(2)
 	}
 
 	@Test func mapped() -> void {
-		this.empty.mapped(_ + 1) =?= List()
+		this.empty.mapped(_ + 1) =?= List<Int>()
 
 		this.ints.mapped(_ + 1) =?= List(2, 3, 4)
 		this.ints.mapped(_ * 2) =?= List(2, 4, 6)
 	}
 
 	@Test func flatMapped() -> void {
-		this.empty.flatMapped(e => []) =?= List()
-		this.empty.flatMapped(e => [ e ]) =?= List()
+		this.empty.flatMapped(e => []) =?= List<Int>()
+		this.empty.flatMapped(e => [ e ]) =?= List<Int>()
 
-		this.ints.flatMapped(e => []) =?= List()
+		this.ints.flatMapped(e => []) =?= List<Int>()
 		this.ints.flatMapped(e => [ 1 ]) =?= List(1, 1, 1)
 		this.ints.flatMapped(e => [ e ]) =?= List(1, 2, 3)
 		this.ints.flatMapped(e => [ e - 1, e, e + 1 ]) =?= List(0, 1, 2, 1, 2, 3, 2, 3, 4)
