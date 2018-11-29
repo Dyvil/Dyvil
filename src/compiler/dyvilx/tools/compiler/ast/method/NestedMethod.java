@@ -4,6 +4,7 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.field.IDataMember;
@@ -85,6 +86,21 @@ public class NestedMethod extends CodeMethod
 		}
 
 		super.resolveTypes(markers, context);
+	}
+
+	// --------------- Diagnostic Phases ---------------
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		final int accessLevel = this.getAccessLevel();
+		if (accessLevel != Modifiers.PRIVATE)
+		{
+			markers.add(Markers.semanticError(this.position, "method.nested.not_private", this.getName(),
+			                                  ModifierUtil.accessModifiersToString(accessLevel)));
+		}
+
+		super.check(markers, context);
 	}
 
 	// --------------- Pre-Compilation Phases ---------------

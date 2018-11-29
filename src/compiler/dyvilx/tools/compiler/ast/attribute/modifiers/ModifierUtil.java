@@ -23,7 +23,7 @@ public final class ModifierUtil
 	{
 		final StringBuilder builder = new StringBuilder();
 		appendAccessModifiers(mod, builder);
-		return builder.toString();
+		return builder.substring(0, builder.length() - 1);
 	}
 
 	public static String classTypeToString(long mod)
