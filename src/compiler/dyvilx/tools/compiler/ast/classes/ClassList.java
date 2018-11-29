@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Iterators;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.function.Function;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -20,6 +19,8 @@ import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 {
@@ -107,16 +108,16 @@ public class ClassList implements Formattable, Resolvable, Iterable<IClass>
 
 	public Iterable<IClass> objectClasses()
 	{
-		//noinspection RedundantCast
-		return () -> Iterators.filtered(this.iterator(), (Function.Of1<IClass, Boolean>) IClass::isObject);
+		// TODO after v0.44.0: Remove cast
+		return () -> Iterators.filtered(this.iterator(), (Predicate<IClass>) IClass::isObject);
 	}
 
 	public Iterable<IField> objectClassInstanceFields()
 	{
-		//noinspection RedundantCast
+		// TODO after v0.44.0: Remove cast
 		return () -> Iterators.mapped(this.objectClasses().iterator(),
-		                              (Function.Of1<IClass, IField>) (iclass -> iclass.getMetadata()
-		                                                                              .getInstanceField()));
+		                              (Function<IClass, IField>) (iclass -> iclass.getMetadata()
+		                                                                          .getInstanceField()));
 	}
 
 	// --------------- Context Resolution ---------------

@@ -3,7 +3,6 @@ package dyvilx.tools.compiler.ast.classes;
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Iterators;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.function.Function;
 import dyvil.lang.Name;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
@@ -38,6 +37,7 @@ import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
@@ -142,9 +142,9 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public Iterable<IField> enumConstants()
 	{
-		//noinspection RedundantCast
+		// TODO after v0.44.0: Remove cast
 		return () -> Iterators.filtered(new ArrayIterator<>(this.fields, 0, this.fieldCount),
-		                                (Function.Of1<IField, Boolean>) IField::isEnumConstant);
+		                                (Predicate<IField>) IField::isEnumConstant);
 	}
 
 	public int fieldCount()
