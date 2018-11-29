@@ -1,7 +1,8 @@
 package dyvilx.tools.compiler.phase;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.io.FileUtils;
+import dyvil.io.Files;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
@@ -13,7 +14,6 @@ import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.parsing.token.IdentifierToken;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
@@ -43,7 +43,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Saves the formatted AST to the input file
 	 */
-	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT", unit -> FileUtils.tryWrite(
+	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT", unit -> Files.tryWriteText(
 		unit.getFileSource().file(), unit.toString()));
 
 	ICompilerPhase RESOLVE_HEADERS = new ResolveHeaderPhase(45);
