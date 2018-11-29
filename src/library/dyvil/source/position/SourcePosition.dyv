@@ -1,7 +1,13 @@
 package dyvil.source.position
 
 interface SourcePosition extends Comparable<SourcePosition> {
-	public const ORIGIN: SourcePosition = new Base(1, 1, 0, 1)
+	// =============== Constants ===============
+
+	public const FIRST_LINE: int = 1
+	public const FIRST_COLUMN: int = 0
+
+	public const ORIGIN: SourcePosition
+		= SourcePosition(inLine: FIRST_LINE, column: FIRST_COLUMN)
 
 	// =============== Operators ===============
 
@@ -11,35 +17,37 @@ interface SourcePosition extends Comparable<SourcePosition> {
 	// =============== Static Methods ===============
 
 	// SourcePosition(fromLine: 2, fromColumn: 3, toLine: 3, toColumn: 4)
-	static func apply(fromLine startLine: int, toLine endLine: int, fromColumn startColumn: int, toColumn endColumn: int) -> SourcePosition
+	static func apply(fromLine startLine: int, toLine endLine: int,
+	                  fromColumn startColumn: int, toColumn endColumn: int) -> SourcePosition
 		= new Base(startLine, endLine, startColumn, endColumn)
 
-	// SourcePosition(inLine: 1, fromColumn: 1, to: 3)
+	// SourcePosition(inLine: 1, fromColumn: 1, toColumn: 3)
 	static func apply(inLine line: int, fromColumn startColumn: int, toColumn endColumn: int) -> SourcePosition
 		= new Base(line, line, startColumn, endColumn)
+
+	// SourcePosition(inLine: 1, column: 2)
+	static func apply(inLine line: int, column: int) -> SourcePosition
+		= new Base(line, line, column, column + 1)
 
 	// SourcePosition(before: next)
 	@JavaName("before")
 	static func apply(before position: SourcePosition) -> SourcePosition {
-		let line = position.startLine
 		let column = position.startColumn
-		return (column == 0) ? new Base(line, line, column, column + 1) : new Base(line, line, column - 1, column)
+		return SourcePosition(inLine: position.startLine, column: (column <= FIRST_COLUMN) ? FIRST_COLUMN : column - 1)
 	}
 
 	// SourcePosition(after: prev)
 	@JavaName("after")
-	static func apply(after position: SourcePosition) -> SourcePosition {
-		let line = position.endLine
-		let column = position.endColumn
-		return new Base(line, line, column, column + 1)
-	}
+	static func apply(after position: SourcePosition) -> SourcePosition
+		= SourcePosition(inLine: position.endLine, column: position.endColumn)
 
 	// SourcePosition(between: start, and: end)
 	@JavaName("between")
 	static func apply(between start: SourcePosition, and end: SourcePosition) -> SourcePosition {
 		var startColumn = start.endColumn
 		var endColumn = end.startColumn
-		if (startColumn == endColumn) {
+		if startColumn == endColumn {
+			// neighboring, select the last character of the previous position and first character of the next position
 			startColumn += 1
 			endColumn -= 1
 		}
@@ -79,25 +87,26 @@ interface SourcePosition extends Comparable<SourcePosition> {
 	@Deprecated // in Dyvil only
 	func isAfter(position: SourcePosition) -> boolean = this.compareTo(position) > 0
 
-	func isNeighboring(position: SourcePosition) -> boolean = this.endColumn == position.startColumn
+	func isNeighboring(position: SourcePosition) -> boolean
+		= this.endLine == position.startLine && this.endColumn == position.startColumn
 
 	// --------------- Formatting ---------------
 
 	func toPositionString() -> String {
+		// internally, the end column is not inclusive, so we subtract one for printing
+		let endColumn = this.endColumn - 1
 		if this.startLine != this.endLine {
-			return "\(this.startLine).\(this.startColumn)-\(this.endLine).\(this.endColumn)"
+			return "\(this.startLine).\(this.startColumn)-\(this.endLine).\(endColumn)"
 		}
-		else if this.startColumn != this.endColumn {
-			return "\(this.startLine).\(this.startColumn)-\(this.endColumn)"
+		if this.startColumn != endColumn {
+			return "\(this.startLine).\(this.startColumn)-\(endColumn)"
 		}
-		else {
-			return "\(this.startLine).\(this.startColumn)"
-		}
+		return "\(this.startLine).\(this.startColumn)"
 	}
 
 	// Base Implementation
 
-	private static case class Base (
+	private static class Base (
 		let startLine:   int { @JavaName("startLine") override get }
 		let endLine:     int { @JavaName("endLine") override get }
 		let startColumn: int { @JavaName("startColumn") override get }
@@ -105,9 +114,6 @@ interface SourcePosition extends Comparable<SourcePosition> {
 	)
 	implements SourcePosition {
 		override func raw() -> SourcePosition = this
-
-		override func equals(obj: any!) -> boolean
-			= this === obj || obj is SourcePosition && this.equals(obj as SourcePosition)
 
 		func equals(that: SourcePosition) -> boolean {
 			if (this === that) return true
@@ -117,6 +123,12 @@ interface SourcePosition extends Comparable<SourcePosition> {
 			if (this.endColumn != that.endColumn) return false
 			return true
 		}
+
+		override func equals(obj: any!) -> boolean
+			= this === obj || obj is SourcePosition && this.equals(obj as SourcePosition)
+
+		override func hashCode() -> int
+			= java.util.Objects.hash(this.startLine, this.endLine, this.startColumn, this.endColumn)
 
 		override func toString() -> String = this.toPositionString()
 	}
