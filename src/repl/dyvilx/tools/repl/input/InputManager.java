@@ -1,13 +1,17 @@
 package dyvilx.tools.repl.input;
 
 import dyvil.lang.Strings;
+import dyvilx.tools.repl.DyvilREPL;
 import dyvilx.tools.repl.context.Colorizer;
+import org.jline.builtins.Completers;
 import org.jline.reader.*;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class InputManager
 {
@@ -25,12 +29,23 @@ public class InputManager
 
 	private static LineReader createLineReader() throws IOException
 	{
-		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal()).highlighter(createHighlighter()).build();
+		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal())
+		                        .highlighter(createHighlighter()).completer(createCompleter())
+		                        .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true).build();
 	}
 
 	private static Highlighter createHighlighter()
 	{
 		return (reader, buffer) -> AttributedString.fromAnsi(Colorizer.colorize(buffer, null));
+	}
+
+	private static Completer createCompleter()
+	{
+		final List<Completers.TreeCompleter.Node> nodes = DyvilREPL.getCommands().values().stream()
+		                                                           .flatMap(c -> c.getCompletionNodes().stream())
+		                                                           .collect(Collectors.toList());
+
+		return new Completers.TreeCompleter(nodes);
 	}
 
 	private static Terminal createTerminal() throws IOException
