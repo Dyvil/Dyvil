@@ -35,10 +35,4 @@ class MarkerList(let i18n: I18n { public get }) extends ArrayList<Marker> {
 	@java.lang.Deprecated
 	@JavaName("addAll")
 	func addAll_bridge(markers: MarkerList) -> void = this.addAll(markers)
-
-	@Deprecated(replacements: [ "MarkerPrinter.print(MarkerList, Writer)" ], forRemoval: "v0.44.0")
-	@java.lang.Deprecated
-	func log(source: Source, buffer: StringBuilder, colors: boolean) -> void {
-		MarkerPrinter(source, .DYVIL, colors).printHuman(this, new dyvil.io.StringBuilderWriter(buffer))
-	}
 }

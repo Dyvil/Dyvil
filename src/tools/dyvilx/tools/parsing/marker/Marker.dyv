@@ -55,10 +55,4 @@ case class Marker(
 	}
 
 	func equals(that: Marker) -> boolean = this.equals(that as Object)
-
-	@Deprecated(replacements: [ "MarkerPrinter.print(MarkerList, Writer)" ], forRemoval: "v0.44.0")
-	@java.lang.Deprecated
-	func log(source: Source, indent: String, buffer: StringBuilder, colors: boolean) -> void {
-		MarkerPrinter(source, .DYVIL, colors).printHuman(this, indent, new dyvil.io.StringBuilderWriter(buffer))
-	}
 }
