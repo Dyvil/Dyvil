@@ -1,12 +1,11 @@
 package dyvilx.tools.repl.input;
 
 import dyvil.lang.Strings;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.UserInterruptException;
+import dyvilx.tools.repl.context.Colorizer;
+import org.jline.reader.*;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.AttributedString;
 
 import java.io.IOException;
 
@@ -26,7 +25,12 @@ public class InputManager
 
 	private static LineReader createLineReader() throws IOException
 	{
-		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal()).build();
+		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal()).highlighter(createHighlighter()).build();
+	}
+
+	private static Highlighter createHighlighter()
+	{
+		return (reader, buffer) -> AttributedString.fromAnsi(Colorizer.colorize(buffer, null));
 	}
 
 	private static Terminal createTerminal() throws IOException

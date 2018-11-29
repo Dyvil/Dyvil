@@ -34,8 +34,8 @@ public class Colorizer
 			{
 				// insert ANSI color codes before and after the token
 				final StringBuilder line = lines[token.startLine() - 1];
-				line.insert(token.endColumn(), Console.ANSI_RESET);
-				line.insert(token.startColumn(), color);
+				line.insert(Math.min(line.length(), token.endColumn()), Console.ANSI_RESET);
+				line.insert(Math.min(line.length(), token.startColumn()), color);
 			}
 		}
 
@@ -58,15 +58,16 @@ public class Colorizer
 		if ((type & (Tokens.STRING | Tokens.VERBATIM_STRING | Tokens.SINGLE_QUOTED_STRING | Tokens.VERBATIM_CHAR))
 		    != 0) // string literals
 		{
-			return Console.ANSI_BLUE + Console.ANSI_ITALIC;
+			return Console.ANSI_GREEN + Console.ANSI_ITALIC;
 		}
 		if ((type & (Tokens.KEYWORD | Tokens.SYMBOL)) != 0) // keywords and symbols
 		{
-			return Console.ANSI_BOLD;
+			return Console.ANSI_RED;
 		}
-		if ((type & Tokens.IDENTIFIER) != 0 && context.isMember(token.nameValue())) // members / identifiers
+		if ((type & Tokens.IDENTIFIER) != 0 && context != null && context.isMember(
+			token.nameValue())) // members / identifiers
 		{
-			return Console.ANSI_BLUE;
+			return Console.ANSI_YELLOW;
 		}
 		return null;
 	}
