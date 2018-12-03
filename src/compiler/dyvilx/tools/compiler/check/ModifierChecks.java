@@ -54,11 +54,27 @@ public class ModifierChecks
 		{
 			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
 			                                  errorBuilder.toString()));
+			return;
 		}
-		if (!attributes.hasAnyFlag(Modifiers.VISIBILITY_MODIFIERS))
+
+		final int visibility = (int) (attributes.flags() & Modifiers.VISIBILITY_MODIFIERS);
+		switch (visibility)
 		{
+		case Modifiers.PRIVATE:
+		case Modifiers.PRIVATE_PROTECTED:
+		case Modifiers.PROTECTED:
+		case Modifiers.PACKAGE:
+		case Modifiers.PUBLIC:
+			// some visibility modifier or valid combination thereof already present
+			break;
+		case 0:
 			// If there is no explicit or implicit visibility modifier already, add the default one
 			attributes.addFlag(defaultAccess);
+			break;
+		default:
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.visibility.illegal",
+			                                  Util.memberNamed(member),
+			                                  ModifierUtil.accessModifiersToString(visibility)));
 		}
 	}
 
