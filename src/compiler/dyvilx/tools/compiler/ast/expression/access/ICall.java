@@ -4,13 +4,11 @@ import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.method.Candidate;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.method.MatchList;
 import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
-import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -18,6 +16,10 @@ import java.util.function.Supplier;
 
 public interface ICall extends IValue, WildcardLambdaAware
 {
+	// =============== Properties ===============
+
+	// --------------- Receiver ---------------
+
 	default IValue getReceiver()
 	{
 		return null;
@@ -27,9 +29,13 @@ public interface ICall extends IValue, WildcardLambdaAware
 	{
 	}
 
-	void setArguments(ArgumentList arguments);
+	// --------------- Arguments ---------------
 
 	ArgumentList getArguments();
+
+	void setArguments(ArgumentList arguments);
+
+	// --------------- Expression Properties ---------------
 
 	@Override
 	default boolean isUsableAsStatement()
@@ -37,33 +43,9 @@ public interface ICall extends IValue, WildcardLambdaAware
 		return true;
 	}
 
-	@Override
-	default IValue resolve(MarkerList markers, IContext context)
-	{
-		final IValue wildcardLambda = WildcardLambdaAware.transform(this);
-		if (wildcardLambda != null)
-		{
-			return wildcardLambda.resolve(markers, context);
-		}
+	// =============== Methods ===============
 
-		this.resolveReceiver(markers, context);
-		this.resolveArguments(markers, context);
-
-		// Don't resolve and report an error if the receiver is not resolved
-		IValue receiver = this.getReceiver();
-		if (receiver != null && !receiver.isResolved())
-		{
-			return this;
-		}
-
-		// Don't resolve and report an error if the arguments are not resolved
-		if (!this.getArguments().isResolved())
-		{
-			return this;
-		}
-
-		return this.resolveCall(markers, context, true);
-	}
+	// --------------- WildcardLambdaAware ---------------
 
 	@Override
 	default int wildcardCount()
@@ -109,6 +91,38 @@ public interface ICall extends IValue, WildcardLambdaAware
 		return this;
 	}
 
+	// --------------- Resolution Phases ---------------
+
+	@Override
+	default IValue resolve(MarkerList markers, IContext context)
+	{
+		final IValue wildcardLambda = WildcardLambdaAware.transform(this);
+		if (wildcardLambda != null)
+		{
+			return wildcardLambda.resolve(markers, context);
+		}
+
+		this.resolveReceiver(markers, context);
+		this.resolveArguments(markers, context);
+
+		// Don't resolve and report an error if the receiver is not resolved
+		IValue receiver = this.getReceiver();
+		if (receiver != null && !receiver.isResolved())
+		{
+			return this;
+		}
+
+		// Don't resolve and report an error if the arguments are not resolved
+		if (!this.getArguments().isResolved())
+		{
+			return this;
+		}
+
+		return this.resolveCall(markers, context, true);
+	}
+
+	// --------------- Resolution ---------------
+
 	default void resolveReceiver(MarkerList markers, IContext context)
 	{
 	}
@@ -117,26 +131,7 @@ public interface ICall extends IValue, WildcardLambdaAware
 
 	IValue resolveCall(MarkerList markers, IContext context, boolean report);
 
-	static boolean privateAccess(IContext context, IValue receiver)
-	{
-		return receiver == null || context.getThisClass() == receiver.getType().getTheClass();
-	}
-
-	static IDataMember resolveField(IContext context, Typed receiver, Name name)
-	{
-		if (receiver != null)
-		{
-			return receiver.getType().resolveField(name);
-		}
-
-		final IDataMember match = context.resolveField(name);
-		if (match != null)
-		{
-			return match;
-		}
-
-		return Types.BASE_CONTEXT.resolveField(name);
-	}
+	// =============== Static Methods ===============
 
 	static IMethod resolveMethod(IContext context, IValue receiver, Name name, ArgumentList arguments)
 	{

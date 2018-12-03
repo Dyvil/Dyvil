@@ -11,6 +11,7 @@ import dyvilx.tools.compiler.ast.field.IDataMember;
 import dyvilx.tools.compiler.ast.member.Named;
 import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.marker.MarkerList;
@@ -208,6 +209,22 @@ public abstract class AbstractFieldAccess
 
 	// --------------- Resolution ---------------
 
+	public static IDataMember resolveField(IContext context, Typed receiver, Name name)
+	{
+		if (receiver != null)
+		{
+			return receiver.getType().resolveField(name);
+		}
+
+		final IDataMember match = context.resolveField(name);
+		if (match != null)
+		{
+			return match;
+		}
+
+		return Types.BASE_CONTEXT.resolveField(name);
+	}
+
 	@Override
 	public void resolveReceiver(MarkerList markers, IContext context)
 	{
@@ -234,7 +251,7 @@ public abstract class AbstractFieldAccess
 	{
 		IValue value;
 
-		if (ICall.privateAccess(context, this.receiver))
+		if (this.receiver == null || context.getThisClass() == this.receiver.getType().getTheClass())
 		{
 			IValue implicitValue;
 			if (this.receiver == null && (implicitValue = context.resolveImplicit(null)) != null)

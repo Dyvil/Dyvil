@@ -161,7 +161,7 @@ public class FieldAssignment extends AbstractFieldAccess
 	@Override
 	protected IValue resolveAsField(IValue receiver, MarkerList markers, IContext context)
 	{
-		final IDataMember field = ICall.resolveField(context, receiver, this.name);
+		final IDataMember field = AbstractFieldAccess.resolveField(context, receiver, this.name);
 		if (field == null)
 		{
 			return null;
