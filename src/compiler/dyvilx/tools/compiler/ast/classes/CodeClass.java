@@ -9,6 +9,7 @@ import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
+import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.external.ExternalHeader;
@@ -112,7 +113,7 @@ public class CodeClass extends AbstractClass
 
 		if (this.metadata == null)
 		{
-			this.metadata = IClass.getClassMetadata(this, this.attributes.flags());
+			this.metadata = IClassMetadata.getClassMetadata(this, this.attributes.flags());
 		}
 
 		this.attributes.resolveTypes(markers, context, this);

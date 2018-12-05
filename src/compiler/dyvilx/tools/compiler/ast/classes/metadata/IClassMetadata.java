@@ -1,5 +1,7 @@
 package dyvilx.tools.compiler.ast.classes.metadata;
 
+import dyvil.reflect.Modifiers;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IField;
@@ -9,8 +11,8 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.phase.Resolvable;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -20,6 +22,44 @@ import java.util.Set;
 
 public interface IClassMetadata extends ClassCompilable, Resolvable
 {
+	// =============== Static Methods ===============
+
+	static IClassMetadata getClassMetadata(IClass forClass, long modifiers)
+	{
+		if ((modifiers & Modifiers.ANNOTATION) != 0)
+		{
+			return new AnnotationMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.TRAIT) != 0)
+		{
+			return new TraitMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.INTERFACE) != 0)
+		{
+			return new InterfaceMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.ENUM) != 0)
+		{
+			return new EnumClassMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.OBJECT) != 0)
+		{
+			return new ObjectClassMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.EXTENSION) != 0)
+		{
+			return new ExtensionMetadata(forClass);
+		}
+		// All modifiers above are single-bit flags
+		if ((modifiers & Modifiers.CASE_CLASS) != 0)
+		{
+			return new CaseClassMetadata(forClass);
+		}
+		return new ClassMetadata(forClass);
+	}
+
+	// =============== Methods ===============
+
 	MemberKind getKind();
 
 	default IField getInstanceField()

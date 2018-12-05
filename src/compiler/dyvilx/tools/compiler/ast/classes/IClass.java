@@ -1,8 +1,8 @@
 package dyvilx.tools.compiler.ast.classes;
 
-import dyvil.reflect.Modifiers;
+import dyvil.lang.Name;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.classes.metadata.*;
+import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
@@ -32,13 +32,22 @@ import java.util.Set;
 public interface IClass
 	extends ClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
-	@Override
-	MemberKind getKind();
+	// =============== Properties ===============
+
+	// --------------- Enclosing Header ---------------
 
 	@Override
 	IHeaderUnit getHeader();
 
 	void setHeader(IHeaderUnit unit);
+
+	// --------------- Enclosing Package ---------------
+
+	Package getPackage();
+
+	void setPackage(Package pack);
+
+	// --------------- Enclosing Class ---------------
 
 	@Override
 	IClass getEnclosingClass();
@@ -46,11 +55,10 @@ public interface IClass
 	@Override
 	void setEnclosingClass(IClass enclosingClass);
 
-	Package getPackage();
+	// --------------- Attributes ---------------
 
-	void setPackage(Package pack);
-
-	// ------------------------------ Attributable Implementation ------------------------------
+	@Override
+	MemberKind getKind();
 
 	@Override
 	default int getJavaFlags()
@@ -58,19 +66,84 @@ public interface IClass
 		return ITypeParametricMember.super.getJavaFlags() | (!this.isInterface() ? ClassFormat.ACC_SUPER : 0);
 	}
 
-	// Modifiers
-
 	default boolean isAnonymous()
 	{
 		return false;
 	}
 
-	// Full Name
+	// --------------- Name ---------------
+
+	@Override
+	Name getName();
+
+	@Override
+	void setName(Name name);
+
+	// --------------- Full Name ---------------
 
 	@Override
 	String getFullName();
 
 	void setFullName(String name);
+
+	// --------------- Type Parameters ---------------
+
+	@Override
+	TypeParameterList getTypeParameters();
+
+	void setTypeParameters(TypeParameterList typeParameters);
+
+	// --------------- Default Constructor Attributes ---------------
+
+	default AttributeList getConstructorAttributes()
+	{
+		return null;
+	}
+
+	default void setConstructorAttributes(AttributeList attributes)
+	{
+	}
+
+	// --------------- Super Type ---------------
+
+	IType getSuperType();
+
+	void setSuperType(IType type);
+
+	// --------------- Super Constructor Arguments ---------------
+
+	default ArgumentList getSuperConstructorArguments()
+	{
+		return null;
+	}
+
+	default void setSuperConstructorArguments(ArgumentList arguments)
+	{
+	}
+
+	// --------------- Interfaces ---------------
+
+	TypeList getInterfaces();
+
+	// --------------- Class Body ---------------
+
+	ClassBody createBody();
+
+	ClassBody getBody();
+
+	void setBody(ClassBody body);
+
+	// --------------- (end of formal properties) ---------------
+
+	// --------------- Metadata ---------------
+
+	IClassMetadata getMetadata();
+
+	void setMetadata(IClassMetadata metadata);
+
+	IMethod getFunctionalMethod();
+
+	// --------------- Types ---------------
 
 	// Super Types
 
@@ -95,68 +168,29 @@ public interface IClass
 
 	IType getClassType();
 
-	void setSuperType(IType type);
+	// =============== Methods ===============
 
-	IType getSuperType();
+	// --------------- Subclasses ---------------
 
 	boolean isSubClassOf(IType type);
 
-	default ArgumentList getSuperConstructorArguments()
-	{
-		return null;
-	}
-
-	default void setSuperConstructorArguments(ArgumentList arguments)
-	{
-	}
-
-	default AttributeList getConstructorAttributes()
-	{
-		return null;
-	}
-
-	default void setConstructorAttributes(AttributeList attributes)
-	{
-	}
-
-	// Interfaces
-
-	TypeList getInterfaces();
-
-	// Generics
-
-	@Override
-	TypeParameterList getTypeParameters();
-
-	void setTypeParameters(TypeParameterList typeParameters);
+	// --------------- Type Parameter Resolution ---------------
 
 	IType resolveType(ITypeParameter typeVar, IType concrete);
 
-	// Body
+	// --------------- Members ---------------
 
-	ClassBody createBody();
-
-	ClassBody getBody();
-
-	void setBody(ClassBody body);
-
-	IClassMetadata getMetadata();
-
-	void setMetadata(IClassMetadata metadata);
-
-	IMethod getFunctionalMethod();
+	Collection<IMethod> allMethods();
 
 	boolean isMember(ClassMember member);
 
 	byte getVisibility(ClassMember member);
 
-	Collection<IMethod> allMethods();
-
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses);
 
-	// Other Compilables (Lambda Expressions, ...)
+	// --------------- Compilables ---------------
 
 	@Override
 	int classCompilableCount();
@@ -164,7 +198,7 @@ public interface IClass
 	@Override
 	void addClassCompilable(ClassCompilable compilable);
 
-	// Compilation
+	// --------------- Compilation ---------------
 
 	@Override
 	String getInternalName();
@@ -183,38 +217,4 @@ public interface IClass
 	void writeStaticInit(MethodWriter writer) throws BytecodeException;
 
 	void writeInnerClassInfo(ClassWriter writer);
-
-	static IClassMetadata getClassMetadata(IClass forClass, long modifiers)
-	{
-		if ((modifiers & Modifiers.ANNOTATION) != 0)
-		{
-			return new AnnotationMetadata(forClass);
-		}
-		if ((modifiers & Modifiers.TRAIT) != 0)
-		{
-			return new TraitMetadata(forClass);
-		}
-		if ((modifiers & Modifiers.INTERFACE) != 0)
-		{
-			return new InterfaceMetadata(forClass);
-		}
-		if ((modifiers & Modifiers.ENUM) != 0)
-		{
-			return new EnumClassMetadata(forClass);
-		}
-		if ((modifiers & Modifiers.OBJECT) != 0)
-		{
-			return new ObjectClassMetadata(forClass);
-		}
-		if ((modifiers & Modifiers.EXTENSION) != 0)
-		{
-			return new ExtensionMetadata(forClass);
-		}
-		// All modifiers above are single-bit flags
-		if ((modifiers & Modifiers.CASE_CLASS) != 0)
-		{
-			return new CaseClassMetadata(forClass);
-		}
-		return new ClassMetadata(forClass);
-	}
 }

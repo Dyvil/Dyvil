@@ -88,7 +88,7 @@ public final class ExternalClass extends AbstractClass
 
 		final IContext context = this.getCombiningContext();
 
-		this.metadata = IClass.getClassMetadata(this, this.attributes.flags());
+		this.metadata = IClassMetadata.getClassMetadata(this, this.attributes.flags());
 		this.metadata.resolveTypesBeforeBody(null, context);
 		this.metadata.resolveTypesAfterBody(null, context);
 	}
