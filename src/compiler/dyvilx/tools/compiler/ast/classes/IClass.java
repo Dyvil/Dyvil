@@ -152,7 +152,7 @@ public interface IClass
 
 	@Override
 	@Deprecated
-	@dyvil.annotation.Deprecated(replacements = { "getThisType", "getReceiverType", "getClassType" })
+	@dyvil.annotation.Deprecated(replacements = { "getThisType", "getClassType" })
 	default IType getType()
 	{
 		return this.getThisType();
@@ -162,11 +162,6 @@ public interface IClass
 	@Deprecated
 	default void setType(IType type)
 	{
-	}
-
-	default IType getReceiverType()
-	{
-		return this.getThisType().asParameterType();
 	}
 
 	IType getClassType();

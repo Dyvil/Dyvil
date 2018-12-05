@@ -618,7 +618,7 @@ public class Field extends AbstractMember implements IField, IDefaultContext
 	{
 		if (receiver != null && !this.isStatic())
 		{
-			receiver.writeNullCheckedExpression(writer, this.getEnclosingClass().getReceiverType());
+			receiver.writeNullCheckedExpression(writer, this.getEnclosingClass().getClassType());
 		}
 	}
 
