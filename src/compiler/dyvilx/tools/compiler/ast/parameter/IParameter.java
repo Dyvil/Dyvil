@@ -27,26 +27,14 @@ import dyvilx.tools.compiler.backend.method.MethodWriterImpl;
 
 public interface IParameter extends IVariable, ClassMember
 {
+	// =============== Constants ===============
+
 	String DEFAULT_PREFIX_INIT = "init$paramDefault$";
 	String DEFAULT_PREFIX      = "$paramDefault$";
 
-	// ------------------------------ Attributable Implementation ------------------------------
+	// =============== Properties ===============
 
-	@Override
-	default int getJavaFlags()
-	{
-		return ClassMember.super.getJavaFlags() | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
-	}
-
-	// --------------- Label ---------------
-
-	Name getLabel();
-
-	void setLabel(Name name);
-
-	String getQualifiedLabel();
-
-	IType getCovariantType();
+	// --------------- Enclosing Class ---------------
 
 	@Override
 	default IClass getEnclosingClass()
@@ -59,21 +47,51 @@ public interface IParameter extends IVariable, ClassMember
 	{
 	}
 
+	// --------------- Enclosing Method ---------------
+
 	ICallableMember getMethod();
 
 	void setMethod(ICallableMember method);
+
+	// --------------- Index in Enclosing Parameter List ---------------
 
 	int getIndex();
 
 	void setIndex(int index);
 
+	// --------------- Attributes ---------------
+
 	@Override
-	boolean isLocal();
+	default int getJavaFlags()
+	{
+		return ClassMember.super.getJavaFlags() | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
+	}
 
 	default void setVarargs()
 	{
 		this.getAttributes().addFlag(Modifiers.VARARGS);
 	}
+
+	// --------------- Label ---------------
+
+	Name getLabel();
+
+	void setLabel(Name name);
+
+	String getQualifiedLabel();
+
+	// --------------- Type ---------------
+
+	IType getCovariantType();
+
+	// --------------- Misc. Data Member Properties ---------------
+
+	@Override
+	boolean isLocal();
+
+	// =============== Methods ===============
+
+	// --------------- Default Value ---------------
 
 	default IValue getDefaultValue(IContext context)
 	{
@@ -82,45 +100,6 @@ public interface IParameter extends IVariable, ClassMember
 			return null;
 		}
 		return new DummyValue(this::getType, (writer, type) -> this.writeGetDefaultValue(writer));
-	}
-
-	@Override
-	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-	}
-
-	default void writeParameter(MethodWriter writer)
-	{
-		final IType type = this.getInternalType();
-
-		// #443
-		final ICallableMember method = this.getMethod();
-		final int index =
-			this.getIndex() + (method != null && method.hasModifier(Modifiers.EXTENSION) && !method.isStatic() ? 1 : 0);
-
-		final int localIndex = writer.localCount();
-
-		this.setLocalIndex(localIndex);
-
-		final AttributeList attributes = this.getAttributes();
-		int javaFlags = this.getJavaFlags();
-		final long dyvilFlags = this.getDyvilFlags();
-
-		if (this.isVarargs())
-		{
-			javaFlags |= Modifiers.ACC_VARARGS;
-		}
-
-		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaFlags);
-
-		// Annotations
-		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
-
-		attributes.write(visitor);
-
-		ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
-
-		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 	}
 
 	default void writeDefaultValue(ClassWriter writer)
@@ -163,6 +142,47 @@ public interface IParameter extends IVariable, ClassMember
 		final String desc = "()" + this.getDescriptor();
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, enclosingClass.getInternalName(), name, desc,
 		                       enclosingClass.isInterface());
+	}
+
+	// --------------- Compilation ---------------
+
+	@Override
+	default void writeInit(MethodWriter writer, IValue value) throws BytecodeException
+	{
+	}
+
+	default void writeParameter(MethodWriter writer)
+	{
+		final IType type = this.getInternalType();
+
+		// #443
+		final ICallableMember method = this.getMethod();
+		final int index =
+			this.getIndex() + (method != null && method.hasModifier(Modifiers.EXTENSION) && !method.isStatic() ? 1 : 0);
+
+		final int localIndex = writer.localCount();
+
+		this.setLocalIndex(localIndex);
+
+		final AttributeList attributes = this.getAttributes();
+		int javaFlags = this.getJavaFlags();
+		final long dyvilFlags = this.getDyvilFlags();
+
+		if (this.isVarargs())
+		{
+			javaFlags |= Modifiers.ACC_VARARGS;
+		}
+
+		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaFlags);
+
+		// Annotations
+		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
+
+		attributes.write(visitor);
+
+		ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
+
+		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 	}
 
 	default AnnotationVisitor visitAnnotation(String internalType)
