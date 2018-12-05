@@ -146,8 +146,6 @@ public interface IClass
 
 	void setMetadata(IClassMetadata metadata);
 
-	IMethod getFunctionalMethod();
-
 	// --------------- Types ---------------
 
 	// Super Types

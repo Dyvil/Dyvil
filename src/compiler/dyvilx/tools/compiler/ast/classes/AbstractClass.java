@@ -507,12 +507,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 	}
 
-	@Override
-	public IMethod getFunctionalMethod()
-	{
-		return this.getMetadata().getFunctionalMethod();
-	}
-
 	// --------------- Context ---------------
 
 	@Override

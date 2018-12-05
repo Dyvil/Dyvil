@@ -135,7 +135,7 @@ public class ClassType implements IRawType
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.theClass.getFunctionalMethod();
+		return this.theClass.getMetadata().getFunctionalMethod();
 	}
 
 	// Compilation

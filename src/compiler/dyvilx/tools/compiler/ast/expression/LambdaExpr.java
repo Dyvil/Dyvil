@@ -7,7 +7,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
-import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -453,23 +452,19 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 			return true;
 		}
 
-		final IClass interfaceClass = type.getTheClass();
-		if (interfaceClass == null)
-		{
-			return false;
-		}
-		if (interfaceClass == Types.OBJECT_CLASS)
+		// TODO maybe generalize to super-types of the corresponding Function$OfX class?
+		if (type.getTheClass() == Types.OBJECT_CLASS)
 		{
 			return true;
 		}
 
-		final IMethod method = interfaceClass.getFunctionalMethod();
-		if (method == null)
+		final IMethod functionalMethod = type.getFunctionalMethod();
+		if (functionalMethod == null)
 		{
 			return false;
 		}
 
-		final ParameterList methodParameters = method.getParameters();
+		final ParameterList methodParameters = functionalMethod.getParameters();
 		final int parameterCount = this.parameters.size();
 
 		if (parameterCount != methodParameters.size())

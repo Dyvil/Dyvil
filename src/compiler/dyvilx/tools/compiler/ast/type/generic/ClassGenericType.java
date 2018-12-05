@@ -179,7 +179,7 @@ public class ClassGenericType extends GenericType
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.getTheClass().getFunctionalMethod();
+		return this.getTheClass().getMetadata().getFunctionalMethod();
 	}
 
 	@Override

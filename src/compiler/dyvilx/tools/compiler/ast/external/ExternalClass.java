@@ -247,13 +247,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IMethod getFunctionalMethod()
-	{
-		this.resolveMetadata();
-		return super.getFunctionalMethod();
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
