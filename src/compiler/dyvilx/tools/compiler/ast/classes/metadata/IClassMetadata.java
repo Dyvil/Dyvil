@@ -58,9 +58,20 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 		return new ClassMetadata(forClass);
 	}
 
-	// =============== Methods ===============
+	// =============== Properties ===============
+
+	// --------------- Kind ---------------
 
 	MemberKind getKind();
+
+	// --------------- Default Constructor (regular and case classes) ---------------
+
+	default IConstructor getConstructor()
+	{
+		return null;
+	}
+
+	// --------------- Instance Field (object classes) ---------------
 
 	default IField getInstanceField()
 	{
@@ -71,10 +82,7 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	{
 	}
 
-	default IConstructor getConstructor()
-	{
-		return null;
-	}
+	// --------------- Functional Method (interfaces) ---------------
 
 	default IMethod getFunctionalMethod()
 	{
@@ -85,7 +93,7 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	{
 	}
 
-	// Annotations
+	// --------------- Retention and Target (annotations) ---------------
 
 	default RetentionPolicy getRetention()
 	{
@@ -102,7 +110,9 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 		return null;
 	}
 
-	// Resolve
+	// =============== Methods ===============
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	default void resolveTypes(MarkerList markers, IContext context)
@@ -142,6 +152,8 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	{
 	}
 
+	// --------------- Diagnostic Phases ---------------
+
 	@Override
 	default void checkTypes(MarkerList markers, IContext context)
 	{
@@ -152,6 +164,8 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	{
 	}
 
+	// --------------- Pre-Compilation Phases ---------------
+
 	@Override
 	default void foldConstants()
 	{
@@ -161,6 +175,8 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
+
+	// --------------- Compilation ---------------
 
 	default void writePost(ClassWriter writer)
 	{
