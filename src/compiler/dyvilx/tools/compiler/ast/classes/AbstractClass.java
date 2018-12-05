@@ -893,48 +893,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		this.fullName = name;
 	}
 
-	// - - - - - - - - Signature - - - - - - - -
-
-	@Override
-	public String getSignature()
-	{
-		StringBuilder buffer = new StringBuilder();
-
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.appendSignature(buffer);
-		}
-
-		if (this.superType != null)
-		{
-			this.superType.appendSignature(buffer, false);
-		}
-		if (this.interfaces != null)
-		{
-			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
-		}
-		return buffer.toString();
-	}
-
-	// - - - - - - - - Interfaces - - - - - - - -
-
-	@Override
-	public String[] getInterfaceArray()
-	{
-		if (this.interfaces == null)
-		{
-			return null;
-		}
-
-		final int size = this.interfaces.size();
-		final String[] interfaces = new String[size];
-		for (int i = 0; i < size; i++)
-		{
-			interfaces[i] = this.interfaces.get(i).getInternalName();
-		}
-		return interfaces;
-	}
-
 	// - - - - - - - - File Name - - - - - - - -
 
 	@Override

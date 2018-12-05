@@ -491,6 +491,46 @@ public class CodeClass extends AbstractClass
 		}
 	}
 
+	// --------------- Compilation ---------------
+
+	private String getSignature()
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		if (this.typeParameters != null)
+		{
+			this.typeParameters.appendSignature(buffer);
+		}
+
+		if (this.superType != null)
+		{
+			this.superType.appendSignature(buffer, false);
+		}
+		if (this.interfaces != null)
+		{
+			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
+		}
+		return buffer.toString();
+	}
+
+	// - - - - - - - - Interfaces - - - - - - - -
+
+	private String[] getInterfaceArray()
+	{
+		if (this.interfaces == null)
+		{
+			return null;
+		}
+
+		final int size = this.interfaces.size();
+		final String[] interfaces = new String[size];
+		for (int i = 0; i < size; i++)
+		{
+			interfaces[i] = this.interfaces.get(i).getInternalName();
+		}
+		return interfaces;
+	}
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{

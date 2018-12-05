@@ -79,6 +79,11 @@ public interface IClass
 	@Override
 	void setName(Name name);
 
+	// --------------- Internal Name ---------------
+
+	@Override
+	String getInternalName();
+
 	// --------------- Full Name ---------------
 
 	@Override
@@ -199,13 +204,6 @@ public interface IClass
 	void addClassCompilable(ClassCompilable compilable);
 
 	// --------------- Compilation ---------------
-
-	@Override
-	String getInternalName();
-
-	String getSignature();
-
-	String[] getInterfaceArray();
 
 	@Override
 	void write(ClassWriter writer) throws BytecodeException;
