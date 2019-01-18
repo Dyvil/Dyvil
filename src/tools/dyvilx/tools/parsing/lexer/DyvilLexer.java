@@ -294,7 +294,7 @@ public final class DyvilLexer extends Lexer
 
 					this.parseInterpolationValue();
 
-					assert this.codePoint() == ')';
+					// assert this.codePoint() == ')';
 					startColumn = this.column;
 					startLine = this.line;
 					stringPart = true;
