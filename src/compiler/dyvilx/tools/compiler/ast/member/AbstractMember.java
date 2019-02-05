@@ -111,7 +111,7 @@ public abstract class AbstractMember implements Member
 	@Override
 	public String getInternalName()
 	{
-		return this.name.qualified;
+		return this.name != null ? this.name.qualified : null;
 	}
 
 	// ------------------------------ Typed Implementation ------------------------------

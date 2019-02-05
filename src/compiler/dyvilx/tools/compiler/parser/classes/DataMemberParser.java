@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.parser.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
@@ -74,14 +75,22 @@ public class DataMemberParser<T extends IDataMember> extends AbstractMemberParse
 			}
 			// Fallthrough
 		case NAME:
-			if (!Tokens.isIdentifier(type))
+			final Name name;
+			if (type == BaseSymbols.UNDERSCORE)
+			{
+				name = null;
+			}
+			else if (Tokens.isIdentifier(type))
+			{
+				name = token.nameValue();
+			}
+			else
 			{
 				pm.report(token, "variable.identifier");
 				return;
 			}
 
-			this.dataMember = this.consumer
-				                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.attributes);
+			this.dataMember = this.consumer.createDataMember(token.raw(), name, Types.UNKNOWN, this.attributes);
 
 			this.mode = TYPE;
 			return;
