@@ -1,8 +1,10 @@
 package dyvilx.tools.compiler.parser.statement;
 
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -14,7 +16,7 @@ public class RepeatStatementParser extends Parser
 
 	protected static final int REPEAT = 1;
 	protected static final int ACTION = 2;
-	protected static final int WHILE  = 4;
+	protected static final int WHILE  = 3;
 
 	// =============== Fields ===============
 
@@ -41,10 +43,15 @@ public class RepeatStatementParser extends Parser
 			if (type != DyvilKeywords.REPEAT)
 			{
 				pm.reparse();
-				pm.report(token, "repeat.repeat_keyword");
+				pm.report(token, "repeat.keyword");
 			}
 			return;
 		case ACTION:
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				pm.report(Markers.syntaxWarning(SourcePosition.before(token), "repeat.action.block"));
+			}
+
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = WHILE;
 			return;
