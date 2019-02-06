@@ -4,18 +4,22 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes.LOAD_0
 
-public abstract class References
-{
-	private init() {}
+abstract class References {
+	private init() {} // no instances
+
+	// =============== Operators ===============
+
+	// --------------- Prefix & "Reference" Operator ---------------
 
 	@Intrinsic([ LOAD_0 ])
-	static func & <T>(rhs: T^) -> T* = rhs
+	prefix func & <type T>(rhs: T^) -> T* = rhs
 
-	// Primitive Reference Operators
+	// overloads for primitive types
+
 	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
 		#let(PRIMITIVE = spec['PRIMITIVE'])
 
 		@Intrinsic([ LOAD_0 ])
-		static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
+		prefix func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
 	}
 }

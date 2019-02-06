@@ -3,8 +3,7 @@ package dyvil.lang
 #func(from(TYPE: String)){@interface From#(TYPE){} (let methodName: String = "apply")
 }
 
-abstract class LiteralConvertible
-{
+abstract class LiteralConvertible {
 	private init() {} // no instances
 
 	// --------------- Numeric Literals ---------------

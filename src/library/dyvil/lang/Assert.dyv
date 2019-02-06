@@ -1,16 +1,17 @@
 package dyvil.lang
 
-final class Assert
-{
-	private init() {}
+abstract class Assert {
+	private init() {} // no instances
 
-	static func assert(condition: boolean) -> void
-	{
-		if (!condition) throw new AssertionError()
+	static func assert(condition: boolean) -> void {
+		if !condition {
+			throw new AssertionError()
+		}
 	}
 
-	static func assert(condition: boolean, message: -> any) -> void
-	{
-		if (!condition) throw new AssertionError(message())
+	static func assert(condition: boolean, message: -> any) -> void {
+		if !condition {
+			throw new AssertionError(message())
+		}
 	}
 }

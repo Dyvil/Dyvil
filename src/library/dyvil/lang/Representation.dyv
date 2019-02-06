@@ -5,8 +5,11 @@ import java.lang.reflect.Array
 
 using dyvil.lang.Strings._
 
-abstract class Representation
-{
+abstract class Representation {
+	private init() {} // no instances
+
+	// =============== Static Methods ===============
+
 	// for Java interop
 	static func of(value: any!) -> String = value.representation
 
@@ -31,28 +34,24 @@ abstract class Representation
 	 */
 	static func reflect(value: any!) -> String = String(builtBy: reflect(value, appendedTo: _))
 
-	static func reflect(value: any!, appendedTo builder: StringBuilder) -> void
-	{
-		if let value = value
-		{
+	static func reflect(value: any!, appendedTo builder: StringBuilder) -> void {
+		if let value = value {
 			reflectNonNull(value, value.dynamicClass, builder)
 		}
-		else
-		{
+		else {
 			builder.append('null')
 		}
 	}
 
-	private static func reflectNonNull(value: any, valueClass: Class<_>, builder: StringBuilder) -> void
-	{
-		if (valueClass.isArray)
-		{
+	// --------------- Helper Methods ---------------
+
+	private static func reflectNonNull(value: any, valueClass: Class<_>, builder: StringBuilder) -> void {
+		if valueClass.isArray {
 			reflectArray(value, builder)
 			return
 		}
 
-		match (valueClass.getName())
-		{
+		match valueClass.getName() {
 			case 'java.math.BigInteger' | 'java.math.BigDecimal' => builder.append(valueClass.getName()).append('("').append(value).append('")')
 
 			case 'java.lang.Boolean' | 'java.lang.Byte' | 'java.lang.Short' | 'java.lang.Integer' => builder.append(value)
@@ -66,46 +65,40 @@ abstract class Representation
 		}
 	}
 
-	private static func reflectArray(value: any, builder: StringBuilder) -> void
-	{
+	private static func reflectArray(value: any, builder: StringBuilder) -> void {
 		let size = Array.getLength(value)
-		if (size == 0)
-		{
+		if size == 0 {
 			builder.append('[]')
 			return
 		}
 
 		builder.append('[')
 		Array.get(value, 0).representation(appendedTo: builder)
-		for (i <- 1 ..< size)
-		{
+		for i <- 1 ..< size {
 			builder.append(', ')
 			Array.get(value, i).representation(appendedTo: builder)
 		}
 		builder.append(']')
 	}
 
-	private static func reflectFields(value: any, valueClass: Class<_>, builder: StringBuilder) -> void
-	{
+	private static func reflectFields(value: any, valueClass: Class<_>, builder: StringBuilder) -> void {
 		builder.append(valueClass.getCanonicalName()).append('(')
 
 		var currentType: Class<_>! = valueClass
-		while (currentType != null)
-		{
-			for (field <- currentType!!.getDeclaredFields)
-			{
-				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) continue
+		while currentType != null {
+			for field <- currentType!!.getDeclaredFields {
+				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) {
+					continue
+				}
 
 				builder.append(field.getName()).append(': ')
 
-				try
-				{
+				try {
 					field.setAccessible(true)
 					field.get(value).representation(appendedTo: builder)
 					field.setAccessible(false)
 				}
-				catch (ex: Exception)
-				{
+				catch (ex: Exception) {
 					builder.append("<error>")
 				}
 
@@ -117,8 +110,7 @@ abstract class Representation
 
 		// delete extra ', '
 		let length = builder.length
-		if (builder.charAt(length - 2) == ',')
-		{
+		if builder.charAt(length - 2) == ',' {
 			builder.delete(length - 2, length)
 		}
 
@@ -136,8 +128,9 @@ abstract class Representation
  * representation of an arbitrary object using the `String(representing: value)` syntax. Representation computation
  * for arbitrary objects is described in the docs of the {@link String.apply(representing:)} method.
  */
-interface CustomRepresentable
-{
+interface CustomRepresentable {
+	// =============== Methods ===============
+
 	/**
 	 * Returns the custom representation of this object.
 	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
@@ -151,8 +144,9 @@ interface CustomRepresentable
 }
 
 @JavaName("Representation$AnyRepresentation")
-extension any
-{
+extension any {
+	// =============== Methods ===============
+
 	/**
 	 * Returns the representation of this object.
 	 * This method does not need to be overriden as long as {@link representation(appendedTo:)` is implemented.
@@ -166,7 +160,8 @@ extension any
 }
 
 @JavaName("Representation$StringSyntax")
-extension String
-{
+extension String {
+	// =============== Static Methods ===============
+
 	static func apply(explicit representing value: any!) -> String = value.representation
 }

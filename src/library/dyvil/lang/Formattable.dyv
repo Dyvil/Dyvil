@@ -1,22 +1,20 @@
 package dyvil.lang
 
-interface Formattable
-{
-	// for Java interop
-	static func toString(formattable: Formattable) -> String = format(formattable)
+interface Formattable {
+	// =============== Static Methods ===============
 
-	static func format(formattable: Formattable) -> String
-	{
-		let buffer = new StringBuilder
-		formattable.toString(buffer)
-		return buffer.toString
-	}
+	// for Java interop
+
+	static func toString(formattable: Formattable) -> String = String(formatting: formattable)
+
+	static func format(formattable: Formattable) -> String = String(formatting: formattable)
+
+	// =============== Methods ===============
 
 	func toString(buffer: StringBuilder) -> void
 }
 
 @JavaName("Formattable$StringSyntax")
-extension String
-{
-	static func apply(formatting formattable: Formattable) -> String = Formattable.format(formattable)
+extension String {
+	static func apply(formatting formattable: Formattable) -> String = String(builtBy: formattable.toString(_))
 }
