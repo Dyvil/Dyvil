@@ -12,6 +12,6 @@ cache:
   - $HOME/.gradle/wrapper/
 
 script:
-  - ./gradlew build test
+  - ./gradlew check
   - ./gradlew bootstrap
-  - ./gradlew build test
+  - ./gradlew check
