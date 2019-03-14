@@ -190,6 +190,18 @@ dependencies {
 	testCompile(dpfDyvilClasses, sourceSets.dpf.output)
 }
 
+// --------------- Configurations ---------------
+
+configurations {
+	mainCompile.extendsFrom = configurations.findAll {
+		!it.name.contains('main') && it.name.endsWith('Compile')
+	}
+
+	mainRuntime.extendsFrom = configurations.findAll {
+		!it.name.contains('main') && it.name.endsWith('Runtime')
+	}
+}
+
 wrapper.setDistributionType(Wrapper.DistributionType.ALL)
 
 // --------------- Copy Tasks ---------------
@@ -500,12 +512,20 @@ tasks.register('runRepl', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath + sourceSets.repl.runtimeClasspath
 }
 
-// --------------- Build Tasks ---------------
+// --------------- Jar Tasks ---------------
+
+tasks.withType(Jar) {
+	preserveFileTimestamps = false
+
+	from('.') {
+		include '*LICENSE*.txt'
+	}
+}
 
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
-tasks.register('buildLibrary', Jar) {
+tasks.register('libraryJar', Jar) {
 	group 'build'
 	dependsOn 'libraryClasses', 'compileLibraryDyvil'
 
@@ -515,33 +535,23 @@ tasks.register('buildLibrary', Jar) {
 	from("$buildDir/classes/dyvil/library") {
 		include Constants.binaryFilters
 	}
-
-	archiveFileName = "dyvil-library-${ Constants.libraryVersion }.jar"
-}
-
-tasks.register('buildDPF', Jar) {
-	group 'build'
-	dependsOn 'dpfClasses', 'compileDPFDyvil'
-
-	from sourceSets.dpf.output
-	from("$buildDir/classes/dyvil/dpf") {
-		include Constants.binaryFilters
-	}
-
-	archiveName = "dyvil-property-format-${ Constants.dpfVersion }.jar"
+	
+	archiveAppendix = 'library'
+	archiveVersion = Constants.libraryVersion
 }
 
 /**
  * Creates a Jar file that contains all compiler classes (from src/compiler)
  */
-tasks.register('buildCompiler', Jar) {
+tasks.register('compilerJar', Jar) {
 	group 'build'
 	dependsOn 'compilerClasses'
 
 	from sourceSets.compiler.output
 	from sourceSets.compiler.resources
 
-	archiveName = "dyvil-compiler-${ Constants.compilerVersion }.jar"
+	archiveAppendix = 'compiler'
+	archiveVersion = Constants.compilerVersion
 
 	manifest.attributes("Main-Class": Constants.compilerMainClass)
 }
@@ -549,7 +559,7 @@ tasks.register('buildCompiler', Jar) {
 /**
  * Creates a Jar file that contains all REPL classes (from src/repl)
  */
-tasks.register('buildREPL', Jar) {
+tasks.register('replJar', Jar) {
 	group 'build'
 	dependsOn 'replClasses'
 
@@ -558,19 +568,34 @@ tasks.register('buildREPL', Jar) {
 
 	from configurations.replCompile.collect { it.directory ? it : zipTree(it) }
 
-	archiveName = "dyvil-repl-${ Constants.replVersion }.jar"
+	archiveAppendix = 'repl'
+	archiveVersion = Constants.replVersion
 
 	manifest.attributes("Main-Class": Constants.replMainClass)
 }
 
-tasks.register('buildGenSrc', Jar) {
+tasks.register('dpfJar', Jar) {
+	group 'build'
+	dependsOn 'dpfClasses', 'compileDPFDyvil'
+
+	from sourceSets.dpf.output
+	from("$buildDir/classes/dyvil/dpf") {
+		include Constants.binaryFilters
+	}
+	
+	archiveAppendix = 'property-format'
+	archiveVersion = Constants.dpfVersion
+}
+
+tasks.register('gensrcJar', Jar) {
 	group 'build'
 	dependsOn 'gensrcClasses'
 
 	from sourceSets.gensrc.output
 	from sourceSets.gensrc.resources
-
-	archiveName = "dyvil-gensrc-${ Constants.genSrcVersion }.jar"
+	
+	archiveAppendix = 'gensrc'
+	archiveVersion = Constants.genSrcVersion
 
 	manifest.attributes("Main-Class": Constants.genSrcMainClass)
 }
@@ -578,43 +603,44 @@ tasks.register('buildGenSrc', Jar) {
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
-tasks.register('buildAll', Jar) {
-	group 'build'
-	dependsOn 'buildLibrary', 'buildDPF', 'buildCompiler', 'buildREPL', 'buildGenSrc'
+jar {
+	dependsOn 'libraryJar', 'compilerJar', 'replJar', 'dpfJar', 'gensrcJar'
 
-	from zipTree(buildLibrary.archiveFile)
-	from zipTree(buildDPF.archiveFile)
-	from zipTree(buildCompiler.archiveFile)
-	from zipTree(buildREPL.archiveFile)
-	from zipTree(buildGenSrc.archiveFile)
-
-	archiveName = "dyvil-${ Constants.version }.jar"
+	from tasks.libraryJar.inputs.files
+	from tasks.compilerJar.inputs.files
+	from tasks.replJar.inputs.files
+	from tasks.dpfJar.inputs.files
+	from tasks.gensrcJar.inputs.files
+	
+	archiveVersion = Constants.version
 
 	manifest.attributes("Main-Class": Constants.replMainClass)
 }
 
-build.dependsOn 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF', 'buildGenSrc'
+build.dependsOn 'libraryJar', 'compilerJar', 'replJar', 'dpfJar', 'gensrcJar'
+
+// --------------- Bootstrap Tasks ---------------
 
 /**
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
 tasks.register('bootstrapLibrary', Copy) {
 	group 'bootstrap'
-	dependsOn 'buildLibrary'
+	dependsOn 'libraryJar'
 
 	configureBootstrap(it, 'dyvil-library', Constants.libraryVersion)
 }
 
 tasks.register('bootstrapCompiler', Copy) {
 	group 'bootstrap'
-	dependsOn 'buildCompiler'
+	dependsOn 'compilerJar'
 
 	configureBootstrap(it, 'dyvil-compiler', Constants.compilerVersion)
 }
 
 tasks.register('bootstrapGenSrc', Copy) {
 	group 'bootstrap'
-	dependsOn 'buildGenSrc'
+	dependsOn 'gensrcJar'
 
 	configureBootstrap(it, 'dyvil-gensrc', Constants.genSrcVersion)
 }
@@ -629,14 +655,6 @@ def configureBootstrap(Copy task, String artifact, String version) {
 tasks.register('bootstrap') {
 	group 'bootstrap'
 	dependsOn 'bootstrapLibrary', 'bootstrapCompiler', 'bootstrapGenSrc'
-}
-
-tasks.withType(Jar) {
-	preserveFileTimestamps = false
-
-	from('.') {
-		include '*LICENSE*.txt'
-	}
 }
 
 // --------------- Version Files ---------------
