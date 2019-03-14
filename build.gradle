@@ -58,26 +58,6 @@ publishInfo {
 	}
 }
 
-// --------------- Nightly Versioning ---------------
-
-Map<String, String> env = System.getenv()
-String buildNum = env['TRAVIS_BUILD_NUMBER'] ?: env['DRONE_BUILD_NUMBER']
-boolean nightly
-
-if (buildNum) {
-	String info = "+nightly." + buildNum
-
-	Constants.version += info
-	Constants.libraryVersion += info
-	Constants.compilerVersion += info
-	Constants.replVersion += info
-	Constants.dpfVersion += info
-	Constants.genSrcVersion += info
-
-	nightly = true
-	build.dependsOn 'prepareRelease'
-}
-
 // --------------- Source Settings ---------------
 
 sourceSets {
@@ -603,18 +583,11 @@ tasks.register('bootstrap') {
 
 tasks.register('prepareRelease', Copy) {
 	outputs.upToDateWhen { false }
-	from 'versions/'
 
-	if (nightly) {
-		into 'versions'
-		include 'nightly-template.dyp'
-		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
-	}
-	else {
-		into "versions/$Constants.versionDir"
-		include 'template.dyp'
-		rename 'template\\.dyp', "v${ Constants.version }.dyp"
-	}
+	from 'versions/'
+	into "versions/$Constants.versionDir"
+	include 'template.dyp'
+	rename 'template\\.dyp', "v${ Constants.version }.dyp"
 
 	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
 			version        : Constants.version,
