@@ -3,6 +3,9 @@
 plugins {
 	id 'java'
 	id 'idea'
+	id 'maven-publish'
+	id 'com.jfrog.bintray' version '1.8.4'
+	id 'de.clashsoft.simple-publish' version '0.3.0'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -30,8 +33,30 @@ class Constants {
 	public static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
 }
 
-group = 'clashsoft'
+group = 'dyvil'
 version = Constants.version
+description = 'The Dyvil programming language.'
+
+publishInfo {
+	organization = 'dyvil'
+	websiteUrl = 'https://github.com/Dyvil/Dyvil'
+	issueTrackerUrl = 'https://github.com/Dyvil/Dyvil/issues'
+	vcsUrl = 'https://github.com/Dyvil/Dyvil'
+	githubRepo = 'Dyvil/Dyvil'
+	labels = [ 'programming-language', 'jvm', 'dyvil' ]
+
+	license {
+		shortName = 'BSD 3-Clause'
+		longName = 'BSD 3-Clause "New" or "Revised" License'
+		url = 'https://opensource.org/licenses/BSD-3-Clause'
+	}
+
+	developer {
+		id = 'clashsoft'
+		name = 'Adrian Kunz'
+		email = 'clashsoft@hotmail.com'
+	}
+}
 
 // --------------- Nightly Versioning ---------------
 
