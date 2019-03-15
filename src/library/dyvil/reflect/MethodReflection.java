@@ -46,7 +46,7 @@ public class MethodReflection
 	 * @return the method
 	 */
 	public static Method getMethod(@NonNull Class clazz, @NonNull String methodName,
-		                              @NonNull Class @NonNull [] parameterTypes)
+		@NonNull Class @NonNull [] parameterTypes)
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public class MethodReflection
 	 * @return the method
 	 */
 	public static Method getMethod(@NonNull Class clazz, @NonNull String @NonNull [] methodNames,
-		                              @NonNull Class @NonNull [] parameterTypes)
+		@NonNull Class @NonNull [] parameterTypes)
 	{
 		for (String methodName : methodNames)
 		{
@@ -133,6 +133,8 @@ public class MethodReflection
 	 * Directly invokes the given {@link Method} {@code method} on the given {@link Object} {@code instance} with the
 	 * given arguments {@code args} and returns the result.
 	 *
+	 * @param <R>
+	 * 	the return type
 	 * @param method
 	 * 	the method to invoke
 	 * @param instance

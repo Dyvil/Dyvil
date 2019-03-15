@@ -288,7 +288,7 @@ public class Package implements Named, IDefaultContext
 	/**
 	 * Lists descriptors (including slash-separated package) of all external classes (i.e. classes from libraries) in
 	 * this package. The classes are not loaded; the search is only file-based.
-	 * <p/>
+	 * <p>
 	 * The results are not guaranteed to match the exact case of the actual class names due to filesystem restrictions.
 	 *
 	 * @return the internal names of all classes in this package

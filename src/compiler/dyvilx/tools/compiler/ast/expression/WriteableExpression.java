@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 
 public interface WriteableExpression
 {
@@ -29,9 +29,12 @@ public interface WriteableExpression
 	 * if the current value on the stack equals {@code 0}.
 	 *
 	 * @param writer
+	 * 	the writer
 	 * @param dest
+	 * 	the destination label
 	 *
 	 * @throws BytecodeException
+	 * 	if bytecode generation fails
 	 */
 	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{

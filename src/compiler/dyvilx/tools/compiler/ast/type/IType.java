@@ -31,8 +31,8 @@ import dyvilx.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvilx.tools.compiler.ast.type.raw.ClassType;
 import dyvilx.tools.compiler.ast.type.raw.NamedType;
 import dyvilx.tools.compiler.ast.type.raw.PackageType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -88,10 +88,6 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 		 * wildcard types.
 		 */
 		public static final int GENERIC_ARGUMENT    = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG | WILDCARD_FLAG;
-
-		/**
-		 * Allows all Types, including
-		 */
 
 		public static int genericArgument(int position)
 		{
@@ -355,21 +351,23 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	// Generics
 
 	/**
-	 * Returns the type argument in this generic type for the given type variable.
-	 * <p/>
-	 * Example:<br>
-	 * <p/>
+	 * Example:
 	 * <pre>
 	 * GenericType gt = type[List[String]]
 	 * ITypeParameter tv = type[List].getTypeVariable("E")
-	 * gt.resolveType(tv) // => String
+	 * gt.resolveType(tv) // =&gt; String
 	 * </pre>
+	 *
+	 * @param typeParameter
+	 * 	the type parameter
+	 *
+	 * @return the type argument in this generic type for the given type parameter
 	 */
 	@Override
 	IType resolveType(ITypeParameter typeParameter);
 
 	/**
-	 * Returns true if this is or contains any type variables.
+	 * @return {@code true} iff this type is or contains any type variables.
 	 */
 	boolean hasTypeVariables();
 

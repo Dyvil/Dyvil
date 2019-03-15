@@ -95,59 +95,59 @@ public interface Opcodes
 
 	/**
 	 * Pushes a byte onto the stack.
-	 *
-	 * @param operand1 the byte
+	 * <p>
+	 * Operand 1: the byte
 	 */
 	int BIPUSH = 16;
 
 	/**
 	 * Pushes a short onto the stack.
-	 *
-	 * @param operand1 the first 8 bits of the short
-	 * @param operand2 the second 8 bits of the short
+	 * <p>
+	 * Operand 1: the first 8 bits of the short
+	 * Operand 2: the second 8 bits of the short
 	 */
 	int SIPUSH = 17;
 
 	/**
 	 * Loads a constant. The operand can be of types {@code int}, {@code long}, {@code float}, {@code double}, {@link
 	 * String} or {@link Class}.
-	 *
-	 * @param operand1 the constant
+	 * <p>
+	 * Operand 1: the constant
 	 */
 	int LDC = 18;
 
 	/**
 	 * Loads an {@code int} value from a local variable and pushes it onto the stack.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int ILOAD = 21;
 
 	/**
 	 * Loads a {@code long} value from a local variable and pushes it onto the stack.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int LLOAD = 22;
 
 	/**
 	 * Loads a {@code float} value from a local variable and pushes it onto the stack.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int FLOAD = 23;
 
 	/**
 	 * Loads a {@code double} value from a local variable and pushes it onto the stack.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int DLOAD = 24;
 
 	/**
 	 * Loads an Object reference from a local variable and pushes it onto the stack.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int ALOAD = 25;
 
@@ -169,36 +169,36 @@ public interface Opcodes
 
 	/**
 	 * Removes an {@code int} value from a the stack and stores it in a local variable.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int ISTORE = 54;
 
 	/**
 	 * Removes a {@code long} value from a the stack and stores it in a local variable.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int LSTORE = 55;
 
 	/**
 	 * Removes a {@code float} value from a the stack and stores it in a local variable.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int FSTORE = 56;
 
 	/**
 	 * Removes a {@code double} value from a the stack and stores it in a local variable.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int DSTORE = 57;
 
 	/**
 	 * Removes an {@code int} value from a the stack and stores it in a local variable.
-	 *
-	 * @param operand1 the local variable index
+	 * <p>
+	 * Operand 1: the local variable index
 	 */
 	int ASTORE = 58;
 
@@ -231,7 +231,10 @@ public interface Opcodes
 	/**
 	 * Duplicates the first value on the stack.
 	 * <p>
-	 * Stack:<br> value -> value, value
+	 * Stack:
+	 * <pre>
+	 * value -&gt; value, value
+	 * </pre>
 	 */
 	int DUP = 89;
 
@@ -239,7 +242,10 @@ public interface Opcodes
 	 * Inserts a copy of the first value into the stack two values from the top. Both values must not be of the type
 	 * {@code double} or {@code long}.
 	 * <p>
-	 * Stack:<br> value2, value1 -> value1, value2, value1
+	 * Stack:
+	 * <pre>
+	 * value2, value1 -&gt; value1, value2, value1
+	 * </pre>
 	 */
 	int DUP_X1 = 90;
 
@@ -247,7 +253,10 @@ public interface Opcodes
 	 * Inserts a copy of the first value into the stack two (if value2 is {@code double} or {@code long} it takes up the
 	 * entry of value3, too) or three values (if value2 is neither {@code double} nor {@code long}) from the top.
 	 * <p>
-	 * Stack:<br> value3, value2, value1 -> value1, value3, value2, value1
+	 * Stack:
+	 * <pre>
+	 * value3, value2, value1 -&gt; value1, value3, value2, value1
+	 * </pre>
 	 */
 	int DUP_X2 = 91;
 
@@ -255,28 +264,40 @@ public interface Opcodes
 	 * Duplicates the first two values on the stack (two values, if value1 is not {@code double} nor {@code long}; a
 	 * single value, if value1 is {@code double} or {@code long})
 	 * <p>
-	 * Stack:<br> {value2, value1} -> {value2, value1}, {value2, value1}
+	 * Stack:
+	 * <pre>
+	 * {value2, value1} -&gt; {value2, value1}, {value2, value1}
+	 * </pre>
 	 */
 	int DUP2 = 92;
 
 	/**
 	 * Duplicates the first two values and inserts them beneath the third value.
 	 * <p>
-	 * Stack:<br> value3, {value2, value1} -> {value2, value1}, value3, {value2, value1}
+	 * Stack:
+	 * <pre>
+	 * value3, {value2, value1} -&gt; {value2, value1}, value3, {value2, value1}
+	 * </pre>
 	 */
 	int DUP2_X1 = 93;
 
 	/**
 	 * Duplicates the first two values and inserts them beneath the fourth value.
 	 * <p>
-	 * Stack:<br> {value4, value3}, {value2, value1} -> {value2, value1}, {value4, value3}, {value2, value1}
+	 * Stack:
+	 * <pre>
+	 * {value4, value3}, {value2, value1} -&gt; {value2, value1}, {value4, value3}, {value2, value1}
+	 * </pre>
 	 */
 	int DUP2_X2 = 94;
 
 	/**
 	 * Swaps the first two values on the stack (value1 and value2 must not be {@code double} or {@code long})
 	 * <p>
-	 * Stack:<br> value1, value2 -> value2, value1
+	 * Stack:
+	 * <pre>
+	 * value1, value2 -&gt; value2, value1
+	 * </pre>
 	 */
 	int SWAP = 95;
 
@@ -471,9 +492,10 @@ public interface Opcodes
 
 	/**
 	 * Increments a local variable.
-	 *
-	 * @param operand1 the local variable index
-	 * @param operand2 the value
+	 * <p>
+	 * Operand 1: the local variable index
+	 * <p>
+	 * Operand 2: the value
 	 */
 	int IINC = 132;
 
@@ -594,45 +616,45 @@ public interface Opcodes
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it equals {@code 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFEQ = 153;
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it does not equal {@code 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFNE = 154;
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it is less than {@code 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFLT = 155;
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it is greater than or equal
 	 * to {@code 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFGE = 156;
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it is greater than {@code
 	 * 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFGT = 157;
 
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given {@link Label} if it is less than {@code 0}.
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFLE = 158;
 
@@ -705,8 +727,8 @@ public interface Opcodes
 	/**
 	 * Checks if the value on top of the stack can be cast to the given type, and throws a {@link ClassCastException}
 	 * otherwise.
-	 *
-	 * @param type the type
+	 * <p>
+	 * Operand 1: the type
 	 */
 	int CHECKCAST = 192;
 
@@ -714,8 +736,8 @@ public interface Opcodes
 	 * Checks if the value on top of the stack can be cast to the given type and pushes the result as an {@code int} on
 	 * the stack. If the cast is applicable, the result is {@code 1}, and if it is not applicable or the top value on
 	 * the stack way {@code null}, the result is {@code 0}.
-	 *
-	 * @param type the type
+	 * <p>
+	 * Operand 1: the type
 	 */
 	int INSTANCEOF = 193;
 
@@ -727,15 +749,15 @@ public interface Opcodes
 
 	/**
 	 * Removes a reference from the stack and jumps to the given {@link Label} if it is a {@code null} reference
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFNULL = 198;
 
 	/**
 	 * Removes a reference from the stack and jumps to the given {@link Label} if it is not a {@code null} reference
-	 *
-	 * @param label the label
+	 * <p>
+	 * Operand 1: the label
 	 */
 	int IFNONNULL = 199;
 
@@ -973,7 +995,7 @@ public interface Opcodes
 
 	static boolean isJumpOpcode(int opcode)
 	{
-		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL
+		return opcode >= IFEQ && opcode <= JSR || opcode == IFNULL || opcode == IFNONNULL
 		       || opcode >= IF_LCMPEQ && opcode <= IF_DCMPLE;
 	}
 

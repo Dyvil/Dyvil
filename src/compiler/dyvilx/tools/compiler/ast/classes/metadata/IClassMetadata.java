@@ -127,13 +127,25 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	/**
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and -interfaces and type parameters have
 	 * already been resolved.
+	 *
+	 * @param markers
+	 * 	the list of markers
+	 * @param context
+	 * 	the resolution context
 	 */
 	default void resolveTypesBeforeBody(MarkerList markers, IContext context)
 	{
 	}
 
 	/**
-	 * Called after the class body went through RESOLVE_TYPES.<p/> Checks which synthetic members have to be generated
+	 * Called after the class body went through RESOLVE_TYPES.
+	 * <p>
+	 * Checks which synthetic members have to be generated
+	 *
+	 * @param markers
+	 * 	the list of markers
+	 * @param context
+	 * 	the resolution context
 	 */
 	default void resolveTypesAfterBody(MarkerList markers, IContext context)
 	{
@@ -142,6 +154,11 @@ public interface IClassMetadata extends ClassCompilable, Resolvable
 	/**
 	 * Generates the signatures of the synthetic members. Concrete implementations should be added in {@link
 	 * #resolve(MarkerList, IContext)}.
+	 *
+	 * @param markers
+	 * 	the list of markers
+	 * @param context
+	 * 	the resolution context
 	 */
 	default void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
