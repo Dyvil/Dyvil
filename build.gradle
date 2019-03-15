@@ -62,6 +62,26 @@ ext {
 	libraryBootstrapJarFile = rootProject.files('libs/dyvil-library.jar')
 }
 
+subprojects {
+	// --------------- Source Copying ---------------
+
+	def copyJavaOutput = files("$buildDir/src/main/java/") {
+		builtBy 'copyJava'
+	}
+
+	compileJava.source = copyJavaOutput
+
+	tasks.register('copyJava', Sync) {
+		group 'sources'
+
+		from sourceSets.main.java
+		into copyJavaOutput
+
+		include rootProject.javaFilters
+		includeEmptyDirs = false
+	}
+}
+
 allprojects {
 	// --------------- Dependencies ---------------
 

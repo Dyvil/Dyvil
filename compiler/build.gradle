@@ -35,25 +35,10 @@ dependencies {
 
 // --------------- Source Copying ---------------
 
-tasks.register('copyJava', Sync) {
-	group 'sources'
-
-	from sourceSets.main.java
-	into "$buildDir/src/java/main/"
-
-	include project.javaFilters
-	includeEmptyDirs = false
-
-	filesMatching('**/DyvilCompiler.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-				version        : rootProject.version,
-				libraryVersion : project(':library').version,
-				compilerVersion: project.version
-		])
-	}
-}
-
-compileJava {
-	dependsOn 'copyJava'
-	source = "$buildDir/src/java/main/"
+copyJava.filesMatching('**/DyvilCompiler.java') {
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+			version        : rootProject.version,
+			libraryVersion : project(':library').version,
+			compilerVersion: project.version
+	])
 }

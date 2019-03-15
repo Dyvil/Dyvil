@@ -31,20 +31,3 @@ dependencies {
 	compile project(':compiler')
 	compileOnly rootProject.libraryBootstrapJarFile
 }
-
-// --------------- Source Copying ---------------
-
-tasks.register('copyJava', Sync) {
-	group 'sources'
-
-	from sourceSets.main.java
-	into "$buildDir/src/main/java/"
-
-	include project.javaFilters
-	includeEmptyDirs = false
-}
-
-compileJava {
-	dependsOn 'copyJava'
-	source = "$buildDir/src/main/java/"
-}

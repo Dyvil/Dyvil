@@ -35,6 +35,8 @@ dependencies {
 
 jar.from compilerOutput
 
+// =============== Tasks ===============
+
 // --------------- GenSrc ---------------
 
 tasks.register('gensrcDyvil', JavaExec) {
@@ -50,16 +52,6 @@ tasks.register('gensrcDyvil', JavaExec) {
 
 // --------------- Source Copy ---------------
 
-tasks.register('copyJava', Sync) {
-	group 'sources'
-
-	from sourceSets.main.java
-	into "$buildDir/src/main/java/"
-
-	include project.javaFilters
-	includeEmptyDirs = false
-}
-
 tasks.register('copyDyvil', Sync) {
 	group 'sources'
 	dependsOn 'gensrcDyvil'
@@ -71,11 +63,6 @@ tasks.register('copyDyvil', Sync) {
 
 	include project.dyvilFilters
 	includeEmptyDirs = false
-}
-
-compileJava {
-	dependsOn 'copyJava'
-	source = "$buildDir/src/main/java/"
 }
 
 // --------------- Dyvil Compile ---------------

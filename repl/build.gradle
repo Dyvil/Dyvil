@@ -39,23 +39,8 @@ dependencies {
 
 // --------------- Source Copying ---------------
 
-tasks.register('copyJava', Sync) {
-	group 'sources'
-
-	from sourceSets.main.java
-	into "$buildDir/src/main/java/"
-
-	include project.javaFilters
-	includeEmptyDirs = false
-
-	filesMatching('**/DyvilREPL.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-				replVersion: project.version
-		])
-	}
-}
-
-compileJava {
-	dependsOn 'copyJava'
-	source = "$buildDir/src/main/java/"
+copyJava.filesMatching('**/DyvilREPL.java') {
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+			replVersion: project.version
+	])
 }
