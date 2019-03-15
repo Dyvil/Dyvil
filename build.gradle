@@ -65,17 +65,14 @@ ext {
 subprojects {
 	// --------------- Source Copying ---------------
 
-	def copyJavaOutput = files("$buildDir/src/main/java/") {
-		builtBy 'copyJava'
-	}
-
-	compileJava.source = copyJavaOutput
+	def outputPath = "$buildDir/src/main/java/"
+	compileJava.source = files(outputPath).builtBy 'copyJava'
 
 	tasks.register('copyJava', Sync) {
 		group 'sources'
 
 		from sourceSets.main.java
-		into copyJavaOutput
+		into outputPath
 
 		include rootProject.javaFilters
 		includeEmptyDirs = false
