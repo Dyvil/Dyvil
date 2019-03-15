@@ -17,7 +17,7 @@ allprojects {
 
 // --------------- Info ---------------
 
-version = '0.44.0'
+version = '0.44.1'
 description = 'The Dyvil programming language.'
 publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
 

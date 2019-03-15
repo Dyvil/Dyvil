@@ -53,3 +53,19 @@
 ## Dyvil Property Format v0.16.1
 
 ## Dyvil GenSrc v0.9.5
+
+# Dyvil v0.44.1
+
+## Dyvil Library v0.44.1
+
+* Fixed errors and warnings in Javadoc comments.
+
+## Dyvil Compiler v0.44.1
+
+* Fixed errors and warnings in Javadoc comments.
+
+## Dyvil REPL v0.27.0
+
+## Dyvil Property Format v0.16.1
+
+## Dyvil GenSrc v0.9.5

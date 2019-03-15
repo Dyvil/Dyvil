@@ -1,6 +1,6 @@
 // --------------- Info ---------------
 
-version = '0.44.0'
+version = '0.44.1'
 description = 'The Dyvil Standard Library'
 publishInfo.labels = [ 'dyvil', 'library' ]
 
