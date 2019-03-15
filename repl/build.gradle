@@ -1,0 +1,60 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+// --------------- Plugins ---------------
+
+plugins {
+	id 'java'
+	id 'application'
+}
+
+// --------------- Info ---------------
+
+version = '0.27.0'
+
+mainClassName = 'dyvilx.tools.repl.Main'
+
+// --------------- Source Sets ---------------
+
+sourceSets.main {
+	java {
+		srcDir '../src/repl'
+	}
+
+	resources {
+		srcDir '../src/repl'
+	}
+}
+
+// --------------- Dependencies ---------------
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.jline/jline
+	compile group: 'org.jline', name: 'jline', version: '3.9.0'
+
+	compile project(':library')
+	compile project(':compiler')
+	compileOnly rootProject.libraryBootstrapJarFile
+}
+
+// --------------- Source Copying ---------------
+
+tasks.register('copyJava', Sync) {
+	group 'sources'
+
+	from sourceSets.main.java
+	into "$buildDir/src/main/java/"
+
+	include project.javaFilters
+	includeEmptyDirs = false
+
+	filesMatching('**/DyvilREPL.java') {
+		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+				replVersion: project.version
+		])
+	}
+}
+
+compileJava {
+	dependsOn 'copyJava'
+	source = "$buildDir/src/main/java/"
+}

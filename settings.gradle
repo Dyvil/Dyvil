@@ -1,1 +1,6 @@
 rootProject.name = 'dyvil'
+include ':library'
+include ':compiler'
+include ':repl'
+include ':dpf'
+include ':gensrc'

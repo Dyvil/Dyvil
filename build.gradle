@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 // --------------- Plugins ---------------
 
 plugins {
@@ -8,33 +10,10 @@ plugins {
 	id 'de.clashsoft.simple-publish' version '0.3.0'
 }
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
-// --------------- Main Settings ---------------
-
-class Constants {
-	public static String version = '0.44.0'
-	public static String libraryVersion = '0.44.0'
-	public static String compilerVersion = '0.44.0'
-	public static String replVersion = '0.27.0'
-	public static String dpfVersion = '0.16.1'
-	public static String genSrcVersion = '0.9.5'
-
-	public static final String versionDir = 'v0.4x'
-
-	public static final String replMainClass = 'dyvilx.tools.repl.Main'
-	public static final String compilerMainClass = 'dyvilx.tools.compiler.Main'
-	public static final String genSrcMainClass = 'dyvilx.tools.gensrc.Main'
-
-	public static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
-	public static final List<String> javaFilters = [ '**/*.java' ]
-	public static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs', '**/*.dgc', '**/*.dgh' ]
-	public static final List<String> resourceFilters = [ '**/*.properties' ]
-	public static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
-}
+// --------------- Info ---------------
 
 group = 'org.dyvil'
-version = Constants.version
+version = '0.44.0'
 description = 'The Dyvil programming language.'
 
 publishInfo {
@@ -58,284 +37,59 @@ publishInfo {
 	}
 }
 
-// --------------- Source Settings ---------------
+// *************** Shared Configuration ***************
 
-sourceSets {
-	library {
-		java {
-			srcDir 'src/library'
-			srcDir 'src/asm'
-			srcDir 'src/tools'
-			srcDir "$buildDir/gensrc/library"
-			include Constants.javaFilters
-		}
+wrapper.setDistributionType(Wrapper.DistributionType.ALL)
 
-		resources {
-			srcDir 'src/library'
-			srcDir 'src/tools'
-			include Constants.resourceFilters
-		}
+// --------------- Constants ---------------
+
+ext {
+	versionDir = 'v0.4x'
+	javaFilters = [ '**/*.java' ]
+	dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+	genSrcFilters = [ '**/*.dgt', '**/*.dgs', '**/*.dgc', '**/*.dgh' ]
+	binaryFilters = [ '**/*.dyo', '**/*.class' ]
+	resourceFilters = [ '**/*.properties' ]
+
+	libraryBootstrapJarFile = rootProject.files('libs/dyvil-library.jar')
+}
+
+allprojects {
+	// --------------- Dependencies ---------------
+
+	repositories {
+		mavenCentral()
 	}
 
-	dpf {
-		java {
-			srcDir 'src/dpf'
-			srcDir "$buildDir/gensrc/dpf"
-			include Constants.javaFilters
-		}
+	// --------------- Java Compilation ---------------
 
-		resources {
-			srcDir 'src/dpf'
-			include Constants.resourceFilters
-		}
+	idea.module.inheritOutputDirs = true
+
+	tasks.withType(JavaCompile) {
+		options.compilerArgs.addAll(
+				'-parameters',          // generates parameter attributes and names
+				'-XDignore.symbol.file' // disables "proprietary API" warnings
+		)
+		options.fork = true
 	}
 
-	compiler {
-		java {
-			srcDir 'src/compiler'
-			include Constants.javaFilters
-		}
+	// --------------- Jar ---------------
 
-		resources {
-			srcDir 'src/compiler'
-			include Constants.resourceFilters
-		}
-	}
+	tasks.withType(Jar) {
+		preserveFileTimestamps = false
 
-	repl {
-		java {
-			srcDir 'src/repl'
-			include Constants.javaFilters
-		}
-
-		resources {
-			srcDir 'src/repl'
-			include Constants.resourceFilters
+		from(rootProject.file('.')) {
+			include '*LICENSE*.txt'
 		}
 	}
 
-	gensrc {
-		java {
-			srcDir 'src/gensrc'
-			include Constants.javaFilters
-		}
+	// --------------- Dyvil Compilation ---------------
 
-		resources {
-			srcDir 'src/gensrc'
-			include Constants.resourceFilters
-		}
-	}
-
-	test {
-		java {
-			srcDir 'src/test'
-			include Constants.javaFilters
-		}
+	ext {
+		setupGenSrc = { args, exec -> setupGenSrc(args, exec) }
+		setupCompiler = { args, exec -> setupCompiler(args, exec) }
 	}
 }
-
-processResources {
-	include Constants.resourceFilters
-}
-
-// --------------- Dependencies ---------------
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	// --------------- Library ---------------
-
-	def libraryBootstrap = files('libs/dyvil-library.jar')
-	def libraryDyvilClasses = files("$buildDir/classes/dyvil/library/") {
-		builtBy 'compileLibraryDyvil'
-	}
-
-	libraryCompileOnly(libraryBootstrap)
-
-	// --------------- Compiler ---------------
-
-	compilerCompile(libraryBootstrap)
-
-	// --------------- DPF ---------------
-
-	def dpfDyvilClasses = files("$buildDir/classes/dyvil/dpf/") {
-		builtBy 'compileDPFDyvil'
-	}
-
-	dpfCompileOnly(libraryBootstrap)
-
-	// --------------- REPL ---------------
-
-	// https://mvnrepository.com/artifact/org.jline/jline
-	replCompile group: 'org.jline', name: 'jline', version: '3.9.0'
-
-	replCompile(libraryBootstrap)
-	replCompile(sourceSets.compiler.output)
-
-	// --------------- GenSrc ---------------
-
-	gensrcCompile(libraryBootstrap)
-	gensrcCompile(sourceSets.compiler.output)
-
-	// --------------- Test ---------------
-
-	def testDyvilClasses = files("$buildDir/classes/dyvil/test") {
-		builtBy 'compileTestDyvil'
-	}
-
-	// https://mvnrepository.com/artifact/junit/junit
-	testCompile group: 'junit', name: 'junit', version: '4.12'
-
-	testRuntimeOnly(testDyvilClasses)
-	testCompile(libraryDyvilClasses, sourceSets.library.output)
-	testCompile(dpfDyvilClasses, sourceSets.dpf.output)
-}
-
-// --------------- Configurations ---------------
-
-configurations {
-	mainCompile.extendsFrom = configurations.findAll {
-		!it.name.contains('main') && it.name.endsWith('Compile')
-	}
-
-	mainRuntime.extendsFrom = configurations.findAll {
-		!it.name.contains('main') && it.name.endsWith('Runtime')
-	}
-}
-
-// =============== Tasks ===============
-
-// --------------- GenSrc Tasks ---------------
-
-private void setupGenSrc(Map args, JavaExec exec) {
-	setupCompiler(args, exec, Constants.genSrcFilters)
-
-	String gensrc_dir = args['gensrc_dir']
-
-	exec.main = Constants.genSrcMainClass
-	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
-
-	if (gensrc_dir) {
-		exec.args "gensrc_dir=$gensrc_dir"
-		exec.args 'test'
-	}
-
-	// Outputs and Inputs
-	exec.outputs.dir gensrc_dir
-}
-
-tasks.register('genLibrary', JavaExec) {
-	group 'sources'
-	setupGenSrc(it,
-			source_dirs: [ 'src/library/', 'src/gensrc-base/' ],
-			output_dir: "$buildDir/classes/dyvil/library-gen/",
-			gensrc_dir: "$buildDir/gensrc/library/",
-	)
-}
-
-tasks.register('genDPF', JavaExec) {
-	group 'sources'
-	setupGenSrc(it,
-			source_dirs: [ 'src/dpf/', 'src/gensrc-base/' ],
-			output_dir: "$buildDir/classes/dyvil/dpf-gen/",
-			gensrc_dir: "$buildDir/gensrc/dpf/",
-	)
-}
-
-// --------------- Copy Tasks ---------------
-
-tasks.register('copyLibraryJava', Sync) {
-	group 'sources'
-	dependsOn 'genLibrary'
-
-	from sourceSets.library.java
-	into "$buildDir/src/java/library"
-
-	include Constants.javaFilters
-	includeEmptyDirs = false
-}
-
-tasks.register('copyLibraryDyvil', Sync) {
-	group 'sources'
-	dependsOn 'genLibrary'
-
-	from 'src/library'
-	from 'src/tools'
-	from "$buildDir/gensrc/library"
-	into "$buildDir/src/dyvil/library"
-
-	include Constants.dyvilFilters
-	includeEmptyDirs = false
-}
-
-tasks.register('copyCompilerJava', Sync) {
-	group 'sources'
-
-	from sourceSets.compiler.java
-	into "$buildDir/src/java/compiler"
-
-	include Constants.javaFilters
-	includeEmptyDirs = false
-
-	filesMatching('**/DyvilCompiler.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-				version        : Constants.version,
-				libraryVersion : Constants.libraryVersion,
-				compilerVersion: Constants.compilerVersion
-		])
-	}
-}
-
-tasks.register('copyReplJava', Sync) {
-	group 'sources'
-	from sourceSets.repl.java
-	into "$buildDir/src/java/repl"
-
-	include Constants.javaFilters
-	includeEmptyDirs = false
-
-	filesMatching('**/DyvilREPL.java') {
-		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-				replVersion: Constants.replVersion
-		])
-	}
-}
-
-tasks.register('copyDPFDyvil', Sync) {
-	group 'sources'
-	dependsOn 'genDPF'
-
-	from 'src/dpf'
-	from "$buildDir/gensrc/dpf"
-	into "$buildDir/src/dyvil/dpf"
-
-	includeEmptyDirs = false
-	include Constants.dyvilFilters
-}
-
-tasks.register('copyGensrcJava', Sync) {
-	group 'sources'
-
-	from sourceSets.gensrc.java
-	into "$buildDir/src/java/gensrc"
-
-	include Constants.javaFilters
-	includeEmptyDirs = false
-}
-
-tasks.register('copyTestDyvil', Sync) {
-	group 'sources'
-
-	from 'src/test'
-	into "$buildDir/src/dyvil/test"
-
-	includeEmptyDirs = false
-	include Constants.dyvilFilters
-}
-
-// --------------- Dyvil Compilation Tasks ---------------
 
 private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] source_dirs = args['source_dirs']
@@ -345,7 +99,7 @@ private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] include_patterns = args['include_patterns']
 	String[] exclude_patterns = args['exclude_patterns']
 
-	exec.main = Constants.compilerMainClass
+	exec.main = project(':compiler').mainClassName
 	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
 
 	if (source_dirs) {
@@ -390,35 +144,67 @@ private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 }
 
 private void setupCompiler(Map args, JavaExec exec) {
-	setupCompiler(args, exec, Constants.dyvilFilters)
+	setupCompiler(args, exec, project.dyvilFilters)
 }
 
-tasks.register('compileLibraryDyvil', JavaExec) {
-	group 'build'
-	dependsOn 'compilerClasses', 'copyLibraryDyvil'
+private void setupGenSrc(Map args, JavaExec exec) {
+	setupCompiler(args, exec, project.genSrcFilters)
 
-	setupCompiler(it,
-			source_dirs: [ "$buildDir/src/dyvil/library/" ],
-			libraries: [ ],
-			output_dir: "$buildDir/classes/dyvil/library",
-	)
+	String gensrc_dir = args['gensrc_dir']
+
+	exec.main = project(':gensrc').mainClassName
+	exec.classpath = project.files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
+
+	if (gensrc_dir) {
+		exec.args "gensrc_dir=$gensrc_dir"
+		exec.args 'test'
+	}
+
+	// Outputs and Inputs
+	exec.outputs.dir gensrc_dir
 }
 
-tasks.register('compileDPFDyvil', JavaExec) {
-	group 'build'
-	dependsOn 'compileLibraryDyvil', 'copyDPFDyvil'
+// *************** Tests ***************
 
-	setupCompiler(it,
-			source_dirs: [ "$buildDir/src/dyvil/dpf" ],
-			libraries: [ "$buildDir/classes/dyvil/library/" ],
-			output_dir: "$buildDir/classes/dyvil/dpf",
-	)
+// --------------- Source Sets ---------------
+
+sourceSets {
+	test {
+		java {
+			srcDir 'src/test'
+		}
+	}
 }
+
+// --------------- Dependencies ---------------
+
+def compilerOutput = files("$buildDir/classes/dyvil/test/") {
+	builtBy 'compileTestDyvil'
+}
+
+dependencies {
+	compile subprojects
+
+	// --------------- Test ---------------
+
+	// https://mvnrepository.com/artifact/junit/junit
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+
+	testCompile project(':library')
+	testCompile project(':dpf')
+	testRuntime compilerOutput
+	testCompileOnly rootProject.libraryBootstrapJarFile
+}
+
+test.testClassesDirs = sourceSets.test.runtimeClasspath
+
+check.dependsOn 'testDyvil', 'testGenSrc'
+
+// --------------- Dyvil Compilation ---------------
 
 tasks.register('compileTestDyvil', JavaExec) {
 	group 'build'
-	dependsOn 'compilerClasses', 'libraryClasses', 'compileLibraryDyvil', 'dpfClasses', 'compileDPFDyvil',
-			'copyTestDyvil'
+	dependsOn 'testClasses'
 
 	setupCompiler(it,
 			source_dirs: [ 'src/test/' ],
@@ -427,8 +213,8 @@ tasks.register('compileTestDyvil', JavaExec) {
 			exclude_patterns: [ 'dyvil/experimental/**' ],
 	)
 
-	// override classpath to use the new classes instead of bootstrap
-	classpath = sourceSets.compiler.runtimeClasspath
+	// override classpath to use the new compiler instead of bootstrap
+	classpath = project(':compiler').sourceSets.main.runtimeClasspath
 }
 
 // --------------- Test Tasks ---------------
@@ -443,7 +229,7 @@ tasks.register('testDyvil', JavaExec) {
 
 tasks.register('testGenSrc', JavaExec) {
 	group 'verification'
-	dependsOn 'gensrcClasses'
+	dependsOn ':gensrc:classes'
 
 	setupGenSrc(it,
 			source_dirs: [ 'src/test/' ],
@@ -455,7 +241,7 @@ tasks.register('testGenSrc', JavaExec) {
 	)
 
 	// override classpath to use the new classes instead of bootstrap
-	classpath = sourceSets.gensrc.runtimeClasspath
+	classpath = project(':gensrc').sourceSets.main.runtimeClasspath
 }
 
 tasks.register('runRepl', JavaExec) {
@@ -469,210 +255,49 @@ tasks.register('runRepl', JavaExec) {
 	standardOutput = System.out
 	standardInput = System.in
 
-	main = Constants.replMainClass
-	classpath = sourceSets.test.runtimeClasspath + sourceSets.repl.runtimeClasspath
+	main = project(':repl').mainClassName
+	classpath = sourceSets.test.runtimeClasspath + project(':repl').sourceSets.main.runtimeClasspath
 }
 
-// --------------- Jar Tasks ---------------
+// *************** Shared Jar ***************
 
-tasks.register('libraryJar', Jar) {
-	group 'build'
-	dependsOn 'libraryClasses', 'compileLibraryDyvil'
-
-	from sourceSets.library.output
-	from sourceSets.library.resources
-
-	from("$buildDir/classes/dyvil/library") {
-		include Constants.binaryFilters
-	}
-
-	archiveAppendix = 'library'
-	archiveVersion = Constants.libraryVersion
+subprojects {
+	rootProject.jar.dependsOn ":$it.name:classes"
 }
 
-tasks.register('compilerJar', Jar) {
-	group 'build'
-	dependsOn 'compilerClasses'
+jar.doFirst {
+	manifest.attributes("Main-Class": project(':repl').mainClassName)
 
-	from sourceSets.compiler.output
-	from sourceSets.compiler.resources
-
-	archiveAppendix = 'compiler'
-	archiveVersion = Constants.compilerVersion
-
-	manifest.attributes("Main-Class": Constants.compilerMainClass)
+	// include dependencies (transitive)
+	from(configurations.runtime.collect { it.directory ? it : zipTree(it) })
 }
 
-tasks.register('replJar', Jar) {
-	group 'build'
-	dependsOn 'replClasses'
-
-	from sourceSets.repl.output
-	from sourceSets.repl.resources
-
-	from configurations.replCompile.collect { it.directory ? it : zipTree(it) }
-
-	archiveAppendix = 'repl'
-	archiveVersion = Constants.replVersion
-
-	manifest.attributes("Main-Class": Constants.replMainClass)
-}
-
-tasks.register('dpfJar', Jar) {
-	group 'build'
-	dependsOn 'dpfClasses', 'compileDPFDyvil'
-
-	from sourceSets.dpf.output
-	from("$buildDir/classes/dyvil/dpf") {
-		include Constants.binaryFilters
-	}
-
-	archiveAppendix = 'property-format'
-	archiveVersion = Constants.dpfVersion
-}
-
-tasks.register('gensrcJar', Jar) {
-	group 'build'
-	dependsOn 'gensrcClasses'
-
-	from sourceSets.gensrc.output
-	from sourceSets.gensrc.resources
-
-	archiveAppendix = 'gensrc'
-	archiveVersion = Constants.genSrcVersion
-
-	manifest.attributes("Main-Class": Constants.genSrcMainClass)
-}
-
-// --------------- Bootstrap Tasks ---------------
-
-def configureBootstrap(Copy task, String artifact, String version) {
-	task.from("$buildDir/libs/")
-			.include("$artifact-${ version }.jar")
-			.rename(".*", "${ artifact }.jar")
-			.into('libs/')
-}
-
-tasks.register('bootstrapLibrary', Copy) {
-	group 'bootstrap'
-	dependsOn 'libraryJar'
-
-	configureBootstrap(it, 'dyvil-library', Constants.libraryVersion)
-}
-
-tasks.register('bootstrapCompiler', Copy) {
-	group 'bootstrap'
-	dependsOn 'compilerJar'
-
-	configureBootstrap(it, 'dyvil-compiler', Constants.compilerVersion)
-}
-
-tasks.register('bootstrapGenSrc', Copy) {
-	group 'bootstrap'
-	dependsOn 'gensrcJar'
-
-	configureBootstrap(it, 'dyvil-gensrc', Constants.genSrcVersion)
-}
-
-tasks.register('bootstrap') {
-	group 'bootstrap'
-	dependsOn 'bootstrapLibrary', 'bootstrapCompiler', 'bootstrapGenSrc'
-}
-
-// --------------- Versioning Tasks ---------------
+// *************** Versioning ***************
 
 tasks.register('prepareRelease', Copy) {
 	outputs.upToDateWhen { false }
 
 	from 'versions/'
-	into "versions/$Constants.versionDir"
+	into "versions/$rootProject.versionDir"
 	include 'template.dyp'
-	rename 'template\\.dyp', "v${ Constants.version }.dyp"
+	rename 'template\\.dyp', "v${ rootProject.version }.dyp"
 
 	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-			version        : Constants.version,
-			libraryVersion : Constants.libraryVersion,
-			compilerVersion: Constants.compilerVersion,
-			replVersion    : Constants.replVersion,
-			dpfVersion     : Constants.dpfVersion,
-			genSrcVersion  : Constants.genSrcVersion
+			version        : rootProject.version,
+			libraryVersion : project(':library').version,
+			compilerVersion: project(':compiler').version,
+			replVersion    : project(':repl').version,
+			dpfVersion     : project(':dpf').version,
+			genSrcVersion  : project(':gensrc').version
 	])
 
 	doLast {
-		println "Release v$Constants.version"
+		println "Release v$rootProject.version"
 		println ""
-		println "Library v$Constants.libraryVersion"
-		println "Compiler v$Constants.compilerVersion"
-		println "REPL v$Constants.replVersion"
-		println "Dyvil Property Format v$Constants.dpfVersion"
-		println "GenSrc v$Constants.genSrcVersion"
+		println "Library v" + project(':library').version
+		println "Compiler v" + project(':compiler').version
+		println "REPL v" + project(':repl').version
+		println "Dyvil Property Format v" + project(':dpf').version
+		println "GenSrc v" + project(':gensrc').version
 	}
-}
-
-// =============== Additional Configuration ===============
-
-idea.module.inheritOutputDirs = true
-wrapper.setDistributionType(Wrapper.DistributionType.ALL)
-
-// --------------- Java Compiler Configuration ---------------
-
-compileLibraryJava.dependsOn 'copyLibraryJava'
-compileLibraryJava.source = "$buildDir/src/java/library"
-
-compileCompilerJava.dependsOn 'copyCompilerJava'
-compileCompilerJava.source = "$buildDir/src/java/compiler"
-
-compileReplJava.dependsOn 'copyReplJava'
-compileReplJava.source = "$buildDir/src/java/repl"
-
-compileGensrcJava.dependsOn 'copyGensrcJava'
-compileGensrcJava.source = "$buildDir/src/java/gensrc"
-
-tasks.withType(JavaCompile) {
-	options.compilerArgs.addAll(
-			'-parameters',          // generates parameter attributes and names
-			'-XDignore.symbol.file' // disables "proprietary API" warnings
-	)
-	options.fork = true
-}
-
-// --------------- Test Configuration ---------------
-
-test.testClassesDirs = sourceSets.test.runtimeClasspath
-
-check.dependsOn 'testDyvil', 'testGenSrc'
-
-// --------------- Artifact Configuration ---------------
-
-tasks.withType(Jar) {
-	preserveFileTimestamps = false
-
-	from('.') {
-		include '*LICENSE*.txt'
-	}
-}
-
-jar {
-	dependsOn 'libraryJar', 'compilerJar', 'replJar', 'dpfJar', 'gensrcJar'
-
-	from tasks.libraryJar.inputs.files
-	from tasks.compilerJar.inputs.files
-	from tasks.replJar.inputs.files
-	from tasks.dpfJar.inputs.files
-	from tasks.gensrcJar.inputs.files
-
-	archiveVersion = Constants.version
-
-	manifest.attributes("Main-Class": Constants.replMainClass)
-}
-
-build.dependsOn 'libraryJar', 'compilerJar', 'replJar', 'dpfJar', 'gensrcJar'
-
-// --------------- Cleanup Configuration ---------------
-
-clean {
-	delete = buildDir.listFiles().findAll {
-		def path = it.path
-		!path.endsWith('libs') && !path.endsWith('idea-out')
-	}.toSet()
 }
