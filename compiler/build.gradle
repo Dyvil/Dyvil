@@ -3,13 +3,14 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // --------------- Plugins ---------------
 
 plugins {
-	id 'java'
 	id 'application'
 }
 
 // --------------- Info ---------------
 
 version = '0.44.0'
+description = 'The Dyvil Compiler'
+publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
 
 mainClassName = 'dyvilx.tools.compiler.Main'
 

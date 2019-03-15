@@ -1,12 +1,8 @@
-// --------------- Plugins ---------------
-
-plugins {
-	id 'java'
-}
-
 // --------------- Info ---------------
 
 version = '0.16.1'
+description = 'The Dyvil Property Format library'
+publishInfo.labels = [ 'dyvil', 'library', 'properties', 'data-format' ]
 
 // --------------- Source Sets ---------------
 

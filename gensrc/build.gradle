@@ -1,13 +1,14 @@
 // --------------- Plugins ---------------
 
 plugins {
-	id 'java'
 	id 'application'
 }
 
 // --------------- Info ---------------
 
 version = '0.9.5'
+description = 'The Dyvil GenSrc template source code generator'
+publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
 
 mainClassName = 'dyvilx.tools.gensrc.Main'
 

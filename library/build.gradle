@@ -1,12 +1,8 @@
-// --------------- Plugins ---------------
-
-plugins {
-	id 'java'
-}
-
 // --------------- Info ---------------
 
 version = '0.44.0'
+description = 'The Dyvil Standard Library'
+publishInfo.labels = [ 'dyvil', 'library' ]
 
 // --------------- Source Sets ---------------
 

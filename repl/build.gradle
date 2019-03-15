@@ -3,13 +3,14 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // --------------- Plugins ---------------
 
 plugins {
-	id 'java'
 	id 'application'
 }
 
 // --------------- Info ---------------
 
 version = '0.27.0'
+description = 'The Dyvil REPL interactive shell'
+publishInfo.labels = [ 'dyvil', 'repl', 'interactive', 'shell' ]
 
 mainClassName = 'dyvilx.tools.repl.Main'
 

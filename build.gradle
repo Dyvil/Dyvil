@@ -3,37 +3,45 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // --------------- Plugins ---------------
 
 plugins {
-	id 'java'
-	id 'idea'
-	id 'maven-publish'
-	id 'com.jfrog.bintray' version '1.8.4'
-	id 'de.clashsoft.simple-publish' version '0.3.0'
+	id 'com.jfrog.bintray' version '1.8.4' apply false
+	id 'de.clashsoft.simple-publish' version '0.3.0' apply false
+}
+
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'idea'
+	apply plugin: 'maven-publish'
+	apply plugin: 'com.jfrog.bintray'
+	apply plugin: 'de.clashsoft.simple-publish'
 }
 
 // --------------- Info ---------------
 
-group = 'org.dyvil'
 version = '0.44.0'
 description = 'The Dyvil programming language.'
+publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
 
-publishInfo {
-	organization = 'dyvil'
-	websiteUrl = 'https://github.com/Dyvil/Dyvil'
-	issueTrackerUrl = 'https://github.com/Dyvil/Dyvil/issues'
-	vcsUrl = 'https://github.com/Dyvil/Dyvil'
-	githubRepo = 'Dyvil/Dyvil'
-	labels = [ 'programming-language', 'jvm', 'dyvil' ]
+allprojects {
+	group = 'org.dyvil'
 
-	license {
-		shortName = 'BSD 3-Clause'
-		longName = 'BSD 3-Clause "New" or "Revised" License'
-		url = 'https://opensource.org/licenses/BSD-3-Clause'
-	}
+	publishInfo {
+		organization = 'dyvil'
+		websiteUrl = 'https://github.com/Dyvil/Dyvil'
+		issueTrackerUrl = 'https://github.com/Dyvil/Dyvil/issues'
+		vcsUrl = 'https://github.com/Dyvil/Dyvil'
+		githubRepo = 'Dyvil/Dyvil'
 
-	developer {
-		id = 'clashsoft'
-		name = 'Adrian Kunz'
-		email = 'clashsoft@hotmail.com'
+		license {
+			shortName = 'BSD 3-Clause'
+			longName = 'BSD 3-Clause "New" or "Revised" License'
+			url = 'https://opensource.org/licenses/BSD-3-Clause'
+		}
+
+		developer {
+			id = 'clashsoft'
+			name = 'Adrian Kunz'
+			email = 'clashsoft@hotmail.com'
+		}
 	}
 }
 
