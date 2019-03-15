@@ -59,7 +59,7 @@ ext {
 	binaryFilters = [ '**/*.dyo', '**/*.class' ]
 	resourceFilters = [ '**/*.properties' ]
 
-	libraryBootstrapJarFile = rootProject.files('libs/dyvil-library.jar')
+	libraryBootstrapJarFile = rootProject.files('library/bootstrap.jar')
 }
 
 subprojects {
@@ -125,7 +125,7 @@ private void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] exclude_patterns = args['exclude_patterns']
 
 	exec.main = project(':compiler').mainClassName
-	exec.classpath = files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar')
+	exec.classpath = files('library/bootstrap.jar', 'compiler/bootstrap.jar')
 
 	if (source_dirs) {
 		exec.args "source_dirs=${ source_dirs.join(':') }"
@@ -178,7 +178,7 @@ private void setupGenSrc(Map args, JavaExec exec) {
 	String gensrc_dir = args['gensrc_dir']
 
 	exec.main = project(':gensrc').mainClassName
-	exec.classpath = project.files('libs/dyvil-library.jar', 'libs/dyvil-compiler.jar', 'libs/dyvil-gensrc.jar')
+	exec.classpath = project.files('library/bootstrap.jar', 'compiler/bootstrap.jar', 'gensrc/bootstrap.jar')
 
 	if (gensrc_dir) {
 		exec.args "gensrc_dir=$gensrc_dir"
