@@ -33,7 +33,7 @@ class Constants {
 	public static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
 }
 
-group = 'dyvil'
+group = 'org.dyvil'
 version = Constants.version
 description = 'The Dyvil programming language.'
 
