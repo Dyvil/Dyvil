@@ -1,0 +1,89 @@
+def script = this
+
+configurations.create('bootstrap')
+
+dependencies {
+	bootstrap libraryDependency
+	bootstrap compilerDependency
+	bootstrap gensrcDependency
+}
+
+allprojects {
+	ext {
+		setupGenSrc = { args, exec -> script.setupGenSrc(args, exec) }
+		setupCompiler = { args, exec -> script.setupCompiler(args, exec) }
+	}
+}
+
+void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
+	String[] source_dirs = args['source_dirs']
+	String[] libraries = args['libraries']
+	String output_dir = args['output_dir']
+	String main_type = args['main_type']
+	String[] include_patterns = args['include_patterns']
+	String[] exclude_patterns = args['exclude_patterns']
+
+	exec.main = project(':compiler').mainClassName
+	exec.classpath configurations.bootstrap
+
+	if (source_dirs) {
+		exec.args "source_dirs=${ source_dirs.join(':') }"
+
+		for (String src : source_dirs) {
+			exec.inputs.files fileTree(src) {
+				include fileFilters
+			}
+		}
+	}
+
+	if (include_patterns) {
+		exec.args "include_patterns=${ include_patterns.join(':') }"
+	}
+
+	if (exclude_patterns) {
+		exec.args "exclude_patterns=${ exclude_patterns.join(':') }"
+	}
+
+	if (libraries) {
+		exec.args "libraries=${ libraries.join(':') }"
+
+		for (String library : libraries) {
+			exec.inputs.files fileTree(library)
+		}
+	}
+
+	if (output_dir) {
+		exec.args "output_dir=$output_dir"
+
+		exec.outputs.dir output_dir
+	}
+
+	if (main_type) {
+		exec.args "main_type=$main_type"
+
+		exec.args 'test'
+	}
+
+	exec.args 'compile', '--ansi', '--machine-markers'
+}
+
+void setupCompiler(Map args, JavaExec exec) {
+	setupCompiler(args, exec, dyvilFilters)
+}
+
+void setupGenSrc(Map args, JavaExec exec) {
+	setupCompiler(args, exec, genSrcFilters)
+
+	String gensrc_dir = args['gensrc_dir']
+
+	exec.main = project(':gensrc').mainClassName
+	exec.classpath configurations.bootstrap
+
+	if (gensrc_dir) {
+		exec.args "gensrc_dir=$gensrc_dir"
+		exec.args 'test'
+	}
+
+	// Outputs and Inputs
+	exec.outputs.dir gensrc_dir
+}

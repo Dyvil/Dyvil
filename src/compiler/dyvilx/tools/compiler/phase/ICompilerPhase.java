@@ -2,18 +2,11 @@ package dyvilx.tools.compiler.phase;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.io.Files;
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.ast.context.IContext;
-import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
-import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.parameter.ArgumentList;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
-import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.token.IdentifierToken;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
@@ -59,9 +52,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	ICompilerPhase RESOLVE = new SequentialCompilerPhase(60, "RESOLVE", ICompilationUnit::resolve);
 
 	/**
-	 * Resolves other things such as lambda expressions or annotations and checks types. This will be called after
-	 * {@link IValue#withType(IType, ITypeContext, MarkerList, IContext)} has been called. Mainly used by {@link
-	 * IMethod#checkArguments(MarkerList, SourcePosition, IContext, IValue, ArgumentList, * dyvilx.tools.compiler.ast.generic.GenericData)} .
+	 * Resolves other things such as lambda expressions or annotations and checks types.
 	 */
 	ICompilerPhase CHECK_TYPES = new SequentialCompilerPhase(70, "CHECK_TYPES", ICompilationUnit::checkTypes);
 

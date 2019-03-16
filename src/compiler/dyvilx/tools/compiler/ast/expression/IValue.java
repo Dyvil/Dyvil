@@ -17,8 +17,8 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.Typed;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.SideEffectHelper;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.ASTNode;
@@ -185,7 +185,7 @@ public interface IValue extends ASTNode, Typed, WriteableExpression
 	}
 
 	default IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
-		                                   SideEffectHelper helper)
+		SideEffectHelper helper)
 	{
 		return null;
 	}
@@ -260,6 +260,7 @@ public interface IValue extends ASTNode, Typed, WriteableExpression
 	 * @param type
 	 * 	the type to match
 	 * @param implicitContext
+	 * 	the context for implicit resolution
 	 *
 	 * @return the subtyping distance
 	 */

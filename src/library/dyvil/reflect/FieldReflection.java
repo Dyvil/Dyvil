@@ -218,6 +218,8 @@ public class FieldReflection
 	/**
 	 * Directly gets the value of the given {@link Field} on the given {@link Object} {@code instance}.
 	 *
+	 * @param <R>
+	 * 	the field type
 	 * @param field
 	 * 	the field to get
 	 * @param instance
@@ -281,6 +283,10 @@ public class FieldReflection
 	 * Directly sets the value of the given {@link Field} on the given {@link Object} {@code instance} to the given
 	 * {@link Object} {@code value} .
 	 *
+	 * @param <T>
+	 * 	the receiver type
+	 * @param <V>
+	 * 	the field type
 	 * @param field
 	 * 	the field to set
 	 * @param instance

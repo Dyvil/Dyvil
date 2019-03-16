@@ -1,0 +1,16 @@
+subprojects {
+	// --------------- Source Copying ---------------
+
+	def outputPath = "$buildDir/src/main/java/"
+	compileJava.source = files(outputPath).builtBy 'copyJava'
+
+	tasks.register('copyJava', Sync) {
+		group 'sources'
+
+		from sourceSets.main.java
+		into outputPath
+
+		include rootProject.javaFilters
+		includeEmptyDirs = false
+	}
+}

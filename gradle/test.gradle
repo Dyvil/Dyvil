@@ -1,0 +1,92 @@
+// --------------- Source Sets ---------------
+
+sourceSets {
+	test {
+		java {
+			srcDir 'src/test'
+		}
+	}
+}
+
+// --------------- Dependencies ---------------
+
+def compilerOutput = files("$buildDir/classes/dyvil/test/") {
+	builtBy 'compileTestDyvil'
+}
+
+dependencies {
+	compile subprojects
+
+	// --------------- Test ---------------
+
+	// https://mvnrepository.com/artifact/junit/junit
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+
+	testCompile project(':library')
+	testCompile project(':dpf')
+	testRuntime compilerOutput
+	testCompileOnly rootProject.libraryDependency
+}
+
+test.testClassesDirs = sourceSets.test.runtimeClasspath
+
+check.dependsOn 'testDyvil', 'testGenSrc'
+
+// --------------- Dyvil Compilation ---------------
+
+tasks.register('compileTestDyvil', JavaExec) {
+	group 'build'
+	dependsOn 'testClasses'
+
+	setupCompiler(it,
+			source_dirs: [ 'src/test/' ],
+			libraries: sourceSets.test.compileClasspath.toList(),
+			output_dir: "$buildDir/classes/dyvil/test/",
+			exclude_patterns: [ 'dyvil/experimental/**' ],
+	)
+
+	// override classpath to use the new compiler instead of bootstrap
+	classpath = project(':compiler').sourceSets.main.runtimeClasspath
+}
+
+// --------------- Test Tasks ---------------
+
+tasks.register('testDyvil', JavaExec) {
+	group 'verification'
+	dependsOn 'compileTestDyvil'
+
+	main = 'dyvil.test.Main'
+	classpath = sourceSets.test.runtimeClasspath
+}
+
+tasks.register('testGenSrc', JavaExec) {
+	group 'verification'
+	dependsOn ':gensrc:classes'
+
+	setupGenSrc(it,
+			source_dirs: [ 'src/test/' ],
+			output_dir: "$buildDir/classes/test-gen/",
+			gensrc_dir: "$buildDir/gensrc/test/",
+			// the line is here to ensure the compiler finds all Dyvil classes
+			// (somehow its classpath-based library resolution is insufficient)
+			libraries: [ "$buildDir/classes/dyvil/library/" ]
+	)
+
+	// override classpath to use the new classes instead of bootstrap
+	classpath = project(':gensrc').sourceSets.main.runtimeClasspath
+}
+
+tasks.register('runRepl', JavaExec) {
+	group 'run'
+	dependsOn 'compileTestDyvil'
+
+	setupCompiler(it,
+			libraries: sourceSets.test.compileClasspath.toList()
+	)
+
+	standardOutput = System.out
+	standardInput = System.in
+
+	main = project(':repl').mainClassName
+	classpath = sourceSets.test.runtimeClasspath + project(':repl').sourceSets.main.runtimeClasspath
+}

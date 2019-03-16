@@ -1,0 +1,33 @@
+// --------------- Plugins ---------------
+
+plugins {
+	id 'application'
+}
+
+// --------------- Info ---------------
+
+version = '0.9.5'
+description = 'The Dyvil GenSrc template source code generator'
+publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
+
+mainClassName = 'dyvilx.tools.gensrc.Main'
+
+// --------------- Source Sets ---------------
+
+sourceSets.main {
+	java {
+		srcDir '../src/gensrc'
+	}
+
+	resources {
+		srcDir '../src/gensrc'
+	}
+}
+
+// --------------- Dependencies ---------------
+
+dependencies {
+	compile project(':library')
+	compile project(':compiler')
+	compileOnly rootProject.libraryDependency
+}

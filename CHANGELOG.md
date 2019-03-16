@@ -38,17 +38,33 @@
 
 ## Dyvil REPL v0.27.0
 
-- Added command argument completions for the `debug`, `dump`, `help`, `library` and `load` commands.
-- Added completions for command names and aliases.
+- Added command argument completions for the `debug`, `dump`, `help`, `library` and `load` commands. #466
+- Added completions for command names and aliases. #466
 - Added support for the new marker style command-line arguments. #454
 - Added support for the new marker styles. #454
 - Fixed backslashes being stripped from the input.
-- Improved multiline input using a custom JLine `Parser`.
+- Improved multiline input using a custom JLine `Parser`. #463
 - Improved the `Colorizer` color scheme.
 - Made the `Colorizer` class more robust.
-- Pressing Tab at the start of a line now inserts a tab character.
-- Syntax highlighting is now done during input.
-- The `InputManager` implementation now uses JLine.
+- Pressing Tab at the start of a line now inserts a tab character. #463
+- Syntax highlighting is now done during input. #463
+- The `InputManager` implementation now uses JLine. #463
+
+## Dyvil Property Format v0.16.1
+
+## Dyvil GenSrc v0.9.5
+
+# Dyvil v0.44.1
+
+## Dyvil Library v0.44.1
+
+* Fixed errors and warnings in Javadoc comments.
+
+## Dyvil Compiler v0.44.1
+
+* Fixed errors and warnings in Javadoc comments.
+
+## Dyvil REPL v0.27.0
 
 ## Dyvil Property Format v0.16.1
 

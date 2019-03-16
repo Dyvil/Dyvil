@@ -1,0 +1,46 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+// --------------- Plugins ---------------
+
+plugins {
+	id 'application'
+}
+
+// --------------- Info ---------------
+
+version = '0.27.0'
+description = 'The Dyvil REPL interactive shell'
+publishInfo.labels = [ 'dyvil', 'repl', 'interactive', 'shell' ]
+
+mainClassName = 'dyvilx.tools.repl.Main'
+
+// --------------- Source Sets ---------------
+
+sourceSets.main {
+	java {
+		srcDir '../src/repl'
+	}
+
+	resources {
+		srcDir '../src/repl'
+	}
+}
+
+// --------------- Dependencies ---------------
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.jline/jline
+	compile group: 'org.jline', name: 'jline', version: '3.9.0'
+
+	compile project(':library')
+	compile project(':compiler')
+	compileOnly rootProject.libraryDependency
+}
+
+// --------------- Source Copying ---------------
+
+copyJava.filesMatching('**/DyvilREPL.java') {
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+			replVersion: project.version
+	])
+}

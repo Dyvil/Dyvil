@@ -1,0 +1,44 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+// --------------- Plugins ---------------
+
+plugins {
+	id 'application'
+}
+
+// --------------- Info ---------------
+
+version = '0.44.1'
+description = 'The Dyvil Compiler'
+publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
+
+mainClassName = 'dyvilx.tools.compiler.Main'
+
+// --------------- Source Sets ---------------
+
+sourceSets.main {
+	java {
+		srcDir '../src/compiler'
+	}
+
+	resources {
+		srcDir '../src/compiler'
+	}
+}
+
+// --------------- Dependencies ---------------
+
+dependencies {
+	compile project(':library')
+	compileOnly rootProject.libraryDependency
+}
+
+// --------------- Source Copying ---------------
+
+copyJava.filesMatching('**/DyvilCompiler.java') {
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+			version        : rootProject.version,
+			libraryVersion : project(':library').version,
+			compilerVersion: project.version
+	])
+}

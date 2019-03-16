@@ -64,6 +64,15 @@ versionFiles = {
 
 	"Epsilon" : {
 		"v0.40.0" : "\(baseLink)/epsilon/v0.40.0.dyp"
+		"v0.41.0" : "\(baseLink)/epsilon/v0.41.0.dyp"
+		"v0.41.1" : "\(baseLink)/epsilon/v0.41.1.dyp"
+		"v0.42.0" : "\(baseLink)/epsilon/v0.42.0.dyp"
+		"v0.42.1" : "\(baseLink)/epsilon/v0.42.1.dyp"
+		"v0.42.2" : "\(baseLink)/epsilon/v0.42.2.dyp"
+		"v0.42.3" : "\(baseLink)/epsilon/v0.42.3.dyp"
+		"v0.43.0" : "\(baseLink)/epsilon/v0.43.0.dyp"
+		"v0.44.0" : "\(baseLink)/epsilon/v0.44.0.dyp"
+		"v0.44.1" : "\(baseLink)/epsilon/v0.44.1.dyp"
 	}
 
 	// "Latest Nightly Build" : "https://drone.io/github.com/Dyvil/Dyvil/files/versions/nightly.dyp",

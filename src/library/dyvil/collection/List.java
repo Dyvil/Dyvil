@@ -27,12 +27,11 @@ import java.util.function.Predicate;
  * mutable} and {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil Collection Framework</i>
  * provides various memory-efficient implementations specialized for lists with zero, one or multiple elements.
  * <p>
- * Since this interface is both {@link LiteralConvertible.FromNil} and {@link LiteralConvertible.FromArray}, it is
+ * Since this interface is {@link LiteralConvertible.FromArray}, it is
  * possible to initialize both mutable and immutable lists with simple expressions, as shown in the below example.
- * <p>
  * <pre>
- * List[int] mutable = nil // Creates an empty, mutable list
- * List[String] immutable = [ "a", "b", "c" ] // Creates an immutable list from the array
+ * List&lt;int&gt; mutable = [] // Creates an empty, mutable list
+ * List&lt;String&gt; immutable = [ "a", "b", "c" ] // Creates an immutable list from the array
  * </pre>
  *
  * @param <E>
@@ -48,6 +47,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * Returns an empty, immutable list. This method is primarily for use with the {@code nil} literal in <i>Dyvil</i>
 	 * and returns an instance of {@link EmptyList}.
 	 *
+	 * @param <E>
+	 * 	the element type
+	 *
 	 * @return an empty, immutable list
 	 */
 	@NonNull
@@ -58,6 +60,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 
 	/**
 	 * Returns an empty, mutable list. The exact type of the returned object is given by {@link MutableList#apply()}.
+	 *
+	 * @param <E>
+	 * 	the element type
 	 *
 	 * @return an empty, mutable list
 	 */
@@ -78,6 +83,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * <i>Array Expressions</i> in <i>Dyvil</i> and internally creates an {@link dyvil.collection.immutable.ArrayList
 	 * ArrayList} from the given {@code elements}.
 	 *
+	 * @param <E>
+	 * 	the element type
 	 * @param elements
 	 * 	the elements of the returned collection
 	 *
@@ -235,7 +242,6 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element multiple times, implementations should
 	 * behave so that <i>all</i> occurrences of the element are removed, not only the first one. This behavior can be
 	 * achieved using this code snippet:
-	 * <p>
 	 * <pre>
 	 * List copy = list.copy()
 	 * copy.removeAt(list.indexOf(element))

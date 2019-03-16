@@ -1,0 +1,73 @@
+// --------------- Info ---------------
+
+version = '0.16.1'
+description = 'The Dyvil Property Format library'
+publishInfo.labels = [ 'dyvil', 'library', 'properties', 'data-format' ]
+
+// --------------- Source Sets ---------------
+
+sourceSets.main {
+	resources {
+		srcDir '../src/dpf'
+
+		exclude dyvilFilters
+		exclude genSrcFilters
+	}
+}
+
+// --------------- Dependencies ---------------
+
+def compilerOutput = files("$buildDir/classes/dyvil/main/") {
+	builtBy 'compileDyvil'
+}
+
+dependencies {
+	compile project(':library')
+	runtime compilerOutput
+	compileOnly rootProject.libraryDependency
+}
+
+jar.from compilerOutput
+
+// =============== Tasks ===============
+
+// --------------- GenSrc ---------------
+
+tasks.register('gensrcDyvil', JavaExec) {
+	group 'sources'
+
+	it.workingDir = rootDir
+	setupGenSrc(it,
+			source_dirs: [ 'src/dpf/', 'src/gensrc-base/' ],
+			output_dir: "$it.temporaryDir/classes/",
+			gensrc_dir: "$buildDir/gensrc/main/dyvil/",
+	)
+}
+
+// --------------- Source Copying ---------------
+
+tasks.register('copyDyvil', Sync) {
+	group 'sources'
+	dependsOn 'gensrcDyvil'
+
+	from '../src/dpf'
+	from "$buildDir/gensrc/main/dyvil/"
+	into "$buildDir/src/main/dyvil/"
+
+	includeEmptyDirs = false
+	include project.dyvilFilters
+}
+
+// --------------- Dyvil Compilation ---------------
+
+tasks.register('compileDyvil', JavaExec) {
+	group 'build'
+	dependsOn ':library:compileDyvil', 'copyDyvil'
+
+	def library = project(':library')
+	setupCompiler(it,
+			source_dirs: [ "$buildDir/src/main/dyvil/" ],
+			libraries: [ "$library.buildDir/classes/dyvil/main/" ],
+			output_dir: "$buildDir/classes/dyvil/main/",
+	)
+}

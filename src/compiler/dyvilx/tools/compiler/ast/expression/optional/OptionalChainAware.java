@@ -127,6 +127,13 @@ public interface OptionalChainAware extends IValue
 	/**
 	 * Creates a new variable for use in binding if statements. The lhs automatically gets wrapped in an optional unwrap
 	 * operator.
+	 *
+	 * @param position
+	 * 	the source position
+	 * @param lhs
+	 * 	the variable value
+	 *
+	 * @return the variable
 	 */
 	static Variable newVar(SourcePosition position, IValue lhs)
 	{
