@@ -1,0 +1,23 @@
+allprojects {
+	// --------------- Java Compilation ---------------
+
+	idea.module.inheritOutputDirs = true
+
+	tasks.withType(JavaCompile) {
+		options.compilerArgs.addAll(
+				'-parameters',          // generates parameter attributes and names
+				'-XDignore.symbol.file' // disables "proprietary API" warnings
+		)
+		options.fork = true
+	}
+
+	// --------------- Jar ---------------
+
+	tasks.withType(Jar) {
+		preserveFileTimestamps = false
+
+		from(rootProject.file('.')) {
+			include '*LICENSE*.txt'
+		}
+	}
+}
