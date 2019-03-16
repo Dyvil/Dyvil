@@ -24,7 +24,7 @@ def compilerOutput = files("$buildDir/classes/dyvil/main/") {
 dependencies {
 	compile project(':library')
 	runtime compilerOutput
-	compileOnly rootProject.libraryBootstrapJarFile
+	compileOnly rootProject.libraryDependency
 }
 
 jar.from compilerOutput

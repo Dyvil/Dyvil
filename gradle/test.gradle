@@ -25,7 +25,7 @@ dependencies {
 	testCompile project(':library')
 	testCompile project(':dpf')
 	testRuntime compilerOutput
-	testCompileOnly rootProject.libraryBootstrapJarFile
+	testCompileOnly rootProject.libraryDependency
 }
 
 test.testClassesDirs = sourceSets.test.runtimeClasspath

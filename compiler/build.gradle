@@ -30,7 +30,7 @@ sourceSets.main {
 
 dependencies {
 	compile project(':library')
-	compileOnly rootProject.libraryBootstrapJarFile
+	compileOnly rootProject.libraryDependency
 }
 
 // --------------- Source Copying ---------------

@@ -1,5 +1,13 @@
 def script = this
 
+configurations.create('bootstrap')
+
+dependencies {
+	bootstrap libraryDependency
+	bootstrap compilerDependency
+	bootstrap gensrcDependency
+}
+
 allprojects {
 	ext {
 		setupGenSrc = { args, exec -> script.setupGenSrc(args, exec) }
@@ -16,7 +24,7 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	String[] exclude_patterns = args['exclude_patterns']
 
 	exec.main = project(':compiler').mainClassName
-	exec.classpath = rootProject.files('library/bootstrap.jar', 'compiler/bootstrap.jar')
+	exec.classpath configurations.bootstrap
 
 	if (source_dirs) {
 		exec.args "source_dirs=${ source_dirs.join(':') }"
@@ -60,16 +68,16 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 }
 
 void setupCompiler(Map args, JavaExec exec) {
-	setupCompiler(args, exec, project.dyvilFilters)
+	setupCompiler(args, exec, dyvilFilters)
 }
 
 void setupGenSrc(Map args, JavaExec exec) {
-	setupCompiler(args, exec, project.genSrcFilters)
+	setupCompiler(args, exec, genSrcFilters)
 
 	String gensrc_dir = args['gensrc_dir']
 
 	exec.main = project(':gensrc').mainClassName
-	exec.classpath = rootProject.files('library/bootstrap.jar', 'compiler/bootstrap.jar', 'gensrc/bootstrap.jar')
+	exec.classpath configurations.bootstrap
 
 	if (gensrc_dir) {
 		exec.args "gensrc_dir=$gensrc_dir"

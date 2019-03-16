@@ -34,7 +34,7 @@ dependencies {
 
 	compile project(':library')
 	compile project(':compiler')
-	compileOnly rootProject.libraryBootstrapJarFile
+	compileOnly rootProject.libraryDependency
 }
 
 // --------------- Source Copying ---------------
