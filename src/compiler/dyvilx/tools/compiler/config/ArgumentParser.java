@@ -90,7 +90,7 @@ public final class ArgumentParser
 			}
 			catch (Exception ignored)
 			{
-				compiler.warn(I18n.get("argument.optimisation.invalid", level));
+				compiler.warn(I18n.get("argument.optimisation.invalid", argument, level));
 			}
 			return;
 		}
@@ -118,7 +118,7 @@ public final class ArgumentParser
 				}
 			}
 
-			compiler.warn(I18n.get("argument.print.phase", phase));
+			compiler.warn(I18n.get("argument.print.phase", argument, phase));
 			return;
 		}
 
