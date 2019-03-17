@@ -261,6 +261,34 @@ extension CharSequence {
 	final func subscript(range: Range<int>) -> CharSequence inline = this.subSequence(range.first, range.last + 1)
 }
 
+@JavaName("StringBuilders")
+extension StringBuilder {
+	// =============== Methods ===============
+
+	final func remove(at index: int) -> StringBuilder {
+		this.deleteCharAt(index)
+		return this
+	}
+
+	final func removeFirst() -> StringBuilder = this.remove(at: 0)
+
+	final func removeLast() -> StringBuilder = this.remove(at: this.length - 1)
+}
+
+@JavaName("Patterns")
+extension Pattern {
+	// =============== Static Methods ===============
+
+	static func apply(from string: String) implicit -> Pattern inline = Pattern.compile(string)!!
+
+	// =============== Methods ===============
+
+	final func matches(string: String) -> boolean = this.matcher(string).matches()
+}
+
+// The following classes only have syntactic meaning in the Dyvil language,
+// they are practically useless in Java code.
+
 @JavaName("Strings$CharSyntax")
 extension char {
 	// =============== Static Methods ===============
@@ -274,15 +302,6 @@ extension char {
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: .WARNING)
 	static func apply(_ c: String) -> char inline = c[0]
-}
-
-@JavaName("Patterns")
-extension Pattern {
-	// =============== Methods ===============
-
-	static func apply(from string: String) implicit -> Pattern inline = Pattern.compile(string)!!
-
-	final func matches(string: String) -> boolean = this.matcher(string).matches()
 }
 
 @JavaName("Strings$AnyToStringBuilder")
