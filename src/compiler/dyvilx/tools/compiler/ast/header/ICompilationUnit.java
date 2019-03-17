@@ -39,7 +39,7 @@ public interface ICompilationUnit extends ASTNode
 	void compile();
 
 	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, FileType fileType, Name name,
-		                           FileSource source)
+		FileSource source)
 	{
 		final int size = markers.size();
 		if (size <= 0)
@@ -47,57 +47,76 @@ public interface ICompilationUnit extends ASTNode
 			return false;
 		}
 
-		final StringBuilder builder = new StringBuilder(I18n.get("unit.problems", fileType.getLocalizedName(), name,
-		                                                         source.file())).append("\n\n");
-
-		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
 		final MarkerStyle style = compiler.config.getMarkerStyle();
 		final boolean colors = compiler.config.useAnsiColors();
+		final MarkerPrinter printer = new MarkerPrinter(source, style, colors);
+		final StringBuilder builder = new StringBuilder();
 
-		new MarkerPrinter(source, style, colors).print(markers, new StringBuilderWriter(builder));
-
-		if (errors > 0)
+		if (style == MarkerStyle.DYVIL)
 		{
-			if (colors)
-			{
-				builder.append(Console.ANSI_RED);
-			}
-
-			builder.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
-
-			if (colors)
-			{
-				builder.append(Console.ANSI_RESET);
-			}
+			builder.append(I18n.get("unit.problems", fileType.getLocalizedName(), name, source.file()));
+			builder.append("\n\n");
 		}
-		if (warnings > 0)
+
+		printer.print(markers, new StringBuilderWriter(builder));
+
+		if (style == MarkerStyle.DYVIL)
 		{
+			final int warnings = markers.getWarnings();
+			if (warnings > 0)
+			{
+				// TODO v0.45.0: Console.colored
+
+				if (colors)
+				{
+					builder.append(Console.ANSI_YELLOW);
+				}
+				builder.append(warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings));
+
+				if (colors)
+				{
+					builder.append(Console.ANSI_RESET);
+				}
+			}
+
 			if (errors > 0)
 			{
-				builder.append(", ");
+				if (warnings > 0)
+				{
+					builder.append(", ");
+				}
+
+				if (colors)
+				{
+					builder.append(Console.ANSI_RED);
+				}
+
+				builder.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
+				builder.append(": ");
+				builder.append(I18n.get("unit.problems.not_compiled", fileType.getLocalizedName(), name));
+
+				if (colors)
+				{
+					builder.append(Console.ANSI_RESET);
+				}
 			}
 
-			if (colors)
-			{
-				builder.append(Console.ANSI_YELLOW);
-			}
-			builder.append(warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings));
-
-			if (colors)
-			{
-				builder.append(Console.ANSI_RESET);
-			}
+			builder.append('\n');
 		}
 
-		builder.append('\n');
+		// remove trailing newline because compiler.log uses println
+		// TODO v0.45.0: StringBuilders.last / StringBuilders.removeLast
+		if (builder.charAt(builder.length() - 1) == '\n')
+		{
+			builder.deleteCharAt(builder.length() - 1);
+		}
 
 		compiler.log(builder.toString());
+
 		if (errors > 0)
 		{
 			compiler.fail();
-			compiler.warn(I18n.get("unit.problems.not_compiled", name));
-			compiler.warn("");
 			return true;
 		}
 		return false;

@@ -198,7 +198,6 @@ public class DyvilCompiler extends BasicTool
 		this.log(I18n.get("files.found", fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
 		                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
 		                  Util.toTime(endTime - startTime)));
-		this.log("");
 	}
 
 	protected void setupFileFinder()
