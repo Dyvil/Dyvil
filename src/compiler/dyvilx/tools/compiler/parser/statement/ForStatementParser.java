@@ -14,6 +14,7 @@ import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -63,7 +64,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 			if (type != DyvilKeywords.FOR)
 			{
 				pm.reparse();
-				pm.report(token, "for.for_keyword");
+				pm.report(token, "for.keyword");
 			}
 			return;
 		case FOR_START:
@@ -118,6 +119,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				this.mode = END;
 				return;
 			default:
+				pm.report(Markers.syntaxWarning(SourcePosition.before(token), "for.action.block"));
 				pm.pushParser(new ExpressionParser(this.forStatement::setAction), true);
 				this.mode = END;
 				return;
