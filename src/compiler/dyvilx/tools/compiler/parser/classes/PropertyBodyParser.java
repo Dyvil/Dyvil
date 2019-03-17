@@ -93,8 +93,7 @@ public class PropertyBodyParser extends AbstractMemberParser
 					this.target = SETTER;
 					return;
 				}
-				pm.report(token, "property.tag.unknown");
-				return;
+				break;
 			case DyvilKeywords.INIT:
 				this.property.setInitializerPosition(token.raw());
 				this.mode = SEPARATOR;
