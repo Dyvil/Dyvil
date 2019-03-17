@@ -1,12 +1,10 @@
 package dyvil.lang
 
+import dyvil.collection.range.specialized.IntRange
 import java.util.regex.{ Pattern, Matcher }
 
 @JavaName("Strings")
 extension String {
-	private const STRING_VALUE_OFFSET: long
-		= dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
-
 	// =============== Operators ===============
 
 	// --------------- Pattern Matching ---------------
@@ -38,7 +36,7 @@ extension String {
 
 	static func apply(from value: any!) -> String inline = "\(value)"
 
-	static func apply(from sequence: CharSequence) implicit -> String inline = "\(sequence)"
+	static func apply(from sequence: CharSequence) implicit -> String inline = sequence.toString()
 
 	@JavaName("build")
 	static func apply(builtBy closure: StringBuilder.() -> void) -> String inline
@@ -54,47 +52,34 @@ extension String {
 
 	// =============== Methods ===============
 
+	@Deprecated(description: "use String.charCount", since: "0.45.0", forRemoval: "v0.46.0",
+	            replacements: [ "String.charCount" ])
+	@java.lang.Deprecated // use String.length
 	final func size() -> int inline = this.length
+
+	// --------------- Char Access ---------------
 
 	final func subscript(index: int) -> char inline = this.charAt(index)
 
 	final func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
 
-	final func getCharArray() -> [final char]
-		= dyvil.reflect.ReflectUtils.UNSAFE.getObject(this, STRING_VALUE_OFFSET) as [final char]
+	@JavaName("getCharArray")
+	@java.lang.Deprecated // moved to UnsafeStrings
+	final func __getCharArray() -> [final char] = this.getCharArray()
 
-	final func contains(character: char) -> boolean inline = this.indexOf(character) >= 0
+	@JavaName("contains")
+	@java.lang.Deprecated // moved to StringChars
+	final func __contains(character: char) -> boolean = this.contains(character)
 
-	final func count(character: char) -> int {
-		var count = 0
-		for c <- this {
-			if c == character {
-				count += 1
-			}
-		}
-		return count
-	}
+	@JavaName("count")
+	@java.lang.Deprecated // moved to StringChars
+	final func __count(character: char) -> int = this.count(character)
 
-	final func split(by delimiter: char) -> [String] {
-		let count = this.count(delimiter)
-		if count == 0 {
-			return [this]
-		}
+	@JavaName("split")
+	@java.lang.Deprecated // moved to StringChars
+	final func __split(by delimiter: char) -> [String] = this.split(by: delimiter)
 
-		let array = new [String](count + 1)
-		var start = 0
-		var arrayIndex = 0
-
-		for i <- 0 ..< this.length {
-			if this[i] == delimiter {
-				array[arrayIndex] = this.substring(start, i)!!
-				arrayIndex += 1
-				start = i + 1
-			}
-		}
-		array[arrayIndex] = this.substring(start)!!
-		return array
-	}
+	// --------------- Misc. ---------------
 
 	final func format(args: Object! ...) -> String inline = String.format(this, args...)!!
 
@@ -155,8 +140,75 @@ extension String {
 	}
 }
 
-// The following classes only have syntactic meaning in the Dyvil language,
-// they are practically useless in Java code.
+@JavaName("UnsafeString")
+extension String {
+	// =============== Constants ===============
+
+	private const STRING_VALUE_OFFSET: long
+		= dyvil.reflect.ReflectUtils.UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
+
+	// =============== Static Methods ===============
+
+	@JavaName("fromShared")
+	static func apply(sharing array: [final char]) -> String
+		= dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
+
+	// =============== Methods ===============
+
+	final func getCharArray() -> [final char]
+		= dyvil.reflect.ReflectUtils.UNSAFE.getObject(this, STRING_VALUE_OFFSET) as [final char]
+}
+
+@JavaName("StringChars")
+extension String {
+	// =============== Operators ===============
+
+	static func |_|(string: CharSequence) -> int inline = string.length
+
+	// =============== Methods ===============
+
+	final func charCount() -> int inline = this.length
+
+	final func contains(character: char) -> boolean inline = this.indexOf(character) >= 0
+
+	final func count(character: char) -> int {
+		var count = 0
+		for c <- this {
+			if c == character {
+				count += 1
+			}
+		}
+		return count
+	}
+
+	final func split(by delimiter: char) -> [String] {
+		let count = this.count(delimiter)
+		if count == 0 {
+			return [this]
+		}
+
+		let array = new [String](count + 1)
+		var start = 0
+		var arrayIndex = 0
+
+		for i <- 0 ..< this.length {
+			if this[i] == delimiter {
+				array[arrayIndex] = this.substring(start, i)!!
+				arrayIndex += 1
+				start = i + 1
+			}
+		}
+		array[arrayIndex] = this.substring(start)!!
+		return array
+	}
+}
+
+@JavaName("StringCodePoints")
+extension String {
+	// =============== Methods ===============
+
+	final func codePointCount() -> int inline = this.codePointCount(0, this.length)
+}
 
 @JavaName("CharSequences")
 extension CharSequence {
