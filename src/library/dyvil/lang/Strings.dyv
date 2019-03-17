@@ -43,8 +43,8 @@ extension String {
 		= new StringBuilder(capacity).use(closure).toString!!
 
 	@JavaName("fromShared")
-	static func apply(sharing array: [final char]) -> String
-		= dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
+	@java.lang.Deprecated // moved to UnsafeString
+	static func __apply(sharing array: [final char]) -> String = String(sharing: array)
 
 	// =============== Methods ===============
 
@@ -163,10 +163,12 @@ extension String {
 
 	final func contains(character: char) -> boolean inline = this.indexOf(character) >= 0
 
-	final func count(character: char) -> int {
+	final func count(character: char) -> int = this.count(character, from: 0, to: this.length)
+
+	final func count(character: char, from: int, to: int) -> int {
 		var count = 0
-		for c <- this {
-			if c == character {
+		for i <- from ..< to {
+			if this.charAt(i) == character {
 				count += 1
 			}
 		}
@@ -203,11 +205,12 @@ extension String {
 
 	final func contains(codePoint: int) -> boolean inline = this.indexOf(codePoint) >= 0
 
-	final func count(codePoint: int) -> int {
+	final func count(codePoint: int) -> int = this.count(codePoint, from: 0, to: this.length)
+
+	final func count(codePoint: int, from: int, to: int) -> int {
 		var count = 0
-		var i = 0
-		let len = this.length
-		while i < len {
+		var i = from
+		while i < to {
 			let code = this.codePointAt(i)
 			if code == codePoint {
 				count += 1
