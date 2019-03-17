@@ -1,5 +1,6 @@
 package dyvil.string
 
+@Deprecated(since: "v0.45.0", forRemoval: "v0.46.0", replacements: [ "java.lang.Character" ])
 class CharUtils
 {
 	postfix func isAsciiDigit(_ c: char) -> boolean = c >= '0' && c <= '9'
