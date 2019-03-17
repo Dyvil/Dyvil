@@ -28,10 +28,6 @@ extension String {
 
 	infix func *(lhs: String, rhs: int) -> String inline = lhs.repeated(rhs)
 
-	// --------------- Length ---------------
-
-	static func |_|(string: CharSequence) -> int inline = string.length
-
 	// =============== Static Methods ===============
 
 	static func apply(from value: any!) -> String inline = "\(value)"
@@ -161,10 +157,6 @@ extension String {
 
 @JavaName("StringChars")
 extension String {
-	// =============== Operators ===============
-
-	static func |_|(string: CharSequence) -> int inline = string.length
-
 	// =============== Methods ===============
 
 	final func charCount() -> int inline = this.length
@@ -208,11 +200,61 @@ extension String {
 	// =============== Methods ===============
 
 	final func codePointCount() -> int inline = this.codePointCount(0, this.length)
+
+	final func contains(codePoint: int) -> boolean inline = this.indexOf(codePoint) >= 0
+
+	final func count(codePoint: int) -> int {
+		var count = 0
+		var i = 0
+		let len = this.length
+		while i < len {
+			let code = this.codePointAt(i)
+			if code == codePoint {
+				count += 1
+			}
+			i += Character.charCount(code)
+		}
+		return count
+	}
+
+	final func split(by delimiter: int) -> [String] {
+		let count = this.count(delimiter)
+		if count == 0 {
+			return [this]
+		}
+
+		let array = new [String](count + 1)
+		var start = 0
+		var arrayIndex = 0
+		var i = 0
+		let len = this.length
+
+		while i < len {
+			let code = this.codePointAt(i)
+			if code == delimiter {
+				array[arrayIndex] = this.substring(start, i)!!
+				arrayIndex += 1
+				start = i += Character.charCount(code)
+			}
+		}
+		array[arrayIndex] = this.substring(start)!!
+		return array
+	}
 }
 
 @JavaName("CharSequences")
 extension CharSequence {
+	// =============== Operators ===============
+
+	static func |_|(_ s: CharSequence) -> int inline = s.length
+
 	// =============== Methods ===============
+
+	final func first() -> char inline = this.charAt(0)
+
+	final func last() -> char inline = this.charAt(this.length - 1)
+
+	final func indices() -> IntRange inline = 0 ..< this.length
 
 	final func subscript(index: int) -> char inline = this.charAt(index)
 
