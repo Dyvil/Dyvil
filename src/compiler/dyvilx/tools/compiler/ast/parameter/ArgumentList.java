@@ -172,6 +172,12 @@ public class ArgumentList implements Resolvable, IValueList
 			return -1;
 		}
 
+		// if there is a fence at the index, don't check for preceding labels. See #470.
+		if (this.labels[index] == FENCE)
+		{
+			return index;
+		}
+
 		// Require that no argument labels exists before or at the index
 		for (int i = 0; i <= index; i++)
 		{
