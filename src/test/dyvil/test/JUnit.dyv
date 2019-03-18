@@ -26,6 +26,35 @@ extension any {
 
 	static func fail() -> void = Assert.fail()
 
+	static func fail(message: String) -> void = Assert.fail(message)
+
+	@JavaName("expect$")
+	static func expect<@Reified(.ANY_CLASS) type E: RuntimeException>(from: () -> void) -> void
+		= expect(class E, from)
+
+	static func expect(exceptionType: Class<+RuntimeException>, from: () -> void) -> void {
+		try {
+			from()
+		}
+		catch ex: RuntimeException {
+			if exceptionType.isInstance(ex) {
+				return
+			}
+			else {
+				caughtInstead(exceptionType, ex)
+			}
+		}
+		catch ex: Throwable {
+			caughtInstead(exceptionType, ex)
+		}
+		fail("did not catch \(exceptionType.getName())")
+	}
+
+	private static func caughtInstead(expected: Class, actual: Throwable) -> void {
+		let message = "caught \(actual.getClass().getName()) instead of \(expected.getName())"
+		throw new AssertionError(message, actual)
+	}
+
 	// =============== Methods ===============
 
 	final func shouldBe<@Reified(.OBJECT_CLASS) type T>() -> void = assertThat(this, instanceOf<T>(class T))
