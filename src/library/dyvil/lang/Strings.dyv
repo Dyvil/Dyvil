@@ -92,6 +92,42 @@ extension String {
 		return count
 	}
 
+	final func split(explicit by delimiter: String) -> [String] {
+		if this.isEmpty {
+			// special case: "".split(anything) is always [""]
+			return [""]
+		}
+		if delimiter.isEmpty {
+			// special case: anything.split("") returns the characters as strings of width 1
+			return this.charGroups(width: 1)
+		}
+
+		let delimiterLength = delimiter.length
+		let upperBound = this.length _/ delimiterLength + 1
+		let array = new [String](upperBound)
+
+		var start = 0
+
+		for i <- 0 ..< upperBound {
+			let index = this.indexOf(delimiter, start)
+			if index < 0 {
+				array[i] = this.substring(start)!!
+				break
+			}
+			else {
+				array[i] = this.substring(start, index)!!
+			}
+			start = index + delimiterLength
+		}
+
+		// trim trailing empty and null elements
+		var end = array.size
+		while end > 0 && (array[end - 1] == null || array[end - 1].isEmpty) {
+			end -= 1
+		}
+		return array.trim(end)
+	}
+
 	final func distance(to that: String) -> int {
 		if this == that {
 			return 0
