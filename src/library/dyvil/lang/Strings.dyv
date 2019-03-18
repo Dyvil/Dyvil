@@ -307,27 +307,15 @@ extension String {
 	}
 
 	final func split(by delimiter: int) -> [String] {
-		let count = this.count(delimiter)
-		if count == 0 {
-			return [this]
+		if this.isEmpty {
+			// special case: "".split(anything) is always [""]
+			return [""]
 		}
-
-		let array = new [String](count + 1)
-		var start = 0
-		var arrayIndex = 0
-		var i = 0
-		let len = this.length
-
-		while i < len {
-			let code = this.codePointAt(i)
-			if code == delimiter {
-				array[arrayIndex] = this.substring(start, i)!!
-				arrayIndex += 1
-				start = i += Character.charCount(code)
-			}
+		// split by char if possible
+		if Character.isBmpCodePoint(delimiter) {
+			return this.split(by: delimiter as char)
 		}
-		array[arrayIndex] = this.substring(start)!!
-		return array
+		return this.split(by: String(sharing: Character.toChars(delimiter) as [final char]))
 	}
 }
 
