@@ -37,7 +37,6 @@ import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
@@ -142,9 +141,7 @@ public class ClassBody implements ASTNode, Resolvable, IMemberConsumer<IField>
 
 	public Iterable<IField> enumConstants()
 	{
-		// TODO after v0.44.0: Remove cast
-		return () -> Iterators.filtered(new ArrayIterator<>(this.fields, 0, this.fieldCount),
-		                                (Predicate<IField>) IField::isEnumConstant);
+		return () -> Iterators.filtered(new ArrayIterator<>(this.fields, 0, this.fieldCount), IField::isEnumConstant);
 	}
 
 	public int fieldCount()

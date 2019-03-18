@@ -27,7 +27,6 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 public final class Deprecation
 {
@@ -153,10 +152,7 @@ public final class Deprecation
 		final List<Reason> reasons = getReasons(arguments);
 		if (!reasons.isEmpty())
 		{
-			// TODO after v0.44.0: Remove cast
-			final Iterable<CharSequence> reasonNames = () -> Iterators.mapped(reasons.iterator(),
-			                                                                  (Function<Reason, CharSequence>) //
-				                                                                  Deprecation::reasonName);
+			final Iterable<CharSequence> reasonNames = () -> Iterators.mapped(reasons.iterator(), Deprecation::reasonName);
 			marker.addInfo(Markers.getSemantic(reasons.size() == 1 ? "deprecated.reason" : "deprecated.reasons",
 			                                   String.join(", ", reasonNames)));
 		}
