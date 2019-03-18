@@ -2,9 +2,8 @@ package dyvil.io
 
 import java.io._
 
-public abstract class Console
-{
-	private init() {}
+public abstract class Console {
+	// =============== Constants ===============
 
 	public const ANSI_RESET: String = '\e[0m'
 
@@ -27,14 +26,23 @@ public abstract class Console
 	public const ANSI_CYAN:   String = '\e[36m'
 	public const ANSI_WHITE:  String = '\e[37m'
 
-	private static var reader: BufferedReader = unsafeInit<BufferedReader>
-	private static var out:    PrintStream    = unsafeInit<PrintStream>
+	// =============== Static Fields ===============
 
-	static init
-	{
+	private static var reader: BufferedReader!
+	private static var out:    PrintStream!
+
+	static init {
 		setOut(System.out)
 		setIn(System.in)
 	}
+
+	// =============== Constructors ===============
+
+	private init() {}
+
+	// =============== Static Methods ===============
+
+	// --------------- General ---------------
 
 	static func isTerminalOutput() -> boolean = System.console !== null
 
@@ -42,37 +50,33 @@ public abstract class Console
 
 	static func setIn(in: InputStream) -> void = Console.reader = new BufferedReader(new InputStreamReader(in))
 
-	// Write
+	// --------------- Output ---------------
 
 	static func writeLine() -> void = out.println()
 
-	static func writeLine(value: Object!) -> void = out.println(value)
+	static func writeLine(value: any!) -> void = out.println(value)
 
 	static func writeLine(value: String) -> void = out.println(value)
 
-	// Read
+	// --------------- Input ---------------
 
-	static func readLine() -> String!
-	{
-		try
-		{
+	static func readLine() -> String! {
+		try {
 			return reader.readLine()
 		}
-		catch (ex: IOException) {}
+		catch ex: IOException {}
 		return null
 	}
 
 	static func readString() -> String = readLine()
 
-	static func readString(charCount: int) -> String!
-	{
+	static func readString(charCount: int) -> String! {
 		let chars = new [char](charCount)
-		try
-		{
+		try {
 			reader.read(chars)
 			return new String(chars)
 		}
-		catch (ex: IOException) {}
+		catch ex: IOException {}
 		return null
 	}
 
@@ -82,13 +86,11 @@ public abstract class Console
 
 	static func readChar() -> char = readCodePoint() as char
 
-	static func readCodePoint() -> int
-	{
-		try
-		{
+	static func readCodePoint() -> int {
+		try {
 			return reader.read()
 		}
-		catch (ex: IOException) {}
+		catch ex: IOException {}
 		return 0
 	}
 
