@@ -79,6 +79,19 @@ extension String {
 
 	final func format(args: Object! ...) -> String inline = String.format(this, args...)!!
 
+	final func count(substring: String) -> int = this.count(substring, 0, this.length)
+
+	final func count(substring: String, from: int, to: int) -> int {
+		let subLen = substring.length
+		var count = 0
+		var i = from
+		while 0 <= (i = this.indexOf(substring, i)) && i + subLen <= to {
+			count += 1
+			i += subLen
+		}
+		return count
+	}
+
 	final func distance(to that: String) -> int {
 		if this == that {
 			return 0
