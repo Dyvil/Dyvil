@@ -1,0 +1,22 @@
+package dyvil.io
+
+using dyvil.test.JUnit
+using dyvil.io.Console._
+
+class ConsoleTest {
+	private const STYLED: String = Console.ANSI_RED ++ "abc" ++ Console.ANSI_RESET
+
+	@Test func styled() -> void {
+		"abc".styled(with: Console.ANSI_RED) =?= STYLED
+	}
+
+	@Test func append() -> void {
+		new StringBuilder().append("abc", with: Console.ANSI_RED).toString =?= STYLED
+
+		new StringBuilder().append(with: Console.ANSI_RED) {
+			append 'a'
+			append 'b'
+			append 'c'
+		}.toString =?= STYLED
+	}
+}

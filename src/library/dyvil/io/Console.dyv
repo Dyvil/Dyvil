@@ -58,6 +58,20 @@ public abstract class Console {
 
 	static func writeLine(value: String) -> void = out.println(value)
 
+	final extension func styled(this: String, with style: String) -> String = style ++ this ++ ANSI_RESET
+
+	@JavaName("appendStyled")
+	final extension func append(this: StringBuilder, text: String, with style: String) -> StringBuilder {
+		return this.append(style).append(text).append(ANSI_RESET)
+	}
+
+	@JavaName("appendStyled")
+	final extension func append(this: StringBuilder, with style: String, body: StringBuilder.() -> void) -> StringBuilder {
+		this.append(style)
+		body(this)
+		return this.append(ANSI_RESET)
+	}
+
 	// --------------- Input ---------------
 
 	static func readLine() -> String! {
