@@ -214,6 +214,24 @@ extension String {
 		array[arrayIndex] = this.substring(start, end)!!
 		return array
 	}
+
+	final func charGroups(width: int) -> [String] {
+		if this.isEmpty {
+			// special case: "".charGroups(anything) is always []
+			// also the only case where count == 0, which causes problems in the second to last line
+			return []
+		}
+
+		let count = (this.length + width - 1) _/ width
+		let array = new [String](count)
+
+		for i <- 0 ..< count - 1 {
+			array[i] = this.substring(i * width, (i + 1) * width)
+		}
+
+		array[count - 1] = this.substring((count - 1) * width)
+		return array
+	}
 }
 
 @JavaName("StringCodePoints")
