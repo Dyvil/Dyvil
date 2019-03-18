@@ -1,0 +1,263 @@
+package dyvil.lang
+
+using dyvil.test.JUnit
+
+class StringsTest {
+	// --------------- Misc. ---------------
+
+	@Test func count() -> void {
+		"".count('<>') =?= 0
+		"<>".count('<>') =?= 1
+		"<<".count('<>') =?= 0
+		"<<>>".count('<>') =?= 1
+		"<><<>><>".count('<>') =?= 3
+		"<>><><<>".count('<>') =?= 3
+		":::a::::".count(':::') =?= 2
+		":::::a::::::::".count(':::') =?= 3
+
+		":::::a::::::::".count(':::', from: 0, to: 11) =?= 2
+		":::::a::::::::".count(':::', from: 3, to: 14) =?= 2
+		":::::a::::::::".count(':::', from: 3, to: 8) =?= 0
+		":::::a::::::::".count(':::', from: 10, to: 14) =?= 1
+	}
+
+	@Test func splitBy() -> void {
+		// empty delimiter
+		"abcde".split(by: '') =?= ["a", "b", "c", "d", "e"]
+		"😀😀".split(by: '') =?= "😀😀".split('')
+
+		// delimiter length 1
+		"".split(by: ':') =?= [""]
+		"a".split(by: ':') =?= ["a"]
+		":".split(by: ':') =?= []
+		":::".split(by: ':') =?= []
+		"a:::".split(by: ':') =?= ["a"]
+		":::a".split(by: ':') =?= ["", "", "", "a"]
+		":a:a:".split(by: ':') =?= ["", "a", "a"]
+		"a:a:a".split(by: ':') =?= ["a", "a", "a"]
+		":a::a:".split(by: ':') =?= ["", "a", "", "a"]
+		":a:::a:".split(by: ':') =?= ["", "a", "", "", "a"]
+		":a:::a:::".split(by: ':') =?= ["", "a", "", "", "a"]
+
+		// delimiter length 2
+		"".split(by: '<>') =?= [""]
+		"a".split(by: '<>') =?= ["a"]
+		"<>".split(by: '<>') =?= []
+		"<><><>".split(by: '<>') =?= []
+		"a<><><>".split(by: '<>') =?= ["a"]
+		"<><><>a".split(by: '<>') =?= ["", "", "", "a"]
+		"<>a<>a<>".split(by: '<>') =?= ["", "a", "a"]
+		"a<>a<>a".split(by: '<>') =?= ["a", "a", "a"]
+		"<>a<><>a<>".split(by: '<>') =?= ["", "a", "", "a"]
+		"<>a<><><>a<>".split(by: '<>') =?= ["", "a", "", "", "a"]
+		"<>a<><><>a<><><>".split(by: '<>') =?= ["", "a", "", "", "a"]
+
+		// some other cases
+		"a<>b<>c".split(by: '<>') =?= ["a", "b", "c"]
+		"<>a<>b<>c<>".split(by: '<>') =?= ["", "a", "b", "c"]
+		"hello<>world<>test".split(by: '<>') =?= ["hello", "world", "test"]
+
+		"<>😀<><><>😀<><><>".split(by: '<>') =?= ["", "😀", "", "", "😀"]
+
+		"<<>>".split(by: '<>') =?= ["<", ">"]
+		"<><<>><>".split(by: '<>') =?= ["", "<", ">"]
+		"<>><><<>".split(by: '<>') =?= ["", ">", "<"]
+
+		// delimiter length 3, same symbol
+		":::a::::".split(by: ':::') =?= ["", "a", ":"]
+		":::::a::::::::".split(by: ':::') =?= ["", "::a", "", "::"]
+	}
+
+	@Test func distance() -> void {
+		"".distance("") =?= 0
+		"abc".distance("abc") =?= 0
+		"ac".distance("abc") =?= 1
+		"abc".distance("ac") =?= 1
+		"a".distance("abc") =?= 2
+		"abc".distance("a") =?= 2
+		"".distance("abc") =?= 3
+		"a".distance("b") =?= 1
+		"ba".distance("ab") =?= 2
+	}
+
+	@Test func replaceAll() -> void {
+		"ababa".replaceAll("b") { "c" } =?= "acaca"
+		"ababa".replaceAll("a") { "c" } =?= "cbcbc"
+		"ababa".replaceAll("a") { $0.toUpperCase() } =?= "AbAbA"
+		"aabaaabaa".replaceAll("aa") { "c" } =?= "cbcabc"
+
+		"".replaceAll("a") { "b" } =?= ""
+		"ababa".replaceAll("c") { "d" } =?= "ababa"
+
+		"ab2a5ba3ba".replaceAll("[a-z]+") { "*".repeated($0.length) } =?= "**2*5**3**"
+	}
+
+	@Test func repeated() -> void {
+		"".repeated(0) =?= ""
+		"".repeated(1) =?= ""
+		"".repeated(2) =?= ""
+		"".repeated(10) =?= ""
+
+		"a".repeated(0) =?= ""
+		"a".repeated(1) =?= "a"
+		"a".repeated(2) =?= "aa"
+		"a".repeated(10) =?= "aaaaaaaaaa"
+
+		"ab".repeated(2) =?= "abab"
+		"ab".repeated(3) =?= "ababab"
+
+		expect<NegativeArraySizeException> {
+			"a".repeated(-1)
+		}
+	}
+
+	// --------------- Unsafe ---------------
+
+	@Test func unsafeApply() -> void {
+		let array: [char] = [ 'a', 'b', 'c' ]
+		let str = String(sharing: array)
+		str =?= "abc"
+		array[0] = 'A'
+		str =?= "Abc"
+	}
+
+	@Test func unsafeGetCharArray() -> void {
+		let array: [char] = [ 'a', 'b', 'c' ]
+		let str = String(sharing: array)
+		let array2 = str.getCharArray()
+		array[0] = 'A'
+		array2[0] =?= 'A' as char
+		array2[1] = 'B'
+		array[1] =?= 'B' as char
+		str =?= "ABc"
+	}
+
+	// --------------- Chars ---------------
+
+	@Test func countChar() -> void {
+		"".count('a' as char) =?= 0
+		"a".count('a' as char) =?= 1
+		"ababa".count('a' as char) =?= 3
+		"ababa".count('c' as char) =?= 0
+		"ababa".count('a' as char, from: 0, to: 3) =?= 2
+		"ababa".count('a' as char, from: 1, to: 4) =?= 1
+		"ababa".count('a' as char, from: 2, to: 5) =?= 2
+	}
+
+	@Test func splitByChar() -> void {
+		let delimiter = ':' as char
+		"".split(by: delimiter) =?= [""]
+		"a".split(by: delimiter) =?= ["a"]
+		":".split(by: delimiter) =?= []
+		":::".split(by: delimiter) =?= []
+		"a:::".split(by: delimiter) =?= ["a"]
+		":::a".split(by: delimiter) =?= ["", "", "", "a"]
+		":a:a:".split(by: delimiter) =?= ["", "a", "a"]
+		"a:a:a".split(by: delimiter) =?= ["a", "a", "a"]
+		":a::a:".split(by: delimiter) =?= ["", "a", "", "a"]
+		":a:::a:".split(by: delimiter) =?= ["", "a", "", "", "a"]
+		":a:::a:::".split(by: delimiter) =?= ["", "a", "", "", "a"]
+
+		"a:b:c".split(by: delimiter) =?= ["a", "b", "c"]
+		":a:b:c:".split(by: delimiter) =?= ["", "a", "b", "c"]
+		"hello:world:test".split(by: delimiter) =?= ["hello", "world", "test"]
+
+		":😀:::😀:::".split(by: delimiter) =?= ["", "😀", "", "", "😀"]
+	}
+
+	@Test func charGroups() -> void {
+		"".charGroups(1) =?= []
+		"".charGroups(2) =?= []
+		"a".charGroups(1) =?= ["a"]
+		"a".charGroups(2) =?= ["a"]
+		"abcd".charGroups(1) =?= ["a", "b", "c", "d"]
+		"abcd".charGroups(2) =?= ["ab", "cd"]
+		"abcde".charGroups(2) =?= ["ab", "cd", "e"]
+		"abcde".charGroups(3) =?= ["abc", "de"]
+	}
+
+	// --------------- Code Points ---------------
+
+	@Test func codePointCount() -> void {
+		let codePoint = '😀'.codePointAt(0)
+		"😀🤔👁🎩".codePointCount() =?= 4
+		"😀🤔👁🎩".contains(codePoint) =?= true
+		"😀🤔😀👁😀🎩".count(codePoint) =?= 3
+		"".count(codePoint) =?= 0
+	}
+
+	@Test func splitByCodePoint() -> void {
+		let delimiter = '🔹'.codePointAt(0)
+		"".split(by: delimiter) =?= [""]
+		"😀".split(by: delimiter) =?= ["😀"]
+		"🔹".split(by: delimiter) =?= []
+		"🔹🔹🔹".split(by: delimiter) =?= []
+		"😀🔹🔹🔹".split(by: delimiter) =?= ["😀"]
+		"🔹🔹🔹😀".split(by: delimiter) =?= ["", "", "", "😀"]
+		"🔹😀🔹😀🔹".split(by: delimiter) =?= ["", "😀", "😀"]
+		"😀🔹😀🔹😀".split(by: delimiter) =?= ["😀", "😀", "😀"]
+		"🔹😀🔹🔹😀🔹".split(by: delimiter) =?= ["", "😀", "", "😀"]
+		"🔹😀🔹🔹🔹😀🔹".split(by: delimiter) =?= ["", "😀", "", "", "😀"]
+		"🔹😀🔹🔹🔹😀🔹🔹🔹".split(by: delimiter) =?= ["", "😀", "", "", "😀"]
+
+		"😀🔹🐶🔹🍏".split(by: delimiter) =?= ["😀", "🐶", "🍏"]
+		"🔹😀🔹🐶🔹🍏🔹".split(by: delimiter) =?= ["", "😀", "🐶", "🍏"]
+		"☄️💥🔥🔹🌎🌍🌏🔹⛅️🌥🌤".split(by: delimiter) =?= ["☄️💥🔥", "🌎🌍🌏", "⛅️🌥🌤"]
+	}
+
+	// --------------- Char Sequences ---------------
+
+	@Test func first() -> void {
+		expect<IndexOutOfBoundsException> {
+			"".first
+		}
+
+		"a".first =?= 'a' as char
+		"abc".first =?= 'a' as char
+	}
+
+	@Test func last() -> void {
+		expect<IndexOutOfBoundsException> {
+			"".last
+		}
+
+		"a".last =?= 'a' as char
+		"abc".last =?= 'c' as char
+	}
+
+	@Test func indices() -> void {
+		"".indices() =?= 0 ..< 0
+		"a".indices() =?= 0 ..< 1
+		"abc".indices() =?= 0 ..< 3
+	}
+
+	@Test func subscript() -> void {
+		""[0 ..< 0] =?= ""
+		"a"[0 .. 0] =?= "a"
+		"a"[0 ..< 1] =?= "a"
+		"abc"[0 ..< 1] =?= "a"
+		"abc"[0 .. 1] =?= "ab"
+		"abc"[0 ..< 2] =?= "ab"
+		"abc"[0 .. 2] =?= "abc"
+		"abc"[0 ..< 3] =?= "abc"
+	}
+
+	// --------------- StringBuilder ---------------
+
+	@Test func remove() -> void {
+		new StringBuilder("a").remove(at: 0).toString =?= ""
+		new StringBuilder("abc").remove(at: 0).toString =?= "bc"
+		new StringBuilder("abc").remove(at: 1).toString =?= "ac"
+		new StringBuilder("abc").remove(at: 2).toString =?= "ab"
+	}
+
+	@Test func removeFirst() -> void {
+		new StringBuilder("a").removeFirst().toString =?= ""
+		new StringBuilder("abc").removeFirst().toString =?= "bc"
+	}
+
+	@Test func removeLast() -> void {
+		new StringBuilder("a").removeLast().toString =?= ""
+		new StringBuilder("abc").removeLast().toString =?= "ab"
+	}
+}
