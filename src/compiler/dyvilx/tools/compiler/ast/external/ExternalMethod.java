@@ -85,12 +85,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.resolved |= PARAMETERS;
 
-		if (!this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
-		{
-			// for non-static extension methods, remove the first ('this') parameter
-			this.parameters.removeFirst();
-		}
-
 		if (this.typeParameters != null)
 		{
 			for (int i = this.typeParameters.size() - 1; i >= 0; i--)
@@ -101,6 +95,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 					typeParameter.setReifyParameter(this.parameters.removeLast());
 				}
 			}
+		}
+
+		if (!this.isStatic() && this.hasModifier(Modifiers.EXTENSION))
+		{
+			// for non-static extension methods, remove the first ('this') parameter
+			this.parameters.removeFirst();
 		}
 	}
 

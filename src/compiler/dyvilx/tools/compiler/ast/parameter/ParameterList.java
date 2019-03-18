@@ -124,12 +124,7 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 			this.parameters[index] = parameter;
 		}
 		this.size = newSize;
-
-		// Update indices
-		for (int i = 0; i < newSize; i++)
-		{
-			this.parameters[i].setIndex(i);
-		}
+		this.updateIndices(index, newSize);
 	}
 
 	public IParameter removeFirst()
@@ -138,6 +133,7 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 		this.size--;
 		System.arraycopy(this.parameters, 1, this.parameters, 0, this.size);
 		this.parameters[this.size] = null;
+		this.updateIndices(0, this.size);
 		return result;
 	}
 
@@ -148,6 +144,14 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 		this.parameters[index] = null;
 		this.size = index;
 		return result;
+	}
+
+	private void updateIndices(int from, int to)
+	{
+		for (int i = from; i < to; i++)
+		{
+			this.parameters[i].setIndex(i);
+		}
 	}
 
 	// Resolution
