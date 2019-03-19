@@ -54,6 +54,10 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			pm.popParser(true);
 			return;
 		case ACTION:
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				ForStatementParser.reportSingleStatement(pm, token, "try.single.deprecated");
+			}
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = CATCH;
 			return;
@@ -66,6 +70,12 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			}
 			if (type == DyvilKeywords.FINALLY)
 			{
+				final IToken next = token.next();
+				if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+				{
+					ForStatementParser.reportSingleStatement(pm, next, "finally.single.deprecated");
+				}
+
 				pm.pushParser(new ExpressionParser(this.statement::setFinallyBlock));
 				this.mode = END;
 				return;
@@ -98,12 +108,18 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			}
 			return;
 		case CATCH_CLOSE:
+			final IToken next = token.next();
+			if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				ForStatementParser.reportSingleStatement(pm, next, "catch.single.deprecated");
+			}
+
 			this.mode = CATCH;
 			pm.pushParser(new ExpressionParser(this.catchBlock::setAction));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "try.catch.close_paren");
+				pm.report(token, "catch.close_paren");
 			}
 			return;
 		case CATCH_SEPARATOR:
