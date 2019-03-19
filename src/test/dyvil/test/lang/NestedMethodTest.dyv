@@ -10,9 +10,9 @@ class NestedMethodTest {
 			i =?= expected
 		}
 
-		func setI(newValue: int) = i = newValue
+		func setI(newValue: int) -> void = i = newValue
 
-		func setI2(newValue: int) = setI(newValue)
+		func setI2(newValue: int) -> void = setI(newValue)
 
 		testI("Before Assignment", 0)
 		i = 1

@@ -67,8 +67,8 @@ class SortTest {
 		let pivot = list[left + ((right - left) >>> 1)]
 
 		while i <= j {
-			while (list[i] < pivot) i += 1
-			while (list[j] > pivot) j -= 1
+			while list[i] < pivot { i += 1 }
+			while list[j] > pivot { j -= 1 }
 
 			if i <= j {
 				swap(&list[i], &list[j])

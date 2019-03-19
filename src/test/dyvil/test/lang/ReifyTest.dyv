@@ -96,7 +96,7 @@ class ReifyTest {
 		func get() -> T
 	}
 
-	static func newGeneric<@Reified(.OBJECT_CLASS) type T>() = new Generic<T>() {
+	static func newGeneric<@Reified(.OBJECT_CLASS) type T>() -> Generic<T> = new Generic<T>() {
 		override func get() -> T = class(T).newInstance()
 	}
 
@@ -104,7 +104,7 @@ class ReifyTest {
 		newGeneric<String>().get() =?= ""
 	}
 
-	static func newLambda<@Reified(.OBJECT_CLASS) type T>() = => class(T).newInstance
+	static func newLambda<@Reified(.OBJECT_CLASS) type T>() -> (-> T) = => class(T).newInstance
 
 	@Test func captureLambda() -> void {
 		newLambda<String>().apply() =?= ""

@@ -39,7 +39,7 @@ tasks.register('compileTestDyvil', JavaExec) {
 	dependsOn 'testClasses'
 
 	setupCompiler(it,
-			source_dirs: [ 'src/test/' ],
+			source_dirs: [ "$rootDir/src/test/" ],
 			libraries: sourceSets.test.compileClasspath.toList(),
 			output_dir: "$buildDir/classes/dyvil/test/",
 			exclude_patterns: [ 'dyvil/experimental/**' ],

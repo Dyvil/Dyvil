@@ -11,14 +11,14 @@ class TypeTest {
 		@JavaName("sum_doubles")
 		func sum(this: MyList<double>) -> double {
 			var result = 0D
-			for (d <- this.elements) result += d
+			for d <- this.elements { result += d }
 			return result
 		}
 
 		@JavaName("sum_ints")
 		func sum(this: MyList<int>) -> int {
 			var result = 0
-			for (i <- this.elements) result += i
+			for i <- this.elements { result += i }
 			return result
 		}
 	}
@@ -55,7 +55,7 @@ class TypeTest {
 
 	// --------------- Dependent Type Parameters ---------------
 
-	infix func <<< <T, C: Collection<T>>(collection: C, element: T) = collection.added(element)
+	infix func <<< <T, C: Collection<T>>(collection: C, element: T) -> Collection<T> = collection.added(element)
 
 	@Test func dependentTypeParams() -> void {
 		let added = List(1, 2, 3) <<< 1
@@ -64,5 +64,6 @@ class TypeTest {
 
 	// --------------- Misc. ---------------
 
-	static func voidTest<T>(value: T) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+	// will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+	static func voidTest<T>(value: T) -> String = "\(value)"
 }

@@ -79,7 +79,7 @@ public class ReferenceTest {
 	static case class MyInt(let value: int) {
 		static implicit func apply(i: int) -> MyInt = new MyInt(i)
 
-		infix func +(i: MyInt, j: MyInt) = MyInt(i.value + j.value)
+		infix func +(i: MyInt, j: MyInt) -> MyInt = MyInt(i.value + j.value)
 
 		infix func +(i: MyInt, j: int) -> MyInt = MyInt(i.value + j)
 
