@@ -1,0 +1,27 @@
+package dyvil.string
+
+class CharArrayView(let array: [char], let start: int, let length: int) implements CharSequence {
+
+	// =============== Constructors ===============
+
+	public init(array: [char]) : this(array, 0, array.size)
+
+	// =============== Static Methods ===============
+
+	implicit static func apply(array: [char]) -> CharArrayView = new CharArrayView(array)
+
+	static func apply(array: [char], start: int, length: int) -> CharArrayView = new CharArrayView(array, start, length)
+
+	// =============== Properties ===============
+
+	override func length() -> int = this.length
+
+	// =============== Methods ===============
+
+	override func charAt(index: int) -> char = this.array[this.start + index]
+
+	override func subSequence(start: int, end: int) -> CharSequence
+		= new CharArrayView(this.array, this.start + start, end - start)
+
+	override func toString() -> String = new String(this.array, this.start, this.length)
+}

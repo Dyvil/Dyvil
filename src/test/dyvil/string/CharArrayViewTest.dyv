@@ -1,0 +1,40 @@
+package dyvil.string
+
+using dyvil.test.JUnit
+import dyvil.string.CharArrayView
+import implicit dyvil.string.CharArrayView.apply
+
+class CharArrayViewTest {
+	const TEST_ARRAY: [char] = "Hello World".toCharArray
+
+	@Test func implicitApply() -> void {
+		let cav: CharArrayView = TEST_ARRAY
+		let cs: CharSequence = TEST_ARRAY
+	}
+
+	@Test func length() -> void {
+		new CharArrayView(TEST_ARRAY).length =?= TEST_ARRAY.size
+		new CharArrayView([]).length =?= 0
+		new CharArrayView(TEST_ARRAY, 0, 5).length =?= 5
+		new CharArrayView(TEST_ARRAY, 5, 3).length =?= 3
+		new CharArrayView(TEST_ARRAY, 10, 10).length =?= 10
+	}
+
+	@Test func charAt() -> void {
+		new CharArrayView(TEST_ARRAY).charAt(0) =?= 'H' as char
+		new CharArrayView(TEST_ARRAY).charAt(6) =?= 'W' as char
+		new CharArrayView(TEST_ARRAY).charAt(6) =?= 'W' as char
+
+		new CharArrayView(TEST_ARRAY, 5, 5).charAt(1) =?= 'W' as char
+	}
+
+	@Test func subSequence() -> void {
+		new CharArrayView(TEST_ARRAY).subSequence(6, 11).toString =?= "World"
+		new CharArrayView(TEST_ARRAY, 3, 8).subSequence(3, 8).toString =?= "World"
+	}
+
+	@Test func _toString() -> void {
+		new CharArrayView(TEST_ARRAY).toString =?= "Hello World"
+		new CharArrayView([]).toString =?= ""
+	}
+}
