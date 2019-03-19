@@ -26,6 +26,7 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
+import dyvilx.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvilx.tools.compiler.backend.ClassFormat;
@@ -189,6 +190,15 @@ public class CodeMethod extends AbstractMethod
 			if (inferType)
 			{
 				this.type = this.value.getType();
+
+				if (this.type.getTypecode() != PrimitiveType.VOID_CODE)
+				{
+					final Marker marker = Markers.semanticWarning(this.position, "method.type.infer.deprecated");
+					final StringBuilder typeString = new StringBuilder();
+					this.type.toString("", typeString);
+					marker.addInfo(Markers.getSemantic("method.type.infer.deprecated.fix", typeString.toString()));
+					markers.add(marker);
+				}
 			}
 		}
 		else if (this.type == Types.UNKNOWN)
