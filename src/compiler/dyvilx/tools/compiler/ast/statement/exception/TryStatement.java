@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.statement.exception;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -13,14 +14,13 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.statement.IStatement;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvilx.tools.parsing.marker.SemanticError;
-import dyvil.source.position.SourcePosition;
 
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
@@ -265,7 +265,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 		if (DISALLOW_EXPRESSIONS && this.commonType != null && this.commonType != Types.VOID)
 		{
-			markers.add(new SemanticError(this.position, "Try Statements cannot currently be used as expressions"));
+			markers.add(Markers.semanticError(this.position, "Try Statements cannot currently be used as expressions"));
 		}
 		return this;
 	}

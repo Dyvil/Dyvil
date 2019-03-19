@@ -1,15 +1,15 @@
 package dyvilx.tools.parsing;
 
 import dyvil.lang.Name;
+import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
 import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.lexer.Symbols;
 import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvilx.tools.parsing.marker.SyntaxError;
-import dyvil.source.position.SourcePosition;
-import dyvilx.tools.parsing.token.IdentifierToken;
 import dyvilx.tools.parsing.token.IToken;
+import dyvilx.tools.parsing.token.IdentifierToken;
 import dyvilx.tools.parsing.token.SymbolToken;
 
 public class ParserManager implements IParserManager
@@ -130,7 +130,7 @@ public class ParserManager implements IParserManager
 	@Override
 	public void report(SourcePosition position, String message)
 	{
-		this.report(new SyntaxError(position, this.markers.getI18n().getString(message)));
+		this.report(new Marker(position, MarkerLevel.SYNTAX, this.markers.getI18n().getString(message)));
 	}
 
 	@Override
@@ -182,7 +182,8 @@ public class ParserManager implements IParserManager
 	{
 		if (token != null && !token.isInferred())
 		{
-			this.report(new SyntaxError(token, this.markers.getI18n().getString("parser.unexpected", token)));
+			final String message = this.markers.getI18n().getString("parser.unexpected", token);
+			this.report(new Marker(token, MarkerLevel.SYNTAX, message));
 		}
 	}
 
@@ -221,11 +222,10 @@ public class ParserManager implements IParserManager
 		}
 	}
 
-	protected void reportError(SourcePosition position, Throwable ex)
+	protected void reportError(IToken token, Throwable ex)
 	{
-		final Marker marker = new SyntaxError(position, this.markers.getI18n()
-		                                                            .getString("parser.error", position.toString(),
-		                                                                       ex.getLocalizedMessage()));
+		final String message = this.markers.getI18n().getString("parser.error", token, ex.getLocalizedMessage());
+		final Marker marker = new Marker(token, MarkerLevel.SYNTAX, message);
 		marker.addError(ex);
 		this.markers.add(marker);
 	}

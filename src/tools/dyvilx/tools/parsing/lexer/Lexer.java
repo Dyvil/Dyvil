@@ -1,9 +1,10 @@
 package dyvilx.tools.parsing.lexer;
 
 import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
 import dyvilx.tools.parsing.TokenList;
+import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvilx.tools.parsing.marker.SyntaxError;
 import dyvilx.tools.parsing.token.EndToken;
 
 public abstract class Lexer
@@ -144,6 +145,6 @@ public abstract class Lexer
 
 	protected void error(SourcePosition position, String key)
 	{
-		this.markers.add(new SyntaxError(position, this.markers.getI18n().getString(key)));
+		this.markers.add(new Marker(position, MarkerLevel.SYNTAX, this.markers.getI18n().getString(key)));
 	}
 }

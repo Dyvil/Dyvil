@@ -53,7 +53,6 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvilx.tools.parsing.marker.SemanticError;
 
 import java.lang.annotation.ElementType;
 import java.util.Collections;
@@ -883,7 +882,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			builder.replace(index, index + 6, receiverType.toString());
 		}
 
-		markers.add(new SemanticError(receiver.getPosition(), builder.toString()));
+		markers.add(Markers.semanticError(receiver.getPosition(), builder.toString()));
 	}
 
 	// --------------- Override Checking ---------------
