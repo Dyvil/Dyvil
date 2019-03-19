@@ -46,7 +46,7 @@ class TreeMatchTest {
 
 	static implicit func exprMap2Context(map: [String:Expr]) -> Context = s => map[s]
 
-	static implicit func constMap2Context(map: [String:double]) -> Context = s => if let d = map[s] { Const(d) } else null
+	static implicit func constMap2Context(map: [String:double]) -> Context = s => if let d = map[s] { Const(d) } else { null }
 
 	infix func +(lhs: Expr, rhs: Expr) -> Expr = Add(lhs, rhs)
 

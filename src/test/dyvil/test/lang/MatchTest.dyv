@@ -2,7 +2,6 @@ package dyvil.test.lang
 
 import class dyvil.test.lang.CaseClassTest._
 
-using dyvil.Collections
 using dyvil.test.JUnit
 
 class MatchTest {
@@ -220,8 +219,7 @@ class MatchTest {
 	static class KeyValue {
 		static func unapply(s: String) -> (String, String)? {
 			let index = s.indexOf ':'
-			if (index < 0) return null
-			return (s.substring(0, index), s.substring(index + 1))
+			return index < 0 ? null : (s.substring(0, index), s.substring(index + 1))
 		}
 	}
 
@@ -292,10 +290,10 @@ class MatchTest {
 
 		for i <- 0 .. 10 {
 			i match {
-				case 1 | 2 | 3 => list += 0
-				case 4 | 5 | 6 => list += 1
-				case 7 | 8 | 9 => list += 2
-				case 0 | 10	   => list += 3
+				case 1 | 2 | 3 => list.add(0)
+				case 4 | 5 | 6 => list.add(1)
+				case 7 | 8 | 9 => list.add(2)
+				case 0 | 10	   => list.add(3)
 			}
 		}
 
