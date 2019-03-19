@@ -4,6 +4,8 @@ import dyvil.io.Console;
 import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 
+@Deprecated
+@dyvil.annotation.Deprecated(since = "v0.45.0", forRemoval = "v0.46.0")
 public class SyntaxError extends Marker
 {
 	public SyntaxError(SourcePosition position, String message)
