@@ -120,9 +120,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				this.mode = END;
 				return;
 			default:
-				final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), "for.single.deprecated");
-				marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
-				pm.report(marker);
+				reportSingleStatement(pm, token, "for.single.deprecated");
 				pm.pushParser(new ExpressionParser(this.forStatement::setAction), true);
 				this.mode = END;
 				return;
@@ -131,6 +129,13 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 			pm.popParser(true);
 			this.consumer.accept(this.forStatement);
 		}
+	}
+
+	static void reportSingleStatement(IParserManager pm, IToken token, String key)
+	{
+		final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), key);
+		marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
+		pm.report(marker);
 	}
 
 	@Override

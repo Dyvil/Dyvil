@@ -1,14 +1,11 @@
 package dyvilx.tools.compiler.parser.statement;
 
-import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.statement.loop.WhileStatement;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
@@ -62,9 +59,7 @@ public class WhileStatementParser extends Parser
 			}
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), "while.single.deprecated");
-				marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
-				pm.report(marker);
+				ForStatementParser.reportSingleStatement(pm, token, "while.single.deprecated");
 			}
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = END;
