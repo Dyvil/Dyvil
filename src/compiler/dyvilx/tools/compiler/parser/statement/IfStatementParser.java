@@ -63,7 +63,7 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		case IF:
 			if (type != DyvilKeywords.IF)
 			{
-				pm.report(token, "if.if_keyword");
+				pm.report(token, "if.keyword");
 				return;
 			}
 
@@ -132,19 +132,36 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 				return;
 			}
 
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				ForStatementParser.reportSingleStatement(pm, token, "if.single.deprecated");
+			}
+
 			this.mode = ELSE;
 			pm.pushParser(new ExpressionParser(this.statement::setThen), true);
 			return;
 		case ELSE:
+			final IToken next = token.next();
 			if (type == DyvilKeywords.ELSE)
 			{
+				if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+				{
+					ForStatementParser.reportSingleStatement(pm, next, "else.single.deprecated");
+				}
+
 				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
 				return;
 			}
-			if (token.isInferred() && token.next().type() == DyvilKeywords.ELSE)
+			if (token.isInferred() && next.type() == DyvilKeywords.ELSE)
 			{
 				// ... inferred_semicolon else
+				final IToken nextNext = next.next();
+				if (nextNext.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+				{
+					ForStatementParser.reportSingleStatement(pm, nextNext, "else.single.deprecated");
+				}
+
 				pm.skip();
 				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
