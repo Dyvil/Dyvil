@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.token.IToken;
 
 public class RepeatStatementParser extends Parser
@@ -49,7 +50,9 @@ public class RepeatStatementParser extends Parser
 		case ACTION:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(Markers.syntaxWarning(SourcePosition.before(token), "repeat.action.block"));
+				final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), "repeat.single.deprecated");
+				marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
+				pm.report(marker);
 			}
 
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);

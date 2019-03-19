@@ -19,6 +19,7 @@ import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
 import dyvilx.tools.parsing.lexer.Tokens;
+import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
@@ -119,7 +120,9 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				this.mode = END;
 				return;
 			default:
-				pm.report(Markers.syntaxWarning(SourcePosition.before(token), "for.action.block"));
+				final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), "for.single.deprecated");
+				marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
+				pm.report(marker);
 				pm.pushParser(new ExpressionParser(this.forStatement::setAction), true);
 				this.mode = END;
 				return;

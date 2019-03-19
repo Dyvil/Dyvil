@@ -8,6 +8,7 @@ import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
+import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.token.IToken;
 
 import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
@@ -61,7 +62,10 @@ public class SyncStatementParser extends Parser
 			}
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(Markers.syntaxWarning(SourcePosition.before(token), "synchronized.action.block"));
+				final Marker marker = Markers.syntaxWarning(SourcePosition.before(token),
+				                                            "synchronized.single.deprecated");
+				marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
+				pm.report(marker);
 			}
 
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
