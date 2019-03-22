@@ -168,6 +168,10 @@ public interface Modifiers
 
 	int EXTENSION = 0x00040000;
 
+	int PREFIX_FLAG = 0x00080000;
+
+	int PREFIX = PREFIX_FLAG | STATIC;
+
 	// Field Modifiers
 
 	/**
