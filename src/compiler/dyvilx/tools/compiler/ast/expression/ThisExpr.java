@@ -134,7 +134,7 @@ public final class ThisExpr implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.SUPER_TYPE);
+		this.type.checkType(markers, context, TypePosition.TYPE);
 		if (!context.isThisAvailable())
 		{
 			markers.add(Markers.semanticError(this.position, "this.access.static"));

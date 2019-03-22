@@ -119,4 +119,28 @@ class ExtensionTest {
 
 		List.myEmpty<String>() =?= List<String>()
 	}
+
+	// --------------- Array Extensions ---------------
+
+	extension [String] {
+		func myJoin() -> String = String.join("", this)
+	}
+
+	extension [int] {
+		func mySum() -> int = java.util.Arrays.stream(this).sum()
+	}
+
+	@Test func stringArrayExtension() {
+		["a", "b", "c"].myJoin() =?= "abc"
+
+		let array: [String] = ["a", "b", "c"]
+		array.myJoin() =?= "abc"
+	}
+
+	@Test func intArrayExtension() {
+		[1, 2, 3].mySum() =?= 6
+
+		let array: [int] = [4, 5, 6]
+		array.mySum() =?= 15
+	}
 }

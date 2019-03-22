@@ -9,12 +9,11 @@ import dyvilx.tools.compiler.ast.field.IField;
 import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
-import dyvilx.tools.compiler.ast.header.IClassCompilableList;
-import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.ast.type.compound.ArrayType;
 import dyvilx.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -49,6 +48,12 @@ public class ExtensionMetadata implements IClassMetadata
 		{
 			method.getAttributes().addFlag(Modifiers.EXTENSION);
 
+			// make array extension methods final by default
+			if (superType.canExtract(ArrayType.class))
+			{
+				method.getAttributes().addFlag(Modifiers.FINAL);
+			}
+
 			if (!method.isStatic())
 			{
 				ITypeParametric.prependTypeParameters(this.theClass, method);
@@ -61,6 +66,10 @@ public class ExtensionMetadata implements IClassMetadata
 				method.setThisType(superType);
 			}
 		}
+
+		// immediately remove these to avoid further warnings or errors
+		this.theClass.setSuperType(Types.OBJECT);
+		this.theClass.setTypeParameters(null);
 	}
 
 	private static IType replaceTypeVars(IType type, ITypeParametric origin, ITypeParametric target)
@@ -87,6 +96,9 @@ public class ExtensionMetadata implements IClassMetadata
 				break;
 			case '>':
 				mangled.append("__$_");
+				break;
+			case '[':
+				mangled.append("_$_");
 				break;
 			case ',':
 			case ';':
@@ -121,13 +133,6 @@ public class ExtensionMetadata implements IClassMetadata
 		{
 			markers.add(Markers.semanticError(property.getPosition(), "extension.property.invalid"));
 		}
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		this.theClass.setSuperType(Types.OBJECT);
-		this.theClass.setTypeParameters(null);
 	}
 
 	// Compilation
