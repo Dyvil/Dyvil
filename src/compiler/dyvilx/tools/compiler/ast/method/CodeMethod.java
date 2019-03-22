@@ -39,6 +39,7 @@ import dyvilx.tools.compiler.transform.Deprecation;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
+import dyvilx.tools.parsing.lexer.CharacterTypes;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.marker.MarkerList;
 
@@ -285,6 +286,15 @@ public class CodeMethod extends AbstractMethod
 		    && (this.thisType == null || this.thisType == this.enclosingClass.getThisType()))
 		{
 			markers.add(Markers.semanticError(this.position, "method.extension.this_type.invalid", this.name));
+		}
+
+		if ((this.hasModifier(Modifiers.INFIX) || this.hasModifier(Modifiers.PREFIX)) //
+		    && !CharacterTypes
+			        .isIdentifierSymbol(this.name.unqualified.codePointBefore(this.name.unqualified.length())))
+		{
+			final Marker marker = Markers.semanticWarning(this.position, "method.not_symbolic.deprecated", this.name);
+			marker.addInfo(Markers.getSemantic("method.not_symbolic.deprecated.fix"));
+			markers.add(marker);
 		}
 
 		this.parameters.check(markers, context);
