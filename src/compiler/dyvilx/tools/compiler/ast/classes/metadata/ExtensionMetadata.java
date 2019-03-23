@@ -6,7 +6,6 @@ import dyvilx.tools.compiler.ast.classes.ClassBody;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.field.IField;
-import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.ITypeParametric;
 import dyvilx.tools.compiler.ast.member.MemberKind;
@@ -44,7 +43,7 @@ public class ExtensionMetadata implements IClassMetadata
 		this.theClass.setPosition(superType.getPosition());
 		this.theClass.setName(mangleName(superType));
 
-		for (IMethod method : this.theClass.getBody().methods())
+		for (IMethod method : this.theClass.getBody().allMethods())
 		{
 			method.getAttributes().addFlag(Modifiers.EXTENSION);
 
@@ -127,11 +126,6 @@ public class ExtensionMetadata implements IClassMetadata
 			{
 				markers.add(Markers.semanticError(field.getPosition(), "extension.field.invalid"));
 			}
-		}
-
-		for (IProperty property : body.properties())
-		{
-			markers.add(Markers.semanticError(property.getPosition(), "extension.property.invalid"));
 		}
 	}
 

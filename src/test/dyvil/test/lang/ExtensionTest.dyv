@@ -100,9 +100,9 @@ class ExtensionTest {
 	extension<type T> List<T> {
 		static func myEmpty<type T>() -> List<T> = List<T>()
 
-		func first() -> T = this.get(0)
+		func myFirst() -> T = this.get(0)
 
-		func last() -> T = this.get(this.size - 1)
+		func myLast() -> T = this.get(this.size - 1)
 
 		func myAdd(element: T) -> void = this.add(element)
 	}
@@ -110,12 +110,12 @@ class ExtensionTest {
 	@Test func genericExtensionOfExternalClass() -> void {
 		let list = MutableList(1, 2, 3)
 
-		list.first =?= 1
-		list.last =?= 3
+		list.myFirst =?= 1
+		list.myLast =?= 3
 
 		list.myAdd(4)
 
-		list.last =?= 4
+		list.myLast =?= 4
 
 		List.myEmpty<String>() =?= List<String>()
 	}
@@ -142,5 +142,21 @@ class ExtensionTest {
 
 		let array: [int] = [4, 5, 6]
 		array.mySum() =?= 15
+	}
+
+	// --------------- Extension Properties ---------------
+
+	extension [long] {
+		var myFirst: long {
+			get { return this[0] }
+			set { this[0] = newValue }
+		}
+	}
+
+	@Test func extensionProperties() {
+		let array = [0L, 1L, 2L]
+		array.myFirst =?= 0L
+		array.myFirst = 3
+		array.myFirst =?= 3L
 	}
 }
