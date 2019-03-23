@@ -1,3 +1,5 @@
+import java.awt.Desktop
+
 // --------------- Source Sets ---------------
 
 sourceSets {
@@ -89,4 +91,20 @@ tasks.register('runRepl', JavaExec) {
 
 	main = project(':repl').mainClassName
 	classpath = sourceSets.test.runtimeClasspath + project(':repl').sourceSets.main.runtimeClasspath
+}
+
+tasks.register('runReplInTerminal') {
+	dependsOn = tasks.runRepl.dependsOn
+	
+	doLast {
+		JavaExec runRepl = tasks.runRepl as JavaExec
+		List<String> command = runRepl.commandLine
+		File temp = File.createTempFile("dyvil_repl", ".command")
+
+		temp.setExecutable(true, true)
+		temp << command.join(" ")
+
+		System.setProperty("apple.awt.UIElement", "true") // avoid dock icon
+		Desktop.desktop.open(temp)
+	}
 }
