@@ -7,6 +7,7 @@ import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvil.util.MarkerLevel;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
@@ -882,7 +883,7 @@ public abstract class AbstractMethod extends AbstractMember implements IMethod, 
 			builder.replace(index, index + 6, receiverType.toString());
 		}
 
-		markers.add(Markers.semanticError(receiver.getPosition(), builder.toString()));
+		markers.add(Markers.withText(receiver.getPosition(), MarkerLevel.ERROR, builder.toString()));
 	}
 
 	// --------------- Override Checking ---------------
