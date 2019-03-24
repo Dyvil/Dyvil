@@ -168,41 +168,41 @@ public final class Markers
 
 	public static Marker semanticError(SourcePosition position, String key)
 	{
-		return new Marker(position, MarkerLevel.ERROR, semanticMessage(key));
+		return withText(position, MarkerLevel.ERROR, semanticMessage(key));
 	}
 
 	public static Marker semanticError(SourcePosition position, String key, Object... args)
 	{
-		return new Marker(position, MarkerLevel.ERROR, semanticMessage(key, args));
+		return withText(position, MarkerLevel.ERROR, semanticMessage(key, args));
 	}
 
 	public static Marker semanticWarning(SourcePosition position, String key)
 	{
-		return new Marker(position, MarkerLevel.WARNING, semanticMessage(key));
+		return withText(position, MarkerLevel.WARNING, semanticMessage(key));
 	}
 
 	public static Marker semanticWarning(SourcePosition position, String key, Object... args)
 	{
-		return new Marker(position, MarkerLevel.WARNING, semanticMessage(key, args));
+		return withText(position, MarkerLevel.WARNING, semanticMessage(key, args));
 	}
 
 	public static Marker syntaxWarning(SourcePosition position, String key)
 	{
-		return new Marker(position, MarkerLevel.WARNING, syntaxMessage(key));
+		return withText(position, MarkerLevel.WARNING, syntaxMessage(key));
 	}
 
 	public static Marker syntaxWarning(SourcePosition position, String key, Object... args)
 	{
-		return new Marker(position, MarkerLevel.WARNING, syntaxMessage(key, args));
+		return withText(position, MarkerLevel.WARNING, syntaxMessage(key, args));
 	}
 
 	public static Marker syntaxError(SourcePosition position, String key)
 	{
-		return new Marker(position, MarkerLevel.SYNTAX, syntaxMessage(key));
+		return withText(position, MarkerLevel.SYNTAX, syntaxMessage(key));
 	}
 
 	public static Marker syntaxError(SourcePosition position, String key, Object... args)
 	{
-		return new Marker(position, MarkerLevel.SYNTAX, syntaxMessage(key, args));
+		return withText(position, MarkerLevel.SYNTAX, syntaxMessage(key, args));
 	}
 }

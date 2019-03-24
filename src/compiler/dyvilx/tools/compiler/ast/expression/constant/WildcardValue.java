@@ -55,7 +55,7 @@ public class WildcardValue implements IConstantValue
 	public IValue withLambdaParameter(IParameter parameter)
 	{
 		parameter.setPosition(this.position);
-		return new FieldAccess(parameter);
+		return new FieldAccess(this.position, null, parameter);
 	}
 
 	@Override
