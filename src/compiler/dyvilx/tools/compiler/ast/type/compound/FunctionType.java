@@ -216,10 +216,13 @@ public final class FunctionType extends ResolvedGenericType
 
 		final int returnIndex = this.arguments.size() - 1;
 
-		buffer.append(this.arguments.get(0));
-		for (int i = 1; i < returnIndex; i++)
+		if (returnIndex > 0)
 		{
-			buffer.append(", ").append(this.arguments.get(i));
+			buffer.append(this.arguments.get(0));
+			for (int i = 1; i < returnIndex; i++)
+			{
+				buffer.append(", ").append(this.arguments.get(i));
+			}
 		}
 
 		buffer.append(") -> ").append(this.arguments.get(returnIndex));
