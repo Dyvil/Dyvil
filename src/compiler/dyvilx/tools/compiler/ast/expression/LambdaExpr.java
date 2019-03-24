@@ -32,7 +32,7 @@ import dyvilx.tools.compiler.ast.parameter.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.ast.type.compound.LambdaType;
+import dyvilx.tools.compiler.ast.type.compound.FunctionType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -240,11 +240,11 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		return this.type = this.makeType();
 	}
 
-	private @NonNull LambdaType makeType()
+	private @NonNull FunctionType makeType()
 	{
 		final int count = this.parameters.size();
-		final LambdaType lambdaType = new LambdaType();
-		final TypeList arguments = lambdaType.getArguments();
+		final FunctionType functionType = new FunctionType();
+		final TypeList arguments = functionType.getArguments();
 
 		for (int i = 0; i < count; i++)
 		{
@@ -253,7 +253,7 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		arguments.add(this.returnType != null ? this.returnType : Types.UNKNOWN);
 
 		this.flags |= LAMBDA_TYPE_INFERRED;
-		return lambdaType;
+		return functionType;
 	}
 
 	@Override
@@ -355,7 +355,7 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		{
 			this.returnType = valueType;
 		}
-		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0 || type.canExtract(LambdaType.class))
+		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0 || type.canExtract(FunctionType.class))
 		{
 			this.type = this.makeType();
 			return;

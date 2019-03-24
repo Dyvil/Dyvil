@@ -194,10 +194,10 @@ public final class TypeParser extends Parser implements Consumer<IType>
 					final TypeList arguments;
 					if (this.parentType != null)
 					{
-						final LambdaType lambdaType = new LambdaType();
-						lambdaType.setExtension(true);
-						this.type = lambdaType;
-						arguments = lambdaType.getArguments();
+						final FunctionType functionType = new FunctionType();
+						functionType.setExtension(true);
+						this.type = functionType;
+						arguments = functionType.getArguments();
 						arguments.add(this.parentType);
 					}
 					else
@@ -240,14 +240,14 @@ public final class TypeParser extends Parser implements Consumer<IType>
 						return;
 					}
 
-					final LambdaType lambdaType = new LambdaType(token.raw());
-					final TypeList arguments = lambdaType.getArguments();
+					final FunctionType functionType = new FunctionType(token.raw());
+					final TypeList arguments = functionType.getArguments();
 					if (this.parentType != null)
 					{
 						arguments.add(this.parentType);
 					}
 					pm.pushParser(this.subParser(arguments));
-					this.type = lambdaType;
+					this.type = functionType;
 					this.mode = LAMBDA_END;
 					return;
 				}
@@ -325,21 +325,21 @@ public final class TypeParser extends Parser implements Consumer<IType>
 			final IToken nextToken = token.next();
 			if (nextToken.type() == DyvilSymbols.ARROW_RIGHT)
 			{
-				final LambdaType lambdaType;
-				if (this.type instanceof LambdaType)
+				final FunctionType functionType;
+				if (this.type instanceof FunctionType)
 				{
-					lambdaType = (LambdaType) this.type;
+					functionType = (FunctionType) this.type;
 				}
 				else
 				{
-					lambdaType = new LambdaType(nextToken.raw(), ((TupleType) this.type).getArguments());
-					this.type = lambdaType;
+					functionType = new FunctionType(nextToken.raw(), ((TupleType) this.type).getArguments());
+					this.type = functionType;
 				}
-				lambdaType.setPosition(nextToken);
+				functionType.setPosition(nextToken);
 
 				this.mode = LAMBDA_END;
 				pm.skip();
-				pm.pushParser(this.subParser(lambdaType.getArguments()));
+				pm.pushParser(this.subParser(functionType.getArguments()));
 				return;
 			}
 
@@ -481,10 +481,10 @@ public final class TypeParser extends Parser implements Consumer<IType>
 				// all these flags have to be unset
 				if (this.parentType == null && (this.flags & (NAMED_ONLY | IGNORE_OPERATOR | IGNORE_LAMBDA)) == 0)
 				{
-					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
-					this.type = lambdaType;
+					final FunctionType functionType = new FunctionType(token.raw(), this.type);
+					this.type = functionType;
 					this.mode = LAMBDA_END;
-					pm.pushParser(this.subParser(lambdaType.getArguments()));
+					pm.pushParser(this.subParser(functionType.getArguments()));
 					return;
 				}
 				break;

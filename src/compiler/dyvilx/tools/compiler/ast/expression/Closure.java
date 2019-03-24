@@ -11,7 +11,7 @@ import dyvilx.tools.compiler.ast.parameter.CodeParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.ast.type.compound.LambdaType;
+import dyvilx.tools.compiler.ast.type.compound.FunctionType;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public class Closure extends LambdaExpr
@@ -109,8 +109,8 @@ public class Closure extends LambdaExpr
 			return super.resolveImplicit(type);
 		}
 
-		final LambdaType lambdaType = this.getType().extract(LambdaType.class);
-		if (lambdaType != null && lambdaType.isExtension())
+		final FunctionType functionType = this.getType().extract(FunctionType.class);
+		if (functionType != null && functionType.isExtension())
 		{
 			return new FieldAccess(this.parameters.get(0));
 		}

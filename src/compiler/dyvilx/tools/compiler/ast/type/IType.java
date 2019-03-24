@@ -617,7 +617,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 			type = new TupleType();
 			break;
 		case LAMBDA:
-			type = new LambdaType();
+			type = new FunctionType();
 			break;
 		case ARRAY:
 			type = new ArrayType();

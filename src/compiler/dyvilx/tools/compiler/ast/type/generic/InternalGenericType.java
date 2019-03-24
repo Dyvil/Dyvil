@@ -15,7 +15,7 @@ import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.ast.type.compound.LambdaType;
+import dyvilx.tools.compiler.ast.type.compound.FunctionType;
 import dyvilx.tools.compiler.ast.type.compound.MapType;
 import dyvilx.tools.compiler.ast.type.compound.TupleType;
 import dyvil.lang.Name;
@@ -86,7 +86,7 @@ public class InternalGenericType extends GenericType
 		}
 		if (this.internalName.startsWith("dyvil/function/Function$Of"))
 		{
-			return new LambdaType(this.arguments);
+			return new FunctionType(this.arguments);
 		}
 
 		switch (this.internalName)

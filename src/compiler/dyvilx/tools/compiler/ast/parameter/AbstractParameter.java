@@ -16,7 +16,7 @@ import dyvilx.tools.compiler.ast.method.ICallableMember;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
-import dyvilx.tools.compiler.ast.type.compound.LambdaType;
+import dyvilx.tools.compiler.ast.type.compound.FunctionType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
@@ -179,8 +179,8 @@ public abstract class AbstractParameter extends Variable implements IParameter
 
 		this.covariantType = null;
 
-		final LambdaType functionType;
-		if (this.type != null && (functionType = this.type.extract(LambdaType.class)) != null)
+		final FunctionType functionType;
+		if (this.type != null && (functionType = this.type.extract(FunctionType.class)) != null)
 		{
 			if (functionType.isExtension())
 			{

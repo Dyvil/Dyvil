@@ -27,29 +27,29 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class LambdaType extends ResolvedGenericType
+public final class FunctionType extends ResolvedGenericType
 {
 	private static final IClass[] functionClasses = new IClass[TupleType.MAX_ARITY];
 
 	// Metadata
 	protected boolean extension;
 
-	public LambdaType()
+	public FunctionType()
 	{
 		super(null);
 	}
 
-	public LambdaType(@NonNull TypeList arguments)
+	public FunctionType(@NonNull TypeList arguments)
 	{
 		super(null, null, arguments);
 	}
 
-	public LambdaType(@NonNull SourcePosition position, IType... arguments)
+	public FunctionType(@NonNull SourcePosition position, IType... arguments)
 	{
 		super(position, null, arguments);
 	}
 
-	public LambdaType(@NonNull SourcePosition position, TypeList arguments)
+	public FunctionType(@NonNull SourcePosition position, TypeList arguments)
 	{
 		super(position, null, arguments);
 	}
@@ -202,10 +202,10 @@ public final class LambdaType extends ResolvedGenericType
 	@Override
 	protected GenericType withArguments(TypeList arguments)
 	{
-		final LambdaType lambdaType = new LambdaType(this.position, arguments);
-		lambdaType.position = this.position;
-		lambdaType.extension = this.extension;
-		return lambdaType;
+		final FunctionType functionType = new FunctionType(this.position, arguments);
+		functionType.position = this.position;
+		functionType.extension = this.extension;
+		return functionType;
 	}
 
 	@Override
