@@ -86,6 +86,8 @@ tasks.register('runRepl', JavaExec) {
 			libraries: sourceSets.test.compileClasspath.toList()
 	)
 
+	jvmArgs += '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+
 	standardOutput = System.out
 	standardInput = System.in
 
@@ -93,18 +95,39 @@ tasks.register('runRepl', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath + project(':repl').sourceSets.main.runtimeClasspath
 }
 
-tasks.register('runReplInTerminal') {
-	dependsOn = tasks.runRepl.dependsOn
-	
+tasks.register('saveReplConfig') {
+	File configFile = new File("temp/repl_config.txt")
+	outputs.file configFile
+
 	doLast {
 		JavaExec runRepl = tasks.runRepl as JavaExec
-		List<String> command = runRepl.commandLine
-		File temp = File.createTempFile("dyvil_repl", ".command")
+		configFile.withWriter { out ->
+			runRepl.args.each {
+				out.println it
+			}
+		}
+	}
+}
 
-		temp.setExecutable(true, true)
-		temp << command.join(" ")
+tasks.register('saveReplCommand') {
+	File commandFile = new File('temp/repl.command')
+	outputs.file commandFile
 
+	doLast {
+		JavaExec runRepl = tasks.runRepl as JavaExec
+		String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.join(' ') + '\n'
+
+		commandFile.text = content
+		commandFile.executable = true
+	}
+}
+
+tasks.register('runReplInTerminal') {
+	dependsOn = tasks.runRepl.dependsOn
+	dependsOn 'saveReplCommand'
+
+	doLast {
 		System.setProperty("apple.awt.UIElement", "true") // avoid dock icon
-		Desktop.desktop.open(temp)
+		Desktop.desktop.open(new File('temp/repl.command'))
 	}
 }
