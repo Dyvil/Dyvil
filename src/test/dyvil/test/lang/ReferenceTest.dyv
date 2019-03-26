@@ -85,7 +85,7 @@ public class ReferenceTest {
 
 		infix func +(i: int, j: MyInt) -> MyInt = MyInt(i + j.value)
 
-		postfix func addInplace(i: MyInt^, j: int) -> void = *i = *i + j
+		final extension func addInplace(this: MyInt^, _ j: int) -> void = *this = *this + j
 	}
 
 	@Test func receiverReference() -> void {

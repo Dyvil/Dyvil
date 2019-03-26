@@ -21,7 +21,7 @@ class OperatorTest {
 	postfix func +++(i: int) -> int = i + 1
 
 	@Test func unary() -> void {
-		infix func apply(i: int, j: int) -> (int, int) = (i, j)
+		final extension func apply(this: int, that: int) -> (int, int) = (this, that)
 
 		var i = 1                         // Canonical Representation:
 		let j = [ i -i, i+++ i, i+++ -i ] // i.apply(-i), (i+++).apply(i), (i+++).apply(-i)

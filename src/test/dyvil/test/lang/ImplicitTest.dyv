@@ -22,9 +22,9 @@ class ImplicitTest {
 			func test() -> String = "B"
 		}
 
-		implicit postfix func s2a(s: String) -> A = new A
+		implicit static func s2a(s: String) -> A = new A
 
-		implicit postfix func s2b(s: String) -> B = new B
+		implicit static func s2b(s: String) -> B = new B
 
 		// "a".test() -> error: Ambigous call to method 'test' [method.access.ambiguous]
 	}
