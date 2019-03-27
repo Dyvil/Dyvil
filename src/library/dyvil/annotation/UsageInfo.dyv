@@ -13,5 +13,5 @@ import java.lang.annotation.Retention
 	let description: String = ''
 
 	/** the marker level of the compiler diagnostic message */
-	let markerLevel: MarkerLevel = .INFO
+	let level: MarkerLevel = .INFO
 )
