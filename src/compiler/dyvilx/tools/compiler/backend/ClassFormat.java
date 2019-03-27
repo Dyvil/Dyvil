@@ -32,6 +32,8 @@ import java.util.function.Consumer;
 @SuppressWarnings( { "UnnecessaryBoxing", "unused" })
 public final class ClassFormat
 {
+	// =============== Constants ===============
+
 	public static final int CLASS_VERSION = ASMConstants.V1_8;
 	public static final int ASM_VERSION   = ASMConstants.ASM5;
 
@@ -48,28 +50,33 @@ public final class ClassFormat
 	public static final int H_NEWINVOKESPECIAL = ASMConstants.H_NEWINVOKESPECIAL;
 	public static final int H_INVOKEINTERFACE  = ASMConstants.H_INVOKEINTERFACE;
 
-	public static final int T_BOOLEAN = 4;
-	public static final int T_CHAR    = 5;
-	public static final int T_FLOAT   = 6;
-	public static final int T_DOUBLE  = 7;
-	public static final int T_BYTE    = 8;
-	public static final int T_SHORT   = 9;
-	public static final int T_INT     = 10;
-	public static final int T_LONG    = 11;
+	public static final int T_BOOLEAN = ASMConstants.T_BOOLEAN;
+	public static final int T_CHAR    = ASMConstants.T_CHAR;
+	public static final int T_FLOAT   = ASMConstants.T_FLOAT;
+	public static final int T_DOUBLE  = ASMConstants.T_DOUBLE;
+	public static final int T_BYTE    = ASMConstants.T_BYTE;
+	public static final int T_SHORT   = ASMConstants.T_SHORT;
+	public static final int T_INT     = ASMConstants.T_INT;
+	public static final int T_LONG    = ASMConstants.T_LONG;
 
 	public static final int ACC_SUPER = ASMConstants.ACC_SUPER;
 
 	public static final Integer UNINITIALIZED_THIS = ASMConstants.UNINITIALIZED_THIS;
 	public static final Integer NULL               = ASMConstants.NULL;
 	public static final Integer TOP                = ASMConstants.TOP;
-	public static final Integer BOOLEAN            = new Integer(1);
-	public static final Integer BYTE               = new Integer(1);
-	public static final Integer SHORT              = new Integer(1);
-	public static final Integer CHAR               = new Integer(1);
-	public static final Integer INT                = ASMConstants.INTEGER;
-	public static final Integer LONG               = ASMConstants.LONG;
-	public static final Integer FLOAT              = ASMConstants.FLOAT;
-	public static final Integer DOUBLE             = ASMConstants.DOUBLE;
+
+	public static final Integer BOOLEAN = new Integer(1);
+	public static final Integer BYTE    = new Integer(1);
+	public static final Integer SHORT   = new Integer(1);
+	public static final Integer CHAR    = new Integer(1);
+	public static final Integer INT     = ASMConstants.INTEGER;
+	public static final Integer LONG    = ASMConstants.LONG;
+	public static final Integer FLOAT   = ASMConstants.FLOAT;
+	public static final Integer DOUBLE  = ASMConstants.DOUBLE;
+
+	// =============== Static Methods ===============
+
+	// --------------- Misc. ---------------
 
 	public static int insnToHandle(int invokeOpcode)
 	{
@@ -91,6 +98,8 @@ public final class ClassFormat
 	{
 		return type == LONG || type == DOUBLE;
 	}
+
+	// --------------- Format Conversions ---------------
 
 	public static String packageToInternal(String pack)
 	{
@@ -159,6 +168,8 @@ public final class ClassFormat
 		return name;
 	}
 
+	// --------------- Type Parsing ---------------
+
 	public static IType internalToType(String internal)
 	{
 		return new InternalType(internal);
@@ -167,97 +178,6 @@ public final class ClassFormat
 	public static IType extendedToType(String extended)
 	{
 		return readType(extended, 0, extended.length() - 1, false);
-	}
-
-	public static IType readFieldType(String desc)
-	{
-		return readType(desc, 0, desc.length() - 1, true);
-	}
-
-	public static IType readReturnType(String desc)
-	{
-		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1, true);
-	}
-
-	public static void readClassSignature(String desc, IClass iclass)
-	{
-		int i = 0;
-		if (desc.charAt(0) == '<')
-		{
-			i++;
-			while (desc.charAt(i) != '>')
-			{
-				i = readGeneric(desc, i, iclass);
-			}
-			i++;
-		}
-
-		int len = desc.length();
-		i = readTyped(desc, i, iclass::setSuperType, false);
-		while (i < len)
-		{
-			i = readTyped(desc, i, iclass.getInterfaces(), false);
-		}
-	}
-
-	private static Consumer<IType> parameterTypeConsumer(IExternalCallableMember methodSignature)
-	{
-		final ParameterList parameterList = methodSignature.getExternalParameterList();
-		return type -> {
-			final ExternalParameter parameter = new ExternalParameter(null, null, type);
-			parameter.setMethod(methodSignature);
-			parameterList.add(parameter);
-		};
-	}
-
-	public static void readMethodType(String desc, ExternalMethod method)
-	{
-		int i = 1;
-		if (desc.charAt(0) == '<')
-		{
-			while (desc.charAt(i) != '>')
-			{
-				i = readGeneric(desc, i, method);
-			}
-			i += 2;
-		}
-		while (desc.charAt(i) != ')')
-		{
-			i = readTyped(desc, i, parameterTypeConsumer(method), true);
-		}
-		i++;
-		i = readTyped(desc, i, method::setType, true);
-
-		// Throwables
-		int len = desc.length();
-		while (i < len && desc.charAt(i) == '^')
-		{
-			i = readException(desc, i + 1, method.getExceptions());
-		}
-	}
-
-	public static void readConstructorType(String desc, ExternalConstructor constructor)
-	{
-		int i = 1;
-		while (desc.charAt(i) != ')')
-		{
-			i = readTyped(desc, i, parameterTypeConsumer(constructor), true);
-		}
-		i += 2;
-
-		int len = desc.length();
-		while (i < len && desc.charAt(i) == '^')
-		{
-			i = readException(desc, i + 1, constructor.getExceptions());
-		}
-	}
-
-	public static void readExceptions(String[] exceptions, TypeList exceptionList)
-	{
-		for (String s : exceptions)
-		{
-			exceptionList.add(internalToType(s));
-		}
 	}
 
 	public static IType readType(String desc, int start, int end, boolean nullables)
@@ -320,13 +240,14 @@ public final class ClassFormat
 		return null;
 	}
 
+	// --------------- Type Parsing Helpers ---------------
+
 	private static IType readReferenceType(String desc, int start, int end, boolean nullables)
 	{
 		return nullable(readReferenceType(desc, start, end), nullables);
 	}
 
-	@NonNull
-	private static IType readReferenceType(String desc, int start, int end)
+	private static @NonNull IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);
 		if (index >= 0 && index < end)
@@ -460,6 +381,101 @@ public final class ClassFormat
 		return nullables ? new ImplicitNullableType(type) : type;
 	}
 
+	// --------------- Signature Parsing ---------------
+
+	public static IType readFieldType(String desc)
+	{
+		return readType(desc, 0, desc.length() - 1, true);
+	}
+
+	public static IType readReturnType(String desc)
+	{
+		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1, true);
+	}
+
+	public static void readClassSignature(String desc, IClass iclass)
+	{
+		int i = 0;
+		if (desc.charAt(0) == '<')
+		{
+			i++;
+			while (desc.charAt(i) != '>')
+			{
+				i = readGeneric(desc, i, iclass);
+			}
+			i++;
+		}
+
+		int len = desc.length();
+		i = readTyped(desc, i, iclass::setSuperType, false);
+		while (i < len)
+		{
+			i = readTyped(desc, i, iclass.getInterfaces(), false);
+		}
+	}
+
+	public static void readMethodType(String desc, ExternalMethod method)
+	{
+		int i = 1;
+		if (desc.charAt(0) == '<')
+		{
+			while (desc.charAt(i) != '>')
+			{
+				i = readGeneric(desc, i, method);
+			}
+			i += 2;
+		}
+		while (desc.charAt(i) != ')')
+		{
+			i = readTyped(desc, i, parameterTypeConsumer(method), true);
+		}
+		i++;
+		i = readTyped(desc, i, method::setType, true);
+
+		// Throwables
+		int len = desc.length();
+		while (i < len && desc.charAt(i) == '^')
+		{
+			i = readException(desc, i + 1, method.getExceptions());
+		}
+	}
+
+	public static void readConstructorType(String desc, ExternalConstructor constructor)
+	{
+		int i = 1;
+		while (desc.charAt(i) != ')')
+		{
+			i = readTyped(desc, i, parameterTypeConsumer(constructor), true);
+		}
+		i += 2;
+
+		int len = desc.length();
+		while (i < len && desc.charAt(i) == '^')
+		{
+			i = readException(desc, i + 1, constructor.getExceptions());
+		}
+	}
+
+	public static void readExceptions(String[] exceptions, TypeList exceptionList)
+	{
+		for (String s : exceptions)
+		{
+			exceptionList.add(internalToType(s));
+		}
+	}
+
+	// --------------- Signature Helpers ---------------
+
+	private static Consumer<IType> parameterTypeConsumer(IExternalCallableMember methodSignature)
+	{
+		final ParameterList parameterList = methodSignature.getExternalParameterList();
+		return type -> {
+			final ExternalParameter parameter = new ExternalParameter(null, null, type);
+			parameter.setMethod(methodSignature);
+			parameterList.add(parameter);
+		};
+	}
+
 	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
@@ -487,6 +503,8 @@ public final class ClassFormat
 	{
 		return readTyped(desc, start, list, false);
 	}
+
+	// --------------- General Helpers ---------------
 
 	private static int getMatchingSemicolon(String s, int start, int end)
 	{
