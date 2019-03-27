@@ -1,7 +1,8 @@
 package dyvilx.tools.compiler.backend;
 
-import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Name;
+import dyvil.ref.ObjectRef;
+import dyvil.ref.simple.SimpleObjectRef;
 import dyvilx.tools.asm.ASMConstants;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.external.ExternalConstructor;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-@SuppressWarnings( { "UnnecessaryBoxing", "unused" })
+@SuppressWarnings( { "UnnecessaryBoxing", "unused", "UnusedAssignment" })
 public final class ClassFormat
 {
 	// =============== Constants ===============
@@ -170,96 +171,25 @@ public final class ClassFormat
 
 	public static IType extendedToType(String extended)
 	{
-		return readType(extended, 0, extended.length() - 1, false);
+		return readType(extended, 0, false);
 	}
 
+	@Deprecated
 	public static IType readType(String desc, int start, int end, boolean nullables)
 	{
-		switch (desc.charAt(start))
-		{
-		// primitives
-		case 'V':
-			return Types.VOID;
-		case 'Z':
-			return Types.BOOLEAN;
-		case 'B':
-			return Types.BYTE;
-		case 'S':
-			return Types.SHORT;
-		case 'C':
-			return Types.CHAR;
-		case 'I':
-			return Types.INT;
-		case 'J':
-			return Types.LONG;
-		case 'F':
-			return Types.FLOAT;
-		case 'D':
-			return Types.DOUBLE;
-		case 'L': // class type
-			return readReferenceType(desc, start + 1, end, nullables);
-		case 'R': // reference type
-			final ReferenceType rt = new ReferenceType();
-			readTyped(desc, start + 1, rt::setType, true);
-			return rt;
-		case NullType.NULL_DESC: // null
-			return Types.NULL;
-		case NoneType.NONE_DESC: // none
-			return Types.NONE;
-		case AnyType.ANY_DESC: // any
-			return Types.ANY;
-		case 'T': // type parameter reference
-			return new InternalTypeVarType(desc.substring(start + 1, end));
-		case '[': // array type
-			final ArrayType arrayType = new ArrayType(readType(desc, start + 1, end, true));
-			return nullable(arrayType, nullables);
-		case '|': // union
-		{
-			final UnionType union = new UnionType();
-			final int end1 = readTyped(desc, start + 1, union::setLeft, nullables);
-			readTyped(desc, end1, union::setRight, nullables);
-			return union;
-		}
-		case '&': // intersection
-		{
-			final IntersectionType intersection = new IntersectionType();
-			final int end1 = readTyped(desc, start + 1, intersection::setLeft, nullables);
-			readTyped(desc, end1, intersection::setRight, nullables);
-			return intersection;
-		}
-		case '?': // option
-			return new NullableType(readType(desc, start + 1, end, false));
-		}
-		return null;
+		return readType(desc, start, nullables);
 	}
 
 	// --------------- Type Parsing Helpers ---------------
 
-	private static IType readReferenceType(String desc, int start, int end, boolean nullables)
+	private static IType readType(String desc, int start, boolean nullables)
 	{
-		return nullable(readReferenceType(desc, start, end), nullables);
+		ObjectRef<IType> target = new SimpleObjectRef<>(null);
+		readType(desc, start, nullables, target::set);
+		return target.get();
 	}
 
-	private static @NonNull IType readReferenceType(String desc, int start, int end)
-	{
-		int index = desc.indexOf('<', start);
-		if (index >= 0 && index < end)
-		{
-			final GenericType type = new InternalGenericType(desc.substring(start, index));
-			final TypeList arguments = type.getArguments();
-			index++;
-
-			while (desc.charAt(index) != '>')
-			{
-				index = readTyped(desc, index, arguments, true);
-			}
-			return type;
-		}
-
-		return new InternalType(desc.substring(start, end));
-	}
-
-	private static int readTyped(String desc, int start, Consumer<IType> consumer, boolean nullables)
+	private static int readType(String desc, int start, boolean nullables, Consumer<IType> consumer)
 	{
 		switch (desc.charAt(start))
 		{
@@ -291,15 +221,11 @@ public final class ClassFormat
 			consumer.accept(Types.DOUBLE);
 			return start + 1;
 		case 'L': // class
-		{
-			final int end = getMatchingSemicolon(desc, start, desc.length());
-			consumer.accept(readReferenceType(desc, start + 1, end, nullables));
-			return end + 1;
-		}
+			return readLType(desc, start, nullables, consumer);
 		case 'R': // reference
 		{
 			final ReferenceType reference = new ReferenceType();
-			final int end = readTyped(desc, start + 1, reference::setType, true);
+			final int end = readType(desc, start + 1, true, reference::setType);
 			consumer.accept(reference);
 			return end + 1;
 		}
@@ -324,49 +250,79 @@ public final class ClassFormat
 		case '+': // covariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.COVARIANT);
-			final int end = readTyped(desc, start + 1, var::setType, nullables);
+			final int end = readType(desc, start + 1, nullables, var::setType);
 			consumer.accept(var);
 			return end;
 		}
 		case '-': // contravariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			final int end = readTyped(desc, start + 1, var::setType, nullables);
+			final int end = readType(desc, start + 1, nullables, var::setType);
 			consumer.accept(var);
 			return end;
 		}
 		case '[': // array
 		{
 			final ArrayType arrayType = new ArrayType();
-			final int end = readTyped(desc, start + 1, arrayType::setElementType, true);
+			final int end = readType(desc, start + 1, true, arrayType::setElementType);
 			consumer.accept(nullable(arrayType, nullables));
 			return end;
 		}
 		case '|': // union
 		{
 			final UnionType union = new UnionType();
-			final int end1 = readTyped(desc, start + 1, union::setLeft, nullables);
-			final int end2 = readTyped(desc, end1, union::setRight, nullables);
+			final int end1 = readType(desc, start + 1, nullables, union::setLeft);
+			final int end2 = readType(desc, end1, nullables, union::setRight);
 			consumer.accept(union);
 			return end2;
 		}
 		case '&': // intersection
 		{
 			final IntersectionType intersection = new IntersectionType();
-			final int end1 = readTyped(desc, start + 1, intersection::setLeft, nullables);
-			final int end2 = readTyped(desc, end1, intersection::setRight, nullables);
+			final int end1 = readType(desc, start + 1, nullables, intersection::setLeft);
+			final int end2 = readType(desc, end1, nullables, intersection::setRight);
 			consumer.accept(intersection);
 			return end2;
 		}
 		case '?': // option
 		{
 			final NullableType nullableType = new NullableType();
-			final int end = readTyped(desc, start + 1, nullableType::setElementType, false);
+			final int end = readType(desc, start + 1, false, nullableType::setElementType);
 			consumer.accept(nullableType);
 			return end;
 		}
 		}
 		return start;
+	}
+
+	private static int readLType(String desc, int start, boolean nullables, Consumer<IType> consumer)
+	{
+		start++; // consume 'L'
+		for (int end = start; end < desc.length(); end++)
+		{
+			switch (desc.charAt(end))
+			{
+			case ';':
+				consumer.accept(nullable(new InternalType(desc.substring(start, end)), nullables));
+				end++; // consume ';'
+				return end;
+			case '<':
+				final GenericType type = new InternalGenericType(desc.substring(start, end));
+				final TypeList arguments = type.getArguments();
+
+				end++; // consume '<'
+				while (desc.charAt(end) != '>')
+				{
+					end = readType(desc, end, true, arguments);
+				}
+				consumer.accept(nullable(type, nullables));
+
+				end += 2; // consume '>;'
+				return end;
+			}
+		}
+
+		throw new IllegalArgumentException("missing ';' or '<' after reference type");
 	}
 
 	private static IType nullable(IType type, boolean nullables)
@@ -378,75 +334,40 @@ public final class ClassFormat
 
 	public static IType readFieldType(String desc)
 	{
-		return readType(desc, 0, desc.length() - 1, true);
+		return readType(desc, 0, true);
 	}
 
 	public static IType readReturnType(String desc)
 	{
-		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1, true);
+		return readType(desc, desc.lastIndexOf(')') + 1, true);
 	}
 
 	public static void readClassSignature(String desc, IClass iclass)
 	{
 		int i = 0;
-		if (desc.charAt(0) == '<')
+		i = readTypeParameters(desc, i, iclass);
+		i = readType(desc, i, false, iclass::setSuperType);
+		while (i < desc.length())
 		{
-			i++;
-			while (desc.charAt(i) != '>')
-			{
-				i = readGeneric(desc, i, iclass);
-			}
-			i++;
-		}
-
-		int len = desc.length();
-		i = readTyped(desc, i, iclass::setSuperType, false);
-		while (i < len)
-		{
-			i = readTyped(desc, i, iclass.getInterfaces(), false);
+			i = readType(desc, i, false, iclass.getInterfaces());
 		}
 	}
 
 	public static void readMethodType(String desc, ExternalMethod method)
 	{
-		int i = 1;
-		if (desc.charAt(0) == '<')
-		{
-			while (desc.charAt(i) != '>')
-			{
-				i = readGeneric(desc, i, method);
-			}
-			i += 2;
-		}
-		while (desc.charAt(i) != ')')
-		{
-			i = readTyped(desc, i, parameterTypeConsumer(method), true);
-		}
-		i++;
-		i = readTyped(desc, i, method::setType, true);
-
-		// Throwables
-		int len = desc.length();
-		while (i < len && desc.charAt(i) == '^')
-		{
-			i = readException(desc, i + 1, method.getExceptions());
-		}
+		int i = 0;
+		i = readTypeParameters(desc, i, method);
+		i = readParameters(desc, i, method);
+		i = readType(desc, i, true, method::setType);
+		i = readExceptions(desc, i, method.getExternalExceptions());
 	}
 
 	public static void readConstructorType(String desc, ExternalConstructor constructor)
 	{
-		int i = 1;
-		while (desc.charAt(i) != ')')
-		{
-			i = readTyped(desc, i, parameterTypeConsumer(constructor), true);
-		}
-		i += 2;
-
-		int len = desc.length();
-		while (i < len && desc.charAt(i) == '^')
-		{
-			i = readException(desc, i + 1, constructor.getExceptions());
-		}
+		int i = 0;
+		i = readParameters(desc, i, constructor);
+		i++; // consume 'V'
+		i = readExceptions(desc, i, constructor.getExternalExceptions());
 	}
 
 	public static void readExceptions(String[] exceptions, TypeList exceptionList)
@@ -457,7 +378,7 @@ public final class ClassFormat
 		}
 	}
 
-	// --------------- Signature Helpers ---------------
+	// --------------- Signature Parsing Helpers ---------------
 
 	private static Consumer<IType> parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
@@ -469,11 +390,27 @@ public final class ClassFormat
 		};
 	}
 
-	private static int readGeneric(String desc, int start, ITypeParametric generic)
+	private static int readTypeParameters(String desc, int start, ITypeParametric typeParametric)
+	{
+		if (desc.charAt(start) != '<')
+		{
+			return start;
+		}
+
+		start++; // consume '<'
+		while (desc.charAt(start) != '>')
+		{
+			start = readTypeParameter(desc, start, typeParametric);
+		}
+		start++; // consume '>'
+		return start;
+	}
+
+	private static int readTypeParameter(String desc, int start, ITypeParametric typeParametric)
 	{
 		int index = desc.indexOf(':', start);
 		final Name name = Name.fromRaw(desc.substring(start, index));
-		final ExternalTypeParameter typeParam = new ExternalTypeParameter(generic, name);
+		final ExternalTypeParameter typeParam = new ExternalTypeParameter(typeParametric, name);
 
 		if (desc.charAt(index + 1) == ':')
 		{
@@ -484,40 +421,37 @@ public final class ClassFormat
 		List<IType> upperBounds = new ArrayList<>();
 		while (desc.charAt(index) == ':')
 		{
-			index = readTyped(desc, index + 1, upperBounds::add, true);
+			index = readType(desc, index + 1, true, upperBounds::add);
 		}
 
 		typeParam.setUpperBounds(upperBounds.toArray(new IType[0]));
-		generic.getTypeParameters().add(typeParam);
+		typeParametric.getTypeParameters().add(typeParam);
 		return index;
 	}
 
-	private static int readException(String desc, int start, TypeList list)
+	private static int readParameters(String desc, int start, IExternalCallableMember parametric)
 	{
-		return readTyped(desc, start, list, false);
+		if (desc.charAt(start) != '(')
+		{
+			return start;
+		}
+
+		start++; // consume '('
+		while (desc.charAt(start) != ')')
+		{
+			start = readType(desc, start, true, parameterTypeConsumer(parametric));
+		}
+		start++; // consume ')'
+		return start;
 	}
 
-	// --------------- General Helpers ---------------
-
-	private static int getMatchingSemicolon(String s, int start, int end)
+	private static int readExceptions(String desc, int start, TypeList list)
 	{
-		int depth = 0;
-		for (int i = start; i < end; i++)
+		while (start < desc.length() && desc.charAt(start) == '^')
 		{
-			char c = s.charAt(i);
-			if (c == '<')
-			{
-				depth++;
-			}
-			else if (c == '>')
-			{
-				depth--;
-			}
-			else if (c == ';' && depth == 0)
-			{
-				return i;
-			}
+			start++; // consume '^'
+			start = readType(desc, start, false, list);
 		}
-		return -1;
+		return start;
 	}
 }
