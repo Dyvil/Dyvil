@@ -193,6 +193,9 @@ public final class ClassFormat
 	{
 		switch (desc.charAt(start))
 		{
+		// --- Types that can occur in Descriptors ---
+
+		// Primitives
 		case 'V':
 			consumer.accept(Types.VOID);
 			return start + 1;
@@ -220,77 +223,75 @@ public final class ClassFormat
 		case 'D':
 			consumer.accept(Types.DOUBLE);
 			return start + 1;
-		case 'L': // class
+		// Class Types
+		case 'L':
 			return readLType(desc, start, nullables, consumer);
-		case 'R': // reference
-		{
-			final ReferenceType reference = new ReferenceType();
-			final int end = readType(desc, start + 1, true, reference::setType);
-			consumer.accept(reference);
-			return end + 1;
-		}
-		case NullType.NULL_DESC: // null type
+		// Array Types
+		case '[':
+			start++; // consume '['
+			final ArrayType arrayType = new ArrayType();
+			start = readType(desc, start, true, arrayType::setElementType);
+			consumer.accept(nullable(arrayType, nullables));
+			return start;
+
+		// --- Types that can only occur in Signatures ---
+
+		// Type Variable References
+		case 'T':
+			return readTType(desc, start, nullables, consumer);
+		// Wildcard Type
+		case '*':
+			consumer.accept(new WildcardType(Variance.COVARIANT));
+			return start + 1;
+		// Covariant Wildcard
+		case '+':
+			start++; // consume '+'
+			final WildcardType covariant = new WildcardType(Variance.COVARIANT);
+			start = readType(desc, start, nullables, covariant::setType);
+			consumer.accept(covariant);
+			return start;
+		// Contravariant Wildcard
+		case '-':
+			start++; // consume '-'
+			final WildcardType contravariant = new WildcardType(Variance.CONTRAVARIANT);
+			start = readType(desc, start, nullables, contravariant::setType);
+			consumer.accept(contravariant);
+			return start;
+
+		// --- Types that can only occur in DyvilType annotations ---
+
+		// Null Type
+		case NullType.NULL_DESC:
 			consumer.accept(Types.NULL);
 			return start + 1;
+		// None Type
 		case NoneType.NONE_DESC:
 			consumer.accept(Types.NONE);
 			return start + 1;
+		// Any Type
 		case AnyType.ANY_DESC:
 			consumer.accept(Types.ANY);
 			return start + 1;
-		case 'T': // type var reference
-		{
-			final int end = desc.indexOf(';', start);
-			consumer.accept(new InternalTypeVarType(desc.substring(start + 1, end)));
-			return end + 1;
-		}
-		case '*': // any wildcard
-			consumer.accept(new WildcardType(Variance.COVARIANT));
-			return start + 1;
-		case '+': // covariant wildcard
-		{
-			final WildcardType var = new WildcardType(Variance.COVARIANT);
-			final int end = readType(desc, start + 1, nullables, var::setType);
-			consumer.accept(var);
-			return end;
-		}
-		case '-': // contravariant wildcard
-		{
-			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			final int end = readType(desc, start + 1, nullables, var::setType);
-			consumer.accept(var);
-			return end;
-		}
-		case '[': // array
-		{
-			final ArrayType arrayType = new ArrayType();
-			final int end = readType(desc, start + 1, true, arrayType::setElementType);
-			consumer.accept(nullable(arrayType, nullables));
-			return end;
-		}
-		case '|': // union
-		{
-			final UnionType union = new UnionType();
-			final int end1 = readType(desc, start + 1, nullables, union::setLeft);
-			final int end2 = readType(desc, end1, nullables, union::setRight);
-			consumer.accept(union);
-			return end2;
-		}
-		case '&': // intersection
-		{
-			final IntersectionType intersection = new IntersectionType();
-			final int end1 = readType(desc, start + 1, nullables, intersection::setLeft);
-			final int end2 = readType(desc, end1, nullables, intersection::setRight);
-			consumer.accept(intersection);
-			return end2;
-		}
-		case '?': // option
-		{
+		// Ref Types
+		case 'R':
+			start++; // consume 'R'
+			final ReferenceType reference = new ReferenceType();
+			start = readType(desc, start, true, reference::setType);
+			consumer.accept(reference);
+			return start;
+		// Option Type
+		case '?':
+			start++; // consume '?'
 			final NullableType nullableType = new NullableType();
-			final int end = readType(desc, start + 1, false, nullableType::setElementType);
+			start = readType(desc, start, false, nullableType::setElementType);
 			consumer.accept(nullableType);
-			return end;
-		}
+			return start;
+		// Union Type
+		case '|':
+			return readBinaryType(desc, start, nullables, new UnionType(), consumer);
+		// Intersection Type
+		case '&':
+			return readBinaryType(desc, start, nullables, new IntersectionType(), consumer);
 		}
 		return start;
 	}
@@ -323,6 +324,25 @@ public final class ClassFormat
 		}
 
 		throw new IllegalArgumentException("missing ';' or '<' after reference type");
+	}
+
+	private static int readTType(String desc, int start, boolean nullables, Consumer<IType> consumer)
+	{
+		start++; // consume 'T'
+		int end = desc.indexOf(';', start);
+		final InternalTypeVarType typeVar = new InternalTypeVarType(desc.substring(start, end));
+		consumer.accept(typeVar);
+		end++; // consume ';'
+		return end;
+	}
+
+	private static int readBinaryType(String desc, int start, boolean nullables, BinaryType type, Consumer<IType> consumer)
+	{
+		start++; // consume '&' or '|'
+		start = readType(desc, start, nullables, type::setLeft);
+		start = readType(desc, start, nullables, type::setRight);
+		consumer.accept(type);
+		return start;
 	}
 
 	private static IType nullable(IType type, boolean nullables)
