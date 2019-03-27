@@ -1,5 +1,6 @@
 package dyvil.collection
 
+@Deprecated(replacements: [ "java.util.Deque" ])
 interface Stack<type E> extends Queryable<E>
 {
 	/**

@@ -5,6 +5,7 @@ import dyvil.util.ImmutableException
 import java.util.{ Iterator, Spliterator, Spliterators }
 import java.util.function.{ Function, Predicate }
 
+@Deprecated(replacements: [ "java.util.Collection" ])
 @Immutable
 interface ImmutableCollection<type E> extends Collection<E>
 {

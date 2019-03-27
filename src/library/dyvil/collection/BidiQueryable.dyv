@@ -6,6 +6,7 @@ import java.util._
 import java.util.stream._
 import java.util.function._
 
+@Deprecated(replacements: [])
 interface BidiQueryable<E> extends Queryable<E>
 {
 	/**

@@ -5,6 +5,7 @@ import dyvil.util.ImmutableException
 import java.util.{ Iterator, Spliterator, Spliterators }
 import java.util.function.{ Function, Predicate }
 
+@Deprecated(replacements: [ "java.util.Collection" ])
 @LiteralConvertible.FromArray
 interface MutableCollection<type E> extends Collection<E>
 {

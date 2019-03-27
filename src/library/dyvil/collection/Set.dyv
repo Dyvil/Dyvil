@@ -3,6 +3,7 @@ package dyvil.collection
 import java.util.{ Iterator, Spliterator, Spliterators, Arrays, Comparator }
 import java.util.function.{ Function, Predicate }
 
+@Deprecated(replacements: [ "java.util.Set" ])
 @LiteralConvertible.FromArray
 interface Set<type E> extends Collection<E>
 {

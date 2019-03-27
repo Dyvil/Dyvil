@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.mutable.ArrayMap;
@@ -15,6 +16,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.Map" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 public interface MutableMap<K, V> extends Map<K, V>

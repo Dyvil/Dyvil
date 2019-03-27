@@ -3,6 +3,7 @@ package dyvil.collection
 import java.util._
 import java.util.function._
 
+@Deprecated(replacements: [ "java.util.Iterable" ])
 interface SizedIterable<type E> extends Iterable<E>
 {
 	// Size

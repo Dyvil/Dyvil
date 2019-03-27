@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.immutable.EmptyList;
@@ -40,6 +41,8 @@ import java.util.function.Predicate;
  * @author Clashsoft
  */
 @SuppressWarnings("unused")
+@Deprecated(replacements = { "java.util.List" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {

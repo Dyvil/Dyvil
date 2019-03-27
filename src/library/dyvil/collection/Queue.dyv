@@ -12,6 +12,7 @@ package dyvil.collection
  * @see Stack
  * @see Deque
  */
+@Deprecated(replacements: [ "java.util.Queue" ])
 interface Queue<type E> extends Queryable<E>
 {
 	/**

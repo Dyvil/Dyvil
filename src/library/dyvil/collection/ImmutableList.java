@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.Covariant;
@@ -20,6 +21,8 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.List" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 @Immutable
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>

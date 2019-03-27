@@ -1,9 +1,9 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.Covariant;
 import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonSet;
@@ -16,6 +16,8 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.Set" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 @Immutable
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>

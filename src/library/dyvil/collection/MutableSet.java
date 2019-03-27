@@ -1,7 +1,7 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.view.SetView;
@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.Set" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {

@@ -8,6 +8,7 @@ import java.util.{ Iterator, Spliterator, Spliterators, Comparator }
 import java.util.stream.{ Stream, StreamSupport }
 import java.util.function.{ Function, BiFunction, Predicate, BiPredicate, Consumer, BiConsumer }
 
+@Deprecated(replacements: [ "java.util.Map" ])
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V>>, java.io.Serializable

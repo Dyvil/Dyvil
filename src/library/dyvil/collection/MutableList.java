@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.mutable.ArrayList;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.List" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 public interface MutableList<E> extends List<E>, MutableCollection<E>
 {

@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.Deprecated;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.Covariant;
 import dyvil.annotation.internal.NonNull;
@@ -20,6 +21,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Deprecated(replacements = { "java.util.Map" })
+@java.lang.Deprecated
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>

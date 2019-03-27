@@ -1,5 +1,6 @@
 package dyvil.collection
 
+@Deprecated(replacements: [ "java.util.Deque" ])
 interface Deque<type E> extends BidiQueryable<E>, Stack<E>, Queue<E>
 {
 	// Deque Methods
