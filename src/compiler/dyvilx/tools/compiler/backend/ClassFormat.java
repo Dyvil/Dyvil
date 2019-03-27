@@ -101,9 +101,14 @@ public final class ClassFormat
 
 	// --------------- Format Conversions ---------------
 
-	public static String packageToInternal(String pack)
+	public static String packageToInternal(String qualified)
 	{
-		return pack.replace('.', '/');
+		return qualified.replace('.', '/');
+	}
+
+	public static String packageToExtended(String qualified)
+	{
+		return internalToExtended(packageToInternal(qualified));
 	}
 
 	public static String internalToPackage(String internal)
@@ -116,26 +121,14 @@ public final class ClassFormat
 		return 'L' + internal + ';';
 	}
 
+	public static String extendedToPackage(String extended)
+	{
+		return internalToPackage(extendedToInternal(extended));
+	}
+
 	public static String extendedToInternal(String extended)
 	{
 		return extended.substring(1, extended.length() - 1);
-	}
-
-	public static String extendedToPackage(String extended)
-	{
-		int len = extended.length() - 1;
-		StringBuilder builder = new StringBuilder(len - 1);
-		for (int i = 1; i < len; i++)
-		{
-			char c = extended.charAt(i);
-			if (c == '/')
-			{
-				builder.append('.');
-				continue;
-			}
-			builder.append(c);
-		}
-		return builder.toString();
 	}
 
 	public static String userToExtended(String name)
@@ -163,7 +156,7 @@ public final class ClassFormat
 		}
 		if (name.length() > 1)
 		{
-			return "L" + name.replace('.', '/') + ";";
+			return packageToExtended(name);
 		}
 		return name;
 	}
