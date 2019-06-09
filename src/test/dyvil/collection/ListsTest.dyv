@@ -12,6 +12,38 @@ class ListsTest {
 	const list123: List<Int> = Arrays.asList(1, 2, 3)
 	const list111: List<Int> = Arrays.asList(1, 1, 1)
 
+	// =============== Operators ===============
+
+	@Test func +() -> void {
+		(0 + list123) =?= List(0, 1, 2, 3)
+		(list123 + 4) =?= List(1, 2, 3, 4)
+	}
+
+	@Test func ++() -> void {
+		(emptyList ++ list123) =?= list123
+		(list123 ++ emptyList) =?= list123
+		(list1 ++ list123) =?= List(1, 1, 2, 3)
+		(list123 ++ list1) =?= List(1, 2, 3, 1)
+	}
+
+	@Test func -() -> void {
+		(emptyList - 1) =?= emptyList
+		(list1 - 1) =?= emptyList
+		(list123 - 1) =?= List(2, 3)
+		(list111 - 1) =?= emptyList
+	}
+
+	@Test func --() -> void {
+		(emptyList -- list1) =?= emptyList
+		(list1 -- emptyList) =?= list1
+		(list1 -- list1) =?= emptyList
+		(list1 -- list123) =?= emptyList
+		(list111 -- list1) =?= emptyList
+		(list111 -- list123) =?= emptyList
+		(list123 -- list1) =?= List(2, 3)
+		(list123 -- list111) =?= List(2, 3)
+	}
+
 	// =============== Static Methods ===============
 
 	@Test func applyList() -> void {
@@ -106,6 +138,13 @@ class ListsTest {
 		*ref =?= 0
 	}
 
+	// TODO List.map
+	// @Test func map() -> void {
+	// 	let list = ArrayList(1, 2, 3, 4)
+	// 	// list.map { $0 * 2 }
+	// 	list =?= List(2, 4, 6, 8)
+	// }
+
 	@Test func replaceAll() -> void {
 		let list = Arrays.asList(1, 2, 1, 3, 1)
 		list.replaceAll(1, 0)
@@ -149,4 +188,36 @@ class ListsTest {
 		list.sort()
 		list =?= List(1, 2, 3, 4, 5)
 	}
+
+	// --------------- Copies ---------------
+
+	@Test func copy() {
+		let list = ArrayList(1, 2, 3)
+		let copy = list.copy
+		copy.add(4)
+		list =?= List(1, 2, 3)
+		copy =?= List(1, 2, 3, 4)
+	}
+
+	@Test func modifiableCopy() {
+		let list = List(1, 2, 3)
+		let copy = list.modifiableCopy
+		copy.add(4)
+		list =?= List(1, 2, 3)
+		copy =?= List(1, 2, 3, 4)
+	}
+
+	@Test func unmodifiableCopy() {
+		let list = ArrayList(1, 2, 3)
+		let copy = list.unmodifiableCopy
+		list.add(4)
+		list =?= List(1, 2, 3, 4)
+		copy =?= List(1, 2, 3)
+
+		expect<UnsupportedOperationException> {
+			copy.add(4)
+		}
+	}
+
+	// --------------- Copying Operations ---------------
 }

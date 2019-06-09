@@ -32,6 +32,35 @@ class CollectionsTest {
 		collection =?= List(3)
 	}
 
+	// =============== Properties ===============
+
+	@Test func isUnmodifiableView() {
+		let list = ArrayList(1, 2, 3)
+		list.isUnmodifiableView =?= false
+		let unmodifiableView = list.unmodifiableView
+		unmodifiableView.isUnmodifiableView =?= true
+	}
+
+	@Test func isSynchronizedView() {
+		let list = ArrayList(1, 2, 3)
+		list.isSynchronizedView =?= false
+		let synchronizedView = list.synchronizedView
+		synchronizedView.isSynchronizedView =?= true
+	}
+
+	@Test func isUnmodifiableAndSynchronizedView() {
+		let list = ArrayList(1, 2, 3)
+		let unmodSync = list.unmodifiableView.synchronizedView
+		let syncUnmod = list.synchronizedView.unmodifiableView
+
+		// only the last applied modifier is true
+		// because of the way it is implemented (by checking the runtime class)
+		unmodSync.isUnmodifiableView =?= false
+		unmodSync.isSynchronizedView =?= true
+		syncUnmod.isUnmodifiableView =?= true
+		syncUnmod.isSynchronizedView =?= false
+	}
+
 	// =============== Methods ===============
 
 	@Test func addAll() -> void {
@@ -42,5 +71,11 @@ class CollectionsTest {
 
 		collection.addAll(List(7, 8, 9))
 		collection =?= List(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	}
+
+	@Test func filter() -> void {
+		let list = ArrayList(1, 2, 3, 4, 5, 6)
+		list.filter { ($0 & 1) == 0 }
+		list =?= List(2, 4, 6)
 	}
 }

@@ -1,7 +1,8 @@
 package dyvil.collection
 
 import java.util.{ Collection, List, ArrayList, LinkedList, concurrent.CopyOnWriteArrayList }
-import java.util.function.{ IntFunction, Supplier }
+import java.util.function.{ Function, UnaryOperator, Predicate, IntFunction, Supplier }
+import java.util.stream.{ Stream, Collectors }
 import java.util.Comparator
 import java.util.Random
 
@@ -12,6 +13,18 @@ import dyvil.ref.ObjectRef
 
 @JavaName("Lists")
 extension<type E> List<E> {
+	// =============== Operators ===============
+
+	infix func + <type E>(lhs: E, rhs: List<+E>) -> List<E> = rhs.copyWith { add(0, lhs) }
+
+	infix func + <type E>(lhs: List<+E>, rhs: E) -> List<E> = lhs.copyWith { add(rhs) }
+
+	infix func ++ <type E>(lhs: List<+E>, rhs: List<+E>) -> List<E> = lhs.copyWith { addAll(rhs) }
+
+	infix func - <type E>(lhs: List<E>, rhs: any!) -> List<E> = lhs.copyWith { removeAll(Collections.singleton(rhs)) }
+
+	infix func -- <type E>(lhs: List<E>, rhs: Collection<_>) -> List<E> = lhs.copyWith { removeAll(rhs) }
+
 	// =============== Static Methods ===============
 
 	// List<Int>()
@@ -112,6 +125,14 @@ extension<type E> List<E> {
 
 	// --------------- Mutation ---------------
 
+	// TODO List.map
+	// @Mutating
+	// final func map(by function: UnaryOperator<E>) -> void = this.replaceAll(function)
+
+	// TODO List.flatMap
+	// @Mutating
+	// final func flatMap(by function: Function<-E, +???>) -> void = ???
+
 	@Mutating
 	final func replaceAll(occurrencesOf oldVal: any!, with newVal: E) -> void
 		= Collections.replaceAll(this, oldVal, newVal)
@@ -143,6 +164,45 @@ extension<type E> List<E> {
 	final func synchronizedView() -> List<E> = Collections.synchronizedList(this)
 
 	// func checked(withType: Class<-E>) -> List<E> = Collections.checkedList(this, withType)
+
+	// --------------- Copies ---------------
+
+	private final func copyWith(operation: List<E>.() -> void) -> List<E> inline {
+		return this.finalizeCopy(this.modifiableCopy().use(operation))
+	}
+
+	private final func finalizeCopy<type R>(copy: List<R>) -> List<R> inline {
+		return this.isUnmodifiableView ? copy.unmodifiableView : copy
+	}
+
+	final func copy() -> List<E> = this.isUnmodifiableView ? this.unmodifiableCopy : this.modifiableCopy
+
+	final func modifiableCopy() -> List<E> = new ArrayList(this)
+
+	final func unmodifiableCopy() -> List<E> = new ArrayList(this).unmodifiableView
+
+	// --------------- Copying Operations ---------------
+
+	final func filtered(by predicate: Predicate<-E>) -> List<E>
+		= this.finalizeCopy(this.stream.filter(predicate).collect(Collectors.toList<E>))
+
+	final func mapped<type R>(by function: Function<-E, +R>) -> List<R>
+		= this.finalizeCopy(this.stream.map(function).collect(Collectors.toList<R>))
+
+	final func flatMapped<type R>(by function: Function<-E, +Stream<+R>>) -> List<R>
+		= this.finalizeCopy(this.stream.flatMap(function).collect(Collectors.toList<R>))
+
+	final func reversed() -> List<E> = this.copyWith { reverse() }
+
+	final func rotated(distance: int) -> List<E> = this.copyWith { rotate(distance) }
+
+	final func shuffled() -> List<E> = this.copyWith { shuffle() }
+
+	final func shuffled(random: Random) -> List<E> = this.copyWith { shuffle(random) }
+
+	final func sorted() -> List<E> = this.copyWith { sort() }
+
+	final func sorted(by comparator: Comparator<-E>) -> List<E> = this.copyWith { sort(comparator) }
 }
 
 // *************** ArrayList ***************

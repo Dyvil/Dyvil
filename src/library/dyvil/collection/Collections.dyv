@@ -2,6 +2,7 @@ package dyvil.collection
 
 import java.util.{ Collection }
 import java.util.Collections
+import java.util.function.{ Predicate }
 
 @JavaName("Collections")
 extension<type E> Collection<E> {
@@ -20,6 +21,12 @@ extension<type E> Collection<E> {
 	@Mutating
 	infix func --= (lhs: Collection<_>, rhs: Collection<_>) -> void = lhs.removeAll(rhs)
 
+	// =============== Properties ===============
+
+	func isUnmodifiableView() -> boolean = this.getClass().getName().startsWith("java.util.Collections$Unmodifiable")
+
+	func isSynchronizedView() -> boolean = this.getClass().getName().startsWith("java.util.Collections$Synchronized")
+
 	// =============== Methods ===============
 
 	// --------------- Predicates ---------------
@@ -32,6 +39,9 @@ extension<type E> Collection<E> {
 
 	@Mutating
 	func addAll(elements: [E]) -> boolean = Collections.addAll(this, elements...)
+
+	@Mutating
+	final func filter(by predicate: Predicate<-E>) -> void = this.removeIf(predicate.negate)
 
 	// --------------- Views ---------------
 
