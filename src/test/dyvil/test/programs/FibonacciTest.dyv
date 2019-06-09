@@ -2,6 +2,8 @@ package dyvil.test.programs
 
 using dyvil.test.JUnit
 
+import java.util.{ List, ArrayList }
+
 class FibonacciTest {
 	@Test
 	func fibonacci() -> void {
@@ -13,7 +15,7 @@ class FibonacciTest {
 	}
 
 	static func fibonacciSequence(n: int) -> List<int> {
-		let list: MutableList<int> = [ 1, 1 ]
+		let list = ArrayList(1, 1)
 
 		for i <- 2 ..< n {
 			list.add(list[i - 1] + list[i - 2])

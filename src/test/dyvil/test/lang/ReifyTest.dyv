@@ -2,6 +2,8 @@ package dyvil.test.lang
 
 using dyvil.test.JUnit
 
+import java.util.List
+
 class ReifyTest {
 	// --------------- Type ---------------
 

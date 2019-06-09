@@ -2,6 +2,8 @@ package dyvil.test.lang
 
 using dyvil.test.JUnit
 
+import java.util.{ List, Set }
+
 class VarargsTest {
 	// Declaration Styles with Type Checks
 	// All methods with the same first letter do the same thing
@@ -10,12 +12,13 @@ class VarargsTest {
 
 	static func f_2(ints : int...) -> [int] = ints
 
-	static func g_1(ints... : Set<int>) -> Set<int> = ints
+	// TODO
+	// static func g_1(ints... : Set<int>) -> Set<int> = ints
 
 	@Test func syntax() -> void {
 		f_1(1, 2, 3) =?= [ 1, 2, 3 ]
 		f_2(4, 5, 6) =?= [ 4, 5, 6 ]
-		g_1(7, 8, 9) =?= Set(7, 8, 9)
+		// g_1(7, 8, 9) =?= Set(7, 8, 9)
 	}
 
 	// --------------- One Varargs Parameter ---------------

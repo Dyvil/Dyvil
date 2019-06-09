@@ -1,42 +1,44 @@
 package dyvil.test.lang
 
-using dyvil.Collections
 using dyvil.test.JUnit
+
 import dyvil.collection.range.Rangeable
+
+import java.util.{ List, ArrayList }
 
 class RangeTest {
 	// --------------- Int Range ---------------
 
 	@Test func closedInt() -> void {
 		let range1 = 1 .. 4
-		let rangeInclusive = List<int>()
+		let rangeInclusive = ArrayList<int>()
 		for i <- range1 {
-			rangeInclusive += i
+			rangeInclusive.add(i)
 		}
 		rangeInclusive =?= List(1, 2, 3, 4)
 	}
 
 	@Test func halfOpenInt() -> void {
 		let range2 = 1 ..< 4
-		let rangeExclusive = List<int>()
+		let rangeExclusive = ArrayList<int>()
 		for i <- range2 {
-			rangeExclusive += i
+			rangeExclusive.add(i)
 		}
 		rangeExclusive =?= List(1, 2, 3)
 	}
 
 	@Test func forClosedInt() {
-		let forInclusive = List<int>()
+		let forInclusive = ArrayList<int>()
 		for i <- 1 .. 4 {
-			forInclusive += i
+			forInclusive.add(i)
 		}
 		forInclusive =?= List(1, 2, 3, 4)
 	}
 
 	@Test func forHalfOpenInt() {
-		let forExclusive = List<int>()
+		let forExclusive = ArrayList<int>()
 		for i <- 1 ..< 4 {
-			forExclusive += i
+			forExclusive.add(i)
 		}
 		forExclusive =?= List(1, 2, 3)
 	}
@@ -59,35 +61,35 @@ class RangeTest {
 
 	@Test func closedRangeable() -> void {
 		let range1 = one .. four
-		let rangeInclusive = List<RangeableInt>()
+		let rangeInclusive = ArrayList<RangeableInt>()
 		for i <- range1 {
-			rangeInclusive += i
+			rangeInclusive.add(i)
 		}
 		rangeInclusive =?= List<RangeableInt>(1, 2, 3, 4)
 	}
 
 	@Test func halfOpenRangeable() -> void {
 		let range2 = one ..< four
-		let rangeExclusive = List<RangeableInt>()
+		let rangeExclusive = ArrayList<RangeableInt>()
 		for i <- range2 {
-			rangeExclusive += i
+			rangeExclusive.add(i)
 		}
 
 		rangeExclusive =?= List<RangeableInt>(1, 2, 3)
 	}
 
 	@Test func forClosedRangeable() -> void {
-		let forInclusive = List<RangeableInt>()
+		let forInclusive = ArrayList<RangeableInt>()
 		for i <- one .. four {
-			forInclusive += i
+			forInclusive.add(i)
 		}
 		forInclusive =?= List<RangeableInt>(1, 2, 3, 4)
 	}
 
 	@Test func forHalfOpenRangeable() -> void {
-		let forExclusive = List<RangeableInt>()
+		let forExclusive = ArrayList<RangeableInt>()
 		for i <- one ..< four {
-			forExclusive += i
+			forExclusive.add(i)
 		}
 
 		forExclusive =?= List<RangeableInt>(1, 2, 3)

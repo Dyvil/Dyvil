@@ -1,8 +1,9 @@
 package dyvil.collection
 
-import java.util.Iterator
-using dyvil.collection.Iterables._
 using dyvil.test.JUnit
+
+import java.util.Iterator
+import java.util.List
 
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -18,7 +19,7 @@ class IterablesTest {
 
 	// =============== Static Fields ===============
 
-	static let emptyList: Iterable<Int> = List.empty<Int>()
+	static let emptyList: Iterable<Int> = List<Int>()
 	static let emptyGeneric: Iterable<Int> = new GenericIterable<Int>([])
 
 	static let intList: Iterable<Int> = List(1, 2, 3)

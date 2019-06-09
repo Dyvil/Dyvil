@@ -1,16 +1,17 @@
 package dyvil.test.lang
 
-import java.util.Iterator
 using dyvil.test.JUnit
-using dyvil.Collections
+
+import java.util.Iterator
+import java.util.{ List, ArrayList }
 
 class ForTest {
 	@Test func array() -> void {
 		let array = [ 1, 2, 3 ]
-		let list = List<int>()
+		let list = ArrayList<int>()
 
 		for i <- array {
-			list += i
+			list.add(i)
 		}
 
 		list =?= List(1, 2, 3)
@@ -18,10 +19,10 @@ class ForTest {
 
 	@Test func iterable() -> void {
 		let iterable: Iterable<int> = List(1, 2, 3)
-		let list = List<int>()
+		let list = ArrayList<int>()
 
 		for i <- iterable {
-			list += i
+			list.add(i)
 		}
 
 		list =?= iterable
@@ -30,10 +31,10 @@ class ForTest {
 	@Test func iterator() -> void {
 		let iterable = List(1, 2, 3)
 		let iterator = iterable.iterator
-		let list = List<int>()
+		let list = ArrayList<int>()
 
 		for i <- iterator {
-			list += i
+			list.add(i)
 		}
 
 		list =?= iterable
@@ -51,11 +52,11 @@ class ForTest {
 	}
 
 	@Test func nested() -> void {
-		let results = List<(int, int)>()
+		let results = ArrayList<(int, int)>()
 
 		for i <- 0 .. 1 {
 			for j <- 0 .. 1 {
-				results += (i, j)
+				results.add((i, j))
 			}
 		}
 

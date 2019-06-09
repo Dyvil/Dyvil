@@ -3,6 +3,8 @@ package dyvil.test.lang
 using dyvil.test.JUnit
 using dyvil.Strings
 
+import java.util.{ List, ArrayList }
+
 class ExtensionTest {
 	// --------------- Extension of Source Classes ---------------
 
@@ -108,7 +110,7 @@ class ExtensionTest {
 	}
 
 	@Test func genericExtensionOfExternalClass() -> void {
-		let list = MutableList(1, 2, 3)
+		let list = ArrayList(1, 2, 3)
 
 		list.myFirst =?= 1
 		list.myLast =?= 3

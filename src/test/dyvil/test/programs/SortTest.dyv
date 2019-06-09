@@ -1,17 +1,18 @@
 package dyvil.test.programs
 
-using dyvil.Collections
 using dyvil.test.JUnit
+
 import java.util.Random
+import java.util.List
 
 class SortTest {
 	static let random = new Random
 
-	static let list          = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-	static let reversed      = list.reversed
-	static let fewUnique     = List(1, 2, 3, 1, 4, 2, 3, 4, 1, 2, 3, 4, 1, 2)
-	static let randoms       = List.generate(100, i => random.nextInt 100)
-	static let sortedRandoms = randoms.sorted
+	static let list          : List<int> = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	static let reversed      : List<int> = list.reversed
+	static let fewUnique     : List<int> = List(1, 2, 3, 1, 4, 2, 3, 4, 1, 2, 3, 4, 1, 2)
+	static let randoms       : List<int> = List(with: 100, itemsGeneratedBy: i => random.nextInt 100)
+	static let sortedRandoms : List<int> = randoms.sorted
 
 	@Test
 	func quicksortSorted() -> void {
@@ -35,12 +36,12 @@ class SortTest {
 
 	@Test
 	func quicksortInplace() -> void {
-		var mutable = randoms.mutable
-		quicksort(mutable)
+		var mutable = randoms.modifiableCopy()
+		quicksortInplace(mutable)
 		mutable =?= sortedRandoms
 	}
 
-	static func quicksort<type T: Comparable<-T>>(list: ImmutableList<T>) -> ImmutableList<T> {
+	static func quicksort<type T: Comparable<-T>>(list: List<T>) -> List<T> {
 		if list.isEmpty {
 			return list
 		}
@@ -59,9 +60,9 @@ class SortTest {
 		*right = temp
 	}
 
-	static func quicksort<type T: Comparable<-T>>(list: MutableList<T>) -> void = quicksortRange(list, 0, list.size - 1)
+	static func quicksortInplace<type T: Comparable<-T>>(list: List<T>) -> void = quicksortRange(list, 0, list.size - 1)
 
-	private static func quicksortRange<type T: Comparable<-T>>(list: MutableList<T>, left: int, right: int) -> void {
+	private static func quicksortRange<type T: Comparable<-T>>(list: List<T>, left: int, right: int) -> void {
 		var i = left
 		var j = right
 		let pivot = list[left + ((right - left) >>> 1)]

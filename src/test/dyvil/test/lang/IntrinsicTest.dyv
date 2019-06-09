@@ -3,6 +3,8 @@ package dyvil.test.lang
 using dyvil.test.JUnit
 using dyvil.reflect.Opcodes._
 
+import java.util.{ List, ArrayList }
+
 infix operator +- { precedence 100, associativity left }
 
 class IntrinsicTest {
@@ -44,7 +46,7 @@ class IntrinsicTest {
 
 	@Test
 	func order() -> void {
-		let order = MutableList<int>()
+		let order = ArrayList<int>()
 		let res1 = orderTest(first: { order.add 1; 1 }, second: { order.add 2; 2 })
 		let res2 = orderTest({ order.add 2; 2 }, { order.add 1; 1 })
 

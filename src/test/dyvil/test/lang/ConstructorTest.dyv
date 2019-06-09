@@ -1,7 +1,8 @@
 package dyvil.test.lang
 
-using dyvil.Collections
 using dyvil.test.JUnit
+
+import java.util.{ List, ArrayList }
 
 class ConstructorTest
 {
@@ -33,23 +34,23 @@ class ConstructorTest
 	static case object O extends A(1, 1)
 
 	static class InitOrder {
-		public var order = MutableList<String>()
+		public var order = ArrayList<String>()
 
 		let i: int = {
-			this.order += "init s"
+			this.order.add("init s")
 			0
 		}
 
 		init {
-			this.order += "init block"
+			this.order.add("init block")
 		}
 
 		public init() : this(1) {
-			this.order += "init() body"
+			this.order.add("init() body")
 		}
 
 		public init(value: int) {
-			this.order += "init(int) body"
+			this.order.add("init(int) body")
 		}
 	}
 

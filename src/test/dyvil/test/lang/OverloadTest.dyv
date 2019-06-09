@@ -2,6 +2,8 @@ package dyvil.test.lang
 
 using dyvil.test.JUnit
 
+import java.util.{ List, Set }
+
 class OverloadTest {
 	static let o = new Object
 	static let s = ""

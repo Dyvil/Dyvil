@@ -1,8 +1,9 @@
 package dyvil.test.lang
 
-using dyvil.Collections
-using dyvil.Functions
 using dyvil.test.JUnit
+using dyvil.Functions
+
+import java.util.{ List, ArrayList }
 
 class LambdaTest {
 	@Test func basic() -> void {
@@ -81,19 +82,19 @@ class LambdaTest {
 	static func repeatClosure(times: int, function: -> void) -> void = for (i <- 0 ..< times) { function() }
 
 	@Test func capture() -> void {
-		let result = List<String>()
+		let result = ArrayList<String>()
 
 		// capturing
-		let function1: -> void = => result += "a"
+		let function1: -> void = => result.add("a")
 
 		// non-capturing
 		let function2: -> String = => "b"
 
 		// capturing another closure
-		repeatClosure(3) { result += function2() }
+		repeatClosure(3) { result.add(function2()) }
 
 		// named
-		with("c") { it => result += it }
+		with("c") { it => result.add(it) }
 
 		function1()
 

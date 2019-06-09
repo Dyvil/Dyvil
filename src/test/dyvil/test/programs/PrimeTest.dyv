@@ -3,6 +3,8 @@ package dyvil.test.programs
 using dyvil.test.JUnit
 using dyvil.Math
 
+import java.util.{ List, ArrayList }
+
 class PrimeTest {
 	@Test
 	func isPrime() -> void {
@@ -50,7 +52,7 @@ class PrimeTest {
 			return List(1)
 		}
 
-		let res = List<int>()
+		let res = ArrayList<int>()
 
 		label outer:
 		while value > 1 {
@@ -63,6 +65,6 @@ class PrimeTest {
 			}
 		}
 
-		return res.immutable
+		return res.unmodifiableView
 	}
 }

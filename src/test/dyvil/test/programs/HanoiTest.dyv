@@ -2,6 +2,8 @@ package dyvil.test.programs
 
 using dyvil.test.JUnit
 
+import java.util.{ List, LinkedList, ArrayList }
+
 class HanoiTest {
 	@Test
 	func hanoi() -> void {
@@ -13,12 +15,12 @@ class HanoiTest {
 	static func requiredMoves(n: int) -> int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
-	static class Tower(public let id: String) extends mutable.LinkedList<int> {
+	static class Tower(public let id: String) extends LinkedList<int> {
 		static func apply(id: String) -> Tower = new Tower(id)
 	}
 
 	static func run(n: int) -> List<String> {
-		let moves = List<String>()
+		let moves = ArrayList<String>()
 
 		let source: Tower = 'source'
 		for i <- 1 .. n {
@@ -31,7 +33,7 @@ class HanoiTest {
 	}
 
 	static func move(moves: List<String>, from: Tower, to: Tower) -> void {
-		if let item = from.pop() {
+		if let item = from.pop() as int? {
 			moves.add "Move \(item) from \(from.id) to \(to.id)"
 			to.push(item)
 		}

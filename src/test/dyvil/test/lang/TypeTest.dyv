@@ -2,6 +2,8 @@ package dyvil.test.lang
 
 using dyvil.test.JUnit
 
+import java.util.{ Collection, List }
+
 infix operator <<< { 120 }
 
 class TypeTest {
@@ -55,7 +57,7 @@ class TypeTest {
 
 	// --------------- Dependent Type Parameters ---------------
 
-	infix func <<< <T, C: Collection<T>>(collection: C, element: T) -> Collection<T> = collection.added(element)
+	infix func <<< <T, C: List<T>>(list: C, element: T) -> List<T> = list + element
 
 	@Test func dependentTypeParams() -> void {
 		let added = List(1, 2, 3) <<< 1
