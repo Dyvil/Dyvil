@@ -126,7 +126,7 @@ public class DynamicLinker
 			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(type);
 			return invokeWith(callSite, args, type, receiverClass, target, CHECK_CLASS);
 		}
-		catch (NoSuchMethodException ex)
+		catch (NoSuchMethodException | IllegalAccessException ex)
 		{
 			final MethodHandle fallbackMethod = callSite.fallback;
 			if (fallbackMethod != null)
