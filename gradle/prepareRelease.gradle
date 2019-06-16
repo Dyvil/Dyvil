@@ -1,29 +1,11 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
-tasks.register('prepareRelease', Copy) {
-	outputs.upToDateWhen { false }
-
-	from 'versions/'
-	into "versions/$rootProject.versionDir"
-	include 'template.dyp'
-	rename 'template\\.dyp', "v${ rootProject.version }.dyp"
-
-	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
-			version        : rootProject.version,
-			libraryVersion : project(':library').version,
-			compilerVersion: project(':compiler').version,
-			replVersion    : project(':repl').version,
-			dpfVersion     : project(':dpf').version,
-			genSrcVersion  : project(':gensrc').version
-	])
-
+tasks.register('prepareRelease') {
 	doLast {
 		println "Release v$rootProject.version"
 		println ""
-		println "Library v" + project(':library').version
-		println "Compiler v" + project(':compiler').version
-		println "REPL v" + project(':repl').version
-		println "Dyvil Property Format v" + project(':dpf').version
-		println "GenSrc v" + project(':gensrc').version
+		println "Library v${ project(':library').version }"
+		println "Compiler v${ project(':compiler').version }"
+		println "REPL v${ project(':repl').version }"
+		println "Dyvil Property Format v${ project(':dpf').version }"
+		println "GenSrc v${ project(':gensrc').version }"
 	}
 }
