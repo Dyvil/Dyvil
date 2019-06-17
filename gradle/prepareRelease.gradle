@@ -5,7 +5,6 @@ tasks.register('prepareRelease') {
 		println "Library v${ project(':library').version }"
 		println "Compiler v${ project(':compiler').version }"
 		println "REPL v${ project(':repl').version }"
-		println "Dyvil Property Format v${ project(':dpf').version }"
 		println "GenSrc v${ project(':gensrc').version }"
 	}
 }

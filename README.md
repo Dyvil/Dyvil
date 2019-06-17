@@ -12,7 +12,6 @@
 | Compiler | [![Download Compiler](https://api.bintray.com/packages/dyvil/maven/compiler/images/download.svg) ](https://bintray.com/dyvil/maven/compiler/_latestVersion) |
 | REPL | [![Download REPL](https://api.bintray.com/packages/dyvil/maven/repl/images/download.svg) ](https://bintray.com/dyvil/maven/repl/_latestVersion) |
 | GenSrc | [![Download GenSrc](https://api.bintray.com/packages/dyvil/maven/gensrc/images/download.svg) ](https://bintray.com/dyvil/maven/gensrc/_latestVersion) |
-| DPF | [![Download DPF](https://api.bintray.com/packages/dyvil/maven/dpf/images/download.svg) ](https://bintray.com/dyvil/maven/dpf/_latestVersion) |
 
 | Branch | Status |
 |--------|--------|

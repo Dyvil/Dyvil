@@ -1,8 +1,0 @@
-package dyvilx.tools.dpf.visitor
-
-interface ListVisitor
-{
-	func visitElement() -> ValueVisitor
-
-	func visitEnd() -> void { }
-}
