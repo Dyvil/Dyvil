@@ -83,3 +83,21 @@
 ## Dyvil Property Format v0.16.1
 
 ## Dyvil GenSrc v0.9.5
+
+# Dyvil v0.45.1
+
+## Dyvil Library v0.45.0
+
+## Dyvil Compiler v0.45.0
+
+## Dyvil REPL v0.27.1
+
+* Bumped version number.
+
+## Dyvil Property Format v0.16.2
+
+* Bumped version number.
+
+## Dyvil GenSrc v0.9.6
+
+* Bumped version number.
