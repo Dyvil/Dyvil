@@ -79,7 +79,7 @@ class LambdaTest {
 
 	// --------------- Capture ---------------
 
-	static func repeatClosure(times: int, function: -> void) -> void = for (i <- 0 ..< times) { function() }
+	static func repeatClosure(times: int, function: -> void) -> void = for i <- 0 ..< times { function() }
 
 	@Test func capture() -> void {
 		let result = ArrayList<String>()
