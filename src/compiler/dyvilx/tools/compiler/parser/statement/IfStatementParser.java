@@ -14,6 +14,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -102,8 +103,11 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			switch (type)
 			{
 			case BaseSymbols.COMMA:
+				this.mode = CONDITION_PART;
+				return;
 			case BaseSymbols.SEMICOLON:
-				if (this.parentheses && !this.hasCondition())
+				// semicolon only allowed within parentheses, otherwise treated as end of if statements / empty action
+				if (this.parentheses)
 				{
 					this.mode = CONDITION_PART;
 					return;
@@ -116,12 +120,13 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 					return;
 				}
 				break; // then
+			default:
+				if (this.parentheses)
+				{
+					pm.report(token, "if.close_paren");
+				}
 			}
 
-			if (this.parentheses)
-			{
-				pm.report(token, "if.close_paren");
-			}
 			// Fallthrough
 		case THEN:
 			switch (type)
