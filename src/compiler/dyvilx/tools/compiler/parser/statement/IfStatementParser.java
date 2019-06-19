@@ -144,7 +144,8 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			final IToken next = token.next();
 			if (type == DyvilKeywords.ELSE)
 			{
-				if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+				final int nextType = next.type();
+				if (nextType != BaseSymbols.OPEN_CURLY_BRACKET && nextType != DyvilKeywords.IF)
 				{
 					ForStatementParser.reportSingleStatement(pm, next, "else.single.deprecated");
 				}
@@ -157,7 +158,8 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			{
 				// ... inferred_semicolon else
 				final IToken nextNext = next.next();
-				if (nextNext.type() != BaseSymbols.OPEN_CURLY_BRACKET)
+				final int nextNextType = nextNext.type();
+				if (nextNextType != BaseSymbols.OPEN_CURLY_BRACKET && nextNextType != DyvilKeywords.IF)
 				{
 					ForStatementParser.reportSingleStatement(pm, nextNext, "else.single.deprecated");
 				}
