@@ -73,6 +73,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.parenthesis = true;
+				pm.report(Markers.syntaxWarning(token, "for.paren.deprecated"));
 				return;
 			}
 			// Fallthrough

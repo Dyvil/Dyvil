@@ -12,6 +12,7 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
+import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -99,6 +100,7 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = CATCH_CLOSE;
+				pm.report(Markers.syntaxWarning(token, "catch.paren.deprecated"));
 				pm.pushParser(new DataMemberParser<>(this));
 			}
 			else

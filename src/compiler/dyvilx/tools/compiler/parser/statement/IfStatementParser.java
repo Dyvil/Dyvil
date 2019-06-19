@@ -76,6 +76,7 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			{
 				this.parentheses = true;
 				this.mode = CONDITION_PART;
+				pm.report(Markers.syntaxWarning(token, "if.paren.deprecated"));
 				return;
 			}
 			// Fallthrough
