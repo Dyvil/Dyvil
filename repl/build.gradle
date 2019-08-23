@@ -8,7 +8,7 @@ plugins {
 
 // --------------- Info ---------------
 
-version = '0.27.1'
+version = getTagVersion('repl/')
 description = 'The Dyvil REPL interactive shell'
 publishInfo.labels = [ 'dyvil', 'repl', 'interactive', 'shell' ]
 

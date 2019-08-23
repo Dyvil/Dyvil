@@ -1,3 +1,5 @@
+import java.util.regex.Matcher
+
 // --------------- Plugins ---------------
 
 plugins {
@@ -15,7 +17,7 @@ allprojects {
 
 // --------------- Info ---------------
 
-version = '0.45.1'
+version = getTagVersion()
 description = 'The Dyvil programming language.'
 publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
 
@@ -60,6 +62,26 @@ ext {
 	genSrcFilters = [ '**/*.dgt', '**/*.dgs', '**/*.dgc', '**/*.dgh' ]
 	binaryFilters = [ '**/*.dyo', '**/*.class' ]
 	resourceFilters = [ '**/*.properties' ]
+
+	getTagVersion = this.&getTagVersion
+}
+
+private static String getTagVersion(String module = '') {
+	if (!module.isEmpty() && !module.endsWith("/")) {
+		module += '/'
+	}
+
+	final Matcher matcher = 'git tag --sort=-version:refname'.execute().text =~ module + 'v(.*)'
+	matcher.find()
+
+	final String newestTag = matcher.group(0)
+	final String newestVersion = matcher.group(1)
+	final String commitCount = "git rev-list $newestTag.. --count".execute().text.trim()
+	if (commitCount == "0") {
+		return newestVersion
+	}
+	final String commitID = 'git rev-parse --short HEAD'.execute().text.trim()
+	return newestVersion + '-' + commitCount + '-' + commitID
 }
 
 apply from: 'gradle/dependencies.gradle'

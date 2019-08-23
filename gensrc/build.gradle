@@ -6,7 +6,7 @@ plugins {
 
 // --------------- Info ---------------
 
-version = '0.9.6'
+version = getTagVersion('gensrc/')
 description = 'The Dyvil GenSrc template source code generator'
 publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
 

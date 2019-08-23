@@ -1,6 +1,6 @@
 // --------------- Info ---------------
 
-version = '0.45.0'
+version = getTagVersion('library/')
 description = 'The Dyvil Standard Library'
 publishInfo.labels = [ 'dyvil', 'library' ]
 
