@@ -11,6 +11,7 @@ import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.marker.MarkerPrinter;
 import dyvilx.tools.parsing.marker.MarkerStyle;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 public interface ICompilationUnit extends ASTNode
@@ -59,7 +60,16 @@ public interface ICompilationUnit extends ASTNode
 			compiler.log("");
 		}
 
-		printer.print(markers, new OutputStreamWriter(compiler.getOutput()));
+		final OutputStreamWriter writer = new OutputStreamWriter(compiler.getOutput());
+		printer.print(markers, writer);
+		try
+		{
+			writer.flush();
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace(compiler.getErrorOutput());
+		}
 
 		if (compiler.config.isDebug())
 		{
