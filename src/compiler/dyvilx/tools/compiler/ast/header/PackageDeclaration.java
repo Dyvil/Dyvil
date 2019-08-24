@@ -72,13 +72,13 @@ public class PackageDeclaration implements ASTNode
 
 	public void check(MarkerList markers, Package enclosingPackage)
 	{
+		final String fullName = enclosingPackage.getFullName();
 		if (enclosingPackage == Package.rootPackage)
 		{
-			markers.add(Markers.semanticError(this.position, "package_declaration.default_package"));
+			markers.add(Markers.semanticError(this.position, "package_declaration.default_package", fullName));
 			return;
 		}
 
-		final String fullName = enclosingPackage.getFullName();
 		if (!this.fullPackageName.equals(fullName))
 		{
 			markers.add(
