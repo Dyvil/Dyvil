@@ -5,18 +5,52 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
 import dyvilx.tools.compiler.phase.PrintPhase;
 import dyvilx.tools.compiler.util.Util;
-import dyvilx.tools.parsing.marker.MarkerStyle;
+import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Set;
 
 public final class ArgumentParser
 {
+	private static final String USAGE  = "dyvilc <options>";
 
-	public static void parseArgument(String argument, DyvilCompiler compiler)
+	public static boolean parseArguments(String[] arguments, DyvilCompiler compiler)
+	{
+		final Options options = new Options();
+		compiler.config.addOptions(options);
+
+		final CommandLineParser parser = new DefaultParser();
+		final HelpFormatter formatter = new HelpFormatter();
+		final CommandLine cmd;
+
+		try
+		{
+			cmd = parser.parse(options, arguments);
+		}
+		catch (ParseException e)
+		{
+			compiler.getOutput().println(e.getMessage());
+			final PrintWriter writer = new PrintWriter(compiler.getOutput());
+			formatter.printHelp(writer, 80, USAGE, "", options, 2, 1, "");
+			writer.flush();
+			return false;
+		}
+
+		compiler.config.readOptions(cmd);
+
+		for (final String extraArg : cmd.getArgList())
+		{
+			parseArgument(extraArg, compiler);
+		}
+
+		return true;
+	}
+
+	private static void parseArgument(String argument, DyvilCompiler compiler)
 	{
 		CompilerConfig config = compiler.config;
 		Set<ICompilerPhase> phases = compiler.phases;
@@ -58,41 +92,6 @@ public final class ArgumentParser
 		case "test":
 			phases.add(ICompilerPhase.TEST);
 			return;
-		case "--debug":
-			phases.add(ICompilerPhase.PRINT); // print after parse
-			phases.add(ICompilerPhase.TEST);
-			config.setDebug(true);
-			return;
-		case "--ansi":
-			config.setAnsiColors(true);
-			return;
-		case "-Mg":
-		case "-Mgcc":
-		case "--gcc-markers":
-			config.setMarkerStyle(MarkerStyle.GCC);
-			return;
-		case "-Mm":
-		case "-Mmachine":
-		case "--machine-markers":
-			config.setMarkerStyle(MarkerStyle.MACHINE);
-			return;
-		}
-
-		// - - - - - - - - Optimization Level - - - - - - - -
-
-		if (argument.startsWith("-o"))
-		{
-			final String level = argument.substring(2);
-			try
-			{
-				phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				config.setConstantFolding(Integer.parseInt(level));
-			}
-			catch (Exception ignored)
-			{
-				compiler.warn(I18n.get("argument.optimisation.invalid", argument, level));
-			}
-			return;
 		}
 
 		// - - - - - - - - Argument File - - - - - - - -
@@ -108,6 +107,7 @@ public final class ArgumentParser
 		if (argument.startsWith("print:"))
 		{
 			final String phase = argument.substring(6);
+			compiler.warn(I18n.get("argument.print.deprecated", phase));
 
 			for (ICompilerPhase compilerPhase : phases)
 			{
@@ -126,9 +126,12 @@ public final class ArgumentParser
 
 		if (ArgumentParser.readProperty(argument, config))
 		{
+			compiler.warn(I18n.get("argument.property.deprecated"));
+
 			return;
 		}
 
+		// TODO handle source files
 		compiler.warn(I18n.get("argument.invalid", argument));
 	}
 

@@ -108,8 +108,10 @@ public class DyvilCompiler extends BasicTool
 
 	public boolean baseInit(String[] args)
 	{
-		// Sets up States from arguments
-		this.processArguments(args);
+		if (!ArgumentParser.parseArguments(args, this))
+		{
+			return false;
+		}
 
 		final List<File> sourceDirs = this.config.sourceDirs;
 		if (sourceDirs.isEmpty())
@@ -128,19 +130,6 @@ public class DyvilCompiler extends BasicTool
 
 		this.log(I18n.get("config.source_path.not_found", sourceDirs));
 		return false;
-	}
-
-	public void processArguments(String[] args)
-	{
-		for (String arg : args)
-		{
-			this.processArgument(arg);
-		}
-	}
-
-	public void processArgument(String arg)
-	{
-		ArgumentParser.parseArgument(arg, this);
 	}
 
 	public void loadLibraries()

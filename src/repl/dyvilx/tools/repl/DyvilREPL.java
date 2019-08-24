@@ -4,6 +4,7 @@ import dyvil.io.Files;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.config.ArgumentParser;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.SemicolonInference;
@@ -112,7 +113,7 @@ public final class DyvilREPL
 
 		Names.init();
 
-		this.compiler.processArguments(args);
+		ArgumentParser.parseArguments(args, this.compiler);
 
 		if (this.compiler.config.isDebug())
 		{
