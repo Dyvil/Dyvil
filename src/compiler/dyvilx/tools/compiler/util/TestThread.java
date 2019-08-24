@@ -30,11 +30,12 @@ public final class TestThread extends Thread
 			final long start = System.nanoTime();
 			Process p = pb.start();
 			p.waitFor();
-
-			final long end = System.nanoTime();
 			final int exitCode = p.exitValue();
 
-			this.compiler.log(I18n.get("test.completed", exitCode, Util.toTime(end - start)));
+			if (this.compiler.config.isDebug())
+			{
+				this.compiler.log(I18n.get("test.completed", exitCode, Util.toTime(System.nanoTime() - start)));
+			}
 			if (exitCode != 0)
 			{
 				this.compiler.fail();

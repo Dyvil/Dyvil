@@ -44,92 +44,77 @@ public class DyvilCompiler extends BasicTool
 	@Override
 	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
 	{
-		final long startTime = System.nanoTime();
-
 		this.initOutput(out, err);
-
-		this.log(I18n.get("compiler.init", DyvilCompiler.VERSION, DyvilCompiler.DYVIL_VERSION));
-		this.log("");
-
-		final int exitCode = this.run(arguments);
-
-		final long endTime = System.nanoTime();
-		final boolean colors = this.config.useAnsiColors();
-
-		final StringBuilder builder = new StringBuilder();
-
-		if (exitCode != 0)
+		try
 		{
-			if (colors)
-			{
-				builder.append(Console.ANSI_RED);
-			}
-			builder.append(I18n.get("compilation.failure"));
+			this.run(arguments);
 		}
-		else
+		finally
 		{
-			if (colors)
-			{
-				builder.append(Console.ANSI_GREEN);
-			}
-			builder.append(I18n.get("compilation.success"));
+			this.shutdown();
 		}
-		if (colors)
-		{
-			builder.append(Console.ANSI_RESET);
-		}
-
-		builder.append(" (").append(Util.toTime(endTime - startTime)).append(')');
-
-		this.log(builder.toString());
 		return this.getExitCode();
 	}
 
-	private int run(String[] arguments)
+	private void run(String[] args)
 	{
-		if (!this.baseInit(arguments))
-		{
-			this.shutdown();
-			return -1;
-		}
+		long startTime = System.nanoTime();
 
-		this.loadLibraries();
-		this.findFiles();
-
-		if (!this.applyPhases())
-		{
-			this.shutdown();
-			return -1;
-		}
-
-		this.shutdown();
-		return this.getExitCode();
-	}
-
-	public boolean baseInit(String[] args)
-	{
 		if (!ArgumentParser.parseArguments(args, this))
 		{
-			return false;
+			return;
+		}
+
+		if (this.config.isDebug())
+		{
+			this.log(I18n.get("compiler.init", DyvilCompiler.VERSION, DyvilCompiler.DYVIL_VERSION));
+			this.log("");
 		}
 
 		final List<File> sourceDirs = this.config.sourceDirs;
 		if (sourceDirs.isEmpty())
 		{
-			this.log(I18n.get("config.source_path.missing"));
-			return false;
+			this.warn(I18n.get("config.source_path.missing"));
+			return;
 		}
 
-		for (File file : sourceDirs)
+		if (sourceDirs.stream().noneMatch(File::exists))
 		{
-			if (file.exists())
-			{
-				return true;
-			}
+			this.warn(I18n.get("config.source_path.not_found", sourceDirs));
+			return;
 		}
 
-		this.log(I18n.get("config.source_path.not_found", sourceDirs));
-		return false;
+		this.loadLibraries();
+		this.findFiles();
+
+		if (this.config.isDebug())
+		{
+			this.log(I18n.get("compilation.init", sourceDirs, this.config.getOutputDir()));
+		}
+
+		if (!this.applyPhases())
+		{
+			return; // applyPhases prints a message
+		}
+
+		if (!this.config.isDebug())
+		{
+			return;
+		}
+
+		final String time = Util.toTime(System.nanoTime() - startTime);
+		final String key = this.isCompilationFailed() ? "compilation.failure" : "compilation.success";
+		final String message = I18n.get(key, time);
+
+		if (this.config.useAnsiColors())
+		{
+			final String color = this.isCompilationFailed() ? Console.ANSI_RED : Console.ANSI_GREEN;
+			this.log(Console.styled(message, color));
+		}
+		else
+		{
+			this.log(message);
+		}
 	}
 
 	public void loadLibraries()
@@ -151,24 +136,23 @@ public class DyvilCompiler extends BasicTool
 
 		Package.initRoot(this);
 
-		final long endTime = System.nanoTime();
-		this.log(I18n.get("library.found", libs == 1 ? I18n.get("libraries.1") : I18n.get("libraries.n", libs),
-		                  Util.toTime(endTime - startTime)));
+		if (this.config.isDebug())
+		{
+			final long endTime = System.nanoTime();
+			this.log(I18n.get("library.found", libs == 1 ? I18n.get("libraries.1") : I18n.get("libraries.n", libs),
+			                  Util.toTime(endTime - startTime)));
+		}
 	}
 
-	protected void findFiles()
+	private void findFiles()
 	{
-		final long startTime = System.nanoTime();
-
-		final List<File> sourceDirs = this.config.sourceDirs;
-		final File outputDir = this.config.getOutputDir();
-
-		this.log(I18n.get("compilation.init", sourceDirs, outputDir));
-
-		// Scan for Packages and Compilation Units
 		this.setupFileFinder();
 
-		for (File sourceDir : sourceDirs)
+		final File outputDir = this.config.getOutputDir();
+		final long startTime = System.nanoTime();
+
+		// Scan for Packages and Compilation Units
+		for (File sourceDir : this.config.getSourceDirs())
 		{
 			this.fileFinder.process(this, sourceDir, outputDir, Package.rootPackage);
 		}
@@ -179,14 +163,17 @@ public class DyvilCompiler extends BasicTool
 		this.fileFinder.units.sort(
 			Comparator.comparing(unit -> unit.getFileSource().file().getAbsolutePath(), String.CASE_INSENSITIVE_ORDER));
 
-		final int fileCount = this.fileFinder.files.size();
-		final int unitCount = this.fileFinder.units.size();
+		if (this.config.isDebug())
+		{
+			final int fileCount = this.fileFinder.files.size();
+			final int unitCount = this.fileFinder.units.size();
 
-		final long endTime = System.nanoTime();
+			final long endTime = System.nanoTime();
 
-		this.log(I18n.get("files.found", fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
-		                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
-		                  Util.toTime(endTime - startTime)));
+			this.log(I18n.get("files.found", fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
+			                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
+			                  Util.toTime(endTime - startTime)));
+		}
 	}
 
 	protected void setupFileFinder()
@@ -197,7 +184,7 @@ public class DyvilCompiler extends BasicTool
 		this.fileFinder.registerFileType(".dyvilh", DYVIL_HEADER); // legacy
 	}
 
-	public boolean applyPhases()
+	private boolean applyPhases()
 	{
 		if (!this.config.isDebug())
 		{
@@ -249,7 +236,10 @@ public class DyvilCompiler extends BasicTool
 	{
 		if (this.config.getMainType() == null)
 		{
-			this.log(I18n.get("test.skipped"));
+			if (this.config.isDebug())
+			{
+				this.log(I18n.get("test.skipped"));
+			}
 			return;
 		}
 

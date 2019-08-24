@@ -45,7 +45,10 @@ public final class JarLibrary extends Library
 	{
 		try
 		{
-			this.jarFileSystem.close();
+			if (this.jarFileSystem != null)
+			{
+				this.jarFileSystem.close();
+			}
 		}
 		catch (IOException ignored)
 		{

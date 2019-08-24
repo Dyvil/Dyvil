@@ -150,8 +150,10 @@ public final class ArgumentParser
 
 			Files.lines(file.toPath(), StandardCharsets.UTF_8).forEach(line -> parseArgument(line, compiler));
 
-			final long endTime = System.nanoTime();
-			compiler.log(I18n.get("config.loaded", source, Util.toTime(endTime - startTime)));
+			if (compiler.config.isDebug())
+			{
+				compiler.log(I18n.get("config.loaded", source, Util.toTime(System.nanoTime() - startTime)));
+			}
 		}
 		catch (IOException ex)
 		{

@@ -133,9 +133,7 @@ public final class DyvilREPL
 
 		if (this.compiler.config.isDebug())
 		{
-			final long endTime = System.nanoTime();
-
-			this.compiler.log(I18n.get("repl.loaded", Util.toTime(endTime - startTime)));
+			this.compiler.log(I18n.get("repl.loaded", Util.toTime(System.nanoTime() - startTime)));
 		}
 
 		for (File file : this.getConfig().getAutoLoadFiles())

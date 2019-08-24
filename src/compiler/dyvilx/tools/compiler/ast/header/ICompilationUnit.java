@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.ast.header;
 
 import dyvil.io.Console;
-import dyvil.io.StringBuilderWriter;
 import dyvil.lang.Name;
 import dyvil.source.FileSource;
 import dyvilx.tools.compiler.DyvilCompiler;
@@ -11,6 +10,8 @@ import dyvilx.tools.parsing.ASTNode;
 import dyvilx.tools.parsing.marker.MarkerList;
 import dyvilx.tools.parsing.marker.MarkerPrinter;
 import dyvilx.tools.parsing.marker.MarkerStyle;
+
+import java.io.OutputStreamWriter;
 
 public interface ICompilationUnit extends ASTNode
 {
@@ -51,32 +52,32 @@ public interface ICompilationUnit extends ASTNode
 		final MarkerStyle style = compiler.config.getMarkerStyle();
 		final boolean colors = compiler.config.useAnsiColors();
 		final MarkerPrinter printer = new MarkerPrinter(source, style, colors);
-		final StringBuilder builder = new StringBuilder();
 
-		if (style == MarkerStyle.DYVIL)
+		if (compiler.config.isDebug())
 		{
-			builder.append(I18n.get("unit.problems", fileType.getLocalizedName(), name, source.file()));
-			builder.append("\n\n");
+			compiler.log(I18n.get("unit.problems", fileType.getLocalizedName(), name, source.file()));
+			compiler.log("");
 		}
 
-		printer.print(markers, new StringBuilderWriter(builder));
+		printer.print(markers, new OutputStreamWriter(compiler.getOutput()));
 
-		if (style == MarkerStyle.DYVIL)
+		if (compiler.config.isDebug())
 		{
+			final StringBuilder summary = new StringBuilder();
+
 			final int warnings = markers.getWarnings();
 			if (warnings > 0)
 			{
-				// TODO v0.45.0: Console.colored
+				final String warningsStr =
+					warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings);
 
 				if (colors)
 				{
-					builder.append(Console.ANSI_YELLOW);
+					Console.appendStyled(summary, warningsStr, Console.ANSI_YELLOW);
 				}
-				builder.append(warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings));
-
-				if (colors)
+				else
 				{
-					builder.append(Console.ANSI_RESET);
+					summary.append(warningsStr);
 				}
 			}
 
@@ -84,35 +85,26 @@ public interface ICompilationUnit extends ASTNode
 			{
 				if (warnings > 0)
 				{
-					builder.append(", ");
+					summary.append(", ");
 				}
 
 				if (colors)
 				{
-					builder.append(Console.ANSI_RED);
+					summary.append(Console.ANSI_RED);
 				}
 
-				builder.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
-				builder.append(": ");
-				builder.append(I18n.get("unit.problems.not_compiled", fileType.getLocalizedName(), name));
+				summary.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
+				summary.append(": ");
+				summary.append(I18n.get("unit.problems.not_compiled", fileType.getLocalizedName(), name));
 
 				if (colors)
 				{
-					builder.append(Console.ANSI_RESET);
+					summary.append(Console.ANSI_RESET);
 				}
 			}
 
-			builder.append('\n');
+			compiler.log(summary.toString());
 		}
-
-		// remove trailing newline because compiler.log uses println
-		// TODO v0.45.0: StringBuilders.last / StringBuilders.removeLast
-		if (builder.charAt(builder.length() - 1) == '\n')
-		{
-			builder.deleteCharAt(builder.length() - 1);
-		}
-
-		compiler.log(builder.toString());
 
 		if (errors > 0)
 		{
