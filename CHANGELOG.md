@@ -101,3 +101,34 @@
 ## Dyvil GenSrc v0.9.6
 
 * Bumped version number.
+
+# Dyvil v0.46.0
+
+## Dyvil Library v0.46.0
+
+- Removed the deprecated `CharUtils` class.
+- Removed the deprecated subclasses of `Marker`.
+
+## Dyvil Compiler v0.46.0
+
++ Added a more standardized command-line option format. #489
+* Binding if statements no longer require parentheses when using a condition. #486
+* Deprecated parentheses in if statements, for loops and catch blocks. #488
+* Deprecated the old command-line option format. #489
+* Fixed a '%s' instead of the package name in the `package_declaration.default_package` message.
+* Fixed a possible NPE in `Library.unloadLibrary`.
+* Fixed incorrect marker formatting for `Deprecated.forRemoval` values.
+* Informational output is now omitted without the `--debug` option. #489
+* The `else if` idiom no longer produces a single-statement else warning. #485
+
+## Dyvil REPL v0.28.0
+
++ Added a more standardized command-line option format. #489
+* Deprecated the old command-line option format. #489
+* Informational output is now omitted without the `--debug` option. #489
+
+## Dyvil GenSrc v0.10.0
+
++ Added a more standardized command-line option format. #489
+* Deprecated the old command-line option format. #489
+* Informational output is now omitted without the `--debug` option. #489
