@@ -419,6 +419,8 @@ public class CompilerConfig
 		                  "sets the maximum constant depth for constant expression resolution. can be any non-negative integer");
 		options.addOption("F", "max-constant-folding", true,
 		                  "sets the maximum constant folding depth. can be any non-negative integer, 0 = no constant folding");
+		// dump-dir is used by REPL
+		// g/gensrc-dir are used by GenSrc
 
 		options.addOption("o", null, true, "legacy format for max-constant-folding");
 		options.addOption(null, "machine-markers", false, "legacy format for --marker-style=machine");

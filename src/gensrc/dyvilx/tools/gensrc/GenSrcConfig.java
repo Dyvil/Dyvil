@@ -1,6 +1,8 @@
 package dyvilx.tools.gensrc;
 
 import dyvilx.tools.compiler.config.CompilerConfig;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 
 import java.io.File;
 
@@ -33,5 +35,24 @@ public class GenSrcConfig extends CompilerConfig
 		}
 
 		return super.setProperty(name, value);
+	}
+
+	@Override
+	public void addOptions(Options options)
+	{
+		super.addOptions(options);
+
+		options.addOption("g", "gensrc-dir", true, "the target directory for generated sources");
+	}
+
+	@Override
+	public void readOptions(CommandLine cmd)
+	{
+		super.readOptions(cmd);
+
+		if (cmd.hasOption("gensrc-dir"))
+		{
+			this.setGenSrcDir(new File(cmd.getOptionValue("gensrc-dir")));
+		}
 	}
 }
