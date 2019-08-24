@@ -95,7 +95,7 @@ public interface ICompilationUnit extends ASTNode
 
 				summary.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
 				summary.append(": ");
-				summary.append(I18n.get("unit.problems.not_compiled", fileType.getLocalizedName(), name));
+				summary.append(I18n.get("unit.problems.not_compiled", name, fileType.getLocalizedName()));
 
 				if (colors)
 				{
