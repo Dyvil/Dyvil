@@ -431,13 +431,15 @@ public class CompilerConfig
 		options.addOption(sourceDirs);
 
 		final Option includes = new Option("i", "include-patterns", true,
-		                                   "ant-style include patterns, separated by ','");
+		                                   "ant-style include patterns, separated by '" + File.pathSeparatorChar + "'");
 		includes.setArgs(Option.UNLIMITED_VALUES);
+		sourceDirs.setValueSeparator(File.pathSeparatorChar);
 		options.addOption(includes);
 
 		final Option excludes = new Option("x", "exclude-patterns", true,
-		                                   "ant-style exclude patterns, separated by ','");
+		                                   "ant-style exclude patterns, separated by '" + File.pathSeparatorChar + "'");
 		excludes.setArgs(Option.UNLIMITED_VALUES);
+		sourceDirs.setValueSeparator(File.pathSeparatorChar);
 		options.addOption(excludes);
 
 		final Option classpath = new Option("cp", "classpath", true,
