@@ -26,7 +26,7 @@ public class REPLClassLoader extends ClassLoader
 
 	private static void dumpClass(DyvilREPL repl, ICompilable compilable, byte[] bytes)
 	{
-		final File dumpDir = repl.getDumpDir();
+		final File dumpDir = repl.getConfig().getDumpDir();
 		if (dumpDir == null)
 		{
 			return;
@@ -35,7 +35,7 @@ public class REPLClassLoader extends ClassLoader
 		final String fileName = compilable.getFileName();
 		try
 		{
-			Files.writeData(new File(repl.getDumpDir(), fileName), bytes);
+			Files.writeData(new File(dumpDir, fileName), bytes);
 		}
 		catch (IOException e)
 		{

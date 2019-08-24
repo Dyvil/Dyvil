@@ -4,6 +4,7 @@ import dyvil.io.Files;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
+import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.compiler.parser.DyvilSymbols;
 import dyvilx.tools.compiler.parser.SemicolonInference;
 import dyvilx.tools.compiler.transform.Names;
@@ -22,8 +23,6 @@ import dyvilx.tools.repl.lang.I18n;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,14 +30,18 @@ public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
 
-	protected DyvilCompiler compiler = new DyvilCompiler();
+	protected DyvilCompiler compiler = new DyvilCompiler()
+	{
+		@Override
+		protected CompilerConfig createConfig()
+		{
+			return new REPLConfig(this);
+		}
+	};
 
 	protected REPLContext     context     = new REPLContext(this);
 	protected REPLParser      parser      = new REPLParser(this.context);
 	protected REPLClassLoader classLoader = new REPLClassLoader(this);
-
-	protected File       dumpDir;
-	private   List<File> autoLoadFiles = new ArrayList<>();
 
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
@@ -88,14 +91,9 @@ public final class DyvilREPL
 		return this.parser;
 	}
 
-	public File getDumpDir()
+	public REPLConfig getConfig()
 	{
-		return this.dumpDir;
-	}
-
-	public void setDumpDir(File dumpDir)
-	{
-		this.dumpDir = dumpDir;
+		return (REPLConfig) this.compiler.config;
 	}
 
 	public PrintStream getOutput()
@@ -114,7 +112,7 @@ public final class DyvilREPL
 
 		Names.init();
 
-		this.processArguments(args);
+		this.compiler.processArguments(args);
 
 		if (this.compiler.config.isDebug())
 		{
@@ -139,34 +137,10 @@ public final class DyvilREPL
 			this.compiler.log(I18n.get("repl.loaded", Util.toTime(endTime - startTime)));
 		}
 
-		for (File file : this.autoLoadFiles)
+		for (File file : this.getConfig().getAutoLoadFiles())
 		{
 			this.processFile(file);
 		}
-	}
-
-	private void processArguments(String[] args)
-	{
-		for (String arg : args)
-		{
-			this.processArgument(arg);
-		}
-	}
-
-	private void processArgument(String arg)
-	{
-		if (arg.startsWith("dump_dir="))
-		{
-			this.dumpDir = new File(arg.substring(9).trim());
-			return;
-		}
-		if (arg.startsWith("load="))
-		{
-			this.autoLoadFiles.add(new File(arg.substring(5).trim()));
-			return;
-		}
-
-		this.compiler.processArgument(arg);
 	}
 
 	public void shutdown()

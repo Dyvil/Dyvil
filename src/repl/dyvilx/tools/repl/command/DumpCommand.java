@@ -37,12 +37,12 @@ public class DumpCommand implements ICommand
 		if (argument == null)
 		{
 			repl.getOutput().println(I18n.get("command.dump.disabled"));
-			repl.setDumpDir(null);
+			repl.getConfig().setDumpDir(null);
 			return;
 		}
 
 		File dumpDir = new File(argument);
-		repl.setDumpDir(dumpDir);
+		repl.getConfig().setDumpDir(dumpDir);
 
 		try
 		{
