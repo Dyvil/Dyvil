@@ -62,6 +62,7 @@ public class DyvilCompiler extends BasicTool
 
 		if (!ArgumentParser.parseArguments(args, this))
 		{
+			this.fail();
 			return;
 		}
 
