@@ -132,3 +132,25 @@
 + Added a more standardized command-line option format. #489
 * Deprecated the old command-line option format. #489
 * Informational output is now omitted without the `--debug` option. #489
+
+# Dyvil v0.46.1
+
+## Dyvil Library v0.46.0
+
+## Dyvil Compiler v0.46.1
+
++ Added the `--main-type`, `--main-args` and `--test-dir` options. #493
++ Added the `--jar-name`, `--jar-version`, `--jar-vendor` and `--jar-name-format` options. #493
+* Deprecated the `jar` phase and related options. #492
+* Deprecated the `test` phase and related options. #494
+* Fixed markers not being printed.
+* Fixed weird format of the "'x' was not compiled due to errors in the compilation unit" message.
+* Fixed zero exit code when an option is unrecognized.
+
+## Dyvil REPL v0.28.1
+
++ Added the `--dump-dir` option. #493
+
+## Dyvil GenSrc v0.10.1
+
++ Added the `-g`/`--gensrc-dir` options. #493
