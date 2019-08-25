@@ -423,10 +423,6 @@ public class CompilerConfig
 		// dump-dir is used by REPL
 		// g/gensrc-dir are used by GenSrc
 
-		options.addOption("o", null, true, "legacy format for max-constant-folding");
-		options.addOption(null, "machine-markers", false, "legacy format for --marker-style=machine");
-		options.addOption(null, "gcc-markers", false, "legacy format for --marker-style=gcc");
-
 		final Option sourceDirs = new Option("s", "source-dirs", true,
 		                                     "source directories, separated by '" + File.pathSeparatorChar + "'");
 		sourceDirs.setArgs(Option.UNLIMITED_VALUES);
@@ -521,59 +517,14 @@ public class CompilerConfig
 		{
 			final String optionValue = cmd.getOptionValue("marker-style");
 
-			switch (optionValue)
-			{
-			// TODO deprecated, remove in v0.47.0
-			case "m":
-				this.setMarkerStyle(MarkerStyle.MACHINE);
-				this.compiler.warn(I18n.get("option.marker-style.deprecated", optionValue, "machine"));
-				break;
-			// TODO deprecated, remove in v0.47.0
-			case "g":
-				this.setMarkerStyle(MarkerStyle.GCC);
-				this.compiler.warn(I18n.get("option.marker-style.deprecated", optionValue, "gcc"));
-				break;
-			default:
-				try
-				{
-					this.setMarkerStyle(MarkerStyle.valueOf(optionValue.toUpperCase()));
-				}
-				catch (IllegalArgumentException ex)
-				{
-					this.compiler.warn(I18n.get("option.marker-style.unknown", optionValue));
-				}
-			}
-		}
-
-		// TODO deprecated, remove in v0.47.0
-		if (cmd.hasOption('o'))
-		{
-			final String level = cmd.getOptionValue('o');
-			this.compiler.warn(I18n.get("option.optimisation.deprecated", level));
-
 			try
 			{
-				this.compiler.phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				this.setConstantFolding(Integer.parseInt(level));
+				this.setMarkerStyle(MarkerStyle.valueOf(optionValue.toUpperCase()));
 			}
-			catch (Exception ignored)
+			catch (IllegalArgumentException ex)
 			{
-				this.compiler.warn(I18n.get("option.optimisation.invalid", "-o" + level, level));
+				this.compiler.warn(I18n.get("option.marker-style.unknown", optionValue));
 			}
-		}
-
-		// TODO deprecated, remove in v0.47.0
-		if (cmd.hasOption("machine-markers"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated.alternative", "machine-markers", "0.47.0", "--marker-style=machine"));
-			this.setMarkerStyle(MarkerStyle.MACHINE);
-		}
-
-		// TODO deprecated, remove in v0.47.0
-		if (cmd.hasOption("gcc-markers"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated.alternative", "gcc-markers", "0.47.0", "--marker-style=gcc"));
-			this.setMarkerStyle(MarkerStyle.GCC);
 		}
 
 		if (cmd.hasOption("source-dirs"))
