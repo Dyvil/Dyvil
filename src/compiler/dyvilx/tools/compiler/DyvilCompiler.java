@@ -235,6 +235,9 @@ public class DyvilCompiler extends BasicTool
 
 	public void test()
 	{
+		// TODO deprecated, remove in v0.47.0
+		this.warn(I18n.get("phase.deprecated", "test", "0.47.0"));
+
 		if (this.config.getMainType() == null)
 		{
 			if (this.config.isDebug())

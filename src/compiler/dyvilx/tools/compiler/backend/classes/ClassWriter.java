@@ -82,6 +82,9 @@ public class ClassWriter extends dyvilx.tools.asm.ClassWriter
 
 	public static void generateJAR(DyvilCompiler compiler)
 	{
+		// TODO deprecated, remove in v0.47.0
+		compiler.warn(I18n.get("phase.deprecated", "jar", "0.47.0"));
+
 		final List<File> files = compiler.fileFinder.files;
 		final CompilerConfig config = compiler.config;
 		final String fileName = config.getJarFileName();
