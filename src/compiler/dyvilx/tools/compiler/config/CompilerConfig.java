@@ -614,41 +614,50 @@ public class CompilerConfig
 		}
 
 		// Test Options
+		// TODO deprecated, remove in v0.47.0
 
 		if (cmd.hasOption("main-type"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "main-type", "0.47.0"));
 			this.setMainType(cmd.getOptionValue("main-type"));
 		}
 
 		if (cmd.hasOption("main-args"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "main-args", "0.47.0"));
 			Collections.addAll(this.mainArgs, cmd.getOptionValues("main-args"));
 		}
 
 		if (cmd.hasOption("test-dir"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "test-dir", "0.47.0"));
 			this.setTestDir(new File(cmd.getOptionValue("test-dir")));
 		}
 
 		// Jar Options
+		// TODO deprecated, remove in v0.47.0
 
 		if (cmd.hasOption("jar-name"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "jar-name", "0.47.0"));
 			this.setJarName(cmd.getOptionValue("jar-name"));
 		}
 
 		if (cmd.hasOption("jar-version"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "jar-version", "0.47.0"));
 			this.setJarVersion(cmd.getOptionValue("jar-version"));
 		}
 
 		if (cmd.hasOption("jar-vendor"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "jar-vendor", "0.47.0"));
 			this.setJarVendor(cmd.getOptionValue("jar-vendor"));
 		}
 
 		if (cmd.hasOption("jar-name-format"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "jar-name-format", "0.47.0"));
 			this.setJarNameFormat(cmd.getOptionValue("jar-name-format"));
 		}
 	}
