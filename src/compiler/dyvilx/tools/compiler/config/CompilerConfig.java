@@ -412,6 +412,7 @@ public class CompilerConfig
 
 	public void addOptions(Options options)
 	{
+		// TODO deprecated, remove in v0.47.0
 		options.addOption("L", "log-file", true, "a file path to which output will be logged");
 		options.addOption("D", "debug", false, "enables debug output");
 		options.addOption("A", "ansi", false, "enables colored output using ANSI color codes");
@@ -477,8 +478,10 @@ public class CompilerConfig
 
 	public void readOptions(CommandLine cmd)
 	{
+		// TODO deprecated, remove in v0.47.0
 		if (cmd.hasOption("log-file"))
 		{
+			this.compiler.warn(I18n.get("option.deprecated", "log-file", "0.47.0"));
 			this.setLogFile(new File(cmd.getOptionValue("log-file")));
 		}
 
