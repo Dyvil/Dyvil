@@ -159,30 +159,31 @@ public class CompilerConfig
 
 	public boolean isIncluded(String name)
 	{
-		// All match
-		for (Pattern p : this.excludePatterns)
-		{
-			if (p.matcher(name).find())
-			{
-				return false;
-			}
-		}
+		return this.checkIsIncluded(name) && this.checkNotExcluded(name);
+	}
 
+	@SuppressWarnings("SimplifiableIfStatement")
+	private boolean checkIsIncluded(String name)
+	{
+		// If no include patterns are specified, then all files will be included.
 		if (this.includePatterns.isEmpty())
 		{
 			return true;
 		}
+		// If any include patterns are specified, then a file is included if it matches any of the patterns.
+		return this.includePatterns.stream().anyMatch(p -> p.matcher(name).find());
+	}
 
-		// Any match
-		for (Pattern p : this.includePatterns)
+	@SuppressWarnings("SimplifiableIfStatement")
+	private boolean checkNotExcluded(String name)
+	{
+		// If no exclude patterns are specified, then no files will be excluded.
+		if (this.excludePatterns.isEmpty())
 		{
-			if (p.matcher(name).find())
-			{
-				return true;
-			}
+			return true;
 		}
-
-		return false;
+		// If any exclude patterns are specified, then a file is included only if it matches none of the patterns.
+		return this.excludePatterns.stream().noneMatch(p -> p.matcher(name).find());
 	}
 
 	// - - - - - - - - Libraries - - - - - - - -
