@@ -154,3 +154,15 @@
 ## Dyvil GenSrc v0.10.1
 
 + Added the `-g`/`--gensrc-dir` options. #493
+
+# Dyvil v0.46.1
+
+## Dyvil Library v0.46.0
+
+## Dyvil Compiler v0.46.2
+
+* Fixed name clash with option name `-o`.
+
+## Dyvil REPL v0.28.1
+
+## Dyvil GenSrc v0.10.1
