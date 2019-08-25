@@ -74,10 +74,6 @@ public final class ArgumentParser
 			phases.add(ICompilerPhase.FOLD_CONSTANTS);
 			config.setConstantFolding(CompilerConfig.OPTIMIZE_CONSTANT_FOLDING);
 			return;
-		case "jar":
-			phases.add(ICompilerPhase.CLEAN);
-			phases.add(ICompilerPhase.JAR);
-			return;
 		case "format":
 			phases.add(ICompilerPhase.TOKENIZE);
 			phases.add(ICompilerPhase.PARSE);

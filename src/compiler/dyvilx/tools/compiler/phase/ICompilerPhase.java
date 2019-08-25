@@ -4,7 +4,6 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.io.Files;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.ast.header.ICompilationUnit;
-import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.parsing.lexer.DyvilLexer;
 import dyvilx.tools.parsing.token.IdentifierToken;
@@ -77,11 +76,6 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Compiles the AST to byte code and stores the generated .class files in the bin directory.
 	 */
 	ICompilerPhase COMPILE = new SequentialCompilerPhase(200, "COMPILE", ICompilationUnit::compile);
-
-	/**
-	 * Converts the .class files in the bin directory to a JAR file, sets up the classpath and signs the JAR.
-	 */
-	ICompilerPhase JAR = new CompilerPhase(210, "JAR", ClassWriter::generateJAR);
 
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.

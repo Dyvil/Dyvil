@@ -61,13 +61,6 @@ public class CompilerConfig
 
 	private File outputDir;
 
-	// - - - - - - - - Jar - - - - - - - -
-
-	private String jarName;
-	private String jarVendor;
-	private String jarVersion;
-	private String jarNameFormat = DEFAULT_JAR_FILE_FORMAT;
-
 	// - - - - - - - - Test - - - - - - - -
 
 	private String mainType;
@@ -238,53 +231,6 @@ public class CompilerConfig
 		this.outputDir = outputDir;
 	}
 
-	// - - - - - - - - Jar - - - - - - - -
-
-	public String getJarFileName()
-	{
-		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
-	}
-
-	public String getJarName()
-	{
-		return this.jarName;
-	}
-
-	public void setJarName(String jarName)
-	{
-		this.jarName = jarName;
-	}
-
-	public String getJarVendor()
-	{
-		return this.jarVendor;
-	}
-
-	public void setJarVendor(String jarVendor)
-	{
-		this.jarVendor = jarVendor;
-	}
-
-	public String getJarVersion()
-	{
-		return this.jarVersion;
-	}
-
-	public void setJarVersion(String jarVersion)
-	{
-		this.jarVersion = jarVersion;
-	}
-
-	public String getJarNameFormat()
-	{
-		return this.jarNameFormat;
-	}
-
-	public void setJarNameFormat(String jarNameFormat)
-	{
-		this.jarNameFormat = jarNameFormat;
-	}
-
 	// - - - - - - - - Test - - - - - - - -
 
 	public String getMainType()
@@ -365,14 +311,6 @@ public class CompilerConfig
 		options.addOption(mainArgs);
 
 		options.addOption(null, "test-dir", true, "the working directory to run the test phase in");
-
-		// Jar Options
-
-		options.addOption(null, "jar-name", true, "the name component of the produced jar file");
-		options.addOption(null, "jar-version", true, "the version component of the produced jar file");
-		options.addOption(null, "jar-vendor", true, "the vendor of the produced jar file");
-		options.addOption(null, "jar-name-format", true,
-		                  "the name format of the produced jar file. default: %1$s-%2$s.jar, where %1$s stands for jar-name and %2$s for jar-version");
 	}
 
 	public void readOptions(CommandLine cmd)
@@ -488,33 +426,6 @@ public class CompilerConfig
 		{
 			this.compiler.warn(I18n.get("option.deprecated", "test-dir", "0.47.0"));
 			this.setTestDir(new File(cmd.getOptionValue("test-dir")));
-		}
-
-		// Jar Options
-		// TODO deprecated, remove in v0.47.0
-
-		if (cmd.hasOption("jar-name"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "jar-name", "0.47.0"));
-			this.setJarName(cmd.getOptionValue("jar-name"));
-		}
-
-		if (cmd.hasOption("jar-version"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "jar-version", "0.47.0"));
-			this.setJarVersion(cmd.getOptionValue("jar-version"));
-		}
-
-		if (cmd.hasOption("jar-vendor"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "jar-vendor", "0.47.0"));
-			this.setJarVendor(cmd.getOptionValue("jar-vendor"));
-		}
-
-		if (cmd.hasOption("jar-name-format"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "jar-name-format", "0.47.0"));
-			this.setJarNameFormat(cmd.getOptionValue("jar-name-format"));
 		}
 	}
 }
