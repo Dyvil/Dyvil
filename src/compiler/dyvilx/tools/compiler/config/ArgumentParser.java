@@ -124,13 +124,6 @@ public final class ArgumentParser
 
 		// - - - - - - - - Properties - - - - - - - -
 
-		if (ArgumentParser.readProperty(argument, config))
-		{
-			compiler.warn(I18n.get("argument.property.deprecated"));
-
-			return;
-		}
-
 		// TODO handle source files
 		compiler.warn(I18n.get("argument.invalid", argument));
 	}
@@ -158,31 +151,6 @@ public final class ArgumentParser
 		catch (IOException ex)
 		{
 			compiler.error(I18n.get("config.error", source), ex);
-		}
-	}
-
-	private static boolean readProperty(String arg, CompilerConfig config)
-	{
-		final int index = arg.indexOf('=');
-		if (index <= 1)
-		{
-			return false;
-		}
-
-		final String key;
-		final String value = arg.substring(index + 1);
-
-		if (arg.charAt(index - 1) == '+')
-		{
-			// key+=value
-			key = arg.substring(0, index - 1);
-			return config.addProperty(key, value);
-		}
-		else
-		{
-			// key=value
-			key = arg.substring(0, index);
-			return config.setProperty(key, value);
 		}
 	}
 }

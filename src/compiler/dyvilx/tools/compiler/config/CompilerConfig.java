@@ -1,7 +1,6 @@
 package dyvilx.tools.compiler.config;
 
 import dyvil.io.Files;
-import dyvil.lang.Strings;
 import dyvilx.tools.compiler.DyvilCompiler;
 import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
@@ -314,100 +313,6 @@ public class CompilerConfig
 	}
 
 	// --------------- Dynamic Property Parsing ---------------
-
-	public boolean addProperty(String name, String value)
-	{
-		switch (name)
-		{
-		case "source_dirs":
-			this.sourceDirs.add(new File(value));
-			return true;
-		case "main_args":
-			this.mainArgs.add(value);
-			return true;
-		case "includes":
-		case "include_patterns":
-			this.include(value);
-			return true;
-		case "excludes":
-		case "exclude_patterns":
-			this.exclude(value);
-			return true;
-		case "libraries":
-			this.loadLibrary(value);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean setProperty(String name, String value)
-	{
-		switch (name)
-		{
-		case "jar_name":
-			this.setJarName(value);
-			return true;
-		case "jar_vendor":
-			this.setJarVendor(value);
-			return true;
-		case "jar_version":
-			this.setJarVersion(value);
-			return true;
-		case "jar_format":
-			this.setJarNameFormat(value);
-			return true;
-		case "log_file":
-			this.setLogFile(new File(value));
-			return true;
-		case "source_dir":
-			this.sourceDirs.clear();
-			this.sourceDirs.add(new File(value));
-			return true;
-		case "source_dirs":
-			this.sourceDirs.clear();
-			for (String path : Strings.split(value, ':'))
-			{
-				this.sourceDirs.add(new File(path));
-			}
-			return true;
-		case "output_dir":
-			this.setOutputDir(new File(value));
-			return true;
-		case "main_type":
-			this.setMainType(value);
-			return true;
-		case "main_args": // deprecated
-			this.mainArgs.add(value);
-			return true;
-		case "test_dir":
-			this.setTestDir(new File(value));
-			return true;
-		case "includes":
-		case "include_patterns":
-			this.includePatterns.clear();
-			for (String pattern : Strings.split(value, ':'))
-			{
-				this.include(pattern);
-			}
-			return true;
-		case "excludes":
-		case "exclude_patterns":
-			this.excludePatterns.clear();
-			for (String pattern : Strings.split(value, ':'))
-			{
-				this.exclude(pattern);
-			}
-			return true;
-		case "libraries":
-			this.libraries.clear();
-			for (String path : Strings.split(value, ':'))
-			{
-				this.loadLibrary(path);
-			}
-			return true;
-		}
-		return false;
-	}
 
 	public void addOptions(Options options)
 	{

@@ -26,18 +26,6 @@ public class GenSrcConfig extends CompilerConfig
 	}
 
 	@Override
-	public boolean setProperty(String name, String value)
-	{
-		if ("gensrc_dir".equals(name))
-		{
-			this.setGenSrcDir(new File(value));
-			return true;
-		}
-
-		return super.setProperty(name, value);
-	}
-
-	@Override
 	public void addOptions(Options options)
 	{
 		super.addOptions(options);

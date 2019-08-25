@@ -44,34 +44,6 @@ public class REPLConfig extends CompilerConfig
 	// =============== Methods ===============
 
 	@Override
-	public boolean setProperty(String name, String value)
-	{
-		switch (name)
-		{
-		case "dump_dir":
-			this.setDumpDir(new File(value));
-			return true;
-		case "load":
-			this.autoLoadFiles.clear();
-			this.autoLoadFiles.add(new File(value));
-			return true;
-		}
-
-		return super.setProperty(name, value);
-	}
-
-	@Override
-	public boolean addProperty(String name, String value)
-	{
-		if ("load".equals(name))
-		{
-			this.autoLoadFiles.add(new File(value));
-		}
-
-		return super.addProperty(name, value);
-	}
-
-	@Override
 	public void addOptions(Options options)
 	{
 		super.addOptions(options);
