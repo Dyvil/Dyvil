@@ -52,7 +52,7 @@ abstract class Representation {
 		}
 
 		match valueClass.getName() {
-			case 'java.math.BigInteger' | 'java.math.BigDecimal' => builder.append(valueClass.getName()).append('("').append(value).append('")')
+			case 'java.math.BigInteger' | 'java.math.BigDecimal' => builder.append(valueClass.getName()).append('("').append(value).append('")')
 
 			case 'java.lang.Boolean' | 'java.lang.Byte' | 'java.lang.Short' | 'java.lang.Integer' => builder.append(value)
 			case 'java.lang.Long'      => builder.append(value).append('L')

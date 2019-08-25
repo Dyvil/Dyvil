@@ -239,11 +239,11 @@ public final class Operator implements IOperator
 			       .append(" }");
 			return;
 		case ID_INFIX_LEFT:
-			builder.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
+			builder.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
 			       .append(this.precedence).append(" }");
 			return;
 		case ID_INFIX_RIGHT:
-			builder.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
+			builder.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
 			       .append(this.precedence).append(" }");
 			return;
 		case ID_TERNARY:

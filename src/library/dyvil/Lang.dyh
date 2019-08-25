@@ -102,7 +102,7 @@ infix   operator ^   { left, 500 }
 infix   operator &   { left, 600 }
 
 // Equality and Identity Operators
-infix   operator ==  { left, 700 }
+infix   operator ==  { left, 700 }
 infix   operator !=  { left, 700 }
 infix   operator === { left, 700 }
 infix   operator !== { left, 700 }

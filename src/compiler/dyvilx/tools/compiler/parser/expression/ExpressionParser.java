@@ -682,7 +682,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 	 * <pre>
 	 * this 3
 	 * print "abc"
-	 * button { ... }
+	 * button { ... }
 	 * </pre>
 	 *
 	 * @param pm
