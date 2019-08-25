@@ -436,13 +436,13 @@ public class CompilerConfig
 		final Option includes = new Option("i", "include-patterns", true,
 		                                   "ant-style include patterns, separated by '" + File.pathSeparatorChar + "'");
 		includes.setArgs(Option.UNLIMITED_VALUES);
-		sourceDirs.setValueSeparator(File.pathSeparatorChar);
+		includes.setValueSeparator(File.pathSeparatorChar);
 		options.addOption(includes);
 
 		final Option excludes = new Option("x", "exclude-patterns", true,
 		                                   "ant-style exclude patterns, separated by '" + File.pathSeparatorChar + "'");
 		excludes.setArgs(Option.UNLIMITED_VALUES);
-		sourceDirs.setValueSeparator(File.pathSeparatorChar);
+		excludes.setValueSeparator(File.pathSeparatorChar);
 		options.addOption(excludes);
 
 		final Option classpath = new Option("cp", "classpath", true,
@@ -565,14 +565,16 @@ public class CompilerConfig
 		// TODO deprecated, remove in v0.47.0
 		if (cmd.hasOption("machine-markers"))
 		{
-			this.compiler.warn(I18n.get("option.deprecated.alternative", "machine-markers", "0.47.0", "--marker-style=machine"));
+			this.compiler
+				.warn(I18n.get("option.deprecated.alternative", "machine-markers", "0.47.0", "--marker-style=machine"));
 			this.setMarkerStyle(MarkerStyle.MACHINE);
 		}
 
 		// TODO deprecated, remove in v0.47.0
 		if (cmd.hasOption("gcc-markers"))
 		{
-			this.compiler.warn(I18n.get("option.deprecated.alternative", "gcc-markers", "0.47.0", "--marker-style=gcc"));
+			this.compiler
+				.warn(I18n.get("option.deprecated.alternative", "gcc-markers", "0.47.0", "--marker-style=gcc"));
 			this.setMarkerStyle(MarkerStyle.GCC);
 		}
 
@@ -596,7 +598,7 @@ public class CompilerConfig
 		{
 			for (final String pattern : cmd.getOptionValues("exclude-patterns"))
 			{
-				this.includePatterns.add(Files.antPattern(pattern));
+				this.excludePatterns.add(Files.antPattern(pattern));
 			}
 		}
 
