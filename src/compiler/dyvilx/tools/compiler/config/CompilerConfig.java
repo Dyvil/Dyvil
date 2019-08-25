@@ -565,14 +565,14 @@ public class CompilerConfig
 		// TODO deprecated, remove in v0.47.0
 		if (cmd.hasOption("machine-markers"))
 		{
-			this.compiler.warn(I18n.get("option.machine-markers.deprecated"));
+			this.compiler.warn(I18n.get("option.deprecated.alternative", "machine-markers", "0.47.0", "--marker-style=machine"));
 			this.setMarkerStyle(MarkerStyle.MACHINE);
 		}
 
 		// TODO deprecated, remove in v0.47.0
 		if (cmd.hasOption("gcc-markers"))
 		{
-			this.compiler.warn(I18n.get("option.gcc-markers.deprecated"));
+			this.compiler.warn(I18n.get("option.deprecated.alternative", "gcc-markers", "0.47.0", "--marker-style=gcc"));
 			this.setMarkerStyle(MarkerStyle.GCC);
 		}
 
