@@ -155,13 +155,27 @@
 
 + Added the `-g`/`--gensrc-dir` options. #493
 
-# Dyvil v0.46.1
+# Dyvil v0.46.2
 
 ## Dyvil Library v0.46.0
 
 ## Dyvil Compiler v0.46.2
 
-* Fixed name clash with option name `-o`.
+* Fixed name clash with the `-o` option.
+
+## Dyvil REPL v0.28.1
+
+## Dyvil GenSrc v0.10.1
+
+# Dyvil v0.46.3
+
+## Dyvil Library v0.46.0
+
+## Dyvil Compiler v0.46.3
+
+* Standardized the way include/exclude filtering is performed. #497
+* Deprecated the `-L`/`--log-file` option. #500
+* Fixed an issue causing the `--include-patterns` and `--exclude-patterns` options to be parsed incorrectly. #498
 
 ## Dyvil REPL v0.28.1
 
