@@ -38,10 +38,25 @@ dependencies {
 
 // --------------- Source Copying ---------------
 
-copyJava.filesMatching('**/DyvilCompiler.java') {
-	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+tasks.register('copyJava', Copy) {
+	it.from sourceSets.main.java
+	it.into "$buildDir/src/main/java/"
+
+	it.include '**/DyvilCompiler.java'
+	it.includeEmptyDirs = false
+
+	it.filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
 			version        : rootProject.version,
 			libraryVersion : project(':library').version,
 			compilerVersion: project.version
 	])
+}
+
+tasks.named('compileJava', JavaCompile) {
+	it.dependsOn 'copyJava'
+	it.source fileTree("$buildDir/src/main/java").builtBy('copyJava')
+	it.exclude {
+		final String path = it.file.path
+		path.contains('src/compiler') && path.endsWith('DyvilCompiler.java')
+	}
 }

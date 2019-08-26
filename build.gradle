@@ -89,7 +89,6 @@ private static String getTagVersion(String module = '') {
 }
 
 apply from: 'gradle/dependencies.gradle'
-apply from: 'gradle/sourceCopying.gradle'
 apply from: 'gradle/javaCompile.gradle'
 apply from: 'gradle/dyvilCompile.gradle'
 apply from: 'gradle/test.gradle'
