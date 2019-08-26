@@ -1,6 +1,6 @@
 package dyvilx.tools.parsing.marker
 
-import dyvil.util.I18n
+import dyvil.util.{ I18n, MarkerLevel }
 import dyvil.source.Source
 
 import java.util.ArrayList
@@ -26,7 +26,7 @@ class MarkerList(let i18n: I18n { public get }) extends ArrayList<Marker> {
 	@java.lang.Deprecated
 	@JavaName("add")
 	func add_bridge(marker: Marker!) -> void {
-		if (let marker = marker, !marker.isIgnored) {
+		if let marker = marker, marker.level != MarkerLevel.IGNORE {
 			this.add(marker)
 		}
 	}

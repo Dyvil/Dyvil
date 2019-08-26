@@ -1,12 +1,12 @@
 package dyvilx.tools.gensrc
 
+import java.util.{ List, ArrayList }
 import java.io.{ File, IOException, Writer, FileWriter }
 
 import dyvilx.tools.gensrc.spec.DefaultSpec
 using dyvilx.tools.gensrc.Builtins._
 
-abstract class Template(let name: String)
-{
+abstract class Template(let name: String) {
 	var outputDir: File = new File('.') { public get; public set }
 
 	// --------------- Name Components and Paths ---------------
@@ -23,43 +23,36 @@ abstract class Template(let name: String)
 
 	var fileName: String { get: getFileName(this.name) }
 
-	private static func getFileName(name: String) -> String
-	{
+	private static func getFileName(name: String) -> String {
 		let index = name.lastIndexOf('.')
 		return index < 0 ? name : name.substring(0, index)
 	}
 
 	// --------------- Specializations ---------------
 
-	let specs: List<Specialization> = new mutable.ArrayList<Specialization>()
+	let specs: List<Specialization> = new ArrayList<Specialization>()
 
-	static func nameMatches(templateName: String, specName: String) -> boolean
-	{
+	static func nameMatches(templateName: String, specName: String) -> boolean {
 		// specName = src/pack/age/name/TemplateName.ext-SpecID.dgs
 		//                ^^^^^^^^^ file name ^^^^^^^^^^
 		return specName.contains(getFileName(templateName))
 	}
 
-	func addSpec(named specName: String) -> void
-	{
-		if (!nameMatches(this.name, specName)) return
+	func addSpec(named specName: String) -> void {
+		if !nameMatches(this.name, specName) {
+			return
+		}
 
-		try
-		{
+		try {
 			this.specs.add(Builtins.spec(specName))
 		}
-		catch (ex: IOException)
-		{
-		}
+		catch ex: IOException {}
 	}
 
-	func spec(name: String) -> Specialization throws IOException
-	{
+	func spec(name: String) -> Specialization throws IOException {
 		// try to find the spec from our list of specs, by filename
-		for (spec <- this.specs)
-		{
-			if (spec.file.getName() == name)
-			{
+		for spec <- this.specs {
+			if spec.file.getName() == name {
 				return spec
 			}
 		}
@@ -69,18 +62,14 @@ abstract class Template(let name: String)
 
 	// --------------- Main Implementation ---------------
 
-	func mainImpl(args: [String]) -> void
-	{
+	func mainImpl(args: [String]) -> void {
 		// parses output dir and specs from arguments
-		for (arg <- args)
-		{
-			if (arg.startsWith('output_dir='))
-			{
+		for arg <- args {
+			if arg.startsWith('output_dir=') {
 				this.outputDir = new File(arg.substring(11))
 				continue
 			}
-			if (arg.startsWith('source_dir='))
-			{
+			if arg.startsWith('source_dir=') {
 				Builtins.addSourceDir(arg.substring(11))
 				continue
 			}
@@ -93,18 +82,14 @@ abstract class Template(let name: String)
 
 	// --------------- Code Generation ---------------
 
-	func generate() -> int
-	{
+	func generate() -> int {
 		this.outputDir.mkdirs()
-		if (this.specs.isEmpty())
-		{
-			try
-			{
+		if this.specs.isEmpty() {
+			try {
 				this.generate(DefaultSpec)
 				print("Generated source for template '\(this.name)'")
 			}
-			catch (ex: IOException)
-			{
+			catch ex: IOException {
 				print("Failed to generate source for template '\(this.name)'")
 				ex.printStackTrace()
 			}
@@ -113,14 +98,13 @@ abstract class Template(let name: String)
 		}
 
 		var count = 0
-		for (spec <- this.specs)
-		{
-			try
-			{
-				if (this.generate(spec)) count += 1
+		for spec <- this.specs {
+			try {
+				if this.generate(spec) {
+					count += 1
+				}
 			}
-			catch (ex: IOException)
-			{
+			catch ex: IOException {
 				print("Failed to generate spec '\(spec)' for template '\(this.name)'")
 				ex.printStackTrace()
 			}
@@ -130,22 +114,21 @@ abstract class Template(let name: String)
 		return count
 	}
 
-	func generate(spec: Specialization) -> boolean throws IOException
-	{
-		if (let enabled = spec['@enabled'], !Boolean.parseBoolean(enabled)) return false
+	func generate(spec: Specialization) -> boolean throws IOException {
+		if let enabled = spec['@enabled'], !Boolean.parseBoolean(enabled) {
+			return false
+		}
 
-		let fileName = if (let prop = spec['@fileName']) { this.pathPrefix ++ prop } else this.fileName
+		let fileName = (if let prop = spec['@fileName'] { this.pathPrefix ++ prop } else { this.fileName })
 		let outputFile = new File(this.outputDir, fileName)
 		outputFile.getParentFile().mkdirs()
 
 		let writer = new FileWriter(outputFile)
 
-		try
-		{
+		try {
 			this.generate(spec, writer)
 		}
-		catch (ex: IOException)
-		{
+		catch ex: IOException {
 			writer.close()
 			throw ex
 		}

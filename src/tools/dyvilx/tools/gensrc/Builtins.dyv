@@ -3,12 +3,12 @@ package dyvilx.tools.gensrc
 import dyvilx.tools.gensrc.spec._
 import dyvil.io.Files._
 
+import java.util.{ List, ArrayList }
 import java.util.Properties
 import java.io.{ File, BufferedInputStream, FileInputStream, IOException }
 import java.time.{ LocalDateTime, format.DateTimeFormatter }
 
-abstract class Builtins
-{
+abstract class Builtins {
 	private init() {} // no instances
 
 	public const GEN_NOTICE: String = 'GENERATED SOURCE - DO NOT EDIT'
@@ -25,17 +25,14 @@ abstract class Builtins
 
 	// Files
 
-	private static const SOURCE_DIRS: List<String> = new mutable.ArrayList<String>()
+	private static const SOURCE_DIRS: List<String> = new ArrayList<String>()
 
 	protected static func addSourceDir(dir: String) -> void = SOURCE_DIRS.add(dir)
 
-	static func file(name: String) -> File
-	{
-		for (srcDir <- SOURCE_DIRS)
-		{
+	static func file(name: String) -> File {
+		for srcDir <- SOURCE_DIRS {
 			let file = new File(srcDir, name)
-			if (file.exists())
-			{
+			if file.exists() {
 				return file
 			}
 		}
@@ -49,23 +46,19 @@ abstract class Builtins
 
 	static func spec(name: String) -> Specialization throws IOException = spec(file(name))
 
-	static func spec(file: File) -> Specialization throws IOException
-	{
+	static func spec(file: File) -> Specialization throws IOException {
 		let canonPath = file.getCanonicalPath()
-		if let loaded = SPEC_MAP[canonPath]
-		{
+		if let loaded = SPEC_MAP[canonPath] {
 			return loaded
 		}
 
 		let input = new BufferedInputStream(new FileInputStream(file))
 		let props = new Properties()
 
-		try
-		{
+		try {
 			props.load(input)
 		}
-		catch (ex: IOException)
-		{
+		catch ex: IOException {
 			input.close()
 			throw ex
 		}
@@ -84,28 +77,23 @@ abstract class Builtins
 
 	// Other Functions
 
-	static func decorate(with process: String -> String, _ body: String) -> String
-	{
+	static func decorate(with process: String -> String, _ body: String) -> String {
 		let result = new StringBuilder
-		for (line <- body.split('\n'))
-		{
+		for line <- body.split('\n') {
 			result.append(process(line)).append('\n')
 		}
 		return result.toString
 	}
 
-	static func replace(target: String, with replacement: String, in body: String) -> String
-	{
+	static func replace(target: String, with replacement: String, in body: String) -> String {
 		return body.replace(target, replacement)
 	}
 
-	static func replaceAll(target: String, with replacement: String, in body: String) -> String
-	{
+	static func replaceAll(target: String, with replacement: String, in body: String) -> String {
 		return body.replaceAll(target, replacement)
 	}
 
-	static func replaceAll(target: String, with replacer: String -> String, in body: String) -> String
-	{
+	static func replaceAll(target: String, with replacer: String -> String, in body: String) -> String {
 		return body.replaceAll(target, replacer)
 	}
 }

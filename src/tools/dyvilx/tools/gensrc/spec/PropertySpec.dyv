@@ -5,29 +5,26 @@ import dyvilx.tools.gensrc._
 import java.io.{ IOException, File }
 import java.util.Properties
 
-class PropertySpec(let file: File { override get }, private let properties: Properties) implements Specialization
-{
+class PropertySpec(
+	let file: File { override get }
+	private let properties: Properties
+) implements Specialization {
 	// --------------- Parent Spec ---------------
 
 	protected var parent: Specialization!
 
-	protected func resolveParent() -> Specialization!
-	{
-		if let parent = this.parent
-		{
+	protected func resolveParent() -> Specialization! {
+		if let parent = this.parent {
 			return parent
 		}
 
-		if let inheritFrom = this.getOwn('@inheritFrom')
-		{
-			try
-			{
+		if let inheritFrom = this.getOwn('@inheritFrom') {
+			try {
 				let spec = Builtins.spec(inheritFrom)
 				this.parent = spec
 				return spec
 			}
-			catch (ex: IOException)
-			{
+			catch ex: IOException {
 			}
 		}
 

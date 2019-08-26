@@ -2,8 +2,7 @@ package dyvilx.tools.gensrc
 
 import java.io.File
 
-interface Specialization
-{
+interface Specialization {
 	var file: File! { get }
 
 	func subscript(key: String) -> String!

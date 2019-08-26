@@ -4,8 +4,7 @@ import dyvilx.tools.gensrc.Specialization
 
 import java.io.File
 
-object DefaultSpec implements Specialization
-{
+object DefaultSpec implements Specialization {
 	override var file: File! { get: null }
 
 	override func subscript(key: String) -> String! = null
