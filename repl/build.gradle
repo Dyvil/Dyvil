@@ -39,8 +39,23 @@ dependencies {
 
 // --------------- Source Copying ---------------
 
-copyJava.filesMatching('**/DyvilREPL.java') {
-	filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
+tasks.register('copyJava', Copy) {
+	it.from sourceSets.main.java
+	it.into "$buildDir/src/main/java/"
+
+	it.include '**/DyvilREPL.java'
+	it.includeEmptyDirs = false
+
+	it.filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [
 			replVersion: project.version
 	])
+}
+
+tasks.named('compileJava', JavaCompile) {
+	it.dependsOn 'copyJava'
+	it.source files("$buildDir/src/main/java").builtBy('copyJava')
+	it.exclude {
+		final String path = it.file.path
+		path.contains('src/repl') && path.endsWith('DyvilREPL.java')
+	}
 }
