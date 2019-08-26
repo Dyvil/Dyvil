@@ -27,7 +27,7 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	exec.classpath configurations.bootstrap
 
 	if (source_dirs) {
-		exec.args "source_dirs=${ source_dirs.join(':') }"
+		exec.args "--source-dirs=${ source_dirs.join(File.pathSeparator) }"
 
 		for (String src : source_dirs) {
 			exec.inputs.files fileTree(src) {
@@ -37,15 +37,15 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	}
 
 	if (include_patterns) {
-		exec.args "include_patterns=${ include_patterns.join(':') }"
+		exec.args "--include-patterns=${ include_patterns.join(File.pathSeparator) }"
 	}
 
 	if (exclude_patterns) {
-		exec.args "exclude_patterns=${ exclude_patterns.join(':') }"
+		exec.args "--exclude-patterns=${ exclude_patterns.join(File.pathSeparator) }"
 	}
 
 	if (libraries) {
-		exec.args "libraries=${ libraries.join(':') }"
+		exec.args "--classpath=${ libraries.join(File.pathSeparator) }"
 
 		for (String library : libraries) {
 			exec.inputs.files fileTree(library)
@@ -53,7 +53,7 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 	}
 
 	if (output_dir) {
-		exec.args "output_dir=$output_dir"
+		exec.args "--output-dir=$output_dir"
 
 		exec.outputs.dir output_dir
 	}
@@ -64,7 +64,7 @@ void setupCompiler(Map args, JavaExec exec, List<String> fileFilters) {
 		exec.args 'test'
 	}
 
-	exec.args 'compile', '--ansi', '--machine-markers'
+	exec.args 'compile', '--ansi', '--marker-style=machine'
 }
 
 void setupCompiler(Map args, JavaExec exec) {
