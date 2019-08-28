@@ -7,16 +7,15 @@ package dyvil.util
  *
  * @author Clashsoft
  */
-class MatchError(let value: any!) extends RuntimeException
-{
-	override func getMessage() -> String
-	{
-		if (this.value == null) return 'null'
-		try
-		{
+class MatchError(let value: any!) extends RuntimeException {
+	override func getMessage() -> String {
+		if this.value == null {
+			return 'null'
+		}
+		try {
 			return "\(this.value) (of class \(this.value.dynamicClass.getName()))"
 		}
-		catch (t: Throwable) {}
+		catch ignored: Throwable {}
 
 		return "An instance of class \(this.value.dynamicClass.getName())"
 	}

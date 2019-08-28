@@ -1,7 +1,6 @@
 package dyvil.util
 
-class Qualifier
-{
+class Qualifier {
 	public const INSTANCE = new Qualifier
 
 	//           Symbol Name  | Symbol          =  Mnemonic // Proposed Mnemonic
@@ -25,8 +24,7 @@ class Qualifier
     public const SLASH         /* / */ : String = "div"     // sls
     public const TILDE         /* ~ */ : String = "tilde"   // tld
 
-	func replaceString(s: String) -> int = s match
-	{
+	func replaceString(s: String) -> int = s match {
 		case AMPERSAND     => '&'
 		case ASTERISK      => '*'
 		case AT            => '@'
@@ -49,8 +47,7 @@ class Qualifier
 		case _             => 0
 	}
 
-	func replaceCodePoint(c: int) -> String? = c match
-	{
+	func replaceCodePoint(c: int) -> String? = c match {
 		case '&'  => AMPERSAND
 		case '*'  => ASTERISK
 		case '@'  => AT
@@ -75,23 +72,19 @@ class Qualifier
 
 	static func qualify(string: String) -> String = qualify(string, INSTANCE)
 
-	static func qualify(string: String, qualifier: Qualifier) -> String
-	{
+	static func qualify(string: String, qualifier: Qualifier) -> String {
 		let length = string.length
 		let builder = new StringBuilder(length)
 		var i = 0
 
-		while (i < length)
-		{
+		while i < length {
 			let codePoint = string.codePointAt(i)
 			let replacement = qualifier.replaceCodePoint(codePoint)
 
-			if (replacement != null)
-			{
+			if replacement != null {
 				builder.append('$').append(replacement)
 			}
-			else
-			{
+			else {
 				builder.appendCodePoint(codePoint)
 			}
 
@@ -103,11 +96,9 @@ class Qualifier
 
 	static func unqualify(string: String) -> String = unqualify(string, INSTANCE)
 
-	static func unqualify(string: String, qualifier: Qualifier) -> String
-	{
+	static func unqualify(string: String, qualifier: Qualifier) -> String {
 		var appendStart = string.indexOf('$')
-		if (appendStart < 0)
-		{
+		if appendStart < 0 {
 			// no $ in string - don't apply any replacements
 			return string
 		}
@@ -119,17 +110,17 @@ class Qualifier
 		builder.append(string, 0, appendStart)
 		var searchIndex = appendStart
 
-		while (searchIndex < len)
-		{
+		while searchIndex < len {
 			let cashIndex = string.indexOf('$', searchIndex)
-			if (cashIndex < 0) break
+			if cashIndex < 0 {
+				break
+			}
 
 			let startIndex = cashIndex + 1
 			let endIndex = symbolEndIndex(string, startIndex, len)
 			searchIndex = endIndex
 
-			if (startIndex == endIndex)
-			{
+			if startIndex == endIndex {
 				// $$ or $_
 				continue
 			}
@@ -137,8 +128,7 @@ class Qualifier
 			let key = string.substring(startIndex, endIndex)
 			let replacement = qualifier.replaceString(key)
 
-			if (replacement > 0)
-			{
+			if replacement > 0 {
 				builder.append(string, appendStart, cashIndex)
 				builder.appendCodePoint(replacement)
 				appendStart = endIndex
@@ -149,12 +139,9 @@ class Qualifier
 		return builder.toString()
 	}
 
-	private static func symbolEndIndex(string: String, start: int, end: int) -> int
-	{
-		while (start < end)
-		{
-			match string.charAt(start)
-			{
+	private static func symbolEndIndex(string: String, start: int, end: int) -> int {
+		while start < end {
+			match string.charAt(start) {
 				case '$' | '_' => return start
 				case _ => start += 1
 			}

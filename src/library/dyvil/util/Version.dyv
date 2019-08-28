@@ -18,10 +18,8 @@ final class Version
 	let prerelease: String?
 	let build: String?
 )
-implements Comparable<Version>, Serializable
-{
-	enum Element
-	{
+implements Comparable<Version>, Serializable {
+	enum Element {
 		case MAJOR
 		case MINOR
 		case PATCH
@@ -39,26 +37,22 @@ implements Comparable<Version>, Serializable
 
 	static func apply(major: int, minor: int, patch: int) -> Version = Version(major, minor, patch, null, null)
 
-	static func apply(major: int, minor: int, patch: int, prerelease: String? = null, build: String? = null) -> Version
-	{
-		if (major < 0) throw new IllegalArgumentException("\(Element.MAJOR) must not be negative")
-		if (minor < 0) throw new IllegalArgumentException("\(Element.MINOR) must not be negative")
-		if (patch < 0) throw new IllegalArgumentException("\(Element.PATCH) must not be negative")
-		if (prerelease != null && !INFO_PATTERN.matcher(prerelease).find())
-		{
+	static func apply(major: int, minor: int, patch: int, prerelease: String? = null, build: String? = null) -> Version {
+		if major < 0 { throw new IllegalArgumentException("\(Element.MAJOR) must not be negative") }
+		if minor < 0 { throw new IllegalArgumentException("\(Element.MINOR) must not be negative") }
+		if patch < 0 { throw new IllegalArgumentException("\(Element.PATCH) must not be negative") }
+		if prerelease != null && !INFO_PATTERN.matcher(prerelease).find() {
 			throw new IllegalArgumentException("\(Element.PRERELEASE) '\(prerelease)' does not match format '\(INFO_FORMAT)'")
 		}
-		if (build != null && !INFO_PATTERN.matcher(build).find())
-		{
+		if build != null && !INFO_PATTERN.matcher(build).find() {
 			throw new IllegalArgumentException("\(Element.BUILD) '\(build)' does not match format '\(INFO_FORMAT)'")
 		}
 		return new Version(major, minor, patch, prerelease, build)
 	}
 
-	static func apply(version: String) -> Version
-	{
+	static func apply(version: String) -> Version {
 		let matcher = PATTERN.matcher(version)
-		if (!matcher.matches()) throw new IllegalArgumentException("'\(version)' does not match format '\(FORMAT)'")
+		if !matcher.matches() { throw new IllegalArgumentException("'\(version)' does not match format '\(FORMAT)'") }
 
 		let major = Integer.parseInt(matcher.group(1))
 		let minor = Integer.parseInt(matcher.group(2))
@@ -76,8 +70,7 @@ implements Comparable<Version>, Serializable
 
 	func isStable() -> boolean = this.major > 0
 
-	func next(element: Element) -> Version = element match
-	{
+	func next(element: Element) -> Version = element match {
 		case .MAJOR => return new Version(this.major + 1, 0, 0, null, null)
 		case .MINOR => return new Version(this.major, this.minor + 1, 0, null, null)
 		case .PATCH => return new Version(this.major, this.minor, this.patch + 1, null, null)
@@ -86,17 +79,20 @@ implements Comparable<Version>, Serializable
 
 	override func toString() -> String = new StringBuilder().{
 		append(this.major).append('.').append(this.minor).append('.').append(this.patch) // major.minor.patch
-		if (this.prerelease != null) append('-').append(this.prerelease) // -prerelease
-		if (this.build != null) append('+').append(this.build) // +build
-		toString!
+		if this.prerelease != null {
+			append('-').append(this.prerelease) // -prerelease
+		}
+		if this.build != null {
+			append('+').append(this.build) // +build
+		}
+		toString!!
 	}
 
 	override func equals(obj: any!) -> boolean = this === obj || obj is Version && this.equals(obj as Version)
 
 	func equals(that: Version) -> boolean = this === that || this.major == that.major && this.minor == that.minor && this.patch == that.patch && this.prerelease == that.prerelease
 
-	override func hashCode() -> int
-	{
+	override func hashCode() -> int {
 		let prime = 31
 		var result = 1
 		result = prime * result + this.major
@@ -106,23 +102,20 @@ implements Comparable<Version>, Serializable
 		return result
 	}
 
-	override func compareTo(o: Version) -> int
-	{
+	override func compareTo(o: Version) -> int {
 		var cmp = this.major - o.major
-		if (cmp != 0) return cmp
+		if cmp != 0 { return cmp }
 
 		cmp = this.minor - o.minor
-		if (cmp != 0) return cmp
+		if cmp != 0 { return cmp }
 
 		cmp = this.patch - o.patch
-		if (cmp != 0) return cmp
+		if cmp != 0 { return cmp }
 
-		if (this.prerelease == null)
-		{
+		if this.prerelease == null {
 			return o.prerelease != null ? -1 : 0
 		}
-		else if (o.prerelease == null)
-		{
+		else if o.prerelease == null {
 			return 1
 		}
 		return this.prerelease!!.compareTo(o.prerelease!!)

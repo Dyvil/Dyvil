@@ -5,8 +5,7 @@ package dyvil.util
  *
  * @author Clashsoft
  */
-class ImmutableException extends RuntimeException
-{
+class ImmutableException extends RuntimeException {
 	public init() : super()
 
 	public init(message: String) : super(message)

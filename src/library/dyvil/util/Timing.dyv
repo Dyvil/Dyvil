@@ -5,27 +5,28 @@ import func java.lang.System.{
 	nanoTime
 }
 
-final class Timing
-{
+final class Timing {
 	private init() {} // no instances
 
 	// Simple Measurement
 
 	static func measureMillis(f: -> void) -> long = measureMillis(1, f)
 
-	static func measureMillis(iterations: int, f: -> void) -> long
-	{
+	static func measureMillis(iterations: int, f: -> void) -> long {
 		var start = milliTime()
-		for (i <- 0 ..< iterations) f()
+		for i <- 0 ..< iterations {
+			f()
+		}
 		return (milliTime() - start) _/ iterations
 	}
 
 	static func measureNanos(f: -> void) -> long = measureNanos(1, f)
 
-	static func measureNanos(iterations: int, f: -> void) -> long
-	{
+	static func measureNanos(iterations: int, f: -> void) -> long {
 		var start = nanoTime()
-		for (i <- 0 ..< iterations) f()
+		for i <- 0 ..< iterations {
+			f()
+		}
 		return (nanoTime() - start) _/ iterations
 	}
 

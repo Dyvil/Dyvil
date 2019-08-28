@@ -1,7 +1,6 @@
 package dyvil.util
 
-final class Blackhole
-{
+final class Blackhole {
 	private init() {} // no instances
 
 	private static var consumeSum: long = 0
