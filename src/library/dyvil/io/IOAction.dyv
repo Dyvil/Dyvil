@@ -3,7 +3,6 @@ package dyvil.io
 import java.io.IOException
 
 interface IOAction {
-
 	func apply() -> void throws IOException
 
 	static func tryIO(action: IOAction) -> boolean inline {
@@ -11,7 +10,7 @@ interface IOAction {
 			action()
 			return true
 		}
-		catch (ignored: IOException) {
+		catch ignored: IOException {
 			return false
 		}
 	}

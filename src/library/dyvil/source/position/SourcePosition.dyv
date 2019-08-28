@@ -75,10 +75,7 @@ interface SourcePosition extends Comparable<SourcePosition> {
 
 	override func compareTo(o: SourcePosition) -> int {
 		let byLine = this.startLine.compareTo(o.startLine)
-		if (byLine != 0) {
-			return byLine
-		}
-		return this.startColumn.compareTo(o.startColumn)
+		return byLine != 0 ? byLine : this.startColumn.compareTo(o.startColumn)
 	}
 
 	@Deprecated // in Dyvil only
@@ -116,11 +113,11 @@ interface SourcePosition extends Comparable<SourcePosition> {
 		override func raw() -> SourcePosition = this
 
 		func equals(that: SourcePosition) -> boolean {
-			if (this === that) return true
-			if (this.startLine != that.startLine) return false
-			if (this.endLine != that.endLine) return false
-			if (this.startColumn != that.startColumn) return false
-			if (this.endColumn != that.endColumn) return false
+			if this === that { return true }
+			if this.startLine != that.startLine { return false }
+			if this.endLine != that.endLine { return false }
+			if this.startColumn != that.startColumn { return false }
+			if this.endColumn != that.endColumn { return false }
 			return true
 		}
 

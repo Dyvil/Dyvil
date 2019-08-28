@@ -1,17 +1,13 @@
 package dyvil.source.position
 
-interface Positioned
-{
+interface Positioned {
 	var position: SourcePosition! { get; set }
 
-	final func expandPosition(to: SourcePosition) -> void
-	{
-		if let from = this.position
-		{
+	final func expandPosition(to: SourcePosition) -> void {
+		if let from = this.position {
 			this.position = from .. to
 		}
-		else
-		{
+		else {
 			this.position = to.raw
 		}
 	}

@@ -7,8 +7,7 @@ abstract class GroupImplicits
 {
 	private init() {} // no instances
 
-	implicit object IntGroup implements GroupAddNegate<int>, GroupMultiply<int>
-	{
+	implicit object IntGroup implements GroupAddNegate<int>, GroupMultiply<int> {
 		override var _0: int { get: 0 }
 
 		override var _1: int { get: 1 }
@@ -24,8 +23,7 @@ abstract class GroupImplicits
 		override func power(lhs: int, rhs: int) -> int = lhs ** rhs
 	}
 
-	implicit object LongGroup implements GroupAddNegate<long>, GroupMultiply<long>
-	{
+	implicit object LongGroup implements GroupAddNegate<long>, GroupMultiply<long> {
 		override var _0: long { get: 0 }
 
 		override var _1: long { get: 1 }
@@ -41,8 +39,7 @@ abstract class GroupImplicits
 		override func power(lhs: long, rhs: int) -> long = lhs ** rhs
 	}
 
-	implicit object BigIntegerGroup implements GroupAddNegate<BigInteger>, GroupMultiply<BigInteger>
-	{
+	implicit object BigIntegerGroup implements GroupAddNegate<BigInteger>, GroupMultiply<BigInteger> {
 		override var _0: BigInteger { get: BigInteger.valueOf(0) }
 
 		override var _1: BigInteger { get: BigInteger.valueOf(1) }
@@ -58,8 +55,7 @@ abstract class GroupImplicits
 		override func power(lhs: BigInteger, rhs: int) -> BigInteger = lhs.pow(rhs)
 	}
 
-	implicit object DoubleRing implements Ring<double>
-	{
+	implicit object DoubleRing implements Ring<double> {
 		override var _0: double { get: 0 }
 
 		override var _1: double { get: 1 }
@@ -79,8 +75,7 @@ abstract class GroupImplicits
 		override func power(lhs: double, rhs: int) -> double = lhs ** rhs
 	}
 
-	implicit object FloatRing implements Ring<float>
-	{
+	implicit object FloatRing implements Ring<float> {
 		override var _0: float { get: 0 }
 
 		override var _1: float { get: 1 }
@@ -100,8 +95,7 @@ abstract class GroupImplicits
 		override func power(lhs: float, rhs: int) -> float = lhs ** rhs
 	}
 
-	implicit object BigDecimalRing implements Ring<BigDecimal>
-	{
+	implicit object BigDecimalRing implements Ring<BigDecimal> {
 		override var _0: BigDecimal { get: BigDecimal.ZERO }
 
 		override var _1: BigDecimal { get: BigDecimal.ONE }
@@ -121,8 +115,7 @@ abstract class GroupImplicits
 		override func power(lhs: BigDecimal, rhs: int) -> BigDecimal = PowImpl.pow(lhs, rhs)
 	}
 
-	implicit object StringGroup implements GroupAdd<String>
-	{
+	implicit object StringGroup implements GroupAdd<String> {
 		override var _0: String { get: "" }
 
 		override func add(lhs: String, rhs: String) -> String = lhs ++ rhs

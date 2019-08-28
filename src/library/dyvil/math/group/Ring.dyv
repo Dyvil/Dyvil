@@ -1,9 +1,7 @@
 package dyvil.math.group
 
-interface Ring<T> extends GroupAddNegate<T>, GroupMultiplyInverse<T>
-{
-	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> Ring<R> = new Ring<R>()
-	{
+interface Ring<T> extends GroupAddNegate<T>, GroupMultiplyInverse<T> {
+	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> Ring<R> = new Ring<R>() {
 		override var _0: R { get: R._0 }
 
 		override var _1: R { get: R._1 }

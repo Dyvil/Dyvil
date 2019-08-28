@@ -1,7 +1,6 @@
 package dyvil.random
 
-interface Random
-{
+interface Random {
 	static func apply() -> Random = new JavaRandom()
 
 	static func apply(seed: long) -> Random = new JavaRandom(seed)
@@ -32,18 +31,15 @@ interface Random
 
 	func nextInt() -> int = this.next(31)
 
-	func nextInt(max: int) -> int
-	{
+	func nextInt(max: int) -> int {
 		var r = this.next(31)
 		let m = max - 1
-		if ((max & m) == 0)
-		{
+		if 0 == (max & m) {
 			return (max * (r as long) >> 31) as int
 		}
 
 		var u = r
-		while (u - (r = u % max) + m < 0)
-		{
+		while u - (r = u % max) + m < 0 {
 			u = this.next(31)
 		}
 		return r
@@ -55,18 +51,15 @@ interface Random
 
 	func nextLong() -> long = ((this.next(31) as long) << 32) | this.next(32)
 
-	func nextLong(max: long) -> long
-	{
+	func nextLong(max: long) -> long {
 		var r = this.nextLong()
 		let m = max - 1
-		if ((max & m) == 0L)
-		{
+		if 0L == (max & m) {
 			return r & m
 		}
 
 		var u = r >>> 1
-		while (u + m - (r = u % max) < 0L)
-		{
+		while u + m - (r = u % max) < 0L {
 			u = this.nextLong() >>> 1
 		}
 		return r

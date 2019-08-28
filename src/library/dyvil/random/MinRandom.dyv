@@ -5,8 +5,7 @@ package dyvil.random
  *
  * @author Clashsoft
  */
-object MinRandom implements Random
-{
+object MinRandom implements Random {
 	override func next(bits: int) -> int = 0
 
 	override func nextInt(max: int) -> int = 0

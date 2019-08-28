@@ -5,17 +5,14 @@ using dyvil.math.BigIntegers
 #let(TYPES = [ 'long', 'BigInteger' ])
 
 @JavaName("Combinatorics")
-extension Math
-{
+extension Math {
 	// --------------- Factorial ---------------
 
 	#for (T <- TYPES) {
 
-		static func factorial(of value: T) -> T
-		{
+		static func factorial(of value: T) -> T {
 			var result = value
-			while (value > 1)
-			{
+			while value > 1 {
 				value -= 1
 				result *= value
 			}
@@ -39,13 +36,11 @@ extension Math
 }
 
 @JavaName("Combinatorics$LongSyntax")
-extension long
-{
+extension long {
 	postfix func !(_ lhs: long) -> long = Math.factorial(lhs)
 }
 
 @JavaName("Combinatorics$BigIntegerSyntax")
-extension BigInt
-{
+extension BigInt {
 	postfix func !(_ lhs: BigInt) -> BigInt = Math.factorial(lhs)
 }

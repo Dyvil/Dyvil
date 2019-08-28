@@ -6,8 +6,7 @@ import dyvil.math.group.RingCompatible
 @LiteralConvertible.FromLong
 @LiteralConvertible.FromFloat
 @LiteralConvertible.FromDouble
-class Polynomial private (coefficients: [double]) implements RingCompatible<Polynomial>, Formattable, (double -> double)
-{
+class Polynomial private (coefficients: [double]) implements RingCompatible<Polynomial>, Formattable, (double -> double) {
 	// Constants
 
 	public const _0: Polynomial = new Polynomial([]) { override get }
@@ -19,13 +18,10 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 	@JavaName("apply0")
 	static func apply(coefficient: double) -> Polynomial = Polynomial(coefficient, degree: 0)
 
-	static func apply(coefficients: double...) -> Polynomial
-	{
+	static func apply(coefficients: double...) -> Polynomial {
 		var i = coefficients.size - 1
-		while (i >= 0)
-		{
-			if (coefficients[i] != 0)
-			{
+		while i >= 0 {
+			if coefficients[i] != 0 {
 				// trim trailing zeroes of the array
 				return new Polynomial(coefficients.trim(i + 1))
 			}
@@ -36,9 +32,8 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		return _0
 	}
 
-	static func apply(coefficient: double, explicit degree: int) -> Polynomial
-	{
-		if (coefficient == 0) return _0
+	static func apply(coefficient: double, explicit degree: int) -> Polynomial {
+		if coefficient == 0 { return _0 }
 
 		let array = new [double](degree + 1)
 		array[degree] = coefficient
@@ -47,44 +42,42 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	var degree: int { get: this.coefficients.size - 1 }
 
-	func subscript(index: int) = this.coefficients[index]
+	func subscript(index: int) -> double = this.coefficients[index]
 
-	func isZero() = this.coefficients.isEmpty
+	func isZero() -> boolean = this.coefficients.isEmpty
 
-	override func apply(_ x: double) -> double
-	{
+	override func apply(_ x: double) -> double {
 		var xpow = 1.0
 		var sum = 0.0
-		for (c <- this.coefficients)
-		{
+		for c <- this.coefficients {
 			sum += c * xpow
 			xpow *= x
 		}
 		return sum
 	}
 
-	func differentiate() -> Polynomial
-	{
+	func differentiate() -> Polynomial {
 		// derivative of a polynomial of degree 0 or -1 is the zero polynomial
-		if (this.degree <= 0) return _0
+		if this.degree <= 0 {
+			return _0
+		}
 
 		let oldCoeff = this.coefficients
 		let newCoeff = [double](oldCoeff.size - 1)
-		for (i <- 1 ..< oldCoeff.size)
-		{
+		for i <- 1 ..< oldCoeff.size {
 			newCoeff[i - 1] = oldCoeff[i] * i
 		}
 		return new Polynomial(newCoeff) // no trimming necessary
 	}
 
-	func integrate() -> Polynomial
-	{
-		if (this.isZero) return _0
+	func integrate() -> Polynomial {
+		if this.isZero {
+			return _0
+		}
 
 		let oldCoeff = this.coefficients
 		let newCoeff = [double](oldCoeff.size + 1)
-		for (i <- 0 ..< oldCoeff.size)
-		{
+		for i <- 0 ..< oldCoeff.size {
 			newCoeff[i + 1] = oldCoeff[i] / (i + 1)
 		}
 		return new Polynomial(newCoeff) // no trimming necessary
@@ -92,12 +85,13 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	// Unary Operators
 
-	private postfix func mapped(poly: Polynomial, op: double -> double) -> Polynomial
-	{
+	private postfix func mapped(poly: Polynomial, op: double -> double) -> Polynomial {
 		let oldCoeff = poly.coefficients
 		let size = oldCoeff.size
 		let newCoeff = new [double](size)
-		for (i <- 0 ..< size) newCoeff[i] = op(oldCoeff[i])
+		for i <- 0 ..< size {
+			newCoeff[i] = op(oldCoeff[i])
+		}
 		return Polynomial(newCoeff...)
 	}
 
@@ -105,28 +99,28 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	override prefix func -(rhs: Polynomial) -> Polynomial = rhs.mapped(c => -c)
 
-	override postfix func inverse(lhs: Polynomial) -> Polynomial
-	{
+	override postfix func inverse(lhs: Polynomial) -> Polynomial {
 		throw new UnsupportedOperationException('reciprocal of polynomial')
 	}
 
 	// Additive Operators
 
-	override infix func +(lhs: Polynomial, rhs: Polynomial) -> Polynomial
-	{
+	override infix func +(lhs: Polynomial, rhs: Polynomial) -> Polynomial {
 		let lhsCoeff = lhs.coefficients
 		let rhsCoeff = rhs.coefficients
 
-		if (lhsCoeff.size > rhsCoeff.size)
-		{
+		if lhsCoeff.size > rhsCoeff.size {
 			let coeff = lhsCoeff.copy
-			for (i <- 0 ..< rhsCoeff.size) coeff[i] += rhsCoeff[i]
+			for i <- 0 ..< rhsCoeff.size {
+				coeff[i] += rhsCoeff[i]
+			}
 			return Polynomial(coeff...)
 		}
-		else
-		{
+		else {
 			let coeff = rhsCoeff.copy
-			for (i <- 0 ..< lhsCoeff.size) coeff[i] += lhsCoeff[i]
+			for i <- 0 ..< lhsCoeff.size {
+				coeff[i] += lhsCoeff[i]
+			}
 			return Polynomial(coeff...)
 		}
 	}
@@ -139,18 +133,15 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	infix func *(lhs: Polynomial, rhs: double) -> Polynomial = lhs.mapped(c => c * rhs)
 
-	override infix func *(lhs: Polynomial, rhs: Polynomial) -> Polynomial
-	{
+	override infix func *(lhs: Polynomial, rhs: Polynomial) -> Polynomial {
 		let lhsCoeff = lhs.coefficients
 		let lhsSize = lhsCoeff.size
 		let rhsCoeff = rhs.coefficients
 		let rhsSize = rhsCoeff.size
 		let coeff = new [double](lhsSize + rhsSize - 1)
 
-		for (i <- 0 ..< lhsCoeff.size)
-		{
-			for (j <- 0 ..< rhsCoeff.size)
-			{
+		for i <- 0 ..< lhsCoeff.size {
+			for j <- 0 ..< rhsCoeff.size {
 				coeff[i + j] += lhsCoeff[i] * rhsCoeff[j]
 			}
 		}
@@ -165,15 +156,15 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 	infix func %(lhs: Polynomial, rhs: Polynomial) -> Polynomial = (lhs /% rhs)._2
 
 	// divmod
-	infix func /%(lhs n: Polynomial, rhs d: Polynomial) -> (Polynomial, Polynomial)
-	{
-		if (d.isZero) throw new ArithmeticException('division by zero polynomial')
+	infix func /%(lhs n: Polynomial, rhs d: Polynomial) -> (Polynomial, Polynomial) {
+		if d.isZero {
+			throw new ArithmeticException('division by zero polynomial')
+		}
 
 		var q = _0
 		var r = n // invariant: n = d * q + r
 
-		while (!r.isZero && r.degree >= d.degree)
-		{
+		while !r.isZero && r.degree >= d.degree {
 			let t = divideHigh(r, d)
 			q += t
 			r -= t * d
@@ -183,8 +174,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 	}
 
 	// helper for divmod
-	private static func divideHigh(r: Polynomial, d: Polynomial) -> Polynomial
-	{
+	private static func divideHigh(r: Polynomial, d: Polynomial) -> Polynomial {
 		let rDeg = r.degree
 		let rCoeff = r.coefficients[rDeg]
 		let dDeg = d.degree
@@ -192,27 +182,22 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		return Polynomial(rCoeff / dCoeff, degree: rDeg - dDeg)
 	}
 
-	override infix func **(lhs: Polynomial, rhs: int) -> Polynomial
-	{
-		if (rhs < 0) throw new UnsupportedOperationException('polynomial to the negative power')
-		if (rhs == 0) return _1
-		if (rhs == 1) return lhs
+	override infix func **(lhs: Polynomial, rhs: int) -> Polynomial {
+		if rhs < 0 { throw new UnsupportedOperationException('polynomial to the negative power') }
+		if rhs == 0 { return _1 }
+		if rhs == 1 { return lhs }
 
 		// exp by squaring
-		if ((rhs & 1) == 0)
-		{
+		if 0 == (rhs & 1) {
 			return (lhs * lhs) ** (rhs >> 1)
 		}
-		else
-		{
+		else {
 			return lhs * (lhs * lhs) ** (rhs >> 1) // use (rhs >> 1) instead of (rhs - 1) \ 2
 		}
 	}
 
-	static func gcd(a: Polynomial, b: Polynomial) -> Polynomial
-	{
-		while (!b.isZero())
-		{
+	static func gcd(a: Polynomial, b: Polynomial) -> Polynomial {
+		while !b.isZero {
 			let t = b
 			b = a % b
 			a = t
@@ -232,33 +217,27 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	override func toString() -> String = format(this)
 
-	override func toString(buffer: StringBuilder) -> void
-	{
+	override func toString(buffer: StringBuilder) -> void {
 		let size = this.coefficients.size
-		if (size == 0)
-		{
+		if size == 0 {
 			buffer.append('0.0')
 			return
 		}
-		else if (size == 1)
-		{
+		else if size == 1 {
 			buffer.append(this.coefficients[0])
 			return
 		}
 
 		// append x^0 term, but without x^0
 		var coeff = this.coefficients[0]
-		if (coeff != 0)
-		{
+		if coeff != 0 {
 			buffer.append(coeff).append(' + ')
 		}
 
 		// append x^1 .. x^(n-1) terms
-		for (i <- 1 .. size - 2)
-		{
+		for i <- 1 .. size - 2 {
 			coeff = this.coefficients[i]
-			if (coeff != 0)
-			{
+			if coeff != 0 {
 				toString(coeff, i, buffer)
 				buffer.append(' + ')
 			}
@@ -268,8 +247,7 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 		toString(this.coefficients[size - 1], size - 1, buffer)
 	}
 
-	private static func toString(coefficient: double, degree: int, buffer: StringBuilder) -> void
-	{
+	private static func toString(coefficient: double, degree: int, buffer: StringBuilder) -> void {
 		buffer.append(coefficient).append(' x^').append(degree)
 	}
 }

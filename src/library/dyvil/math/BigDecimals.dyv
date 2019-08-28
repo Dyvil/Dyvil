@@ -5,8 +5,7 @@ public header BigDecimals
 import java.math.BigDecimal
 
 @JavaName("BigDecimals$BigDecimalSyntax")
-extension BigDecimal
-{
+extension BigDecimal {
 	// =============== Static Methods ===============
 
 	static func apply(_ i: long) implicit -> BigDecimal inline = BigDecimal.valueOf(i)
@@ -47,19 +46,16 @@ extension BigDecimal
 }
 
 @JavaName("BigDecimals$LongSyntax")
-extension long
-{
+extension long {
 	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
 @JavaName("BigDecimals$DoubleSyntax")
-extension double
-{
+extension double {
 	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }
 
 @JavaName("BigDecimals$BigIntegerSyntax")
-extension java.math.BigInteger
-{
+extension java.math.BigInteger {
 	final func toBigDecimal() -> BigDecimal inline = BigDecimal(this)
 }

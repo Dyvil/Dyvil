@@ -1,7 +1,6 @@
 package dyvil.math.group
 
-abstract class GroupOperators
-{
+abstract class GroupOperators {
 	private init() {} // no instances
 
 	// Constants

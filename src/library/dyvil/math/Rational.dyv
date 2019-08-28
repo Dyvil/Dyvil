@@ -4,19 +4,19 @@ import dyvil.math.group.RingCompatible
 
 @LiteralConvertible.FromInt
 @LiteralConvertible.FromLong
-class Rational private (let numerator: long { public get }, let denominator: long { public get })
-	implements RingCompatible<Rational>, Formattable, Comparable<Rational>
-{
+class Rational private (
+	let numerator: long { public get }
+	let denominator: long { public get }
+)
+implements RingCompatible<Rational>, Formattable, Comparable<Rational> {
 	// Constants
 
 	public const _0: Rational = 0 { override get }
 
 	public const _1: Rational = 1 { override get }
 
-	static func gcd(a: long, b: long) -> long
-	{
-		while (b != 0)
-		{
+	static func gcd(a: long, b: long) -> long {
+		while b != 0 {
 			let t = b
 			b = a % b
 			a = t
@@ -26,16 +26,16 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	static func apply(numerator: long) -> Rational = new Rational(numerator, 1)
 
-	static func apply(numerator: long, denominator: long) -> Rational
-	{
-		if (numerator == 0) return _0
+	static func apply(numerator: long, denominator: long) -> Rational {
+		if numerator == 0 {
+			return _0
+		}
 
 		let gcd = gcd(numerator, denominator)
 		numerator _/= gcd
 		denominator _/= gcd
 
-		if (denominator < 0)
-		{
+		if denominator < 0 {
 			// make sure the denominator is always positive
 			numerator = -numerator
 			denominator = -denominator
@@ -45,8 +45,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 	}
 
 	@Experimental
-	static func apply(explicit approximating d: double)
-	{
+	static func apply(explicit approximating d: double) -> Rational {
 		let bits = Double.doubleToLongBits(d)
 
 		let sign = ((bits >>> 63) == 0) ? 1 : -1
@@ -55,8 +54,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 		let m    = bits & 0xF_FFFF_FFFF_FFFFL
 		var mant = e == 0 ? (m << 1) : (m | 0x10_0000_0000_0000L)
 
-		if (exp > 0)
-		{
+		if exp > 0 {
 			mant <<= exp
 			exp = 0
 		}
@@ -82,8 +80,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	// Additive Operators
 
-	override infix func +(lhs: Rational, rhs: Rational) -> Rational
-	{
+	override infix func +(lhs: Rational, rhs: Rational) -> Rational {
 		// a / b + c / d = (a * d + b * c) / (b * d)
 		let lhsDenom = lhs.denominator
 		let rhsDenom = rhs.denominator
@@ -97,15 +94,13 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	// Multiplicative Operators
 
-	override infix func *(lhs: Rational, rhs: Rational) -> Rational
-	{
+	override infix func *(lhs: Rational, rhs: Rational) -> Rational {
 		let num = lhs.numerator * rhs.numerator
 		let denom = lhs.denominator * rhs.denominator
 		return Rational(num, denom)
 	}
 
-	override infix func /(lhs: Rational, rhs: Rational) -> Rational
-	{
+	override infix func /(lhs: Rational, rhs: Rational) -> Rational {
 		let num = lhs.numerator * rhs.denominator
 		let denom = lhs.denominator * rhs.numerator
 		return Rational(num, denom)
@@ -121,8 +116,7 @@ class Rational private (let numerator: long { public get }, let denominator: lon
 
 	override func hashCode() -> int = this.numerator.hashCode * 31 + this.denominator.hashCode
 
-	override func compareTo(_ that: Rational) -> int
-	{
+	override func compareTo(_ that: Rational) -> int {
 		// a / b <?> c / d  | * b | * d
 		// a * d <?> c * b
 		return (this.numerator * that.denominator).compareTo(that.numerator * this.denominator)

@@ -3,14 +3,13 @@ package dyvil.io
 import java.io.IOException
 
 interface IOSupplier<type R> {
-
 	func apply() -> R throws IOException
 
 	static func tryIO<type R>(supplier: IOSupplier<R>) -> R? inline {
 		try {
 			return supplier()
 		}
-		catch (ignored: IOException) {
+		catch ignored: IOException {
 			return null
 		}
 	}

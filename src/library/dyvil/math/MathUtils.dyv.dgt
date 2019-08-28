@@ -6,8 +6,7 @@ package dyvil.math
 using dyvil.Math
 
 @JavaName("MathUtils")
-extension Math
-{
+extension Math {
 	// --------------- min ---------------
 
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
@@ -17,11 +16,14 @@ extension Math
 
 		static func min(_ a: T, _ b: T, _ c: T) -> T = min(a, min(b, c))
 
-		static func min(_ values: T...) -> T
-		{
+		static func min(_ values: T...) -> T {
 			var min = #if (FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
-			for (v <- values) if (v < min) min = v
+			for v <- values {
+				if v < min {
+					min = v
+				}
+			}
 			return min
 		}
 
@@ -37,11 +39,14 @@ extension Math
 
 		static func max(_ a: T, _ b: T, _ c: T) -> T = max(a, max(b, c))
 
-		static func max(_ values: T...) -> T
-		{
+		static func max(_ values: T...) -> T {
 			var max = #if (FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
-			for (v <- values) if (v > max) max = v
+			for v <- values {
+				if v > max {
+					max = v
+				}
+			}
 			return max
 		}
 
@@ -54,27 +59,30 @@ extension Math
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func sum(_ values: [T]) -> T
-		{
+		static func sum(_ values: [T]) -> T {
 			var sum: T = 0
-			for (v <- values) sum += v
+			for v <- values {
+				sum += v
+			}
 			return sum
 		}
 	}
 
 	static func sum<T>(_ values: [T], implicit group: GroupAdd<T>) -> T = sum(values.asIterable(), group)
 
-	static func sum<T>(_ values: Iterable<T>, implicit group: GroupAdd<T>) -> T
-	{
+	static func sum<T>(_ values: Iterable<T>, implicit group: GroupAdd<T>) -> T {
 		var sum = group._0
-		for (k <- values) sum += k
+		for k <- values {
+			sum += k
+		}
 		return sum
 	}
 
-	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupAdd<T>) -> T
-	{
+	static func sum<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupAdd<T>) -> T {
 		var sum = group._0
-		for (k <- values) sum += f(k)
+		for k <- values {
+			sum += f(k)
+		}
 		return sum
 	}
 
@@ -83,27 +91,30 @@ extension Math
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func product(_ values: [T]) -> T
-		{
+		static func product(_ values: [T]) -> T {
 			var product: T = 1
-			for (v <- values) product *= v
+			for v <- values {
+				product *= v
+			}
 			return product
 		}
 	}
 
 	static func product<T>(_ values: [T], implicit group: GroupMultiply<T>) -> T = product(values as Iterable<T>, group)
 
-	static func product<T>(_ values: Iterable<T>, implicit group: GroupMultiply<T>) -> T
-	{
+	static func product<T>(_ values: Iterable<T>, implicit group: GroupMultiply<T>) -> T {
 		var product = group._1
-		for (k <- values) product *= k
+		for k <- values {
+			product *= k
+		}
 		return product
 	}
 
-	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupMultiply<T>) -> T
-	{
+	static func product<R, T>(_ values: Iterable<R>, _ f: R -> T, implicit group: GroupMultiply<T>) -> T {
 		var product = group._1
-		for (k <- values) product *= f(k)
+		for k <- values {
+			product *= f(k)
+		}
 		return product
 	}
 
@@ -120,10 +131,9 @@ extension Math
 	#for (spec <- LibraryGenConstants.MAIN_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func clamp(value: T, min: T, max: T) -> T
-		{
-			if (value < min) return min
-			if (value > max) return max
+		static func clamp(value: T, min: T, max: T) -> T {
+			if value < min { return min }
+			if value > max { return max }
 			return value
 		}
 	}
@@ -133,46 +143,40 @@ extension Math
 	#for (spec <- LibraryGenConstants.FLOATING_POINT_SPECS) {
 		#let(T = spec['PRIMITIVE'])
 
-		static func interpolate(factor: T, min: T, max: T) -> T
-		{
-			if (factor <= 0) return min
-			if (factor >= 1) return max
+		static func interpolate(factor: T, min: T, max: T) -> T {
+			if factor <= 0 { return min }
+			if factor >= 1 { return max }
 			return min + factor * (max - min)
 		}
 	}
 
 	// --------------- floor ---------------
 
-	static func floor(_ f: float) -> int
-	{
+	static func floor(_ f: float) -> int {
 		let i = f as int
 		return f < i ? i - 1 : i
 	}
 
-	static func floor(_ d: double) -> long
-	{
+	static func floor(_ d: double) -> long {
 		let l = d as long
 		return d < l ? l - 1 : l
 	}
 
 	// --------------- ceil ---------------
 
-	static func ceil(_ f: float) -> int
-	{
+	static func ceil(_ f: float) -> int {
 		let i = f as int
 		return f > i ? i + 1 : i
 	}
 
-	static func ceil(_ d: double) -> long
-	{
+	static func ceil(_ d: double) -> long {
 		let l = d as long
 		return d > l ? l + 1 : l
 	}
 
 	// --------------- powers of two ---------------
 
-	static func nextPowerOf2(_ v: int) -> int
-	{
+	static func nextPowerOf2(_ v: int) -> int {
 		var j = v - 1
 		j |= j >> 1
 		j |= j >> 2
@@ -187,8 +191,7 @@ extension Math
 	static func log2(_ v: int) -> int = isPowerOf2(v) ? DeBruijn[v] : DeBruijn[nextPowerOf2(v)] - 1
 }
 
-package private class DeBruijn
-{
+package private class DeBruijn {
 	private const deBruijnBits: [int] = [ 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31,
 		27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 ]
 

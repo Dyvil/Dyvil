@@ -1,7 +1,6 @@
 package dyvil.math.group
 
-interface RingCompatible<type T: RingCompatible<T>>
-{
+interface RingCompatible<type T: RingCompatible<T>> {
 	// Constants
 
 	static var _0: T { get }

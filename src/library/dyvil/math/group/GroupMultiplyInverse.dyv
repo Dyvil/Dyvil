@@ -1,34 +1,30 @@
 package dyvil.math.group
 
-interface GroupMultiplyInverse<T> extends GroupMultiply<T>
-{
+interface GroupMultiplyInverse<T> extends GroupMultiply<T> {
 	abstract func inverse(rhs: T) -> T
 
 	func divide(lhs: T, rhs: T) -> T = this.multiply(lhs, this.inverse(rhs)) // a / b == a * 1/b
 
 	// supports negative exponent
-	override func power(lhs: T, rhs: int) -> T
-	{
-		if (rhs < 0)
-		{
+	override func power(lhs: T, rhs: int) -> T {
+		if rhs < 0 {
 			return this.inverse(super<GroupMultiply>.power(lhs, -rhs))
 		}
-		else
-		{
+		else {
 			return super<GroupMultiply>.power(lhs, rhs)
 		}
 	}
 
-	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiplyInverse<R> = new GroupMultiplyInverse<R>()
-	{
-		override var _1: R { get: R._1 }
+	override implicit static func of<@Reified(.ANY_CLASS) type R: RingCompatible<R>>() -> GroupMultiplyInverse<R>
+		= new GroupMultiplyInverse<R>() {
+			override var _1: R { get: R._1 }
 
-		override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
+			override func multiply(lhs: R, rhs: R) -> R = R.`*`(lhs, rhs)
 
-		override func inverse(rhs: R) -> R = R.inverse(rhs)
+			override func inverse(rhs: R) -> R = R.inverse(rhs)
 
-		override func divide(lhs: R, rhs: R) -> R = R.`/`(lhs, rhs)
+			override func divide(lhs: R, rhs: R) -> R = R.`/`(lhs, rhs)
 
-		override func power(lhs: R, rhs: int) -> R = R.`**`(lhs, rhs)
-	}
+			override func power(lhs: R, rhs: int) -> R = R.`**`(lhs, rhs)
+		}
 }
