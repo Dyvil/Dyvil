@@ -1,31 +1,24 @@
 package dyvilx.event
 
-class CovariantEventBus extends InvariantEventBus
-{
-	override func dispatch(event: Object) -> void
-	{
+class CovariantEventBus extends InvariantEventBus {
+	override func dispatch(event: Object) -> void {
 		let eventType = event.dynamicClass
 
-		for (entry <- this.handlers)
-		{
+		for entry <- this.handlers {
 			this.invokeRecursively(entry, entry.handler, event, eventType)
 		}
 	}
 
-	private func invokeRecursively(entry: HandlerEntry, handler: Object!, event: Object, eventType: Class<_>) -> void
-	{
-		if let handlerMethod = entry.getHandler(eventType)
-		{
+	private func invokeRecursively(entry: HandlerEntry, handler: Object!, event: Object, eventType: Class<_>) -> void {
+		if let handlerMethod = entry.getHandler(eventType) {
 			this.invoke(handlerMethod, handler, event)
 		}
 
-		if let superClass = eventType.getSuperclass()
-		{
+		if let superClass = eventType.getSuperclass() {
 			this.invokeRecursively(entry, handler, event, superClass)
 		}
 
-		for (itf <- eventType.getInterfaces())
-		{
+		for itf <- eventType.getInterfaces() {
 			this.invokeRecursively(entry, handler, event, itf!!)
 		}
 	}

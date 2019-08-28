@@ -5,8 +5,7 @@ import java.lang.reflect.Method
 case class HandlerEntry(
 	private let handler: Object! { public get }
 	private let handlerType: Class<_> { public get}
-)
-{
+) {
 	private let methods: [Class<_> : Method] = new mutable.HashMap<Class<_>, Method>()
 
 	func addHandler(ofType: Class<_>, target: Method) -> void = this.methods.put(ofType, target)

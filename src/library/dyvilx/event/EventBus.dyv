@@ -1,7 +1,6 @@
 package dyvilx.event
 
-interface EventBus
-{
+interface EventBus {
 	func register(handler: Object) -> void = this.register(handler, handler.dynamicClass)
 
 	func register(staticHandler: Class<_>) -> void = this.register(null, staticHandler)

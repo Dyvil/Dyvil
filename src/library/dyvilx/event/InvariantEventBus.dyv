@@ -1,27 +1,23 @@
 package dyvilx.event
 
+import java.util.{ List, ArrayList }
 import java.lang.reflect.Method
 import const dyvil.reflect.Modifiers.STATIC
 
-public class InvariantEventBus implements EventBus
-{
-	protected let handlers: List<HandlerEntry> = new mutable.ArrayList<HandlerEntry>
+public class InvariantEventBus implements EventBus {
+	protected let handlers: List<HandlerEntry> = new ArrayList<HandlerEntry>
 
-	override func register(handler: Object!, ofType: Class<_>) -> void
-	{
+	override func register(handler: Object!, ofType: Class<_>) -> void {
 		let entry = HandlerEntry(handler, ofType)
 		this.handlers.add(entry)
 
-		for (method <- ofType.getDeclaredMethods)
-		{
+		for method <- ofType.getDeclaredMethods {
 			// Must be unary method with @EventHandler annotation
-			if (method.getParameterCount() != 1 || method.getAnnotation(class<EventHandler>) == null)
-			{
+			if method.getParameterCount() != 1 || method.getAnnotation(class<EventHandler>) == null {
 				continue
 			}
 			// If the method is non-static, the event handler object must not be null
-			if ((method.getModifiers & STATIC) == 0 && handler == null)
-			{
+			if handler == null && (method.getModifiers & STATIC) == 0 {
 				continue
 			}
 
@@ -30,28 +26,22 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	override func dispatch(event: Object) -> void
-	{
+	override func dispatch(event: Object) -> void {
 		let eventType = event.dynamicClass
 
-		for (entry <- this.handlers)
-		{
-			if let method = entry.getHandler(eventType)
-			{
+		for entry <- this.handlers {
+			if let method = entry.getHandler(eventType) {
 				this.invoke(method, entry.handler, event)
 			}
 		}
 	}
 
-	protected final func invoke(method: Method, handler: Object!, event: Object) -> void
-	{
-		try
-		{
+	protected final func invoke(method: Method, handler: Object!, event: Object) -> void {
+		try {
 			method.setAccessible(true)
 			method.invoke(handler, event)
 		}
-		catch (throwable: Throwable)
-		{
+		catch throwable: Throwable {
 			throwable.printStackTrace()
 		}
 	}
