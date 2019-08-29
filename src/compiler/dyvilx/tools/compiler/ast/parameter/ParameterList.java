@@ -71,6 +71,19 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 		return this.size;
 	}
 
+	public int explicitSize()
+	{
+		int count = 0;
+		for (int i = 0; i < this.size; i++)
+		{
+			if (!this.parameters[i].isImplicit())
+			{
+				count++;
+			}
+		}
+		return count;
+	}
+
 	@Override
 	public Iterator<IParameter> iterator()
 	{
@@ -399,7 +412,6 @@ public class ParameterList implements Iterable<IParameter>, Resolvable
 	{
 		this.toString(null, indent, buffer);
 	}
-
 
 	public void toString(IType thisType, @NonNull String indent, @NonNull StringBuilder buffer)
 	{

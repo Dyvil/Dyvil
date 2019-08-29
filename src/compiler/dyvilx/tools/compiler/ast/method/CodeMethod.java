@@ -298,15 +298,15 @@ public class CodeMethod extends AbstractMethod
 			markers.add(marker);
 		}
 
-		if (this.hasModifier(Modifiers.PREFIX) && this.getParameters().size() != 1)
+		if (this.hasModifier(Modifiers.PREFIX) && this.getParameters().explicitSize() != 1)
 		{
 			markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
 		}
-		else if (this.getAttributes().contains(BaseModifiers.POSTFIX) && this.getParameters().size() != 1)
+		else if (this.getAttributes().contains(BaseModifiers.POSTFIX) && this.getParameters().explicitSize() != 1)
 		{
 			markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
 		}
-		else if (this.hasModifier(Modifiers.INFIX) && this.getParameters().size() != 2)
+		else if (this.hasModifier(Modifiers.INFIX) && this.getParameters().explicitSize() != 2)
 		{
 			markers.add(Markers.semanticWarning(this.position, "method.infix.not_2_parameters.deprecated", this.name));
 		}
