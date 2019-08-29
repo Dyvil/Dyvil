@@ -18,7 +18,7 @@ public enum BaseModifiers implements Modifier
 	// Method Modifiers
 	PREFIX(Modifiers.PREFIX, "prefix"),
 	INFIX(Modifiers.INFIX, "infix"),
-	POSTFIX(Modifiers.INFIX, "postfix"),
+	POSTFIX(Modifiers.POSTFIX, "postfix"),
 	IMPLICIT(Modifiers.IMPLICIT, "implicit"),
 	OVERRIDE(Modifiers.OVERRIDE, "override"),
 	INLINE(Modifiers.INLINE, "inline"),

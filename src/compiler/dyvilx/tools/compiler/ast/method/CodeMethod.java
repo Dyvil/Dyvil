@@ -11,7 +11,6 @@ import dyvilx.tools.asm.TypeReference;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.AnnotationUtil;
-import dyvilx.tools.compiler.ast.attribute.modifiers.BaseModifiers;
 import dyvilx.tools.compiler.ast.attribute.modifiers.ModifierUtil;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.context.IContext;
@@ -302,7 +301,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
 		}
-		else if (this.getAttributes().contains(BaseModifiers.POSTFIX) && this.getParameters().explicitSize() != 1)
+		else if (this.hasModifier(Modifiers.POSTFIX) && this.getParameters().explicitSize() != 1)
 		{
 			markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
 		}

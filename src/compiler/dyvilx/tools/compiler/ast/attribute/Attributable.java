@@ -75,6 +75,11 @@ public interface Attributable
 		return this.getAttributes().hasFlag(modifier);
 	}
 
+	default boolean hasModifier(long modifier)
+	{
+		return this.getAttributes().hasFlag(modifier);
+	}
+
 	default boolean isAbstract()
 	{
 		return this.hasModifier(Modifiers.ABSTRACT);
