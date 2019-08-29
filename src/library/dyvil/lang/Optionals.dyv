@@ -2,8 +2,7 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-final class Optionals
-{
+final class Optionals {
 	private init() {} // no instances
 
 	@Intrinsic([ LOAD_0 ])

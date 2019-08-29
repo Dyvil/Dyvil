@@ -9,8 +9,7 @@ import  dyvil.collection.range.specialized.{ IntRange, LongRange, FloatRange, Do
 // *************** boolean primitive ***************
 
 @JavaName("Primitives$Boolean")
-extension boolean
-{
+extension boolean {
 	// =============== Operators ===============
 
 	// --------------- Unary Operators ---------------
@@ -79,8 +78,7 @@ extension boolean
 // *************** byte primitive ***************
 
 @JavaName("Primitives$Byte")
-extension byte
-{
+extension byte {
 	// --------------- equals ---------------
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
@@ -90,8 +88,7 @@ extension byte
 // *************** short primitive ***************
 
 @JavaName("Primitives$Short")
-extension short
-{
+extension short {
 	// --------------- equals ---------------
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
@@ -101,8 +98,7 @@ extension short
 // *************** char primitive ***************
 
 @JavaName("Primitives$Char")
-extension char
-{
+extension char {
 	// --------------- equals ---------------
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
@@ -120,8 +116,7 @@ extension char
 // *************** int primitive ***************
 
 @JavaName("Primitives$Int")
-extension int
-{
+extension int {
 	// =============== Methods ===============
 
 	// --------------- Unary Operators ---------------
@@ -260,8 +255,7 @@ extension int
 // *************** long primitive ***************
 
 @JavaName("Primitives$Long")
-extension long
-{
+extension long {
 	// =============== Operators ===============
 
 	// --------------- Unary Operators ---------------
@@ -400,8 +394,7 @@ extension long
 // *************** float primitive ***************
 
 @JavaName("Primitives$Float")
-extension float
-{
+extension float {
 	// =============== Operators ===============
 
 	// --------------- Unary Operators ---------------
@@ -489,8 +482,7 @@ extension float
 // *************** double primitive ***************
 
 @JavaName("Primitives$Double")
-extension double
-{
+extension double {
 	// =============== Operators ===============
 
 	// --------------- Unary Operators ---------------
@@ -578,8 +570,7 @@ extension double
 // *************** Void wrapper ***************
 
 @JavaName("Primitives$VoidWrapper")
-extension Void
-{
+extension Void {
 	// =============== Constants ===============
 
 	private const INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
@@ -602,8 +593,7 @@ extension Void
 	// *************** WRAPPER wrapper ***************
 
 	@JavaName("Primitives$#(WRAPPER)Wrapper")
-	extension WRAPPER
-	{
+	extension WRAPPER {
 		// =============== Static Methods ===============
 
 		@Intrinsic([ LOAD_0, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])

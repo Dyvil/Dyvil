@@ -2,8 +2,7 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-final class Objects
-{
+final class Objects {
 	private init() {}
 
 	// Class and Type conversions and utilities
@@ -16,9 +15,9 @@ final class Objects
 
 	// Useful globals
 
-	inline static func run<R>(f: -> R) -> R = f()
+	static func run<R>(f: -> R) -> R inline = f()
 
-	inline infix func run<T, R>(self: T, f: T.() -> R) = f(self)
+	inline infix func run<T, R>(self: T, f: T.() -> R) -> R = f(self)
 
 	inline infix func use<T>(self: T, f: T.() -> void) -> T { f self; self }
 

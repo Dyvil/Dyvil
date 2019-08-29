@@ -107,14 +107,14 @@ final class Name private (
 	// --------------- Serialization ---------------
 
 	static func read(from input: DataInput) -> Name! throws IOException {
-		if (let data = input.readUTF(), !data.isEmpty()) {
+		if let data = input.readUTF(), !data.isEmpty() {
 			return apply(unqualified: data)
 		}
 		return null
 	}
 
-	infix func write(name: Name!, to output: DataOutput) -> void throws IOException {
-		output.writeUTF(name?.unqualified ?? "")
+	final extension func write(this: Name!, to output: DataOutput) -> void throws IOException {
+		output.writeUTF(this?.unqualified ?? "")
 	}
 
 	// =============== Methods ===============

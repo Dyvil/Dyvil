@@ -10,9 +10,9 @@ extension String {
 	// --------------- Pattern Matching ---------------
 
 	// here so the compiler does not use the Pattern-based method with an implicit conversion
-	infix func ~=(pattern: String, value: String) = pattern == value
+	infix func ~=(pattern: String, value: String) -> boolean = pattern == value
 
-	infix func ~=(pattern: Pattern, value: String) = pattern.matches(value)
+	infix func ~=(pattern: Pattern, value: String) -> boolean = pattern.matches(value)
 
 	// --------------- Concatenation ---------------
 

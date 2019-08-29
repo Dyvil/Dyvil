@@ -87,7 +87,7 @@ abstract class Representation {
 		var currentType: Class<_>! = valueClass
 		while currentType != null {
 			for field <- currentType!!.getDeclaredFields {
-				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) {
+				if 0 != (field.getModifiers() & dyvil.reflect.Modifiers.STATIC) {
 					continue
 				}
 
@@ -98,7 +98,7 @@ abstract class Representation {
 					field.get(value).representation(appendedTo: builder)
 					field.setAccessible(false)
 				}
-				catch (ex: Exception) {
+				catch ex: Exception {
 					builder.append("<error>")
 				}
 

@@ -1,6 +1,5 @@
 package dyvil.lang.`internal`
 
-object Null
-{
-	inline static func apply() = instance
+object Null {
+	inline static func apply() -> Null = instance
 }
