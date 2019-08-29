@@ -3,47 +3,43 @@
 
 package dyvil.array
 
-abstract class ArrayOperators
-{
-	private init()
-	{
-		// no instances
-	}
+abstract class ArrayOperators {
+	private init() {} // no instances
 
-	// Generic Object array operators
+	// --------------- Generic Object Array Operators ---------------
 
 	inline infix func in <T>(value: T, array: [T]) -> boolean = array.contains(value)
 
-	inline infix func ? <T>(lhs: [T], rhs: T) -> boolean = lhs.contains(rhs)
+	infix func ? <T>(lhs: [T], rhs: T) -> boolean inline = lhs.contains(rhs)
 
-	inline infix func + <T>(lhs: [T], rhs: T) -> [T] = lhs.added(rhs)
+	infix func + <T>(lhs: [T], rhs: T) -> [T] inline = lhs.added(rhs)
 
-	inline infix func + <T>(lhs: T, rhs: [T]) -> [T] = rhs.added(lhs)
+	infix func + <T>(lhs: T, rhs: [T]) -> [T] inline = rhs.added(lhs)
 
-	inline infix func ++ <T>(lhs: [T], rhs: [T]) -> [T] = lhs.union(rhs)
+	infix func ++ <T>(lhs: [T], rhs: [T]) -> [T] inline = lhs.union(rhs)
 
-	inline infix func - <T>(lhs: [T], rhs: T) -> [T] = lhs.removed(rhs)
+	infix func - <T>(lhs: [T], rhs: T) -> [T] inline = lhs.removed(rhs)
 
-	inline infix func -- <T>(lhs: [T], rhs: [T]) -> [T] = lhs.difference(rhs)
+	infix func -- <T>(lhs: [T], rhs: [T]) -> [T] inline = lhs.difference(rhs)
 
-	// Primitive array operators
 	#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
 		#let(PRIMITIVE = spec['PRIMITIVE'])
+		#let(TYPE_NAME = spec['TYPE_NAME'])
 
-		// TYPE_NAME array operators
+		// --------------- TYPE_NAME Array Operators ---------------
 
 		inline infix func in(value: PRIMITIVE, array: [PRIMITIVE]) -> boolean = array.contains(value)
 
-		inline infix func ? (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> boolean = lhs.contains(rhs)
+		infix func ? (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> boolean inline = lhs.contains(rhs)
 
-		inline infix func + (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.added(rhs)
+		infix func + (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] inline = lhs.added(rhs)
 
-		inline infix func + (lhs: PRIMITIVE, rhs: [PRIMITIVE]) -> [PRIMITIVE] = rhs.added(lhs)
+		infix func + (lhs: PRIMITIVE, rhs: [PRIMITIVE]) -> [PRIMITIVE] inline = rhs.added(lhs)
 
-		inline infix func ++ (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.union(rhs)
+		infix func ++ (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] inline = lhs.union(rhs)
 
-		inline infix func - (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] = lhs.removed(rhs)
+		infix func - (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> [PRIMITIVE] inline = lhs.removed(rhs)
 
-		inline infix func -- (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] = lhs.difference(rhs)
+		infix func -- (lhs: [PRIMITIVE], rhs: [PRIMITIVE]) -> [PRIMITIVE] inline = lhs.difference(rhs)
 	}
 }
