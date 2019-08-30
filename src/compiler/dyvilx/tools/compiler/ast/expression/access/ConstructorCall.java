@@ -17,8 +17,8 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.ast.type.compound.ArrayType;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
@@ -27,12 +27,17 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public class ConstructorCall implements ICall
 {
+	// =============== Fields ===============
+
 	protected @NonNull IType        type;
 	protected @NonNull ArgumentList arguments;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	protected SourcePosition position;
 	protected IConstructor   constructor;
+
+	// =============== Constructors ===============
 
 	public ConstructorCall(SourcePosition position)
 	{
@@ -67,6 +72,8 @@ public class ConstructorCall implements ICall
 		this.arguments = arguments;
 	}
 
+	// =============== Properties ===============
+
 	@Override
 	public SourcePosition getPosition()
 	{
@@ -79,21 +86,9 @@ public class ConstructorCall implements ICall
 		this.position = position;
 	}
 
-	@Override
-	public int valueTag()
-	{
-		return CONSTRUCTOR_CALL;
-	}
-
 	public IConstructor getConstructor()
 	{
 		return this.constructor;
-	}
-
-	@Override
-	public boolean isResolved()
-	{
-		return this.constructor != null;
 	}
 
 	@Override
@@ -109,15 +104,29 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
+	public ArgumentList getArguments()
+	{
+		return this.arguments;
+	}
+
+	@Override
 	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}
 
 	@Override
-	public ArgumentList getArguments()
+	public boolean isResolved()
 	{
-		return this.arguments;
+		return this.constructor != null;
+	}
+
+	// =============== Methods ===============
+
+	@Override
+	public int valueTag()
+	{
+		return CONSTRUCTOR_CALL;
 	}
 
 	public ClassConstructorCall toClassConstructor()
@@ -126,6 +135,8 @@ public class ConstructorCall implements ICall
 		cc.constructor = this.constructor;
 		return cc;
 	}
+
+	// --------------- Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -236,7 +247,7 @@ public class ConstructorCall implements ICall
 	}
 
 	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, SourcePosition position,
-		                                   IType type, ArgumentList arguments)
+		IType type, ArgumentList arguments)
 	{
 		final Marker marker;
 		if (list != null && list.isAmbigous())
@@ -329,6 +340,8 @@ public class ConstructorCall implements ICall
 		return this;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -355,6 +368,8 @@ public class ConstructorCall implements ICall
 
 		writer.visitMultiANewArrayInsn(arrayType, count);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public String toString()
