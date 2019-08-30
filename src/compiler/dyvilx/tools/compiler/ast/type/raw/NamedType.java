@@ -154,7 +154,7 @@ public class NamedType implements IUnresolvedType
 
 	private IType resolveTopLevelWith(@SuppressWarnings("UnusedParameters") MarkerList markers, IContext context)
 	{
-		final MatchList<ITypeAlias> typeAliases = IContext.resolveTypeAlias(context, null, this.name, TypeList.EMPTY);
+		final MatchList<ITypeAlias> typeAliases = IContext.resolveTypeAlias(context, null, this.name, new TypeList());
 		if (typeAliases.hasCandidate())
 		{
 			final ITypeAlias typeAlias = typeAliases.getBestMember();
