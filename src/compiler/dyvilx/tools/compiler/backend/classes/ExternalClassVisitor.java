@@ -67,10 +67,6 @@ public class ExternalClassVisitor implements ClassVisitor
 		this.theClass.setInternalName(name);
 
 		this.theClass.setBody(new ClassBody(this.theClass));
-		if (interfaces != null)
-		{
-			this.theClass.setInterfaces(new TypeList(interfaces.length));
-		}
 
 		int index = name.lastIndexOf('$');
 		if (index == -1)
@@ -319,5 +315,6 @@ public class ExternalClassVisitor implements ClassVisitor
 	@Override
 	public void visitEnd()
 	{
+		this.theClass.clearResolved();
 	}
 }

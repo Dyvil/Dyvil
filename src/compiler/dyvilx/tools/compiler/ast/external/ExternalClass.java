@@ -16,6 +16,7 @@ import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
@@ -32,8 +33,9 @@ public final class ExternalClass extends AbstractClass
 	// =============== Constants ===============
 
 	private static final int METADATA       = 1;
-	private static final int SUPER_TYPES    = 1 << 1;
+	private static final int SUPER_TYPE     = 1 << 1;
 	private static final int GENERICS       = 1 << 2;
+	private static final int INTERFACES     = 1 << 3;
 	private static final int ANNOTATIONS    = 1 << 5;
 	private static final int MEMBER_CLASSES = 1 << 6;
 
@@ -86,8 +88,15 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IType getSuperType()
 	{
-		this.resolveSuperTypes();
+		this.resolveSuperType();
 		return super.getSuperType();
+	}
+
+	@Override
+	public TypeList getInterfaces()
+	{
+		this.resolveInterfaces();
+		return super.getInterfaces();
 	}
 
 	@Override
@@ -112,6 +121,11 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	// =============== Methods ===============
+
+	public void clearResolved()
+	{
+		this.resolved = 0;
+	}
 
 	private IContext getCombiningContext()
 	{
@@ -158,25 +172,31 @@ public final class ExternalClass extends AbstractClass
 		}
 	}
 
-	private void resolveSuperTypes()
+	private void resolveSuperType()
 	{
-		if ((this.resolved & SUPER_TYPES) != 0)
+		if ((this.resolved & SUPER_TYPE) != 0)
 		{
 			return;
 		}
 
-		this.resolved |= SUPER_TYPES;
+		this.resolved |= SUPER_TYPE;
 
-		final IContext context = this.getCombiningContext();
 		if (this.superType != null)
 		{
+			final IContext context = this.getCombiningContext();
 			this.superType = this.superType.resolveType(null, context);
 		}
+	}
 
-		if (this.interfaces != null)
+	private void resolveInterfaces()
+	{
+		if ((this.resolved & INTERFACES) != 0)
 		{
-			this.interfaces.resolveTypes(null, context);
+			return;
 		}
+
+		this.resolved |= INTERFACES;
+		this.interfaces.resolveTypes(null, this.getCombiningContext());
 	}
 
 	private void resolveAnnotations()
