@@ -288,13 +288,15 @@ public class CodeMethod extends AbstractMethod
 			markers.add(Markers.semanticError(this.position, "method.extension.this_type.invalid", this.name));
 		}
 
-		if ((this.hasModifier(Modifiers.INFIX) || this.hasModifier(Modifiers.PREFIX)) //
-		    && !CharacterTypes
-			        .isIdentifierSymbol(this.name.unqualified.codePointBefore(this.name.unqualified.length())))
+		if (this.hasModifier(Modifiers.INFIX) || this.hasModifier(Modifiers.PREFIX) || this.hasModifier(Modifiers.POSTFIX))
 		{
-			final Marker marker = Markers.semanticWarning(this.position, "method.not_symbolic.deprecated", this.name);
-			marker.addInfo(Markers.getSemantic("method.not_symbolic.deprecated.fix"));
-			markers.add(marker);
+			final int lastCodePoint = this.name.unqualified.codePointBefore(this.name.unqualified.length());
+			if (!CharacterTypes.isIdentifierSymbol(lastCodePoint) && lastCodePoint != '.')
+			{
+				final Marker marker = Markers.semanticWarning(this.position, "method.not_symbolic.deprecated", this.name);
+				marker.addInfo(Markers.getSemantic("method.not_symbolic.deprecated.fix"));
+				markers.add(marker);
+			}
 		}
 
 		if (this.hasModifier(Modifiers.PREFIX) && this.getParameters().explicitSize() != 1)

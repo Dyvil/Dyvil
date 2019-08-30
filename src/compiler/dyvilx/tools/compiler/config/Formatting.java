@@ -136,6 +136,7 @@ public final class Formatting
 
 	public static boolean endsWithSymbol(StringBuilder buffer)
 	{
-		return CharacterTypes.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));
+		final int lastCodePoint = buffer.codePointBefore(buffer.length());
+		return CharacterTypes.isIdentifierSymbol(lastCodePoint) || lastCodePoint == '.';
 	}
 }
