@@ -180,3 +180,21 @@
 ## Dyvil REPL v0.28.1
 
 ## Dyvil GenSrc v0.10.1
+
+# Dyvil 0.46.4
+
+## Dyvil Library v0.46.1
+
++ Added the `Modifiers.POSTFIX_FLAG` and `.POSTFIX` constants. #508
+* Fixed the `MarkerList.warnings` property counting errors instead of warnings.
+
+## Dyvil Compiler v0.46.4
+
++ The `postfix` modifier is now reified with a flag in `DyvilModifiers` annotations. #508
+* Fixed `postfix` functions causing syntax warnings. #501
+* Fixed operator functions with dot identifiers causing syntax warnings. #502
+* Fixed operator functions with implicit parameters causing syntax warnings. #503
+
+## Dyvil REPL v0.28.1
+
+## Dyvil GenSrc v0.10.1
