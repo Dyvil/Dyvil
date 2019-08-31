@@ -80,7 +80,7 @@ void setupGenSrc(Map args, JavaExec exec) {
 	exec.classpath configurations.bootstrap
 
 	if (gensrc_dir) {
-		exec.args "gensrc_dir=$gensrc_dir"
+		exec.args "--gensrc-dir=$gensrc_dir"
 		exec.args 'test'
 	}
 
