@@ -18,7 +18,7 @@ class MarkerList(let i18n: I18n { public get }) extends ArrayList<Marker> {
 
 	var errors: int { get: this.count(where: _.isError()) }
 
-	var warnings: int { get: this.count(where: _.isError()) }
+	var warnings: int { get: this.count(where: _.isWarning()) }
 
 	// =============== Methods ===============
 

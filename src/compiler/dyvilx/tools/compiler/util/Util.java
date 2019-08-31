@@ -179,10 +179,8 @@ public final class Util
 
 	public static Name addEq(Name name)
 	{
-		final int unqualifiedLength = name.unqualified.length();
-		final char lastChar = name.unqualified.charAt(unqualifiedLength - 1);
-
-		if (CharacterTypes.isIdentifierSymbol(lastChar))
+		final int lastCodePoint = name.unqualified.codePointBefore(name.unqualified.length());
+		if (CharacterTypes.isIdentifierSymbol(lastCodePoint) || lastCodePoint == '.')
 		{
 			// Last character is a symbol -> add = without _
 			return Name.from(name.unqualified.concat("="), name.qualified.concat("$eq"));

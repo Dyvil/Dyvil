@@ -68,7 +68,7 @@ public class ExtensionMetadata implements IClassMetadata
 
 		// immediately remove these to avoid further warnings or errors
 		this.theClass.setSuperType(Types.OBJECT);
-		this.theClass.setTypeParameters(null);
+		this.theClass.getTypeParameters().clear();
 	}
 
 	private static IType replaceTypeVars(IType type, ITypeParametric origin, ITypeParametric target)

@@ -102,7 +102,7 @@ public final class GenericData implements Resolvable, ITypeContext
 		if (this.isMethodTypeVariable(typeParameter))
 		{
 			final int index = typeParameter.getIndex();
-			if (index >= this.lockedCount)
+			if (index >= this.lockedCount || index >= this.generics.size())
 			{
 				return null;
 			}
@@ -131,6 +131,11 @@ public final class GenericData implements Resolvable, ITypeContext
 		}
 
 		final int index = typeParameter.getIndex();
+
+		while (index >= this.generics.size())
+		{
+			this.generics.add(null);
+		}
 
 		final IType current = this.generics.get(index);
 		if (current == null)

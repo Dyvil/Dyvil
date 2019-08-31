@@ -22,6 +22,7 @@ import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.parameter.ParameterList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.IType.TypePosition;
+import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
@@ -121,22 +122,17 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.resolveTypesAfterAttributes(markers, context);
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.resolveTypes(markers, context);
-		}
+		this.getTypeParameters().resolveTypes(markers, context);
 
 		this.parameters.resolveTypes(markers, context);
 
-		if (this.superType != null)
+		final IType unresolvedSuperType = this.getSuperType();
+		if (unresolvedSuperType != null)
 		{
-			this.superType = this.superType.resolveType(markers, context);
+			this.setSuperType(unresolvedSuperType.resolveType(markers, context));
 		}
 
-		if (this.interfaces != null)
-		{
-			this.interfaces.resolveTypes(markers, context);
-		}
+		this.getInterfaces().resolveTypes(markers, context);
 
 		this.metadata.resolveTypesBeforeBody(markers, context);
 
@@ -162,22 +158,17 @@ public class CodeClass extends AbstractClass
 
 		this.attributes.resolve(markers, context);
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.resolve(markers, context);
-		}
+		this.getTypeParameters().resolve(markers, context);
 
 		this.parameters.resolve(markers, context);
 
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.superType.resolve(markers, context);
+			superType.resolve(markers, context);
 		}
 
-		if (this.interfaces != null)
-		{
-			this.interfaces.resolve(markers, context);
-		}
+		this.getInterfaces().resolve(markers, context);
 
 		this.metadata.resolve(markers, context);
 
@@ -208,10 +199,7 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.checkTypes(markers, context);
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.checkTypes(markers, context);
-		}
+		this.getTypeParameters().checkTypes(markers, context);
 
 		final Set<IClass> checkedClasses = Collections.newSetFromMap(new IdentityHashMap<>());
 		checkedClasses.add(this);
@@ -219,15 +207,13 @@ public class CodeClass extends AbstractClass
 
 		this.parameters.checkTypes(markers, context);
 
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.superType.checkType(markers, context, TypePosition.SUPER_TYPE);
+			superType.checkType(markers, context, TypePosition.SUPER_TYPE);
 		}
 
-		if (this.interfaces != null)
-		{
-			this.interfaces.checkTypes(markers, context, TypePosition.SUPER_TYPE);
-		}
+		this.getInterfaces().checkTypes(markers, context, TypePosition.SUPER_TYPE);
 
 		if (this.body != null)
 		{
@@ -244,58 +230,53 @@ public class CodeClass extends AbstractClass
 
 		this.attributes.check(markers, context, this.getElementType());
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.check(markers, context);
-		}
+		this.getTypeParameters().check(markers, context);
 
 		this.parameters.check(markers, context);
 
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.superType.check(markers, context);
+			superType.check(markers, context);
 
 			final IClass superClass;
-			if (!this.hasModifier(Modifiers.EXTENSION) && (superClass = this.superType.getTheClass()) != null)
+			if (!this.hasModifier(Modifiers.EXTENSION) && (superClass = superType.getTheClass()) != null)
 			{
 				final AttributeList superAttributes = superClass.getAttributes();
 				if (superAttributes.hasAnyFlag(Modifiers.CLASS_TYPE_MODIFIERS))
 				{
-					markers.add(Markers.semanticError(this.superType.getPosition(), "class.extend.type",
+					markers.add(Markers.semanticError(superType.getPosition(), "class.extend.type",
 					                                  ModifierUtil.classTypeToString(superAttributes.flags()),
 					                                  superClass.getName()));
 				}
 				else if (superAttributes.hasFlag(Modifiers.FINAL))
 				{
-					markers.add(Markers.semanticError(this.superType.getPosition(), "class.extend.final",
+					markers.add(Markers.semanticError(superType.getPosition(), "class.extend.final",
 					                                  superClass.getName()));
 				}
 			}
 		}
 
-		if (this.interfaces != null)
+		for (IType type : this.getInterfaces())
 		{
-			for (IType type : this.interfaces)
+			type.check(markers, context);
+
+			if (!type.isResolved())
 			{
-				type.check(markers, context);
+				continue;
+			}
 
-				if (!type.isResolved())
-				{
-					continue;
-				}
+			final IClass theClass = type.getTheClass();
+			if (theClass == null)
+			{
+				continue;
+			}
 
-				final IClass theClass = type.getTheClass();
-				if (theClass == null)
-				{
-					continue;
-				}
-
-				if (!theClass.isInterface())
-				{
-					final String classType = ModifierUtil.classTypeToString(theClass.getAttributes().flags());
-					markers.add(
-						Markers.semanticError(this.position, "class.implement.type", classType, theClass.getName()));
-				}
+			if (!theClass.isInterface())
+			{
+				final String classType = ModifierUtil.classTypeToString(theClass.getAttributes().flags());
+				markers.add(
+					Markers.semanticError(this.position, "class.implement.type", classType, theClass.getName()));
 			}
 		}
 
@@ -436,22 +417,17 @@ public class CodeClass extends AbstractClass
 	{
 		this.attributes.foldConstants();
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.foldConstants();
-		}
+		this.getTypeParameters().foldConstants();
 
 		this.parameters.foldConstants();
 
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.superType.foldConstants();
+			superType.foldConstants();
 		}
 
-		if (this.interfaces != null)
-		{
-			this.interfaces.foldConstants();
-		}
+		this.getInterfaces().foldConstants();
 
 		this.metadata.foldConstants();
 
@@ -466,22 +442,17 @@ public class CodeClass extends AbstractClass
 	{
 		this.attributes.cleanup(compilableList, this);
 
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.cleanup(compilableList, this);
-		}
+		this.getTypeParameters().cleanup(compilableList, this);
 
 		this.parameters.cleanup(compilableList, this);
 
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.superType.cleanup(compilableList, this);
+			superType.cleanup(compilableList, this);
 		}
 
-		if (this.interfaces != null)
-		{
-			this.interfaces.cleanup(compilableList, this);
-		}
+		this.getInterfaces().cleanup(compilableList, this);
 
 		this.metadata.cleanup(compilableList, this);
 
@@ -497,39 +468,19 @@ public class CodeClass extends AbstractClass
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		if (this.typeParameters != null)
+		this.getTypeParameters().appendSignature(buffer);
+
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			this.typeParameters.appendSignature(buffer);
+			superType.appendSignature(buffer, false);
 		}
 
-		if (this.superType != null)
-		{
-			this.superType.appendSignature(buffer, false);
-		}
-		if (this.interfaces != null)
-		{
-			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
-		}
+		this.getInterfaces().appendDescriptors(buffer, IType.NAME_SIGNATURE);
 		return buffer.toString();
 	}
 
 	// - - - - - - - - Interfaces - - - - - - - -
-
-	private String[] getInterfaceArray()
-	{
-		if (this.interfaces == null)
-		{
-			return null;
-		}
-
-		final int size = this.interfaces.size();
-		final String[] interfaces = new String[size];
-		for (int i = 0; i < size; i++)
-		{
-			interfaces[i] = this.interfaces.get(i).getInternalName();
-		}
-		return interfaces;
-	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
@@ -537,13 +488,15 @@ public class CodeClass extends AbstractClass
 		// Header
 
 		final String signature = this.getSignature();
-		final String superClass = this.superType != null ? this.superType.getInternalName() : null;
-		final String[] interfaces = this.getInterfaceArray();
+		final IType superType = this.getSuperType();
+		final TypeList interfaces = this.getInterfaces();
 
 		int javaFlags = this.getJavaFlags();
 		final long dyvilFlags = this.getDyvilFlags();
 
-		writer.visit(ClassFormat.CLASS_VERSION, javaFlags, this.getInternalName(), signature, superClass, interfaces);
+		writer.visit(ClassFormat.CLASS_VERSION, javaFlags, this.getInternalName(), signature,
+		             superType != null ? superType.getInternalName() : null,
+		             interfaces.isEmpty() ? null : interfaces.getInternalTypeNames());
 
 		// Source
 
@@ -562,24 +515,21 @@ public class CodeClass extends AbstractClass
 
 		// Super Types
 
-		if (this.superType != null)
+		if (superType != null)
 		{
-			IClass iclass = this.superType.getTheClass();
+			IClass iclass = superType.getTheClass();
 			if (iclass != null)
 			{
 				iclass.writeInnerClassInfo(writer);
 			}
 		}
 
-		if (this.interfaces != null)
+		for (IType type : interfaces)
 		{
-			for (IType type : this.interfaces)
+			final IClass iclass = type.getTheClass();
+			if (iclass != null)
 			{
-				final IClass iclass = type.getTheClass();
-				if (iclass != null)
-				{
-					iclass.writeInnerClassInfo(writer);
-				}
+				iclass.writeInnerClassInfo(writer);
 			}
 		}
 
@@ -700,30 +650,27 @@ public class CodeClass extends AbstractClass
 		this.attributes.write(writer);
 
 		// Type Variable Annotations
-		if (this.typeParameters != null)
-		{
-			this.typeParameters.write(writer);
-		}
+		this.getTypeParameters().write(writer);
 
 		// Super Type Variable Annotations
-		if (this.superType != null)
+		final IType superType = this.getSuperType();
+		if (superType != null)
 		{
-			IType.writeAnnotations(this.superType, writer, TypeReference.newSuperTypeReference(-1), "");
+			IType.writeAnnotations(superType, writer, TypeReference.newSuperTypeReference(-1), "");
 		}
-		if (this.interfaces != null)
+
+		final TypeList interfaces = this.getInterfaces();
+		for (int i = 0, size = interfaces.size(); i < size; i++)
 		{
-			for (int i = 0, size = this.interfaces.size(); i < size; i++)
-			{
-				IType.writeAnnotations(this.interfaces.get(i), writer, TypeReference.newSuperTypeReference(i), "");
-			}
+			IType.writeAnnotations(interfaces.get(i), writer, TypeReference.newSuperTypeReference(i), "");
 		}
 	}
 
 	private void writeTypes(DataOutput out) throws IOException
 	{
-		IType.writeType(this.superType, out);
+		IType.writeType(this.getSuperType(), out);
 
-		this.interfaces.write(out);
+		this.getInterfaces().write(out);
 	}
 
 	@Override
@@ -748,9 +695,8 @@ public class CodeClass extends AbstractClass
 
 	private void readTypes(DataInput in) throws IOException
 	{
-		this.superType = IType.readType(in);
-
-		this.interfaces.read(in);
+		this.setSuperType(IType.readType(in));
+		this.getInterfaces().read(in);
 	}
 
 	@Override

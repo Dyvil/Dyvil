@@ -6,23 +6,17 @@ import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.classes.AbstractClass;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.CombiningContext;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.field.IDataMember;
-import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
 import dyvilx.tools.compiler.ast.generic.TypeParameterList;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
-import dyvilx.tools.compiler.ast.method.IMethod;
-import dyvilx.tools.compiler.ast.method.MatchList;
-import dyvilx.tools.compiler.ast.parameter.ArgumentList;
-import dyvilx.tools.compiler.ast.parameter.IParameter;
 import dyvilx.tools.compiler.ast.structure.Package;
 import dyvilx.tools.compiler.ast.structure.RootPackage;
 import dyvilx.tools.compiler.ast.type.IType;
+import dyvilx.tools.compiler.ast.type.TypeList;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
@@ -31,25 +25,26 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public final class ExternalClass extends AbstractClass
 {
+	// =============== Constants ===============
+
 	private static final int METADATA       = 1;
-	private static final int SUPER_TYPES    = 1 << 1;
+	private static final int SUPER_TYPE     = 1 << 1;
 	private static final int GENERICS       = 1 << 2;
+	private static final int INTERFACES     = 1 << 3;
 	private static final int ANNOTATIONS    = 1 << 5;
 	private static final int MEMBER_CLASSES = 1 << 6;
+
+	// =============== Fields ===============
 
 	private byte                resolved;
 	private Map<String, String> innerTypes; // inner name -> full internal name
 
-	public ExternalClass()
-	{
-	}
+	// =============== Properties ===============
 
 	@Override
 	public SourcePosition getPosition()
@@ -70,6 +65,66 @@ public final class ExternalClass extends AbstractClass
 		}
 
 		return this.innerTypes;
+	}
+
+	@Override
+	public String getFullName()
+	{
+		if (this.fullName != null)
+		{
+			return this.fullName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.fullName = this.enclosingClass.getFullName() + '.' + this.getName();
+		}
+		if (this.enclosingPackage != null)
+		{
+			return this.fullName = this.enclosingPackage.getFullName() + '.' + this.getName();
+		}
+		return this.fullName = this.getName().toString();
+	}
+
+	@Override
+	public IType getSuperType()
+	{
+		this.resolveSuperType();
+		return super.getSuperType();
+	}
+
+	@Override
+	public TypeList getInterfaces()
+	{
+		this.resolveInterfaces();
+		return super.getInterfaces();
+	}
+
+	@Override
+	public TypeParameterList getTypeParameters()
+	{
+		this.resolveGenerics();
+		return super.getTypeParameters();
+	}
+
+	@Override
+	public AttributeList getAttributes()
+	{
+		this.resolveAnnotations();
+		return super.getAttributes();
+	}
+
+	@Override
+	public IClassMetadata getMetadata()
+	{
+		this.resolveMetadata();
+		return this.metadata;
+	}
+
+	// =============== Methods ===============
+
+	public void clearResolved()
+	{
+		this.resolved = 0;
 	}
 
 	private IContext getCombiningContext()
@@ -117,25 +172,31 @@ public final class ExternalClass extends AbstractClass
 		}
 	}
 
-	private void resolveSuperTypes()
+	private void resolveSuperType()
 	{
-		if ((this.resolved & SUPER_TYPES) != 0)
+		if ((this.resolved & SUPER_TYPE) != 0)
 		{
 			return;
 		}
 
-		this.resolved |= SUPER_TYPES;
+		this.resolved |= SUPER_TYPE;
 
-		final IContext context = this.getCombiningContext();
 		if (this.superType != null)
 		{
+			final IContext context = this.getCombiningContext();
 			this.superType = this.superType.resolveType(null, context);
 		}
+	}
 
-		if (this.interfaces != null)
+	private void resolveInterfaces()
+	{
+		if ((this.resolved & INTERFACES) != 0)
 		{
-			this.interfaces.resolveTypes(null, context);
+			return;
 		}
+
+		this.resolved |= INTERFACES;
+		this.interfaces.resolveTypes(null, this.getCombiningContext());
 	}
 
 	private void resolveAnnotations()
@@ -171,128 +232,7 @@ public final class ExternalClass extends AbstractClass
 		this.innerTypes = null;
 	}
 
-	@Override
-	public String getFullName()
-	{
-		if (this.fullName != null)
-		{
-			return this.fullName;
-		}
-		if (this.enclosingClass != null)
-		{
-			return this.fullName = this.enclosingClass.getFullName() + '.' + this.getName();
-		}
-		if (this.enclosingPackage != null)
-		{
-			return this.fullName = this.enclosingPackage.getFullName() + '.' + this.getName();
-		}
-		return this.fullName = this.getName().toString();
-	}
-
-	@Override
-	public IClass getThisClass()
-	{
-		this.resolveGenerics();
-		return this;
-	}
-
-	@Override
-	public IType getThisType()
-	{
-		this.resolveGenerics();
-		return super.getThisType();
-	}
-
-	@Override
-	public IType getSuperType()
-	{
-		this.resolveSuperTypes();
-		return this.superType;
-	}
-
-	@Override
-	public boolean isSubClassOf(IType type)
-	{
-		this.resolveSuperTypes();
-		return super.isSubClassOf(type);
-	}
-
-	@Override
-	public TypeParameterList getTypeParameters()
-	{
-		this.resolveGenerics();
-		return super.getTypeParameters();
-	}
-
-	@Override
-	public AttributeList getAttributes()
-	{
-		this.resolveAnnotations();
-		return super.getAttributes();
-	}
-
-	@Override
-	public IType resolveType(ITypeParameter typeParameter, IType concrete)
-	{
-		this.resolveGenerics();
-		this.resolveSuperTypes();
-		return super.resolveType(typeParameter, concrete);
-	}
-
-	@Override
-	public IClassMetadata getMetadata()
-	{
-		this.resolveMetadata();
-		return this.metadata;
-	}
-
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
-	{
-		this.resolveMetadata();
-		this.resolveGenerics();
-		this.resolveSuperTypes();
-		return super.checkImplements(candidate, typeContext);
-	}
-
-	@Override
-	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
-		Set<IClass> checkedClasses)
-	{
-		this.resolveGenerics();
-		this.resolveSuperTypes();
-		super.checkMethods(markers, checkedClass, typeContext, checkedClasses);
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public void foldConstants()
-	{
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-	}
+	// --------------- Resolution ---------------
 
 	@Override
 	public IClass resolveClass(Name name)
@@ -320,92 +260,45 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IDataMember resolveField(Name name)
-	{
-		final IParameter parameter = this.resolveClassParameter(name);
-		if (parameter != null)
-		{
-			return parameter;
-		}
-
-		// Own fields
-		IDataMember field = this.body.getField(name);
-		if (field != null)
-		{
-			return field;
-		}
-
-		this.resolveSuperTypes();
-
-		// Inherited Fields
-		if (this.superType != null)
-		{
-			field = this.superType.resolveField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public IValue resolveImplicit(IType type)
 	{
 		this.resolveMemberClasses();
 		return super.resolveImplicit(type);
 	}
 
+	// --------------- Phases ---------------
+
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.resolveGenerics();
-
-		/*
-		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
-		External classes do not have any class parameters with associated properties
-		*/
-		this.body.getMethodMatches(list, receiver, name, arguments);
-		// The same applies for the Metadata
-
-		if (list.hasCandidate())
-		{
-			return;
-		}
-
-		this.resolveSuperTypes();
-
-		if (this.superType != null)
-		{
-			this.superType.getMethodMatches(list, receiver, name, arguments);
-		}
-
-		if (list.hasCandidate() || this.interfaces == null)
-		{
-			return;
-		}
-
-		for (IType type : this.interfaces)
-		{
-			type.getMethodMatches(list, receiver, name, arguments);
-		}
 	}
 
 	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	public void resolve(MarkerList markers, IContext context)
 	{
-		this.resolveGenerics();
-		this.body.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.resolveSuperTypes();
-		this.resolveGenerics();
-
-		this.body.getConstructorMatches(list, arguments);
 	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+
+	@Override
+	public void foldConstants()
+	{
+	}
+
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	{
+	}
+
+	// --------------- Compilation ---------------
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
@@ -423,12 +316,12 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void writeSignature(DataOutput out) throws IOException
+	public void writeSignature(DataOutput out)
 	{
 	}
 
 	@Override
-	public void readSignature(DataInput in) throws IOException
+	public void readSignature(DataInput in)
 	{
 	}
 }

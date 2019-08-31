@@ -172,6 +172,10 @@ public interface Modifiers
 
 	int PREFIX = PREFIX_FLAG | STATIC;
 
+	long POSTFIX_FLAG = 0x00000001L << 32;
+
+	long POSTFIX = POSTFIX_FLAG | INFIX;
+
 	// Field Modifiers
 
 	/**
