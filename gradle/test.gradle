@@ -79,7 +79,7 @@ tasks.register('testGenSrc', JavaExec) {
 
 tasks.register('runRepl', JavaExec) {
 	group 'run'
-	dependsOn 'compileTestDyvil'
+	dependsOn ':testClasses', ':repl:classes'
 
 	setupCompiler(it,
 			libraries: sourceSets.test.compileClasspath.toList()
@@ -94,27 +94,13 @@ tasks.register('runRepl', JavaExec) {
 	classpath = sourceSets.test.runtimeClasspath + project(':repl').sourceSets.main.runtimeClasspath
 }
 
-tasks.register('saveReplConfig') {
-	File configFile = new File("temp/repl_config.txt")
-	outputs.file configFile
-
-	doLast {
-		JavaExec runRepl = tasks.runRepl as JavaExec
-		configFile.withWriter { out ->
-			runRepl.args.each {
-				out.println it
-			}
-		}
-	}
-}
-
 tasks.register('saveReplCommand') {
 	File commandFile = new File('temp/repl.command')
 	outputs.file commandFile
 
 	doLast {
 		JavaExec runRepl = tasks.runRepl as JavaExec
-		String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.join(' ') + '\n'
+		String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.join(' \\\n\t') + '\n'
 
 		commandFile.text = content
 		commandFile.executable = true
