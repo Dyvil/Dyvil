@@ -1,6 +1,7 @@
 package dyvilx.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Iterables;
 import dyvil.lang.Formattable;
 import dyvil.lang.Name;
 import dyvil.reflect.Modifiers;
@@ -8,6 +9,7 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.asm.Handle;
 import dyvilx.tools.asm.Type;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
+import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.constructor.IConstructor;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
@@ -558,7 +560,58 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		this.method.getType().inferTypes(valueType, tempContext);
 
 		final IType classType = this.method.getEnclosingClass().getThisType();
-		this.type = classType.getConcreteType(tempContext);
+		final IType concreteClassType = classType.getConcreteType(tempContext);
+
+		this.type = inferRecursively(this.type.getTheClass(), concreteClassType, tempContext);
+	}
+
+	private static IType inferRecursively(IClass thisClass, IType concrete, ITypeContext context)
+	{
+		/*
+		 * Example
+		 *
+		 * interface F<T>, interface G<U> : F<U>, interface H<V> : G<V>
+		 *
+		 * i1 = H<V>
+		 * c = F<Int>
+		 * inferRecursively(i1, c, tc = {})
+		 *    i2 = H.itf[0] // = G<V>
+		 *    c2 = inferRecursively(i2, c, tc)
+		 *       i3 = G.itf[0] // = F<U>
+		 *       c3 = inferRecursively(i3, c, tc = {})
+		 *          // i3.class == c.class
+		 *          rit = i3.class.type // = F<T>
+		 *          rit.inferType(c, tc) // tc[T] = Int
+		 *          return c // = F<Int>
+		 *       i3.inferTypes(c3, tc) // tc[U] = Int
+		 *       return i2.concrete(tc) // = G<Int>
+		 *    i2.inferTypes(c2, tc) // tc[V] = Int
+		 *    return i2.concrete(tc) // H<Int>
+		 */
+
+		if (thisClass == concrete.getTheClass())
+		{
+			thisClass.getThisType().inferTypes(concrete, context);
+			return concrete;
+		}
+
+		for (final IType superType : superTypes(thisClass))
+		{
+			final IType concreteSuperType = inferRecursively(superType.getTheClass(), concrete, context);
+			if (concreteSuperType != null)
+			{
+				superType.inferTypes(concreteSuperType, context);
+				return thisClass.getThisType().getConcreteType(context);
+			}
+		}
+
+		return null;
+	}
+
+	private static Iterable<IType> superTypes(IClass iclass)
+	{
+		final IType superType = iclass.getSuperType();
+		return superType == null ? iclass.getInterfaces() : Iterables.prepend(superType, iclass.getInterfaces());
 	}
 
 	private void checkReturnType(MarkerList markers, IType expectedReturnType)
