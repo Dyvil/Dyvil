@@ -118,7 +118,7 @@ public class ConstructorCall implements ICall
 	@Override
 	public boolean isResolved()
 	{
-		return this.constructor != null;
+		return this.constructor != null || this.type.canExtract(ArrayType.class);
 	}
 
 	// =============== Methods ===============
