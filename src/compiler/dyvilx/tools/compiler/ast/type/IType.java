@@ -374,7 +374,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	boolean isUninferred();
 
 	/**
-	 * Returns a new type with all type variables in this type replaced according to {@code typeContext}.
+	 * Returns a new type with type variables in this type replaced according to {@code typeContext}.
 	 * <p>
 	 * For example,
 	 *
@@ -386,7 +386,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	 * where {@code {Type}} represents the AST produced by the type expression {@code Type},
 	 * and {@code tc} containing the following:
 	 *
-	 * <table>
+	 * <table summary="">
 	 *     <tr><th>Type Variable</th><th>Concrete Type</th></tr>
 	 *     <tr><td>K</td><td>String</td></tr>
 	 *     <tr><td>V</td><td>Int</td></tr>
@@ -394,6 +394,8 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	 *
 	 * @param context
 	 * 	the type context from which to retrieve concrete types
+	 *
+	 * @return a new type with type variables replaced
 	 */
 	IType getConcreteType(ITypeContext context);
 
@@ -409,7 +411,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	 * where {@code {Type}} represents the AST produced by the type expression {@code Type},
 	 * causes {@code tc} to contain the following:
 	 *
-	 * <table>
+	 * <table summary="">
 	 *     <tr><th>Type Variable</th><th>Concrete Type</th></tr>
 	 *     <tr><td>K</td><td>String</td></tr>
 	 *     <tr><td>V</td><td>Int</td></tr>
@@ -423,7 +425,7 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 	 * @param concrete
 	 * 	the concrete type
 	 * @param typeContext
-	 * 	the typeContext to add mappings to
+	 * 	the type context to add mappings to
 	 */
 	void inferTypes(IType concrete, ITypeContext typeContext);
 
