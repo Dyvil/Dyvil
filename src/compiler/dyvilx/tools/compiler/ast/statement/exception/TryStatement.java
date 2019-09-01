@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.statement.exception;
 
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -24,6 +25,8 @@ import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
+	// =============== Constants ===============
+
 	private static final boolean DISALLOW_EXPRESSIONS = true;
 
 	public static final TypeChecker.MarkerSupplier CATCH_MARKER_SUPPLIER = TypeChecker.markerSupplier(
@@ -31,29 +34,59 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	public static final TypeChecker.MarkerSupplier TRY_MARKER_SUPPLIER   = TypeChecker.markerSupplier(
 		"try.action.type.incompatible", "type.expected", "try.action.type");
 
+	// =============== Fields ===============
+
 	protected IValue action;
+
 	protected CatchBlock[] catchBlocks = new CatchBlock[1];
-	protected int    catchBlockCount;
+	protected int          catchBlockCount;
+
 	protected IValue finallyBlock;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	private IType commonType;
+
+	// =============== Constructors ===============
 
 	public TryStatement(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	@Override
-	public int valueTag()
+	// =============== Properties ===============
+
+	public IValue getAction()
 	{
-		return TRY;
+		return this.action;
 	}
 
-	@Override
-	public boolean isUsableAsStatement()
+	public void setAction(IValue action)
 	{
-		return true;
+		this.action = action;
+	}
+
+	public void addCatchBlock(CatchBlock block)
+	{
+		int index = this.catchBlockCount++;
+		if (index >= this.catchBlocks.length)
+		{
+			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
+			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
+			this.catchBlocks = temp;
+		}
+
+		this.catchBlocks[index] = block;
+	}
+
+	public IValue getFinallyBlock()
+	{
+		return this.finallyBlock;
+	}
+
+	public void setFinallyBlock(IValue finallyBlock)
+	{
+		this.finallyBlock = finallyBlock;
 	}
 
 	@Override
@@ -73,24 +106,10 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return true;
 	}
 
-	public void setAction(IValue action)
+	@Override
+	public boolean isUsableAsStatement()
 	{
-		this.action = action;
-	}
-
-	public IValue getAction()
-	{
-		return this.action;
-	}
-
-	public void setFinallyBlock(IValue finallyBlock)
-	{
-		this.finallyBlock = finallyBlock;
-	}
-
-	public IValue getFinallyBlock()
-	{
-		return this.finallyBlock;
+		return true;
 	}
 
 	@Override
@@ -119,25 +138,15 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return this.commonType = combinedType;
 	}
 
+	// =============== Methods ===============
+
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public int valueTag()
 	{
-		if (this.action != null)
-		{
-			this.action = TypeChecker
-				              .convertValue(this.action, type, typeContext, markers, context, TRY_MARKER_SUPPLIER);
-		}
-
-		for (int i = 0; i < this.catchBlockCount; i++)
-		{
-			final CatchBlock block = this.catchBlocks[i];
-			block.action = TypeChecker
-				               .convertValue(block.action, type, typeContext, markers, context, CATCH_MARKER_SUPPLIER);
-		}
-
-		this.commonType = type;
-		return this;
+		return TRY;
 	}
+
+	// --------------- Typing ---------------
 
 	@Override
 	public boolean isType(IType type)
@@ -158,6 +167,26 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (this.action != null)
+		{
+			this.action = TypeChecker
+				              .convertValue(this.action, type, typeContext, markers, context, TRY_MARKER_SUPPLIER);
+		}
+
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			final CatchBlock block = this.catchBlocks[i];
+			block.action = TypeChecker
+				               .convertValue(block.action, type, typeContext, markers, context, CATCH_MARKER_SUPPLIER);
+		}
+
+		this.commonType = type;
+		return this;
 	}
 
 	@Override
@@ -190,18 +219,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return min;
 	}
 
-	public void addCatchBlock(CatchBlock block)
-	{
-		int index = this.catchBlockCount++;
-		if (index >= this.catchBlocks.length)
-		{
-			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
-			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
-			this.catchBlocks = temp;
-		}
-
-		this.catchBlocks[index] = block;
-	}
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -352,6 +370,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return this;
 	}
 
+	// --------------- Context ---------------
+
 	@Override
 	public byte checkException(IType type)
 	{
@@ -365,6 +385,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return PASS;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -373,9 +395,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			type = this.getType();
 		}
 
-		final dyvilx.tools.asm.Label tryStart = new dyvilx.tools.asm.Label();
-		final dyvilx.tools.asm.Label tryEnd = new dyvilx.tools.asm.Label();
-		final dyvilx.tools.asm.Label endLabel = new dyvilx.tools.asm.Label();
+		final Label tryStart = new Label();
+		final Label tryEnd = new Label();
+		final Label endLabel = new Label();
 
 		writer.visitTargetLabel(tryStart);
 		if (this.action != null)
@@ -389,7 +411,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
-			final dyvilx.tools.asm.Label handlerLabel = new dyvilx.tools.asm.Label();
+			final Label handlerLabel = new Label();
 			final String handlerType = block.getType().getInternalName();
 
 			writer.visitTargetLabel(handlerLabel);
@@ -418,7 +440,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 		if (this.finallyBlock != null)
 		{
-			final dyvilx.tools.asm.Label finallyLabel = new dyvilx.tools.asm.Label();
+			final Label finallyLabel = new Label();
 
 			writer.visitLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
@@ -433,6 +455,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			writer.visitLabel(endLabel);
 		}
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
