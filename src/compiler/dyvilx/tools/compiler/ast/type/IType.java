@@ -373,8 +373,58 @@ public interface IType extends ASTNode, IMemberContext, ITypeContext
 
 	boolean isUninferred();
 
+	/**
+	 * Returns a new type with all type variables in this type replaced according to {@code typeContext}.
+	 * <p>
+	 * For example,
+	 *
+	 * <pre>{@code
+	 * ITypeContext tc = { K = String, V = Int }
+	 * {Map<K, List<V>>}.inferTypes(tc) == {Map<String, List<Int>>}
+	 * }</pre>
+	 * <p>
+	 * where {@code {Type}} represents the AST produced by the type expression {@code Type},
+	 * and {@code tc} containing the following:
+	 *
+	 * <table>
+	 *     <tr><th>Type Variable</th><th>Concrete Type</th></tr>
+	 *     <tr><td>K</td><td>String</td></tr>
+	 *     <tr><td>V</td><td>Int</td></tr>
+	 * </table>
+	 *
+	 * @param context
+	 * 	the type context from which to retrieve concrete types
+	 */
 	IType getConcreteType(ITypeContext context);
 
+	/**
+	 * Maps all type variables in this type to their corresponding concrete type in {@code concrete} into {@code typeContext}.
+	 * <p>
+	 * For example,
+	 *
+	 * <pre>{@code
+	 * {Map<K, List<V>>}.inferTypes({Map<String, List<Int>>}, tc)
+	 * }</pre>
+	 * <p>
+	 * where {@code {Type}} represents the AST produced by the type expression {@code Type},
+	 * causes {@code tc} to contain the following:
+	 *
+	 * <table>
+	 *     <tr><th>Type Variable</th><th>Concrete Type</th></tr>
+	 *     <tr><td>K</td><td>String</td></tr>
+	 *     <tr><td>V</td><td>Int</td></tr>
+	 * </table>
+	 * <p>
+	 * This also works if {@code concrete} is a sub-type of {@code this}:
+	 * <pre>{@code
+	 *     {Map<K, List<V>>}.inferTypes({HashMap<String, List<Int>>}, tc)
+	 * }</pre>
+	 *
+	 * @param concrete
+	 * 	the concrete type
+	 * @param typeContext
+	 * 	the typeContext to add mappings to
+	 */
 	void inferTypes(IType concrete, ITypeContext typeContext);
 
 	// Phases
