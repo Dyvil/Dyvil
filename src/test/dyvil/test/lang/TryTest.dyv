@@ -6,10 +6,26 @@ type Ex = Exception
 
 class TryTest {
 	@Test func expressions() {
+		// #33
 		let it = try { 1 } catch ex: Ex { 2 }
 		it =?= 1
 
 		let sum = (try { 1 } catch ex: Ex { 2 }) + (try { 2 } catch ex: Ex { 3 })
 		sum =?= 3
+	}
+
+	static func getFinally() -> int {
+		// #509
+		try {
+			return 1
+		}
+		finally {
+			return 2
+		}
+	}
+
+	@Test func finallyBeforeReturn() {
+		// #511
+		getFinally() =?= 2
 	}
 }

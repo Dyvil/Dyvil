@@ -22,6 +22,8 @@ import dyvilx.tools.compiler.transform.TypeChecker;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.function.Consumer;
+
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
 	// =============== Constants ===============
@@ -406,6 +408,17 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 		}
 
+		final Consumer<? super MethodWriter> handler;
+		if (this.finallyBlock != null)
+		{
+			handler = writer1 -> this.finallyBlock.writeExpression(writer1, Types.VOID);
+			writer.addPreReturnHandler(handler);
+		}
+		else
+		{
+			handler = null;
+		}
+
 		writer.visitTargetLabel(tryStart);
 		if (this.action != null)
 		{
@@ -456,6 +469,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 		if (this.finallyBlock != null)
 		{
+			writer.removePreReturnHandler(handler);
+
 			final Label finallyLabel = new Label();
 
 			writer.visitTargetLabel(finallyLabel);
