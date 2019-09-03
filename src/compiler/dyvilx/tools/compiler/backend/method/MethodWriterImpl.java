@@ -30,9 +30,6 @@ public final class MethodWriterImpl implements MethodWriter
 
 	private List<Consumer<? super MethodWriter>> preReturnHandlers;
 
-	private int[] syncLocals;
-	private int   syncCount;
-
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
 		this.cw = cw;
@@ -548,15 +545,6 @@ public final class MethodWriterImpl implements MethodWriter
 
 	private void visitReturnInsn(int opcode)
 	{
-		if (this.syncCount > 0)
-		{
-			for (int i = 0; i < this.syncCount; i++)
-			{
-				this.mv.visitVarInsn(Opcodes.ALOAD, this.syncLocals[i]);
-				this.mv.visitInsn(Opcodes.MONITOREXIT);
-			}
-		}
-
 		final List<Consumer<? super MethodWriter>> preReturnHandlers = this.preReturnHandlers;
 		if (preReturnHandlers != null && !preReturnHandlers.isEmpty())
 		{
@@ -894,32 +882,6 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	// Blocks
-
-	@Override
-	public int startSync()
-	{
-		if (this.syncLocals == null)
-		{
-			this.syncLocals = new int[1];
-			this.syncCount = 1;
-			return this.syncLocals[0] = this.frame.localCount;
-		}
-
-		int index = this.syncCount++;
-		if (index >= this.syncLocals.length)
-		{
-			int[] temp = new int[this.syncCount];
-			System.arraycopy(this.syncLocals, 0, temp, 0, this.syncLocals.length);
-			this.syncLocals = temp;
-		}
-		return this.syncLocals[index] = this.frame.localCount;
-	}
-
-	@Override
-	public void endSync()
-	{
-		this.syncCount--;
-	}
 
 	@Override
 	public void addPreReturnHandler(Consumer<? super MethodWriter> handler)

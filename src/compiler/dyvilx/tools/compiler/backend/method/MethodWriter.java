@@ -181,10 +181,6 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 
 	// Blocks
 
-	int startSync();
-
-	void endSync();
-
 	void addPreReturnHandler(Consumer<? super MethodWriter> handler);
 
 	void removePreReturnHandler(Consumer<? super MethodWriter> handler);
