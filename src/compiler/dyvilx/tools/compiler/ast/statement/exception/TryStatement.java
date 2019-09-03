@@ -19,15 +19,12 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
 	// =============== Constants ===============
-
-	private static final boolean DISALLOW_EXPRESSIONS = true;
 
 	public static final TypeChecker.MarkerSupplier CATCH_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"try.catch.type.incompatible", "type.expected", "try.catch.type");
@@ -192,11 +189,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (DISALLOW_EXPRESSIONS)
-		{
-			return MISMATCH;
-		}
-
 		int min = TypeChecker.getTypeMatch(this.action, type, implicitContext);
 		if (min == MISMATCH)
 		{
@@ -281,10 +273,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			this.finallyBlock = IStatement.checkStatement(markers, context, this.finallyBlock, "try.finally.type");
 		}
 
-		if (DISALLOW_EXPRESSIONS && this.commonType != null && this.commonType != Types.VOID)
-		{
-			markers.add(Markers.semanticError(this.position, "Try Statements cannot currently be used as expressions"));
-		}
 		return this;
 	}
 
@@ -399,14 +387,37 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		final Label tryEnd = new Label();
 		final Label endLabel = new Label();
 
+		final int localCount = writer.localCount();
+
+		// store everything on the stack into variables
+		final int stackCount = writer.getFrame().stackCount();
+		final int[] stack = new int[stackCount];
+		int nextIndex = localCount;
+		for (int i = 0; i < stackCount; i++)
+		{
+			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+			stack[i] = nextIndex;
+			nextIndex = writer.localCount();
+		}
+
+		if (!Types.isVoid(type))
+		{
+			type.writeDefaultValue(writer);
+			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+		}
+
 		writer.visitTargetLabel(tryStart);
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
-
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			if (!Types.isVoid(type))
+			{
+				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+			}
 		}
-		writer.visitLabel(tryEnd);
+
+		writer.visitTargetLabel(tryEnd);
+		writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
@@ -422,16 +433,21 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
-				final int localCount = writer.localCount();
+				final int localCount1 = writer.localCount();
 				block.variable.writeInit(writer, null);
 				block.action.writeExpression(writer, type);
-				writer.resetLocals(localCount);
+				writer.resetLocals(localCount1);
 			}
 			// Otherwise pop the exception from the stack
 			else
 			{
 				writer.visitInsn(Opcodes.POP);
 				block.action.writeExpression(writer, type);
+			}
+
+			if (!Types.isVoid(type))
+			{
+				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 			}
 
 			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
@@ -442,18 +458,32 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		{
 			final Label finallyLabel = new Label();
 
-			writer.visitLabel(finallyLabel);
+			writer.visitTargetLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
 			writer.visitInsn(Opcodes.POP);
 
-			writer.visitLabel(endLabel);
+			writer.visitTargetLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
 			writer.visitFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else
 		{
-			writer.visitLabel(endLabel);
+			writer.visitTargetLabel(endLabel);
 		}
+
+		// retrieve whatever was on the stack
+		for (int i = stackCount - 1; i >= 0; i--)
+		{
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, stack[i]);
+		}
+
+		// load result
+		if (!Types.isVoid(type))
+		{
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, nextIndex);
+		}
+
+		writer.resetLocals(localCount);
 	}
 
 	// --------------- Formatting ---------------

@@ -1,0 +1,15 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+type Ex = Exception
+
+class TryTest {
+	@Test func expressions() {
+		let it = try { 1 } catch ex: Ex { 2 }
+		it =?= 1
+
+		let sum = (try { 1 } catch ex: Ex { 2 }) + (try { 2 } catch ex: Ex { 3 })
+		sum =?= 3
+	}
+}
