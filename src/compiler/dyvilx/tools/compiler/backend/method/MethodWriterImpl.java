@@ -535,37 +535,51 @@ public final class MethodWriterImpl implements MethodWriter
 			return;
 		}
 
-		this.insnCallback();
-
-		this.frame.visitInsn(opcode);
-
 		if (opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW)
 		{
-			if (this.syncCount > 0)
-			{
-				for (int i = 0; i < this.syncCount; i++)
-				{
-					this.mv.visitVarInsn(Opcodes.ALOAD, this.syncLocals[i]);
-					this.mv.visitInsn(Opcodes.MONITOREXIT);
-				}
-			}
-
-			final List<Consumer<? super MethodWriter>> preReturnHandlers = this.preReturnHandlers;
-			if (preReturnHandlers != null)
-			{
-				// return or throw within the handlers are not handled again
-				this.preReturnHandlers = null;
-				for (final Consumer<? super MethodWriter> handler : preReturnHandlers)
-				{
-					handler.accept(this);
-				}
-				this.preReturnHandlers = preReturnHandlers;
-			}
-
-			this.visitFrame = true;
-			this.hasReturn = true;
+			this.visitReturnInsn(opcode);
+			return;
 		}
+
+		this.insnCallback();
+		this.frame.visitInsn(opcode);
 		this.mv.visitInsn(opcode);
+	}
+
+	private void visitReturnInsn(int opcode)
+	{
+		if (this.syncCount > 0)
+		{
+			for (int i = 0; i < this.syncCount; i++)
+			{
+				this.mv.visitVarInsn(Opcodes.ALOAD, this.syncLocals[i]);
+				this.mv.visitInsn(Opcodes.MONITOREXIT);
+			}
+		}
+
+		final List<Consumer<? super MethodWriter>> preReturnHandlers = this.preReturnHandlers;
+		if (preReturnHandlers != null && !preReturnHandlers.isEmpty())
+		{
+			// return or throw within the handlers are not handled again
+			this.preReturnHandlers = null;
+			for (final Consumer<? super MethodWriter> handler : preReturnHandlers)
+			{
+				handler.accept(this);
+			}
+			this.preReturnHandlers = preReturnHandlers;
+
+			if (this.hasReturn())
+			{
+				return;
+			}
+		}
+
+		this.insnCallback();
+		this.frame.visitInsn(opcode);
+		this.mv.visitInsn(opcode);
+
+		this.visitFrame = true;
+		this.hasReturn = true;
 	}
 
 	private void writeBoolJump(int jump) throws BytecodeException
