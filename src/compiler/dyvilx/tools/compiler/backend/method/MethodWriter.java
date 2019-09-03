@@ -5,6 +5,8 @@ import dyvilx.tools.asm.*;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
+import java.util.function.Consumer;
+
 public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor, MethodVisitor
 {
 	Frame getFrame();
@@ -182,6 +184,10 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 	int startSync();
 
 	void endSync();
+
+	void addPreReturnHandler(Consumer<? super MethodWriter> handler);
+
+	void removePreReturnHandler(Consumer<? super MethodWriter> handler);
 
 	void startCatchBlock(String type);
 

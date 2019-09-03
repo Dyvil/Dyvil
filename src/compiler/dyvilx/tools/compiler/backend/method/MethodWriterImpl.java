@@ -10,6 +10,10 @@ import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
@@ -23,6 +27,8 @@ public final class MethodWriterImpl implements MethodWriter
 	private boolean visitFrame;
 
 	private boolean hasReturn;
+
+	private List<Consumer<? super MethodWriter>> preReturnHandlers;
 
 	private int[] syncLocals;
 	private int   syncCount;
@@ -543,6 +549,19 @@ public final class MethodWriterImpl implements MethodWriter
 					this.mv.visitInsn(Opcodes.MONITOREXIT);
 				}
 			}
+
+			final List<Consumer<? super MethodWriter>> preReturnHandlers = this.preReturnHandlers;
+			if (preReturnHandlers != null)
+			{
+				// return or throw within the handlers are not handled again
+				this.preReturnHandlers = null;
+				for (final Consumer<? super MethodWriter> handler : preReturnHandlers)
+				{
+					handler.accept(this);
+				}
+				this.preReturnHandlers = preReturnHandlers;
+			}
+
 			this.visitFrame = true;
 			this.hasReturn = true;
 		}
@@ -860,7 +879,7 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}
 
-	// Inlining
+	// Blocks
 
 	@Override
 	public int startSync()
@@ -886,6 +905,25 @@ public final class MethodWriterImpl implements MethodWriter
 	public void endSync()
 	{
 		this.syncCount--;
+	}
+
+	@Override
+	public void addPreReturnHandler(Consumer<? super MethodWriter> handler)
+	{
+		if (this.preReturnHandlers == null)
+		{
+			this.preReturnHandlers = new ArrayList<>();
+		}
+		this.preReturnHandlers.add(handler);
+	}
+
+	@Override
+	public void removePreReturnHandler(Consumer<? super MethodWriter> handler)
+	{
+		if (this.preReturnHandlers != null)
+		{
+			this.preReturnHandlers.add(handler);
+		}
 	}
 
 	@Override
