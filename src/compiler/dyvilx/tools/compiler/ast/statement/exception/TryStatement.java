@@ -402,9 +402,18 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			nextIndex = writer.localCount();
 		}
 
+		// for some reason we need to store a (default) value into our result variable
+		// TODO investigate why
 		if (!Types.isVoid(type))
 		{
-			type.writeDefaultValue(writer);
+			if (!type.hasDefaultValue())
+			{
+				writer.visitInsn(Opcodes.ACONST_NULL);
+			}
+			else
+			{
+				type.writeDefaultValue(writer);
+			}
 			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 		}
 
