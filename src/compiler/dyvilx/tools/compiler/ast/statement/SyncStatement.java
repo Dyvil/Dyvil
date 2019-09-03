@@ -1,6 +1,8 @@
 package dyvilx.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.AbstractValue;
@@ -10,17 +12,20 @@ import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class SyncStatement extends AbstractValue implements IStatement
 {
+	// =============== Fields ===============
+
 	protected IValue lock;
 	protected IValue action;
+
+	// =============== Constructors ===============
 
 	public SyncStatement(SourcePosition position)
 	{
@@ -34,11 +39,7 @@ public class SyncStatement extends AbstractValue implements IStatement
 		this.action = block;
 	}
 
-	@Override
-	public int valueTag()
-	{
-		return SYNCHRONIZED;
-	}
+	// =============== Properties ===============
 
 	public IValue getLock()
 	{
@@ -66,12 +67,15 @@ public class SyncStatement extends AbstractValue implements IStatement
 		return this.action.getType();
 	}
 
+	// =============== Methods ===============
+
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public int valueTag()
 	{
-		this.action = this.action.withType(type, typeContext, markers, context);
-		return this;
+		return SYNCHRONIZED;
 	}
+
+	// --------------- Typing ---------------
 
 	@Override
 	public boolean isType(IType type)
@@ -84,6 +88,15 @@ public class SyncStatement extends AbstractValue implements IStatement
 	{
 		return this.action.getTypeMatch(type, implicitContext);
 	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		this.action = this.action.withType(type, typeContext, markers, context);
+		return this;
+	}
+
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -130,6 +143,8 @@ public class SyncStatement extends AbstractValue implements IStatement
 		return this;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -148,11 +163,11 @@ public class SyncStatement extends AbstractValue implements IStatement
 			}
 		 */
 
-		dyvilx.tools.asm.Label start = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label end = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label handlerStart = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label throwLabel = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label handlerEnd = new dyvilx.tools.asm.Label();
+		Label start = new Label();
+		Label end = new Label();
+		Label handlerStart = new Label();
+		Label throwLabel = new Label();
+		Label handlerEnd = new Label();
 
 		this.lock.writeExpression(writer, Types.OBJECT);
 		writer.visitInsn(Opcodes.DUP);
@@ -193,6 +208,8 @@ public class SyncStatement extends AbstractValue implements IStatement
 	{
 		this.writeExpression(writer, Types.VOID);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
