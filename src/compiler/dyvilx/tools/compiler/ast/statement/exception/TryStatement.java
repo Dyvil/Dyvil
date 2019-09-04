@@ -380,16 +380,48 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		/*
+		 * Overview of how a try statement is compiled:
+		 * L0: // before
+		 *   (store stack items into locals)1
+		 *   (store 0/false/null into result variable)2
+		 * L1: // the action
+		 *   action...
+		 *   (store top of stack into result variable)2
+		 * L2: // the end of the action
+		 *   goto L5
+		 * L3: // the catch block
+		 *   store exception
+		 *   catch block 1
+		 *   (store top of stack into result variable)2
+		 *   goto L5
+		 * L4: // the actual finally block
+		 *   (store exception)3
+		 *   (finally...)3
+		 *   (throw exception)3
+		 * L5: // the non-exception finally block
+		 *   (finally...)3
+		 * L6: // the end of the try block
+		 *   (load stack items from locals)
+		 *   (load result variable)2
+		 *
+		 * 1 - if there is anything on the stack
+		 * 2 - if there is a non-void result type
+		 * 3 - if there is a finally block
+		 */
+
 		if (type == null)
 		{
 			type = this.getType();
 		}
 
-		final Label tryStart = new Label();
-		final Label tryEnd = new Label();
-		final Label endLabel = new Label();
+		final Label l1 = new Label();
+		final Label l2 = new Label();
+		final Label l5 = new Label();
 
 		final int localCount = writer.localCount();
+
+		// --------------- L0: ---------------
 
 		// store everything on the stack into variables
 		final int stackCount = writer.getFrame().stackCount();
@@ -428,7 +460,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			handler = null;
 		}
 
-		writer.visitTargetLabel(tryStart);
+		// --------------- L1: ---------------
+
+		writer.visitTargetLabel(l1);
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
@@ -438,16 +472,20 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			}
 		}
 
-		writer.visitTargetLabel(tryEnd);
-		writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+		// --------------- L2: ---------------
+
+		writer.visitTargetLabel(l2);
+		writer.visitJumpInsn(Opcodes.GOTO, l5);
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
-			final Label handlerLabel = new Label();
+			final Label l3 = new Label();
 			final String handlerType = block.getType().getInternalName();
 
-			writer.visitTargetLabel(handlerLabel);
+			// --------------- L3: ---------------
+
+			writer.visitTargetLabel(l3);
 			writer.startCatchBlock(handlerType);
 
 			// Check if the block's variable is actually used
@@ -460,9 +498,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				block.action.writeExpression(writer, type);
 				writer.resetLocals(localCount1);
 			}
-			// Otherwise pop the exception from the stack
 			else
 			{
+				// Otherwise pop the exception from the stack
 				writer.visitInsn(Opcodes.POP);
 				block.action.writeExpression(writer, type);
 			}
@@ -472,28 +510,48 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 			}
 
-			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitTryCatchBlock(l1, l2, l3, handlerType);
+			writer.visitJumpInsn(Opcodes.GOTO, l5);
 		}
 
+		// --------------- L4: ---------------
+
+		// the exception-handling finally block
 		if (this.finallyBlock != null)
 		{
 			writer.removePreReturnHandler(handler);
 
-			final Label finallyLabel = new Label();
+			final Label l4 = new Label();
+			final int targetLocal = writer.localCount();
 
-			writer.visitTargetLabel(finallyLabel);
+			writer.visitTargetLabel(l4);
 			writer.startCatchBlock("java/lang/Throwable");
-			writer.visitInsn(Opcodes.POP);
+			writer.visitVarInsn(Opcodes.ASTORE, targetLocal);
 
-			writer.visitTargetLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
-			writer.visitFinallyBlock(tryStart, tryEnd, finallyLabel);
+
+			if (!writer.hasReturn())
+			{
+				writer.visitVarInsn(Opcodes.ALOAD, targetLocal);
+				writer.visitInsn(Opcodes.ATHROW);
+			}
+
+			writer.visitFinallyBlock(l1, l2, l4);
+
+			writer.resetLocals(targetLocal);
 		}
-		else
+
+		// --------------- L5: ---------------
+
+		writer.visitTargetLabel(l5);
+
+		// the non-exception finally block
+		if (this.finallyBlock != null)
 		{
-			writer.visitTargetLabel(endLabel);
+			this.finallyBlock.writeExpression(writer, Types.VOID);
 		}
+
+		// --------------- L6: ---------------
 
 		// retrieve whatever was on the stack
 		for (int i = stackCount - 1; i >= 0; i--)

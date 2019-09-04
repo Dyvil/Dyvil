@@ -28,4 +28,29 @@ class TryTest {
 		// #511
 		getFinally() =?= 2
 	}
+
+	static func throwing() -> none {
+		throw new RuntimeException
+	}
+
+	static func throwFinally() -> none {
+		try { throwing() }
+		finally { }
+	}
+
+	@Test func finallyRethrow() {
+		// #512
+		expect<RuntimeException> {
+			throwFinally()
+		}
+	}
+
+	static func finallyIntercept() -> int {
+		try { throwing(); return 2 }
+		finally { return 1 }
+	}
+
+	@Test func finallyIntercepting() {
+		finallyIntercept() =?= 1
+	}
 }
