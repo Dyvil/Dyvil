@@ -515,12 +515,13 @@ public final class MethodWriterImpl implements MethodWriter
 		case DRETURN:
 		case ARETURN:
 		case RETURN:
-		case ATHROW:
 			this.invokePreReturnHandlers();
 			if (this.hasReturn) // pre-return handlers may have generated a return
 			{
 				return;
 			}
+			// fallthrough
+		case ATHROW:
 			this.visitOrdinaryInsn(opcode);
 			this.visitFrame = true;
 			this.hasReturn = true;
