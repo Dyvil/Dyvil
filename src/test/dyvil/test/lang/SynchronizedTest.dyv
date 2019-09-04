@@ -3,6 +3,8 @@ package dyvil.test.lang
 using dyvil.test.JUnit
 
 class SynchronizedTest {
+	// #510
+
 	@Test func holdsAndReleasesLock() {
 		let lock = new Object
 		synchronized lock {
