@@ -70,7 +70,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return reference;
 		}
 
-		markers.add(Markers.semanticError(this.getPosition(), "reference.expression.invalid"));
+		markers.add(Markers.semanticError(value.getPosition(), "reference.expression.invalid"));
 		return typedValue;
 	}
 

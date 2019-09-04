@@ -466,7 +466,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
-			if (!Types.isVoid(type))
+			if (!writer.hasReturn() && !Types.isVoid(type))
 			{
 				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 			}
@@ -505,7 +505,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				block.action.writeExpression(writer, type);
 			}
 
-			if (!Types.isVoid(type))
+			if (!writer.hasReturn() && !Types.isVoid(type))
 			{
 				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
 			}

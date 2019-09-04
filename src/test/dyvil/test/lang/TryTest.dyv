@@ -53,4 +53,21 @@ class TryTest {
 	@Test func finallyIntercepting() {
 		finallyIntercept() =?= 1
 	}
+
+	static func finallyThrowOnce(i: int*) -> none {
+		try {
+			throw new RuntimeException
+		}
+		finally {
+			*i = *i + 1
+		}
+	}
+
+	@Test func finallyThrowOnce() {
+		var i = 0
+		expect<RuntimeException> {
+			finallyThrowOnce(&i)
+		}
+		i =?= 1
+	}
 }
