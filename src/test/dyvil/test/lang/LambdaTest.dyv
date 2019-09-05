@@ -142,4 +142,18 @@ class LambdaTest {
 		function2.staticType.toString =?= type((int, int) -> (int, int)).toString
 		functionCurried.staticType.toString =?= type(int -> int -> (int, int)).toString
 	}
+
+	// --------------- Functional Method from Supertype ---------------
+
+	interface F<T> { func apply() -> T }
+	interface G<U> extends F<U>
+	interface H<V> extends G<V>
+
+	@Test func functionalMethodInheritance() {
+		// #504
+		let f: F<String> = () => "a"
+		let g: G<String> = () => "a"
+		let h: H<String> = () => "a"
+		let uo: java.util.function.UnaryOperator<String> = s => s.concat(".")
+	}
 }

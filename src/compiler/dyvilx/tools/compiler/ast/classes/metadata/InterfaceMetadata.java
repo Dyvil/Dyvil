@@ -47,15 +47,15 @@ public class InterfaceMetadata implements IClassMetadata
 
 		this.functionalMethodSearched = true;
 		final ClassBody body = this.theClass.getBody();
-		if (body == null)
+		if (body != null)
 		{
-			return null;
-		}
-
-		for (IMethod method : body.allMethods())
-		{
-			if (method.isFunctional())
+			for (IMethod method : body.allMethods())
 			{
+				if (!method.isFunctional())
+				{
+					continue;
+				}
+
 				if (this.functionalMethod != null)
 				{
 					// duplicate detected
@@ -68,15 +68,17 @@ public class InterfaceMetadata implements IClassMetadata
 		for (final IType itf : this.theClass.getInterfaces())
 		{
 			final IMethod method = itf.getFunctionalMethod();
-			if (method != null)
+			if (method == null)
 			{
-				if (this.functionalMethod != null)
-				{
-					// duplicate detected
-					return this.functionalMethod = null;
-				}
-				this.functionalMethod = method;
+				continue;
 			}
+
+			if (this.functionalMethod != null)
+			{
+				// duplicate detected
+				return this.functionalMethod = null;
+			}
+			this.functionalMethod = method;
 		}
 
 		return this.functionalMethod;
