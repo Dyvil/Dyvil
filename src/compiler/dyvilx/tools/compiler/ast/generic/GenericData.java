@@ -123,11 +123,11 @@ public final class GenericData implements Resolvable, ITypeContext
 	}
 
 	@Override
-	public void addMapping(ITypeParameter typeParameter, IType type)
+	public boolean addMapping(ITypeParameter typeParameter, IType type)
 	{
 		if (!this.isMethodTypeVariable(typeParameter))
 		{
-			return;
+			return false;
 		}
 
 		final int index = typeParameter.getIndex();
@@ -141,13 +141,14 @@ public final class GenericData implements Resolvable, ITypeContext
 		if (current == null)
 		{
 			this.generics.set(index, type);
-			return;
+			return true;
 		}
 		if (index < this.lockedCount)
 		{
-			return;
+			return false;
 		}
 		this.generics.set(index, Types.combine(current, type));
+		return true;
 	}
 
 	@Override

@@ -38,9 +38,8 @@ public class CombiningTypeContext implements ITypeContext
 	}
 
 	@Override
-	public void addMapping(ITypeParameter typeVar, IType type)
+	public boolean addMapping(ITypeParameter typeVar, IType type)
 	{
-		this.context1.addMapping(typeVar, type);
-		this.context2.addMapping(typeVar, type);
+		return this.context1.addMapping(typeVar, type) || this.context2.addMapping(typeVar, type);
 	}
 }

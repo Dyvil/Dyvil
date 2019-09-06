@@ -24,7 +24,8 @@ public interface ITypeContext
 		return true;
 	}
 
-	default void addMapping(ITypeParameter typeVar, IType type)
+	default boolean addMapping(ITypeParameter typeVar, IType type)
 	{
+		return false;
 	}
 }
