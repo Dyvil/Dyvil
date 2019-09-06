@@ -26,6 +26,7 @@ import dyvilx.tools.compiler.ast.field.capture.CaptureHelper;
 import dyvilx.tools.compiler.ast.field.capture.CaptureVariable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.generic.ITypeParameter;
+import dyvilx.tools.compiler.ast.generic.ITypeParametricMember;
 import dyvilx.tools.compiler.ast.generic.MapTypeContext;
 import dyvilx.tools.compiler.ast.header.ClassCompilable;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
@@ -476,7 +477,7 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		this.value = TypeChecker.convertValue(this.value, this.returnType, this.returnType, markers, combinedContext,
 		                                      LAMBDA_MARKER_SUPPLIER);
 
-		this.inferReturnType(type, this.value.getType());
+		this.inferReturnType(type, this.value.getType(), typeContext, markers);
 
 		if (this.returnType.isUninferred() && this.value.isResolved())
 		{
@@ -534,7 +535,7 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));
 	}
 
-	public void inferReturnType(IType type, IType valueType)
+	public void inferReturnType(IType type, IType valueType, ITypeContext typeContext, MarkerList markers)
 	{
 		if (this.hasImplicitReturnType())
 		{
@@ -562,7 +563,29 @@ public class LambdaExpr implements IValue, ClassCompilable, IDefaultContext, IPa
 		final IType classType = this.method.getEnclosingClass().getThisType();
 		final IType concreteClassType = classType.getConcreteType(tempContext);
 
-		this.type = inferRecursively(this.type.getTheClass(), concreteClassType, tempContext);
+		final IType targetType = this.type;
+		final IType recursivelyInferred = inferRecursively(targetType.getTheClass(), concreteClassType, tempContext);
+		assert recursivelyInferred != null; // since this.type is guaranteed to be a super-type of classType
+
+		final IType targetInferred = recursivelyInferred.getConcreteType(targetType);
+
+		if (typeContext == null || typeContext == targetType)
+		{
+			this.type = targetInferred;
+			return;
+		}
+
+		this.type = targetInferred.getConcreteType(typeParameter -> {
+			final IType inferredType = typeParameter.getUpperBound();
+			if (typeContext.addMapping(typeParameter, inferredType))
+			{
+				final Name name = ((ITypeParametricMember) typeParameter.getGeneric()).getName();
+				markers.add(Markers.semantic(this.position, "method.typevar.infer", name, typeParameter.getName(),
+				                             inferredType));
+				return inferredType;
+			}
+			return null;
+		});
 	}
 
 	private static IType inferRecursively(IClass thisClass, IType concrete, ITypeContext context)
