@@ -1,26 +1,34 @@
 package dyvilx.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
 import dyvilx.tools.compiler.ast.expression.AbstractValue;
+import dyvilx.tools.compiler.ast.expression.DummyValue;
 import dyvilx.tools.compiler.ast.expression.IValue;
+import dyvilx.tools.compiler.ast.expression.constant.VoidValue;
+import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.generic.ITypeContext;
 import dyvilx.tools.compiler.ast.header.IClassCompilableList;
 import dyvilx.tools.compiler.ast.header.ICompilableList;
+import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.ast.type.builtin.Types;
-import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class SyncStatement extends AbstractValue implements IStatement
 {
+	// =============== Fields ===============
+
 	protected IValue lock;
 	protected IValue action;
+
+	// =============== Constructors ===============
 
 	public SyncStatement(SourcePosition position)
 	{
@@ -34,11 +42,7 @@ public class SyncStatement extends AbstractValue implements IStatement
 		this.action = block;
 	}
 
-	@Override
-	public int valueTag()
-	{
-		return SYNCHRONIZED;
-	}
+	// =============== Properties ===============
 
 	public IValue getLock()
 	{
@@ -66,12 +70,15 @@ public class SyncStatement extends AbstractValue implements IStatement
 		return this.action.getType();
 	}
 
+	// =============== Methods ===============
+
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public int valueTag()
 	{
-		this.action = this.action.withType(type, typeContext, markers, context);
-		return this;
+		return SYNCHRONIZED;
 	}
+
+	// --------------- Typing ---------------
 
 	@Override
 	public boolean isType(IType type)
@@ -86,8 +93,26 @@ public class SyncStatement extends AbstractValue implements IStatement
 	}
 
 	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		this.action = this.action.withType(type, typeContext, markers, context);
+		return this;
+	}
+
+	// --------------- Resolution Phases ---------------
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.lock == null)
+		{
+			this.lock = DummyValue.INSTANCE;
+		}
+		if (this.action == null)
+		{
+			this.action = new VoidValue();
+		}
+
 		this.lock.resolveTypes(markers, context);
 		this.action.resolveTypes(markers, context);
 	}
@@ -95,104 +120,76 @@ public class SyncStatement extends AbstractValue implements IStatement
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.lock.resolve(markers, context);
-		this.action.resolve(markers, context);
-		return this;
+		this.lock = this.lock.resolve(markers, context);
+		this.action = this.action.resolve(markers, context);
+
+		/*
+		synchonized (obj) {
+			statements...
+		}
+		->
+		Object lock = obj
+		_monitorEnter(lock)
+		try {
+			statements...
+		}
+		finally {
+			_monitorExit(lock)
+		}
+		 */
+
+		final StatementList list = new StatementList(this.position);
+		final Variable var = new Variable(null, Types.OBJECT, this.lock);
+		list.add(new VariableStatement(var));
+		list.add(new DummyValue(() -> Types.VOID, (writer, type) -> {
+			var.writeGet(writer);
+			writer.visitInsn(Opcodes.MONITORENTER);
+		}));
+
+		final TryStatement tryStatement = new TryStatement(this.position);
+		tryStatement.setAction(this.action);
+		tryStatement.setFinallyBlock(new DummyValue(() -> Types.VOID, (writer, type) -> {
+			var.writeGet(writer);
+			writer.visitInsn(Opcodes.MONITOREXIT);
+		}));
+		list.add(tryStatement);
+
+		return list;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.lock.checkTypes(markers, context);
-		this.action.checkTypes(markers, context);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.lock.check(markers, context);
-		this.action.check(markers, context);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		this.lock = this.lock.foldConstants();
-		this.action = this.action.foldConstants();
-		return this;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.lock = this.lock.cleanup(compilableList, classCompilableList);
-		this.action = this.action.cleanup(compilableList, classCompilableList);
-		return this;
+		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		/*
-			synchonized (obj) {
-				statements...
-			}
-			->
-			Object lock = obj
-			_monitorEnter(lock)
-			try {
-				statements...
-			}
-			finally {
-				_monitorExit(lock)
-			}
-		 */
-
-		dyvilx.tools.asm.Label start = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label end = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label handlerStart = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label throwLabel = new dyvilx.tools.asm.Label();
-		dyvilx.tools.asm.Label handlerEnd = new dyvilx.tools.asm.Label();
-
-		this.lock.writeExpression(writer, Types.OBJECT);
-		writer.visitInsn(Opcodes.DUP);
-
-		int varIndex = writer.startSync();
-		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
-		writer.visitInsn(Opcodes.MONITORENTER);
-
-		writer.visitLabel(start);
-		this.action.writeExpression(writer, type);
-		writer.endSync();
-
-		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-		writer.visitInsn(Opcodes.MONITOREXIT);
-		writer.visitLabel(end);
-
-		writer.visitJumpInsn(Opcodes.GOTO, handlerEnd);
-
-		writer.visitLabel(handlerStart);
-		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-		writer.visitInsn(Opcodes.MONITOREXIT);
-		writer.visitLabel(throwLabel);
-		writer.visitInsn(Opcodes.ATHROW);
-		if (type != Types.VOID)
-		{
-			this.action.getType().writeDefaultValue(writer);
-		}
-
-		writer.resetLocals(varIndex);
-		writer.visitLabel(handlerEnd);
-
-		writer.visitFinallyBlock(start, end, handlerStart);
-		writer.visitFinallyBlock(handlerStart, throwLabel, handlerStart);
-	}
+	// --------------- Compilation ---------------
 
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer, Types.VOID);
+		throw new UnsupportedOperationException();
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

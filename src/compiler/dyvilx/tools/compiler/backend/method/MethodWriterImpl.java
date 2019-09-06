@@ -1,6 +1,5 @@
 package dyvilx.tools.compiler.backend.method;
 
-import dyvil.reflect.Opcodes;
 import dyvilx.tools.asm.*;
 import dyvilx.tools.compiler.ast.classes.IClass;
 import dyvilx.tools.compiler.ast.type.IType;
@@ -9,6 +8,10 @@ import dyvilx.tools.compiler.ast.type.compound.ArrayType;
 import dyvilx.tools.compiler.backend.ClassFormat;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -19,13 +22,12 @@ public final class MethodWriterImpl implements MethodWriter
 	public    dyvilx.tools.compiler.backend.classes.ClassWriter cw;
 	protected MethodVisitor                                     mv;
 
-	protected Frame frame = new Frame();
-	private boolean visitFrame;
+	protected Frame   frame = new Frame();
+	private   boolean visitFrame;
 
 	private boolean hasReturn;
 
-	private int[] syncLocals;
-	private int   syncCount;
+	private List<Consumer<? super MethodWriter>> preReturnHandlers;
 
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
@@ -95,7 +97,7 @@ public final class MethodWriterImpl implements MethodWriter
 
 	@Override
 	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end,
-		                                                     int[] index, String desc, boolean visible)
+		int[] index, String desc, boolean visible)
 	{
 		return this.mv.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, desc, visible);
 	}
@@ -196,12 +198,12 @@ public final class MethodWriterImpl implements MethodWriter
 		}
 		if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
 		{
-			this.mv.visitIntInsn(Opcodes.BIPUSH, value);
+			this.mv.visitIntInsn(BIPUSH, value);
 			return;
 		}
 		if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
 		{
-			this.mv.visitIntInsn(Opcodes.SIPUSH, value);
+			this.mv.visitIntInsn(SIPUSH, value);
 			return;
 		}
 		this.mv.visitLdcInsn(value);
@@ -408,145 +410,167 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void visitInsn(int opcode) throws BytecodeException
 	{
-		if (opcode > 255)
+		switch (opcode)
 		{
-			switch (opcode)
+		case LCONST_M1:
+			this.frame.push(ClassFormat.LONG);
+			this.mv.visitLdcInsn(LONG_MINUS_ONE);
+			return;
+		case BNOT:
+			this.writeBoolJump(IFEQ);
+			return;
+		case INOT:
+			this.frame.reserve(1);
+			this.mv.visitInsn(ICONST_M1);
+			this.mv.visitInsn(IXOR);
+			return;
+		case LNOT:
+			this.frame.reserve(2);
+			this.mv.visitLdcInsn(LONG_MINUS_ONE);
+			this.mv.visitInsn(LXOR);
+			return;
+		case L2B:
+			this.frame.set(ClassFormat.BYTE);
+			this.mv.visitInsn(L2I);
+			this.mv.visitInsn(I2B);
+			return;
+		case L2S:
+			this.frame.set(ClassFormat.SHORT);
+			this.mv.visitInsn(L2I);
+			this.mv.visitInsn(I2S);
+			return;
+		case L2C:
+			this.frame.set(ClassFormat.CHAR);
+			this.mv.visitInsn(L2I);
+			this.mv.visitInsn(I2C);
+			return;
+		case F2B:
+			this.frame.set(ClassFormat.BYTE);
+			this.mv.visitInsn(F2I);
+			this.mv.visitInsn(I2B);
+			return;
+		case F2S:
+			this.frame.set(ClassFormat.SHORT);
+			this.mv.visitInsn(F2I);
+			this.mv.visitInsn(I2S);
+			return;
+		case F2C:
+			this.frame.set(ClassFormat.CHAR);
+			this.mv.visitInsn(F2I);
+			this.mv.visitInsn(I2C);
+			return;
+		case D2B:
+			this.frame.set(ClassFormat.BYTE);
+			this.mv.visitInsn(D2I);
+			this.mv.visitInsn(I2B);
+			return;
+		case D2S:
+			this.frame.set(ClassFormat.SHORT);
+			this.mv.visitInsn(D2I);
+			this.mv.visitInsn(I2S);
+			return;
+		case D2C:
+			this.frame.set(ClassFormat.CHAR);
+			this.mv.visitInsn(D2I);
+			this.mv.visitInsn(I2C);
+			return;
+		case IS_NULL:
+			this.writeBoolJump(IFNULL);
+			return;
+		case IS_NONNULL:
+			this.writeBoolJump(IFNONNULL);
+			return;
+		case ACMPEQ:
+			this.writeBoolJump(IF_ACMPEQ);
+			return;
+		case ACMPNE:
+			this.writeBoolJump(IF_ACMPNE);
+			return;
+		case OBJECT_EQUALS:
+			this.frame.pop();
+			this.frame.pop();
+			this.mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+			this.frame.push(ClassFormat.BOOLEAN);
+			return;
+		case SWAP2:
+			this.frame.reserve(2);
+			this.mv.visitInsn(DUP2_X2);
+			this.mv.visitInsn(POP2);
+			return;
+		case AUTO_SWAP:
+			this.swap();
+			return;
+		case AUTO_POP:
+			this.pop();
+			return;
+		case AUTO_DUP:
+			this.dup();
+			return;
+		case AUTO_DUP_X1:
+			this.dupX1();
+			return;
+		case IRETURN:
+		case LRETURN:
+		case FRETURN:
+		case DRETURN:
+		case ARETURN:
+		case RETURN:
+			this.invokePreReturnHandlers();
+			if (this.hasReturn) // pre-return handlers may have generated a return
 			{
-			case Opcodes.LCONST_M1:
-				this.frame.push(ClassFormat.LONG);
-				this.mv.visitLdcInsn(LONG_MINUS_ONE);
-				return;
-			case Opcodes.BNOT:
-				this.writeBoolJump(Opcodes.IFEQ);
-				return;
-			case Opcodes.INOT:
-				this.frame.reserve(1);
-				this.mv.visitInsn(Opcodes.ICONST_M1);
-				this.mv.visitInsn(Opcodes.IXOR);
-				return;
-			case Opcodes.LNOT:
-				this.frame.reserve(2);
-				this.mv.visitLdcInsn(LONG_MINUS_ONE);
-				this.mv.visitInsn(Opcodes.LXOR);
-				return;
-			case Opcodes.L2B:
-				this.frame.set(ClassFormat.BYTE);
-				this.mv.visitInsn(Opcodes.L2I);
-				this.mv.visitInsn(Opcodes.I2B);
-				return;
-			case Opcodes.L2S:
-				this.frame.set(ClassFormat.SHORT);
-				this.mv.visitInsn(Opcodes.L2I);
-				this.mv.visitInsn(Opcodes.I2S);
-				return;
-			case Opcodes.L2C:
-				this.frame.set(ClassFormat.CHAR);
-				this.mv.visitInsn(Opcodes.L2I);
-				this.mv.visitInsn(Opcodes.I2C);
-				return;
-			case Opcodes.F2B:
-				this.frame.set(ClassFormat.BYTE);
-				this.mv.visitInsn(Opcodes.F2I);
-				this.mv.visitInsn(Opcodes.I2B);
-				return;
-			case Opcodes.F2S:
-				this.frame.set(ClassFormat.SHORT);
-				this.mv.visitInsn(Opcodes.F2I);
-				this.mv.visitInsn(Opcodes.I2S);
-				return;
-			case Opcodes.F2C:
-				this.frame.set(ClassFormat.CHAR);
-				this.mv.visitInsn(Opcodes.F2I);
-				this.mv.visitInsn(Opcodes.I2C);
-				return;
-			case Opcodes.D2B:
-				this.frame.set(ClassFormat.BYTE);
-				this.mv.visitInsn(Opcodes.D2I);
-				this.mv.visitInsn(Opcodes.I2B);
-				return;
-			case Opcodes.D2S:
-				this.frame.set(ClassFormat.SHORT);
-				this.mv.visitInsn(Opcodes.D2I);
-				this.mv.visitInsn(Opcodes.I2S);
-				return;
-			case Opcodes.D2C:
-				this.frame.set(ClassFormat.CHAR);
-				this.mv.visitInsn(Opcodes.D2I);
-				this.mv.visitInsn(Opcodes.I2C);
-				return;
-			case IS_NULL:
-				this.writeBoolJump(IFNULL);
-				return;
-			case IS_NONNULL:
-				this.writeBoolJump(IFNONNULL);
-				return;
-			case ACMPEQ:
-				this.writeBoolJump(Opcodes.IF_ACMPEQ);
-				return;
-			case ACMPNE:
-				this.writeBoolJump(Opcodes.IF_ACMPNE);
-				return;
-			case Opcodes.OBJECT_EQUALS:
-				this.frame.pop();
-				this.frame.pop();
-				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z",
-				                        false);
-				this.frame.push(ClassFormat.BOOLEAN);
-				return;
-			case SWAP2:
-				this.frame.reserve(2);
-				this.mv.visitInsn(Opcodes.DUP2_X2);
-				this.mv.visitInsn(Opcodes.POP2);
-				return;
-			case Opcodes.AUTO_SWAP:
-				this.swap();
-				return;
-			case Opcodes.AUTO_POP:
-				this.pop();
-				return;
-			case Opcodes.AUTO_DUP:
-				this.dup();
-				return;
-			case Opcodes.AUTO_DUP_X1:
-				this.dupX1();
 				return;
 			}
-
-			if (opcode >= EQ0 && opcode <= LE0)
-			{
-				this.writeBoolJump(IFEQ + opcode - EQ0);
-			}
-			if (opcode >= ICMPEQ && opcode <= ICMPLE)
-			{
-				this.writeBoolJump(IF_ICMPEQ + opcode - ICMPEQ);
-				return;
-			}
-			if (opcode >= LCMPEQ && opcode <= DCMPLE)
-			{
-				this.writeBoolJump(IF_LCMPEQ + opcode - LCMPEQ);
-				return;
-			}
+			// fallthrough
+		case ATHROW:
+			this.visitOrdinaryInsn(opcode);
+			this.visitFrame = true;
+			this.hasReturn = true;
 			return;
 		}
 
-		this.insnCallback();
-
-		this.frame.visitInsn(opcode);
-
-		if (opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW)
+		if (opcode >= EQ0 && opcode <= LE0)
 		{
-			if (this.syncCount > 0)
-			{
-				for (int i = 0; i < this.syncCount; i++)
-				{
-					this.mv.visitVarInsn(Opcodes.ALOAD, this.syncLocals[i]);
-					this.mv.visitInsn(Opcodes.MONITOREXIT);
-				}
-			}
-			this.visitFrame = true;
-			this.hasReturn = true;
+			this.writeBoolJump(IFEQ + opcode - EQ0);
+			return;
 		}
+		if (opcode >= ICMPEQ && opcode <= ICMPLE)
+		{
+			this.writeBoolJump(IF_ICMPEQ + opcode - ICMPEQ);
+			return;
+		}
+		if (opcode >= LCMPEQ && opcode <= DCMPLE)
+		{
+			this.writeBoolJump(IF_LCMPEQ + opcode - LCMPEQ);
+			return;
+		}
+		if (opcode >= 256)
+		{
+			throw new BytecodeException("unknown opcode " + opcode);
+		}
+
+		this.visitOrdinaryInsn(opcode);
+	}
+
+	private void visitOrdinaryInsn(int opcode)
+	{
+		this.insnCallback();
+		this.frame.visitInsn(opcode);
 		this.mv.visitInsn(opcode);
+	}
+
+	private void invokePreReturnHandlers()
+	{
+		final List<Consumer<? super MethodWriter>> preReturnHandlers = this.preReturnHandlers;
+		if (preReturnHandlers != null && !preReturnHandlers.isEmpty())
+		{
+			// return or throw within the handlers are not handled again
+			this.preReturnHandlers = null;
+			for (final Consumer<? super MethodWriter> handler : preReturnHandlers)
+			{
+				handler.accept(this);
+			}
+			this.preReturnHandlers = preReturnHandlers;
+		}
 	}
 
 	private void writeBoolJump(int jump) throws BytecodeException
@@ -556,10 +580,10 @@ public final class MethodWriterImpl implements MethodWriter
 
 		this.visitJumpInsn(jump, label1);
 
-		this.visitInsn(Opcodes.ICONST_0);
-		this.visitJumpInsn(Opcodes.GOTO, label2);
+		this.visitInsn(ICONST_0);
+		this.visitJumpInsn(GOTO, label2);
 		this.visitTargetLabel(label1);
-		this.visitInsn(Opcodes.ICONST_1);
+		this.visitInsn(ICONST_1);
 		this.visitTargetLabel(label2);
 	}
 
@@ -582,77 +606,77 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			switch (opcode)
 			{
-			case Opcodes.IF_LCMPEQ:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFEQ, target);
+			case IF_LCMPEQ:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFEQ, target);
 				return;
-			case Opcodes.IF_LCMPNE:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFNE, target);
+			case IF_LCMPNE:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFNE, target);
 				return;
-			case Opcodes.IF_LCMPLT:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFLT, target);
+			case IF_LCMPLT:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFLT, target);
 				return;
-			case Opcodes.IF_LCMPGE:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFGE, target);
+			case IF_LCMPGE:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFGE, target);
 				return;
-			case Opcodes.IF_LCMPGT:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFGT, target);
+			case IF_LCMPGT:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFGT, target);
 				return;
-			case Opcodes.IF_LCMPLE:
-				this.visitInsn(Opcodes.LCMP);
-				this.visitJumpInsn(Opcodes.IFLE, target);
+			case IF_LCMPLE:
+				this.visitInsn(LCMP);
+				this.visitJumpInsn(IFLE, target);
 				return;
-			case Opcodes.IF_FCMPEQ:
-				this.visitInsn(Opcodes.FCMPL);
-				this.visitJumpInsn(Opcodes.IFEQ, target);
+			case IF_FCMPEQ:
+				this.visitInsn(FCMPL);
+				this.visitJumpInsn(IFEQ, target);
 				return;
-			case Opcodes.IF_FCMPNE:
-				this.visitInsn(Opcodes.FCMPL);
-				this.visitJumpInsn(Opcodes.IFNE, target);
+			case IF_FCMPNE:
+				this.visitInsn(FCMPL);
+				this.visitJumpInsn(IFNE, target);
 				return;
-			case Opcodes.IF_FCMPLT:
-				this.visitInsn(Opcodes.FCMPL);
-				this.visitJumpInsn(Opcodes.IFLT, target);
+			case IF_FCMPLT:
+				this.visitInsn(FCMPL);
+				this.visitJumpInsn(IFLT, target);
 				return;
-			case Opcodes.IF_FCMPGE:
-				this.visitInsn(Opcodes.FCMPG);
-				this.visitJumpInsn(Opcodes.IFGE, target);
+			case IF_FCMPGE:
+				this.visitInsn(FCMPG);
+				this.visitJumpInsn(IFGE, target);
 				return;
-			case Opcodes.IF_FCMPGT:
-				this.visitInsn(Opcodes.FCMPG);
-				this.visitJumpInsn(Opcodes.IFGT, target);
+			case IF_FCMPGT:
+				this.visitInsn(FCMPG);
+				this.visitJumpInsn(IFGT, target);
 				return;
-			case Opcodes.IF_FCMPLE:
-				this.visitInsn(Opcodes.FCMPL);
-				this.visitJumpInsn(Opcodes.IFLE, target);
+			case IF_FCMPLE:
+				this.visitInsn(FCMPL);
+				this.visitJumpInsn(IFLE, target);
 				return;
-			case Opcodes.IF_DCMPEQ:
-				this.visitInsn(Opcodes.DCMPL);
-				this.visitJumpInsn(Opcodes.IFEQ, target);
+			case IF_DCMPEQ:
+				this.visitInsn(DCMPL);
+				this.visitJumpInsn(IFEQ, target);
 				return;
-			case Opcodes.IF_DCMPNE:
-				this.visitInsn(Opcodes.DCMPL);
-				this.visitJumpInsn(Opcodes.IFNE, target);
+			case IF_DCMPNE:
+				this.visitInsn(DCMPL);
+				this.visitJumpInsn(IFNE, target);
 				return;
-			case Opcodes.IF_DCMPLT:
-				this.visitInsn(Opcodes.DCMPL);
-				this.visitJumpInsn(Opcodes.IFLT, target);
+			case IF_DCMPLT:
+				this.visitInsn(DCMPL);
+				this.visitJumpInsn(IFLT, target);
 				return;
-			case Opcodes.IF_DCMPGE:
-				this.visitInsn(Opcodes.DCMPG);
-				this.visitJumpInsn(Opcodes.IFGE, target);
+			case IF_DCMPGE:
+				this.visitInsn(DCMPG);
+				this.visitJumpInsn(IFGE, target);
 				return;
-			case Opcodes.IF_DCMPGT:
-				this.visitInsn(Opcodes.DCMPG);
-				this.visitJumpInsn(Opcodes.IFGT, target);
+			case IF_DCMPGT:
+				this.visitInsn(DCMPG);
+				this.visitJumpInsn(IFGT, target);
 				return;
-			case Opcodes.IF_DCMPLE:
-				this.visitInsn(Opcodes.DCMPL);
-				this.visitJumpInsn(Opcodes.IFLE, target);
+			case IF_DCMPLE:
+				this.visitInsn(DCMPL);
+				this.visitJumpInsn(IFLE, target);
 				return;
 			}
 		}
@@ -677,12 +701,12 @@ public final class MethodWriterImpl implements MethodWriter
 
 		switch (opcode)
 		{
-		case Opcodes.NEW:
+		case NEW:
 			Label label = new Label();
 			this.mv.visitLabel(label);
 			this.frame.push(label);
 			break;
-		case Opcodes.CHECKCAST:
+		case CHECKCAST:
 			if (type.equals(this.frame.peek()))
 			{
 				// Optimization: omit redundant casts
@@ -744,11 +768,11 @@ public final class MethodWriterImpl implements MethodWriter
 
 			if (elementType.isPrimitive())
 			{
-				this.visitIntInsn(Opcodes.NEWARRAY, getNewArrayCode(elementType.getTypecode()));
+				this.visitIntInsn(NEWARRAY, getNewArrayCode(elementType.getTypecode()));
 				return;
 			}
 
-			this.visitTypeInsn(Opcodes.ANEWARRAY, elementType.getInternalName());
+			this.visitTypeInsn(ANEWARRAY, elementType.getInternalName());
 			return;
 		}
 
@@ -774,12 +798,12 @@ public final class MethodWriterImpl implements MethodWriter
 		if (opcode == AUTO_LOAD)
 		{
 			final PrimitiveType primitiveType = PrimitiveType.fromFrameType(this.frame.locals[index]);
-			opcode = primitiveType != null ? primitiveType.getLoadOpcode() : Opcodes.ALOAD;
+			opcode = primitiveType != null ? primitiveType.getLoadOpcode() : ALOAD;
 		}
 		else if (opcode == AUTO_STORE)
 		{
 			final PrimitiveType primitiveType = PrimitiveType.fromFrameType(this.frame.peek());
-			opcode = primitiveType != null ? primitiveType.getStoreOpcode() : Opcodes.ASTORE;
+			opcode = primitiveType != null ? primitiveType.getStoreOpcode() : ASTORE;
 		}
 
 		this.frame.visitVarInsn(opcode, index);
@@ -800,13 +824,13 @@ public final class MethodWriterImpl implements MethodWriter
 
 	@Override
 	public void visitMethodInsn(int opcode, String owner, String name, String desc, int args, Object returnType,
-		                           boolean isInterface) throws BytecodeException
+		boolean isInterface) throws BytecodeException
 	{
 		this.insnCallback();
 
 		this.frame.visitInvokeInsn(args, returnType);
 
-		if (opcode == Opcodes.INVOKESPECIAL && name.equals("<init>") && this.frame.stackCount > 0)
+		if (opcode == INVOKESPECIAL && name.equals("<init>") && this.frame.stackCount > 0)
 		{
 			this.frame.set(owner);
 		}
@@ -816,7 +840,7 @@ public final class MethodWriterImpl implements MethodWriter
 
 	@Override
 	public void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm,
-		                                  Object... bsmArgs) throws BytecodeException
+		Object... bsmArgs) throws BytecodeException
 	{
 		this.insnCallback();
 
@@ -833,7 +857,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 
-		this.frame.visitInsn(Opcodes.TABLESWITCH);
+		this.frame.visitInsn(TABLESWITCH);
 
 		defaultHandler.info = this.frame.copy();
 		for (Label l : handlers)
@@ -849,7 +873,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 
-		this.frame.visitInsn(Opcodes.LOOKUPSWITCH);
+		this.frame.visitInsn(LOOKUPSWITCH);
 
 		defaultHandler.info = this.frame.copy();
 		for (Label l : handlers)
@@ -860,32 +884,25 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}
 
-	// Inlining
+	// Blocks
 
 	@Override
-	public int startSync()
+	public void addPreReturnHandler(Consumer<? super MethodWriter> handler)
 	{
-		if (this.syncLocals == null)
+		if (this.preReturnHandlers == null)
 		{
-			this.syncLocals = new int[1];
-			this.syncCount = 1;
-			return this.syncLocals[0] = this.frame.localCount;
+			this.preReturnHandlers = new ArrayList<>();
 		}
-
-		int index = this.syncCount++;
-		if (index >= this.syncLocals.length)
-		{
-			int[] temp = new int[this.syncCount];
-			System.arraycopy(this.syncLocals, 0, temp, 0, this.syncLocals.length);
-			this.syncLocals = temp;
-		}
-		return this.syncLocals[index] = this.frame.localCount;
+		this.preReturnHandlers.add(handler);
 	}
 
 	@Override
-	public void endSync()
+	public void removePreReturnHandler(Consumer<? super MethodWriter> handler)
 	{
-		this.syncCount--;
+		if (this.preReturnHandlers != null)
+		{
+			this.preReturnHandlers.add(handler);
+		}
 	}
 
 	@Override

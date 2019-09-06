@@ -1,0 +1,73 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+type Ex = Exception
+
+class TryTest {
+	@Test func expressions() {
+		// #33
+		let it = try { 1 } catch ex: Ex { 2 }
+		it =?= 1
+
+		let sum = (try { 1 } catch ex: Ex { 2 }) + (try { 2 } catch ex: Ex { 3 })
+		sum =?= 3
+	}
+
+	static func getFinally() -> int {
+		// #509
+		try {
+			return 1
+		}
+		finally {
+			return 2
+		}
+	}
+
+	@Test func finallyBeforeReturn() {
+		// #511
+		getFinally() =?= 2
+	}
+
+	static func throwing() -> none {
+		throw new RuntimeException
+	}
+
+	static func throwFinally() -> none {
+		try { throwing() }
+		finally { }
+	}
+
+	@Test func finallyRethrow() {
+		// #512
+		expect<RuntimeException> {
+			throwFinally()
+		}
+	}
+
+	static func finallyIntercept() -> int {
+		try { throwing(); return 2 }
+		finally { return 1 }
+	}
+
+	@Test func finallyIntercepting() {
+		finallyIntercept() =?= 1
+	}
+
+	static func finallyThrowOnce(i: int*) -> none {
+		try {
+			throw new RuntimeException
+		}
+		finally {
+			*i = *i + 1
+		}
+	}
+
+	@Test func finallyThrowOnce() {
+		var i = 0
+		expect<RuntimeException> {
+			finallyThrowOnce(&i)
+		}
+		i =?= 1
+	}
+}

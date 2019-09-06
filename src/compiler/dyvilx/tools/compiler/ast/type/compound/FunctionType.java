@@ -114,12 +114,12 @@ public final class FunctionType extends ResolvedGenericType
 		final IValue typedReturnValue = value.withType(this.arguments.get(0), typeContext, markers, context);
 		if (typedReturnValue != null)
 		{
-			return this.wrapLambda(typedReturnValue);
+			return this.wrapLambda(typedReturnValue, typeContext, markers);
 		}
 		return null;
 	}
 
-	public LambdaExpr wrapLambda(IValue value)
+	public LambdaExpr wrapLambda(IValue value, ITypeContext typeContext, MarkerList markers)
 	{
 		IType returnType = value.getType();
 
@@ -127,7 +127,7 @@ public final class FunctionType extends ResolvedGenericType
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setMethod(this.getFunctionalMethod());
 		lambdaExpr.setValue(value);
-		lambdaExpr.inferReturnType(this, returnType);
+		lambdaExpr.inferReturnType(this, returnType, typeContext, markers);
 		return lambdaExpr;
 	}
 

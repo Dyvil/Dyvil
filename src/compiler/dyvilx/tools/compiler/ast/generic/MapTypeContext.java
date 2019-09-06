@@ -22,9 +22,10 @@ public final class MapTypeContext implements ITypeContext
 	}
 
 	@Override
-	public void addMapping(ITypeParameter typeVar, IType type)
+	public boolean addMapping(ITypeParameter typeVar, IType type)
 	{
 		this.map.put(typeVar, type);
+		return true;
 	}
 
 	@Override

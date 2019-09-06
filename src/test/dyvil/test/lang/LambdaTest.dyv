@@ -1,7 +1,6 @@
 package dyvil.test.lang
 
 using dyvil.test.JUnit
-using dyvil.Functions
 
 import java.util.{ List, ArrayList }
 
@@ -141,5 +140,35 @@ class LambdaTest {
 		function1.staticType.toString =?= type(int -> int).toString
 		function2.staticType.toString =?= type((int, int) -> (int, int)).toString
 		functionCurried.staticType.toString =?= type(int -> int -> (int, int)).toString
+	}
+
+	interface A<T, U> { func apply() -> T }
+	static func f<Tf, Uf: Object>(a: A<Tf, Uf>) -> Uf = unsafeInit<Uf>
+	static func g<Tg>(a: A<Tg, String>) -> String = ""
+
+	@Test func typeInference2() -> void {
+		// #513
+		let v = f(=> "a") // should NOT be v: U
+		v.staticType.toString =?= type(Object).toString
+
+		let w = f<String, String>(=> "a") // w: String
+		w.staticType.toString =?= type(String).toString
+
+		let x = g(=> "a") // g: String
+		x.staticType.toString =?= type(String).toString
+	}
+
+	// --------------- Functional Method from Supertype ---------------
+
+	interface F<T> { func apply() -> T }
+	interface G<U> extends F<U>
+	interface H<V> extends G<V>
+
+	@Test func functionalMethodInheritance() {
+		// #504
+		let f: F<String> = () => "a"
+		let g: G<String> = () => "a"
+		let h: H<String> = () => "a"
+		let uo: java.util.function.UnaryOperator<String> = s => s.concat(".")
 	}
 }

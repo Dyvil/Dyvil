@@ -1,0 +1,27 @@
+package dyvil.test.lang
+
+using dyvil.test.JUnit
+
+class SynchronizedTest {
+	// #510
+
+	@Test func holdsAndReleasesLock() {
+		let lock = new Object
+		synchronized lock {
+			Thread.holdsLock(lock) =?= true
+		}
+		Thread.holdsLock(lock) =?= false
+	}
+
+	extension func syncReturn<R>(this: Object, f: () -> R) -> R {
+		synchronized this {
+			return f()
+		}
+	}
+
+	@Test func holdsAndReleasesLockAfterReturn() {
+		let lock = new Object
+		lock.syncReturn { Thread.holdsLock(lock) } =?= true
+		Thread.holdsLock(lock) =?= false
+	}
+}

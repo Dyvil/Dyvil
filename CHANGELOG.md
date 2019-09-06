@@ -198,3 +198,29 @@
 ## Dyvil REPL v0.28.1
 
 ## Dyvil GenSrc v0.10.1
+
+# Dyvil v0.46.5
+
+## Dyvil Library v0.46.1
+
+## Dyvil Compiler v0.46.5
+
++ Try/Catch Blocks can now be used as expressions. #33
++ Functional methods can now be inherited from super-interfaces. #504
+* Fixed array constructors working incorrectly as subexpressions. #505
+* Fixed error when using Try/Catch Blocks as the last statement. #509
+* Fixed finally blocks not being executed before return statements in try or catch blocks. #511
+* Fixed finally blocks not rethrowing exceptions. #512
+* Fixed incorrect bytecode generation for synchronized blocks. #510
+* Fixed incorrect position in marker for failed implicit reference type conversions.
+* Fixed synchronized blocks being parsed incorrectly. #510
+* Improved finally block compilation.
+* Improved type inference for lambda expressions.
+
+## Dyvil REPL v0.28.2
+
+* Bumped version number due to compiler API changes.
+
+## Dyvil GenSrc v0.10.2
+
+* Bumped version number due to compiler API changes.

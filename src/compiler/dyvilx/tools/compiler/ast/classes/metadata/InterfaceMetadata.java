@@ -13,6 +13,7 @@ import dyvilx.tools.compiler.ast.field.IProperty;
 import dyvilx.tools.compiler.ast.member.Member;
 import dyvilx.tools.compiler.ast.member.MemberKind;
 import dyvilx.tools.compiler.ast.method.IMethod;
+import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.backend.classes.ClassWriter;
 import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.util.Markers;
@@ -46,15 +47,15 @@ public class InterfaceMetadata implements IClassMetadata
 
 		this.functionalMethodSearched = true;
 		final ClassBody body = this.theClass.getBody();
-		if (body == null)
+		if (body != null)
 		{
-			return null;
-		}
-
-		for (IMethod method : body.allMethods())
-		{
-			if (method.isFunctional())
+			for (IMethod method : body.allMethods())
 			{
+				if (!method.isFunctional())
+				{
+					continue;
+				}
+
 				if (this.functionalMethod != null)
 				{
 					// duplicate detected
@@ -63,6 +64,23 @@ public class InterfaceMetadata implements IClassMetadata
 				this.functionalMethod = method;
 			}
 		}
+
+		for (final IType itf : this.theClass.getInterfaces())
+		{
+			final IMethod method = itf.getFunctionalMethod();
+			if (method == null)
+			{
+				continue;
+			}
+
+			if (this.functionalMethod != null)
+			{
+				// duplicate detected
+				return this.functionalMethod = null;
+			}
+			this.functionalMethod = method;
+		}
+
 		return this.functionalMethod;
 	}
 

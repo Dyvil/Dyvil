@@ -7,12 +7,23 @@ public class ArrayTest {
 
 	static func boxed<@Reified(.ANY_CLASS) type T: any!>(array: [T]) -> [T & Object!] = array
 
-	@Test
-	func boxed() -> void {
+	@Test func boxed() {
 		let array: [String] = [ 'a', 'b', 'c' ]
 		let obj: [Object] = boxed<Object>(array)
 		let nobj: [Object!] = genericTest(array)
 
 		obj =?= nobj
+	}
+
+	@Test func constructors() {
+		let arr = new [int](4)
+		arr.size =?= 4
+		arr[0] =?= 0
+
+		// #505
+		let list = java.util.List(1,2,3)
+		let larr = list.toArray(new [Int](0))
+		larr.size =?= 3
+		larr[1] =?= 2
 	}
 }

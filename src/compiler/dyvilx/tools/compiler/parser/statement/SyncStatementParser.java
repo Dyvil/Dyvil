@@ -48,7 +48,7 @@ public class SyncStatementParser extends Parser
 			this.mode = LOCK;
 			return;
 		case LOCK:
-			pm.pushParser(new ExpressionParser(this.statement::setLock).withFlags(IGNORE_STATEMENT));
+			pm.pushParser(new ExpressionParser(this.statement::setLock).withFlags(IGNORE_STATEMENT), true);
 			this.mode = ACTION;
 			return;
 		case ACTION:

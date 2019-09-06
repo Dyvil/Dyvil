@@ -2,6 +2,7 @@ package dyvilx.tools.compiler.ast.statement.exception;
 
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvilx.tools.asm.Label;
 import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.context.IDefaultContext;
 import dyvilx.tools.compiler.ast.context.IImplicitContext;
@@ -18,42 +19,73 @@ import dyvilx.tools.compiler.backend.exception.BytecodeException;
 import dyvilx.tools.compiler.backend.method.MethodWriter;
 import dyvilx.tools.compiler.config.Formatting;
 import dyvilx.tools.compiler.transform.TypeChecker;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.compiler.util.Util;
 import dyvilx.tools.parsing.marker.MarkerList;
 
+import java.util.function.Consumer;
+
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
-	private static final boolean DISALLOW_EXPRESSIONS = true;
+	// =============== Constants ===============
 
 	public static final TypeChecker.MarkerSupplier CATCH_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"try.catch.type.incompatible", "type.expected", "try.catch.type");
 	public static final TypeChecker.MarkerSupplier TRY_MARKER_SUPPLIER   = TypeChecker.markerSupplier(
 		"try.action.type.incompatible", "type.expected", "try.action.type");
 
+	// =============== Fields ===============
+
 	protected IValue action;
+
 	protected CatchBlock[] catchBlocks = new CatchBlock[1];
-	protected int    catchBlockCount;
+	protected int          catchBlockCount;
+
 	protected IValue finallyBlock;
 
-	// Metadata
+	// --------------- Metadata ---------------
+
 	private IType commonType;
+
+	// =============== Constructors ===============
 
 	public TryStatement(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	@Override
-	public int valueTag()
+	// =============== Properties ===============
+
+	public IValue getAction()
 	{
-		return TRY;
+		return this.action;
 	}
 
-	@Override
-	public boolean isUsableAsStatement()
+	public void setAction(IValue action)
 	{
-		return true;
+		this.action = action;
+	}
+
+	public void addCatchBlock(CatchBlock block)
+	{
+		int index = this.catchBlockCount++;
+		if (index >= this.catchBlocks.length)
+		{
+			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
+			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
+			this.catchBlocks = temp;
+		}
+
+		this.catchBlocks[index] = block;
+	}
+
+	public IValue getFinallyBlock()
+	{
+		return this.finallyBlock;
+	}
+
+	public void setFinallyBlock(IValue finallyBlock)
+	{
+		this.finallyBlock = finallyBlock;
 	}
 
 	@Override
@@ -73,24 +105,10 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return true;
 	}
 
-	public void setAction(IValue action)
+	@Override
+	public boolean isUsableAsStatement()
 	{
-		this.action = action;
-	}
-
-	public IValue getAction()
-	{
-		return this.action;
-	}
-
-	public void setFinallyBlock(IValue finallyBlock)
-	{
-		this.finallyBlock = finallyBlock;
-	}
-
-	public IValue getFinallyBlock()
-	{
-		return this.finallyBlock;
+		return true;
 	}
 
 	@Override
@@ -119,25 +137,15 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return this.commonType = combinedType;
 	}
 
+	// =============== Methods ===============
+
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public int valueTag()
 	{
-		if (this.action != null)
-		{
-			this.action = TypeChecker
-				              .convertValue(this.action, type, typeContext, markers, context, TRY_MARKER_SUPPLIER);
-		}
-
-		for (int i = 0; i < this.catchBlockCount; i++)
-		{
-			final CatchBlock block = this.catchBlocks[i];
-			block.action = TypeChecker
-				               .convertValue(block.action, type, typeContext, markers, context, CATCH_MARKER_SUPPLIER);
-		}
-
-		this.commonType = type;
-		return this;
+		return TRY;
 	}
+
+	// --------------- Typing ---------------
 
 	@Override
 	public boolean isType(IType type)
@@ -161,13 +169,28 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
-	public int getTypeMatch(IType type, IImplicitContext implicitContext)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (DISALLOW_EXPRESSIONS)
+		if (this.action != null)
 		{
-			return MISMATCH;
+			this.action = TypeChecker
+				              .convertValue(this.action, type, typeContext, markers, context, TRY_MARKER_SUPPLIER);
 		}
 
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			final CatchBlock block = this.catchBlocks[i];
+			block.action = TypeChecker
+				               .convertValue(block.action, type, typeContext, markers, context, CATCH_MARKER_SUPPLIER);
+		}
+
+		this.commonType = type;
+		return this;
+	}
+
+	@Override
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
+	{
 		int min = TypeChecker.getTypeMatch(this.action, type, implicitContext);
 		if (min == MISMATCH)
 		{
@@ -190,18 +213,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return min;
 	}
 
-	public void addCatchBlock(CatchBlock block)
-	{
-		int index = this.catchBlockCount++;
-		if (index >= this.catchBlocks.length)
-		{
-			CatchBlock[] temp = new CatchBlock[this.catchBlockCount];
-			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
-			this.catchBlocks = temp;
-		}
-
-		this.catchBlocks[index] = block;
-	}
+	// --------------- Resolution Phases ---------------
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -263,10 +275,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			this.finallyBlock = IStatement.checkStatement(markers, context, this.finallyBlock, "try.finally.type");
 		}
 
-		if (DISALLOW_EXPRESSIONS && this.commonType != null && this.commonType != Types.VOID)
-		{
-			markers.add(Markers.semanticError(this.position, "Try Statements cannot currently be used as expressions"));
-		}
 		return this;
 	}
 
@@ -352,6 +360,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return this;
 	}
 
+	// --------------- Context ---------------
+
 	@Override
 	public byte checkException(IType type)
 	{
@@ -365,34 +375,117 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		return PASS;
 	}
 
+	// --------------- Compilation ---------------
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		/*
+		 * Overview of how a try statement is compiled:
+		 * L0: // before
+		 *   (store stack items into locals)1
+		 *   (store 0/false/null into result variable)2
+		 * L1: // the action
+		 *   action...
+		 *   (store top of stack into result variable)2
+		 * L2: // the end of the action
+		 *   goto L5
+		 * L3: // the catch block
+		 *   store exception
+		 *   catch block 1
+		 *   (store top of stack into result variable)2
+		 *   goto L5
+		 * L4: // the actual finally block
+		 *   (store exception)3
+		 *   (finally...)3
+		 *   (throw exception)3
+		 * L5: // the non-exception finally block
+		 *   (finally...)3
+		 * L6: // the end of the try block
+		 *   (load stack items from locals)
+		 *   (load result variable)2
+		 *
+		 * 1 - if there is anything on the stack
+		 * 2 - if there is a non-void result type
+		 * 3 - if there is a finally block
+		 */
+
 		if (type == null)
 		{
 			type = this.getType();
 		}
 
-		final dyvilx.tools.asm.Label tryStart = new dyvilx.tools.asm.Label();
-		final dyvilx.tools.asm.Label tryEnd = new dyvilx.tools.asm.Label();
-		final dyvilx.tools.asm.Label endLabel = new dyvilx.tools.asm.Label();
+		final Label l1 = new Label();
+		final Label l2 = new Label();
+		final Label l5 = new Label();
 
-		writer.visitTargetLabel(tryStart);
+		final int localCount = writer.localCount();
+
+		// --------------- L0: ---------------
+
+		// store everything on the stack into variables
+		final int stackCount = writer.getFrame().stackCount();
+		final int[] stack = new int[stackCount];
+		int nextIndex = localCount;
+		for (int i = 0; i < stackCount; i++)
+		{
+			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+			stack[i] = nextIndex;
+			nextIndex = writer.localCount();
+		}
+
+		// for some reason we need to store a (default) value into our result variable
+		// TODO investigate why
+		if (!Types.isVoid(type))
+		{
+			if (!type.hasDefaultValue())
+			{
+				writer.visitInsn(Opcodes.ACONST_NULL);
+			}
+			else
+			{
+				type.writeDefaultValue(writer);
+			}
+			writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+		}
+
+		final Consumer<? super MethodWriter> handler;
+		if (this.finallyBlock != null)
+		{
+			handler = writer1 -> this.finallyBlock.writeExpression(writer1, Types.VOID);
+			writer.addPreReturnHandler(handler);
+		}
+		else
+		{
+			handler = null;
+		}
+
+		// --------------- L1: ---------------
+
+		writer.visitTargetLabel(l1);
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
-
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			if (!writer.hasReturn() && !Types.isVoid(type))
+			{
+				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+			}
 		}
-		writer.visitLabel(tryEnd);
+
+		// --------------- L2: ---------------
+
+		writer.visitTargetLabel(l2);
+		writer.visitJumpInsn(Opcodes.GOTO, l5);
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
-			final dyvilx.tools.asm.Label handlerLabel = new dyvilx.tools.asm.Label();
+			final Label l3 = new Label();
 			final String handlerType = block.getType().getInternalName();
 
-			writer.visitTargetLabel(handlerLabel);
+			// --------------- L3: ---------------
+
+			writer.visitTargetLabel(l3);
 			writer.startCatchBlock(handlerType);
 
 			// Check if the block's variable is actually used
@@ -400,39 +493,82 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
-				final int localCount = writer.localCount();
+				final int localCount1 = writer.localCount();
 				block.variable.writeInit(writer, null);
 				block.action.writeExpression(writer, type);
-				writer.resetLocals(localCount);
+				writer.resetLocals(localCount1);
 			}
-			// Otherwise pop the exception from the stack
 			else
 			{
+				// Otherwise pop the exception from the stack
 				writer.visitInsn(Opcodes.POP);
 				block.action.writeExpression(writer, type);
 			}
 
-			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			if (!writer.hasReturn() && !Types.isVoid(type))
+			{
+				writer.visitVarInsn(Opcodes.AUTO_STORE, nextIndex);
+			}
+
+			writer.visitTryCatchBlock(l1, l2, l3, handlerType);
+			writer.visitJumpInsn(Opcodes.GOTO, l5);
 		}
 
+		// --------------- L4: ---------------
+
+		// the exception-handling finally block
 		if (this.finallyBlock != null)
 		{
-			final dyvilx.tools.asm.Label finallyLabel = new dyvilx.tools.asm.Label();
+			writer.removePreReturnHandler(handler);
 
-			writer.visitLabel(finallyLabel);
+			final Label l4 = new Label();
+			final int targetLocal = writer.localCount();
+
+			writer.visitTargetLabel(l4);
 			writer.startCatchBlock("java/lang/Throwable");
-			writer.visitInsn(Opcodes.POP);
+			writer.visitVarInsn(Opcodes.ASTORE, targetLocal);
 
-			writer.visitLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
-			writer.visitFinallyBlock(tryStart, tryEnd, finallyLabel);
+
+			if (!writer.hasReturn())
+			{
+				writer.visitVarInsn(Opcodes.ALOAD, targetLocal);
+				writer.visitInsn(Opcodes.ATHROW);
+			}
+
+			writer.visitFinallyBlock(l1, l2, l4);
+
+			writer.resetLocals(targetLocal);
 		}
-		else
+
+		// --------------- L5: ---------------
+
+		writer.visitTargetLabel(l5);
+
+		// the non-exception finally block
+		if (this.finallyBlock != null)
 		{
-			writer.visitLabel(endLabel);
+			this.finallyBlock.writeExpression(writer, Types.VOID);
 		}
+
+		// --------------- L6: ---------------
+
+		// retrieve whatever was on the stack
+		for (int i = stackCount - 1; i >= 0; i--)
+		{
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, stack[i]);
+		}
+
+		// load result
+		if (!Types.isVoid(type))
+		{
+			writer.visitVarInsn(Opcodes.AUTO_LOAD, nextIndex);
+		}
+
+		writer.resetLocals(localCount);
 	}
+
+	// --------------- Formatting ---------------
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
