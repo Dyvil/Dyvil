@@ -92,4 +92,7 @@ apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/javaCompile.gradle'
 apply from: 'gradle/dyvilCompile.gradle'
 apply from: 'gradle/test.gradle'
-apply from: 'gradle/sharedJar.gradle'
+
+jar.doFirst {
+	manifest.attributes("Main-Class": project(':repl').mainClassName)
+}
