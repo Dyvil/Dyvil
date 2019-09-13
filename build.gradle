@@ -3,6 +3,7 @@ import java.util.regex.Matcher
 // --------------- Plugins ---------------
 
 plugins {
+	id 'org.dyvil.dyvil-gradle' version '0.4.0' apply false
 	id 'com.jfrog.bintray' version '1.8.4' apply false
 	id 'de.clashsoft.simple-publish' version '0.3.0' apply false
 }

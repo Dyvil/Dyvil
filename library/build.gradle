@@ -1,56 +1,23 @@
+apply plugin: 'org.dyvil.dyvil-gradle'
+
 // --------------- Info ---------------
 
 version = getTagVersion('library/')
 description = 'The Dyvil Standard Library'
 publishInfo.labels = [ 'dyvil', 'library' ]
 
+// --------------- Dependencies ---------------
+
+dependencies {
+	compile libraryDependency
+	dyvilc compilerDependency
+	gensrc gensrcDependency
+}
+
 // --------------- Source Sets ---------------
 
 sourceSets.main {
-	resources {
-		exclude dyvilFilters
-		exclude genSrcFilters
-	}
-}
+	java.srcDir 'src/main/gensrc'
 
-// --------------- Dependencies ---------------
-
-def compilerOutput = files("$buildDir/classes/dyvil/main/") {
-	builtBy 'compileDyvil'
-}
-
-dependencies {
-	runtime compilerOutput
-	compileOnly rootProject.libraryDependency
-}
-
-jar.from compilerOutput
-
-// =============== Tasks ===============
-
-// --------------- GenSrc ---------------
-
-def gensrcTarget = file "$buildDir/gensrc/main/dyvil/"
-
-tasks.register('gensrcDyvil', JavaExec) {
-	group 'sources'
-
-	setupGenSrc(it,
-			source_dirs: [ 'src/main/dyvil', 'src/main/gensrc/' ],
-			output_dir: "$it.temporaryDir/classes/",
-			gensrc_dir: gensrcTarget.path,
-	)
-}
-
-// --------------- Dyvil Compile ---------------
-
-tasks.register('compileDyvil', JavaExec) {
-	group 'build'
-	dependsOn 'gensrcDyvil'
-
-	setupCompiler(it,
-			source_dirs: [ file('src/main/dyvil').path, gensrcTarget.path ],
-			libraries: [ ],
-			output_dir: "$buildDir/classes/dyvil/main/",
-	)
+	dyvil.srcDir 'src/main/gensrc'
 }
