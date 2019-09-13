@@ -92,8 +92,8 @@ public class EnumClassMetadata extends ClassMetadata
 		final CodeParameter ordParam = new CodeParameter(constructor, null, Names.ordinal, Types.INT,
 		                                                 AttributeList.of(Modifiers.SYNTHETIC));
 
-		constructor.getParameters().insert(0, nameParam);
-		constructor.getParameters().insert(1, ordParam);
+		constructor.getParameters().add(0, nameParam);
+		constructor.getParameters().add(1, ordParam);
 
 		final IConstructor enumConstructor = Types.ENUM_CLASS.getBody().getConstructor(0);
 
