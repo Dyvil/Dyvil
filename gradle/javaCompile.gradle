@@ -14,8 +14,8 @@ allprojects {
 	tasks.withType(Jar) {
 		preserveFileTimestamps = false
 
-		from(rootProject.file('.')) {
-			include '*LICENSE*.txt'
+		from(rootProject.rootDir) {
+			include '*LICENSE*'
 		}
 	}
 }
