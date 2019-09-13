@@ -1,15 +1,5 @@
 import java.awt.Desktop
 
-// --------------- Source Sets ---------------
-
-sourceSets {
-	test {
-		java {
-			srcDir 'src/test'
-		}
-	}
-}
-
 // --------------- Dependencies ---------------
 
 def compilerOutput = files("$buildDir/classes/dyvil/test/") {
