@@ -12,18 +12,6 @@ publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
 
 mainClassName = 'dyvilx.tools.gensrc.Main'
 
-// --------------- Source Sets ---------------
-
-sourceSets.main {
-	java {
-		srcDir '../src/gensrc'
-	}
-
-	resources {
-		srcDir '../src/gensrc'
-	}
-}
-
 // --------------- Dependencies ---------------
 
 dependencies {

@@ -40,7 +40,7 @@ tasks.register('compileTestDyvil', JavaExec) {
 	dependsOn 'testClasses'
 
 	setupCompiler(it,
-			source_dirs: [ "$rootDir/src/test/" ],
+			source_dirs: [ "src/test/dyvil/" ],
 			libraries: sourceSets.test.compileClasspath.toList(),
 			output_dir: "$buildDir/classes/dyvil/test/",
 			exclude_patterns: [ 'dyvil/experimental/**' ],
@@ -65,7 +65,7 @@ tasks.register('testGenSrc', JavaExec) {
 	dependsOn ':gensrc:classes'
 
 	setupGenSrc(it,
-			source_dirs: [ 'src/test/' ],
+			source_dirs: [ 'src/test/dyvil/' ],
 			output_dir: "$buildDir/classes/test-gen/",
 			gensrc_dir: "$buildDir/gensrc/test/",
 			// the line is here to ensure the compiler finds all Dyvil classes

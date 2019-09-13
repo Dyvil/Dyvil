@@ -14,18 +14,6 @@ publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
 
 mainClassName = 'dyvilx.tools.compiler.Main'
 
-// --------------- Source Sets ---------------
-
-sourceSets.main {
-	java {
-		srcDir '../src/compiler'
-	}
-
-	resources {
-		srcDir '../src/compiler'
-	}
-}
-
 // --------------- Dependencies ---------------
 
 dependencies {
@@ -57,6 +45,6 @@ tasks.named('compileJava', JavaCompile) {
 	it.source fileTree("$buildDir/src/main/java").builtBy('copyJava')
 	it.exclude {
 		final String path = it.file.path
-		path.contains('src/compiler') && path.endsWith('DyvilCompiler.java')
+		path.contains('compiler/src/main/java') && path.endsWith('DyvilCompiler.java')
 	}
 }

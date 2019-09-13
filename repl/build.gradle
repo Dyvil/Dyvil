@@ -14,18 +14,6 @@ publishInfo.labels = [ 'dyvil', 'repl', 'interactive', 'shell' ]
 
 mainClassName = 'dyvilx.tools.repl.Main'
 
-// --------------- Source Sets ---------------
-
-sourceSets.main {
-	java {
-		srcDir '../src/repl'
-	}
-
-	resources {
-		srcDir '../src/repl'
-	}
-}
-
 // --------------- Dependencies ---------------
 
 dependencies {
@@ -56,6 +44,6 @@ tasks.named('compileJava', JavaCompile) {
 	it.source files("$buildDir/src/main/java").builtBy('copyJava')
 	it.exclude {
 		final String path = it.file.path
-		path.contains('src/repl') && path.endsWith('DyvilREPL.java')
+		path.contains('repl/src/main/java') && path.endsWith('DyvilREPL.java')
 	}
 }
