@@ -23,7 +23,6 @@ import dyvilx.tools.parsing.marker.MarkerList;
 public class ClassParameter extends Field implements IParameter
 {
 	// Metadata
-	protected int   index;
 	protected int   localIndex;
 	protected IType covariantType;
 
@@ -123,13 +122,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public int getIndex()
 	{
-		return this.index;
-	}
-
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
+		return this.enclosingClass.getParameters().indexOf(this);
 	}
 
 	@Override

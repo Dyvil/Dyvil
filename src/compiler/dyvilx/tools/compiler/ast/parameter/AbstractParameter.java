@@ -32,8 +32,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	// Metadata
 	protected @Nullable ICallableMember method;
 
-	protected int index;
-
 	private IType covariantType;
 
 	public AbstractParameter()
@@ -148,18 +146,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		}
 
 		return this.covariantType = this.type.asParameterType();
-	}
-
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
 	}
 
 	@Override

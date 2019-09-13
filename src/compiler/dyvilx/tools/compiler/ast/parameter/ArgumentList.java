@@ -167,7 +167,7 @@ public class ArgumentList implements Resolvable, IValueList
 
 		// The specified label was not found, check the indices:
 
-		if (index >= this.size)
+		if (index < 0 || index >= this.size)
 		{
 			return -1;
 		}

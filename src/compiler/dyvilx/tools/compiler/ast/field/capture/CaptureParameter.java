@@ -21,8 +21,6 @@ public class CaptureParameter extends CaptureVariable implements IParameter
 {
 	protected ICallableMember method;
 
-	protected int index;
-
 	public CaptureParameter(ICallableMember method, IVariable variable)
 	{
 		super(variable);
@@ -71,18 +69,6 @@ public class CaptureParameter extends CaptureVariable implements IParameter
 	public void setMethod(ICallableMember method)
 	{
 		this.method = method;
-	}
-
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
 	}
 
 	@Override

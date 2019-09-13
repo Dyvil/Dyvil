@@ -55,9 +55,11 @@ public interface IParameter extends IVariable, ClassMember
 
 	// --------------- Index in Enclosing Parameter List ---------------
 
-	int getIndex();
-
-	void setIndex(int index);
+	default int getIndex()
+	{
+		final ICallableMember method = this.getMethod();
+		return method != null ? method.getParameters().indexOf(this) : -1;
+	}
 
 	// --------------- Attributes ---------------
 
@@ -175,14 +177,18 @@ public interface IParameter extends IVariable, ClassMember
 
 		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaFlags);
 
-		// Annotations
-		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
+		// for lambda methods the index is -1, but we don't care about their annotations anyway.
+		if (index >= 0)
+		{
+			// Annotations
+			final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
 
-		attributes.write(visitor);
+			attributes.write(visitor);
 
-		ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
+			ModifierUtil.writeDyvilModifiers(visitor, dyvilFlags);
 
-		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
+			IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
+		}
 	}
 
 	default AnnotationVisitor visitAnnotation(String internalType)
