@@ -76,7 +76,7 @@ private static String getTagVersion(String module = '') {
 
 	final String newestTag = matcher.group(0)
 	final String newestVersion = matcher.group(1)
-	if (!System.getenv("DYVIL_SNAPSHOT")) {
+	if (System.getenv("DYVIL_RELEASE")) {
 		return newestVersion
 	}
 
