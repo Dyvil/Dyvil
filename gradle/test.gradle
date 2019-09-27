@@ -1,10 +1,8 @@
 import java.awt.Desktop
 
-// --------------- Dependencies ---------------
+apply plugin: 'org.dyvil.dyvil-gradle'
 
-def compilerOutput = files("$buildDir/classes/dyvil/test/") {
-	builtBy 'compileTestDyvil'
-}
+// --------------- Dependencies ---------------
 
 dependencies {
 	compile subprojects
@@ -15,67 +13,29 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 
 	testCompile project(':library')
-	testRuntime compilerOutput
-	testCompileOnly rootProject.libraryDependency
-}
-
-test.testClassesDirs = sourceSets.test.runtimeClasspath
-
-check.dependsOn 'testDyvil', 'testGenSrc'
-
-// --------------- Dyvil Compilation ---------------
-
-tasks.register('compileTestDyvil', JavaExec) {
-	group 'build'
-	dependsOn 'testClasses'
-
-	setupCompiler(it,
-			source_dirs: [ "src/test/dyvil/" ],
-			libraries: sourceSets.test.compileClasspath.toList(),
-			output_dir: "$buildDir/classes/dyvil/test/",
-			exclude_patterns: [ 'dyvil/experimental/**' ],
-	)
-
-	// override classpath to use the new compiler instead of bootstrap
-	classpath = project(':compiler').sourceSets.main.runtimeClasspath
 }
 
 // --------------- Test Tasks ---------------
 
-tasks.register('testDyvil', JavaExec) {
-	group 'verification'
-	dependsOn 'compileTestDyvil'
-
-	main = 'dyvil.test.Main'
-	classpath = sourceSets.test.runtimeClasspath
+tasks.named('compileTestDyvil') {
+	// override classpath to use the new compiler instead of bootstrap
+	dyvilcClasspath = project(':compiler').sourceSets.main.runtimeClasspath
 }
 
-tasks.register('testGenSrc', JavaExec) {
-	group 'verification'
-	dependsOn ':gensrc:classes'
-
-	setupGenSrc(it,
-			source_dirs: [ 'src/test/dyvil/' ],
-			output_dir: "$buildDir/classes/test-gen/",
-			gensrc_dir: "$buildDir/gensrc/test/",
-			// the line is here to ensure the compiler finds all Dyvil classes
-			// (somehow its classpath-based library resolution is insufficient)
-			libraries: [ "$buildDir/classes/dyvil/library/" ]
-	)
-
+tasks.named('compileTestDyvilGenSrc') {
 	// override classpath to use the new classes instead of bootstrap
-	classpath = project(':gensrc').sourceSets.main.runtimeClasspath
+	dyvilcClasspath = project(':gensrc').sourceSets.main.runtimeClasspath
 }
+
+// --------------- REPL Tasks ---------------
 
 tasks.register('runRepl', JavaExec) {
 	group 'run'
 	dependsOn ':testClasses', ':repl:classes'
 
-	setupCompiler(it,
-			libraries: sourceSets.test.compileClasspath.toList()
-	)
+	args '--ansi', '--classpath=' + sourceSets.test.runtimeClasspath.asPath
 
-	jvmArgs += '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+	jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
 
 	standardOutput = System.out
 	standardInput = System.in
