@@ -1,5 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+import java.awt.Desktop
+
 // --------------- Plugins ---------------
 
 plugins {
@@ -45,5 +47,44 @@ tasks.named('compileJava', JavaCompile) {
 	it.exclude {
 		final String path = it.file.path
 		path.contains('repl/src/main/java') && path.endsWith('DyvilREPL.java')
+	}
+}
+
+// --------------- Running ---------------
+
+tasks.named('run', JavaExec) {
+	it.dependsOn ':testClasses', ':repl:classes'
+
+	it.args '--ansi', '--classpath=' + rootProject.sourceSets.test.runtimeClasspath.asPath
+
+	it.jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+
+	it.standardOutput = System.out
+	it.standardInput = System.in
+
+	it.main = mainClassName
+	it.classpath = rootProject.sourceSets.test.runtimeClasspath + sourceSets.main.runtimeClasspath
+}
+
+tasks.register('saveCommand') {
+	final File commandFile = new File("$buildDir/tmp/repl.command")
+	it.outputs.file commandFile
+
+	it.doLast {
+		final JavaExec runRepl = tasks.run as JavaExec
+		final String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.join(' \\\n\t') + '\n'
+
+		commandFile.text = content
+		commandFile.executable = true
+	}
+}
+
+tasks.register('runInTerminal') {
+	it.dependsOn = tasks.run.dependsOn
+	it.dependsOn 'saveCommand'
+
+	it.doLast {
+		System.setProperty('apple.awt.UIElement', 'true') // avoid dock icon
+		Desktop.desktop.open(new File("$buildDir/tmp/repl.command"))
 	}
 }
