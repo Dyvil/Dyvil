@@ -1,0 +1,32 @@
+package dyvil.lang
+
+using dyvil.test.JUnit
+
+import java.util.stream.IntStream
+
+class NameTest {
+	const THREAD_COUNT = 128
+	const NAME_COUNT = 2 ** 16;
+
+	@Test func concurrency() {
+		var sums = new [long](THREAD_COUNT)
+		IntStream.range(0, THREAD_COUNT).parallel().forEach { tid =>
+			sums[tid] = checkSum()
+		}
+
+		let checkSum = checkSum()
+
+		for tid <- 0 ..< THREAD_COUNT {
+			sums[tid] =?= checkSum
+		}
+	}
+
+	static func checkSum() -> long {
+		var sum = 0L
+		for i <- 0 ..< NAME_COUNT {
+			let name = Name("i\(i)")
+			sum += System.identityHashCode(name)
+		}
+		return sum
+	}
+}

@@ -1,5 +1,7 @@
 package dyvil.lang
 
+import java.util.{ Map, HashMap, concurrent.ConcurrentHashMap }
+
 import func dyvil.util.Qualifier.{ qualify, unqualify }
 
 import java.io.{ DataInput, DataOutput, IOException }
@@ -20,20 +22,17 @@ final class Name private (
 	// =============== Static Fields ===============
 
 	/**
-	 * This cache stores mappings between both qualified and unqualified names and their associated Name objects.
-	 * Ideally, CACHE.get(name.qualified) == CACHE.get(name.unqualified) == name for all name: Name
+	 * This cache stores mappings between both qualified names and their associated Name objects.
+	 * The invariant 'CACHE.get(name.qualified) == name for all name: Name' always holds.
 	 */
-	private const CACHE: [String:Name] = new mutable.HashMap<String, Name>(CACHE_CAPACITY)
+	private const CACHE: Map<String, Name> = new ConcurrentHashMap<String, Name>(CACHE_CAPACITY)
 
 	// =============== Static Methods ===============
 
 	// --------------- Generic ---------------
 
 	static func apply(value: String) -> Name {
-		if let name = CACHE.get(value) {
-			return name
-		}
-		return apply(unqualify(value), qualify(value))
+		return apply(qualified: qualify(value))
 	}
 
 	@Deprecated(replacements: ["Name.apply(value: String)"]) // in Dyvil only, this func is for Java interop
@@ -42,10 +41,7 @@ final class Name private (
 	// --------------- Explicit Qualified and Unqualified ---------------
 
 	static func apply(unqualified: String, qualified: String) -> Name {
-		if let name = CACHE.get(qualified) {
-			return name
-		}
-		return create(unqualified, qualified)
+		return CACHE.computeIfAbsent(qualified, v => new Name(unqualified, v))
 	}
 
 	@Deprecated(replacements: ["Name.apply(unqualified: String, qualified: String)"]) // in Dyvil only
@@ -55,53 +51,21 @@ final class Name private (
 
 	@JavaName('fromRaw')
 	static func apply(explicit raw value: String) -> Name {
-		if let name = CACHE.get(value) {
-			return name
-		}
-		return create(value)
+		return CACHE.computeIfAbsent(value, v => new Name(v, v))
 	}
 
 	// --------------- From Unqualified ---------------
 
 	@JavaName('fromUnqualified')
 	static func apply(explicit unqualified: String) -> Name {
-		if let name = CACHE.get(unqualified) {
-			return name
-		}
-		let qualified = qualify(unqualified)
-		if let name = CACHE.get(qualified) {
-			return name
-		}
-		return create(unqualified, qualified)
+		return CACHE.computeIfAbsent(qualify(unqualified), v => new Name(unqualified, v))
 	}
 
 	// --------------- From Qualified ---------------
 
 	@JavaName('fromQualified')
 	static func apply(explicit qualified: String) -> Name {
-		if let name = CACHE.get(qualified) {
-			return name
-		}
-		let unqualified = unqualify(qualified)
-		if let name = CACHE.get(unqualified) {
-			return name
-		}
-		return create(unqualified, qualified)
-	}
-
-	// --------------- Name Creation Helpers ---------------
-
-	private static func create(qualified: String) -> Name {
-		let name = new Name(qualified, qualified)
-		CACHE.put(qualified, name)
-		return name
-	}
-
-	private static func create(unqualified: String, qualified: String) -> Name {
-		let name = new Name(unqualified, qualified)
-		CACHE.put(unqualified, name)
-		CACHE.put(qualified, name)
-		return name
+		return CACHE.computeIfAbsent(qualified, v => new Name(unqualify(v), v))
 	}
 
 	// --------------- Serialization ---------------
