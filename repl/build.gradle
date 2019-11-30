@@ -1,6 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-import java.awt.Desktop
+import java.awt.*
 
 // --------------- Plugins ---------------
 
@@ -72,7 +72,9 @@ tasks.register('saveCommand') {
 
 	it.doLast {
 		final JavaExec runRepl = tasks.run as JavaExec
-		final String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.join(' \\\n\t') + '\n'
+		final String content = '#!/usr/bin/env bash\n' + runRepl.commandLine.collect {
+			"'${ it.replace('\'', '\'"\'"\'') }'"
+		}.join(' \\\n\t') + '\n'
 
 		commandFile.text = content
 		commandFile.executable = true
