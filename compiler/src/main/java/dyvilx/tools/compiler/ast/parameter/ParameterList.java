@@ -32,20 +32,9 @@ public class ParameterList extends ArrayList<IParameter> implements ResolvableLi
 		super(capacity);
 	}
 
-	public ParameterList(IParameter parameter)
-	{
-		super(1);
-		this.add(parameter);
-	}
-
 	public ParameterList(IParameter... parameters)
 	{
 		super(Arrays.asList(parameters));
-	}
-
-	public ParameterList(IParameter[] parameters, int size)
-	{
-		super(Arrays.asList(parameters).subList(0, size));
 	}
 
 	// =============== Properties ===============

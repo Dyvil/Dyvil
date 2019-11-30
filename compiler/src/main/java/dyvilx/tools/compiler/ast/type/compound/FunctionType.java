@@ -123,7 +123,7 @@ public final class FunctionType extends ResolvedGenericType
 	{
 		IType returnType = value.getType();
 
-		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition(), null, 0);
+		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition());
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setMethod(this.getFunctionalMethod());
 		lambdaExpr.setValue(value);
