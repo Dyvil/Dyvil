@@ -5,11 +5,14 @@ import dyvilx.tools.repl.context.Colorizer;
 import org.jline.builtins.Completers;
 import org.jline.reader.*;
 import org.jline.reader.impl.DefaultParser;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +32,11 @@ public class InputManager
 
 	private static LineReader createLineReader() throws IOException
 	{
+		final Path historyFile = Paths.get(System.getProperty("user.home"), ".dyvil", "repl_history");
+
 		return LineReaderBuilder.builder().appName("Dyvil REPL").terminal(createTerminal())
 		                        .highlighter(createHighlighter()).completer(createCompleter()).parser(createParser())
+		                        .history(new DefaultHistory()).variable(LineReader.HISTORY_FILE, historyFile)
 		                        .option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
 		                        .option(LineReader.Option.INSERT_TAB, true).build();
 	}
