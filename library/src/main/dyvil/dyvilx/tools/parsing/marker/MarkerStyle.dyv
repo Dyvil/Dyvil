@@ -6,4 +6,5 @@ enum MarkerStyle {
 	case DYVIL
 	case GCC
 	case MACHINE
+	case JAVAC
 }

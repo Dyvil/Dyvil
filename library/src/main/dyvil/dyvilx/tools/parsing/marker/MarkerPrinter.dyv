@@ -15,6 +15,7 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 			case .DYVIL => this.printHuman(markers, writer)
 			case .MACHINE => this.printMachine(markers, writer)
 			case .GCC => this.printGCC(markers, writer)
+			case .JAVAC => this.printJavac(markers, writer)
 		}
 	}
 
@@ -182,10 +183,52 @@ case class MarkerPrinter(let source: Source, let style: MarkerStyle, let colors:
 		writer.write('\n')
 	}
 
+	// --------------- Javac Format ---------------
+
+	private func printJavac(markers: MarkerList, writer: Writer) -> void {
+		markers.sort()
+		for marker <- markers {
+			this.printJavac(marker, writer)
+		}
+	}
+
+	private func printJavac(marker: Marker, writer: Writer) -> void {
+		writer.write(absoluteSourcePath(this.source))
+		writer.write(':')
+		writer.write(marker.position.startLine.toString)
+		writer.write(': ')
+		writer.write(levelName(marker.level))
+		writer.write(': ')
+		writer.write(marker.message)
+		writer.write('\n')
+
+		let line = this.source.line(at: marker.position.startLine)
+		writer.write(line)
+		writer.write('\n')
+
+		for i <- 0 ..< Math.min(marker.position.startColumn, line.length) {
+			writer.write((line[i] == '\t') ? '\t' : ' ')
+		}
+		writer.write('^\n')
+
+		for info <- marker.info {
+			writer.write('  ')
+			writer.write(info)
+			writer.write('\n')
+		}
+	}
+
 	// --------------- Helper Methods ---------------
 
 	private static func sourcePath(source: Source) -> String
 		= source.filePath ?? BaseMarkers.INSTANCE.getString("marker.input_source")
+
+	private static func absoluteSourcePath(source: Source) -> String {
+		if let sourceFile = source.filePath {
+			return new java.io.File(sourceFile).getAbsolutePath()
+		}
+		return BaseMarkers.INSTANCE.getString("marker.input_source")
+	}
 
 	private static func levelName(level: MarkerLevel) -> String
 		= levelName(level.name.toLowerCase())

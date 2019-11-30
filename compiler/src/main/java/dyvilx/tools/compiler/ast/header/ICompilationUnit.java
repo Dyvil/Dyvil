@@ -60,7 +60,9 @@ public interface ICompilationUnit extends ASTNode
 			compiler.log("");
 		}
 
-		final OutputStreamWriter writer = new OutputStreamWriter(compiler.getOutput());
+		// TODO v0.48.0: use style == MarkerStyle.JAVAC
+		final OutputStreamWriter writer = new OutputStreamWriter(
+			"JAVAC".equals(style.name()) ? compiler.getErrorOutput() : compiler.getOutput());
 		printer.print(markers, writer);
 		try
 		{
