@@ -53,7 +53,7 @@ tasks.named('compileJava', JavaCompile) {
 // --------------- Running ---------------
 
 tasks.named('run', JavaExec) {
-	it.dependsOn ':testClasses', ':repl:classes'
+	it.dependsOn ':build'
 
 	it.args '--ansi', '--classpath=' + rootProject.sourceSets.test.runtimeClasspath.asPath
 
