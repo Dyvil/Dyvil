@@ -4,6 +4,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
 	id 'application'
+	id 'antlr'
 }
 
 // --------------- Info ---------------
@@ -22,6 +23,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+	// https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
+	implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
 }
 
 // --------------- Source Copying ---------------
@@ -47,4 +51,22 @@ tasks.named('compileJava', JavaCompile) {
 		final String path = it.file.path
 		path.contains('compiler/src/main/java') && path.endsWith('DyvilCompiler.java')
 	}
+}
+
+// --------------- ANTLR ---------------
+
+def generatedANTLRDir = "$buildDir/generated/sources/antlr/main/"
+
+sourceSets.main.java.srcDir(generatedANTLRDir)
+
+// https://stackoverflow.com/questions/40995727/gradle-cant-find-antlr-token-file
+generateGrammarSource {
+	def packageName = 'dyvilx.tools.compiler.parser'
+	arguments += [ '-package', packageName ]
+	outputDirectory = file("$generatedANTLRDir/${ packageName.replace('.', '/') }/")
+}
+
+// https://github.com/gradle/gradle/issues/820
+configurations.compile {
+	extendsFrom = extendsFrom.findAll { it != configurations.antlr }
 }
