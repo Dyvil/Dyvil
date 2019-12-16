@@ -24,6 +24,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
+	// https://mvnrepository.com/artifact/org.antlr/antlr4
+	antlr group: 'org.antlr', name: 'antlr4', version: '4.7.2'
+
 	// https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
 	implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
 }
