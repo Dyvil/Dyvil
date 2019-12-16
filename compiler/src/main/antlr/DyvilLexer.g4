@@ -94,3 +94,8 @@ USING       : 'using';
 VAR         : 'var';
 WHERE       : 'where';
 WHILE       : 'while';
+
+// --------------- Others ---------------
+
+WS: [ \t] -> skip;
+NL: '\r'? '\n';
