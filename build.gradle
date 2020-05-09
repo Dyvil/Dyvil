@@ -8,7 +8,7 @@ plugins {
 	// https://plugins.gradle.org/plugin/com.jfrog.bintray
 	id 'com.jfrog.bintray' version '1.8.5' apply false
 	// https://plugins.gradle.org/plugin/de.clashsoft.simple-publish
-	id 'de.clashsoft.simple-publish' version '0.3.0' apply false
+	id 'de.clashsoft.simple-publish' version '0.6.0' apply false
 }
 
 allprojects {
@@ -29,14 +29,10 @@ allprojects {
 
 	publishInfo {
 		organization = 'dyvil'
-		websiteUrl = 'https://github.com/Dyvil/Dyvil'
-		issueTrackerUrl = 'https://github.com/Dyvil/Dyvil/issues'
-		vcsUrl = 'https://github.com/Dyvil/Dyvil'
 		githubRepo = 'Dyvil/Dyvil'
 
 		license {
-			shortName = 'BSD 3-Clause'
-			longName = 'BSD 3-Clause "New" or "Revised" License'
+			name = 'BSD 3-Clause'
 			url = 'https://opensource.org/licenses/BSD-3-Clause'
 		}
 
