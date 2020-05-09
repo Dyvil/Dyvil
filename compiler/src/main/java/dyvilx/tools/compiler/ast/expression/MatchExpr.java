@@ -489,7 +489,6 @@ public class MatchExpr implements IValue
 		writer
 			.visitMethodInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V", false);
 		writer.visitInsn(Opcodes.ATHROW);
-		writer.setHasReturn(false);
 	}
 
 	private void writeAction(MethodWriter writer, boolean expr, Object frameType, IValue value) throws BytecodeException

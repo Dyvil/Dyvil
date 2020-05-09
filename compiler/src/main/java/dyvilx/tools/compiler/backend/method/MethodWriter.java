@@ -13,8 +13,6 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 
 	void setLocalType(int index, Object type);
 
-	void setHasReturn(boolean hasReturn);
-
 	boolean hasReturn();
 
 	// Annotations

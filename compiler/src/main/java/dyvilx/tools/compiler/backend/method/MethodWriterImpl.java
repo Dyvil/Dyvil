@@ -48,12 +48,6 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 
 	@Override
-	public void setHasReturn(boolean hasReturn)
-	{
-		this.hasReturn = hasReturn;
-	}
-
-	@Override
 	public boolean hasReturn()
 	{
 		return this.hasReturn;
