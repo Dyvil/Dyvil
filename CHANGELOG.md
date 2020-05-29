@@ -224,3 +224,37 @@
 ## Dyvil GenSrc v0.10.2
 
 * Bumped version number due to compiler API changes.
+
+# Dyvil v0.47.0
+
+* The main artifact (`org.dyvil:dyvil`) no longer includes all dependencies' files.
+
+## Dyvil Library v0.47.0
+
++ Added the `javac` marker style.
++ Added the `UnsafeAccess` class with the `UNSAFE` constant.
++ Added the `LookupAccess` class with the `LOOKUP` constant.
+* The `Name` cache now works correctly when accessed concurrently.
+* Deprecated most `dyvil.reflect` classes.
+- Removed the `ReflectUtils.JAVA_LANG_ACCESS` field because it did not work in some JDKs.
+
+## Dyvil Compiler v0.47.0
+
++ Added support for the `javac` marker style.
++ Added the `-o` option as a short form for `--output-dir`.
+* Dropped support for `key=value` command-line arguments. #490
+* Dropped support for the `jar` phase and related options. #495
+* Fixed a typo in the `throw.type` error message.
+* Fixed an exception caused by implicit lambda conversion. #514
+- Dropped support for legacy `marker-style` values `m` and `g`. #491
+- Dropped support for legacy options `-o`, `--machine-markers` and `--gcc-markers`. #491
+- Dropped support for the `--log-file` option. #491
+
+# Dyvil REPL v0.29.0
+
++ Added a persistent history, saved in `~/.dyvil/repl-history`. #515
+- Dropped support for `key=value` command-line arguments. #490
+
+# Dyvil GenSrc v0.11.0
+
+- Dropped support for `key=value` command-line arguments. #490
