@@ -195,8 +195,11 @@ extension String {
 	// =============== Static Methods ===============
 
 	@JavaName("fromShared")
-	static func apply(sharing array: [final char]) -> String
-		= dyvil.reflect.ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(array)!!
+	static func apply(sharing array: [final char]) -> String {
+		let result = new String()
+		dyvil.reflect.ReflectUtils.UNSAFE.putObject(result, STRING_VALUE_OFFSET, array)
+		return result
+	}
 
 	// =============== Methods ===============
 
