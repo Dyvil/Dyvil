@@ -16,7 +16,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static dyvil.reflect.MethodReflection.LOOKUP;
+import static dyvil.reflect.LookupAccess.LOOKUP;
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.reflect.UnsafeAccess.UNSAFE;

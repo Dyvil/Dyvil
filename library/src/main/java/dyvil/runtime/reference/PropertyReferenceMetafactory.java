@@ -15,7 +15,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static dyvil.reflect.MethodReflection.LOOKUP;
+import static dyvil.reflect.LookupAccess.LOOKUP;
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.reflect.UnsafeAccess.UNSAFE;

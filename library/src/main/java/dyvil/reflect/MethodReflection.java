@@ -11,24 +11,11 @@ import java.lang.reflect.Method;
 @SuppressWarnings( { "unused", "unchecked" })
 public class MethodReflection
 {
-	public static final MethodHandles.Lookup LOOKUP;
-
-	static
-	{
-		Lookup lookup;
-		try
-		{
-			Field field = Lookup.class.getDeclaredField("IMPL_LOOKUP");
-			field.setAccessible(true);
-			lookup = (Lookup) field.get(null);
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			lookup = null;
-		}
-		LOOKUP = lookup;
-	}
+	/**
+	 * @deprecated since v0.47.0; use {@link LookupAccess#LOOKUP} instead
+	 */
+	@Deprecated
+	public static final MethodHandles.Lookup LOOKUP = LookupAccess.LOOKUP;
 
 	// Methods
 
