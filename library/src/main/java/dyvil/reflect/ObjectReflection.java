@@ -9,9 +9,13 @@ import java.lang.reflect.Field;
 
 public class ObjectReflection
 {
+	/**
+	 * @deprecated since v0.47.0; use {@link String#String(char[])} instead
+	 */
+	@Deprecated
 	public static String newUnsafeString(char[] values)
 	{
-		return ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(values);
+		return new String(values);
 	}
 
 	public static <T> T createInstance(String className)

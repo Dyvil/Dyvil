@@ -2,9 +2,13 @@ package dyvil.reflect;
 
 public class EnumReflection
 {
+	/**
+	 * @deprecated since v0.47.0; use {@code enumClass}.{@link Class#getEnumConstants() getEnumConstants()} instead
+	 */
+	@Deprecated
 	public static <E extends Enum<E>> E[] getEnumConstants(Class<E> enumClass)
 	{
-		return ReflectUtils.JAVA_LANG_ACCESS.getEnumConstantsShared(enumClass);
+		return enumClass.getEnumConstants();
 	}
 	
 	public static <E extends Enum<E>> E getEnumConstant(Class<E> enumClass, int index)
