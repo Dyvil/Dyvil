@@ -3,11 +3,14 @@ package dyvil.reflect;
 import dyvil.annotation.internal.NonNull;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 public final class ReflectUtils
 {
 	/**
@@ -50,6 +53,10 @@ public final class ReflectUtils
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@NonNull
 	public static File getFileLocation(@NonNull Class<?> klass) throws ClassNotFoundException
 	{

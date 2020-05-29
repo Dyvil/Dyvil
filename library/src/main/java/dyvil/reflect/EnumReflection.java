@@ -1,5 +1,9 @@
 package dyvil.reflect;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 public class EnumReflection
 {
 	/**
@@ -10,12 +14,20 @@ public class EnumReflection
 	{
 		return enumClass.getEnumConstants();
 	}
-	
+
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <E extends Enum<E>> E getEnumConstant(Class<E> enumClass, int index)
 	{
 		return getEnumConstants(enumClass)[index];
 	}
-	
+
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <E extends Enum<E>> E getEnumConstant(Class<E> enumClass, String name)
 	{
 		for (E e : getEnumConstants(enumClass))
@@ -27,7 +39,11 @@ public class EnumReflection
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <E extends Enum<E>> int getEnumCount(Class<E> enumClass)
 	{
 		return getEnumConstants(enumClass).length;

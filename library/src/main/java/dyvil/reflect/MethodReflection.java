@@ -4,10 +4,12 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 @SuppressWarnings( { "unused", "unchecked" })
 public class MethodReflection
 {
@@ -31,17 +33,16 @@ public class MethodReflection
 	 * 	the parameter types
 	 *
 	 * @return the method
+	 *
+	 * @deprecated since v0.47.0
 	 */
-	public static Method getMethod(@NonNull Class clazz, @NonNull String methodName,
-		@NonNull Class @NonNull [] parameterTypes)
+	@Deprecated
+	public static Method getMethod(@NonNull Class<?> clazz, @NonNull String methodName,
+		@NonNull Class<?> @NonNull [] parameterTypes)
 	{
 		try
 		{
-			Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
-			if (method != null)
-			{
-				return method;
-			}
+			return clazz.getDeclaredMethod(methodName, parameterTypes);
 		}
 		catch (NoSuchMethodException | SecurityException ex)
 		{
@@ -62,9 +63,12 @@ public class MethodReflection
 	 * 	the parameter types
 	 *
 	 * @return the method
+	 *
+	 * @deprecated since v0.47.0
 	 */
-	public static Method getMethod(@NonNull Class clazz, @NonNull String @NonNull [] methodNames,
-		@NonNull Class @NonNull [] parameterTypes)
+	@Deprecated
+	public static Method getMethod(@NonNull Class<?> clazz, @NonNull String @NonNull [] methodNames,
+		@NonNull Class<?> @NonNull [] parameterTypes)
 	{
 		for (String methodName : methodNames)
 		{
@@ -86,8 +90,11 @@ public class MethodReflection
 	 * 	the method ID
 	 *
 	 * @return the method
+	 *
+	 * @deprecated since v0.47.0
 	 */
-	public static @NonNull Method getMethod(@NonNull Class clazz, int methodID)
+	@Deprecated
+	public static @NonNull Method getMethod(@NonNull Class<?> clazz, int methodID)
 	{
 		return clazz.getDeclaredMethods()[methodID];
 	}
@@ -98,18 +105,30 @@ public class MethodReflection
 
 	// Method ID
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@Nullable
 	public static <T, R> R invokeStatic(@NonNull Class<? super T> clazz, Object @NonNull [] args, int methodID)
 	{
 		return invoke(clazz, null, args, methodID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@Nullable
 	public static <T, R> R invoke(@NonNull T instance, Object @NonNull [] args, int methodID)
 	{
 		return invoke((Class<T>) instance.getClass(), instance, args, methodID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@Nullable
 	public static <T, R> R invoke(@NonNull Class<? super T> clazz, T instance, Object @NonNull [] args, int methodID)
 	{
@@ -130,7 +149,10 @@ public class MethodReflection
 	 * 	the arguments
 	 *
 	 * @return the result
+	 *
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	public static <R> R invoke(Method method, Object instance, Object @NonNull [] args)
 	{
 		try

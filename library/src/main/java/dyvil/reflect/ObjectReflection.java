@@ -7,6 +7,10 @@ import dyvil.annotation.internal.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 public class ObjectReflection
 {
 	/**
@@ -18,11 +22,15 @@ public class ObjectReflection
 		return new String(values);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T> T createInstance(String className)
 	{
 		try
 		{
-			Class c = Class.forName(className);
+			Class<?> c = Class.forName(className);
 			return (T) c.newInstance();
 		}
 		catch (Exception ex)
@@ -31,6 +39,10 @@ public class ObjectReflection
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T createInstance(@NonNull Class<T> c)
 	{
@@ -44,11 +56,15 @@ public class ObjectReflection
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@Nullable
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T createInstance(@NonNull Class<T> c, @NonNull Object... parameters)
 	{
-		Class[] parameterTypes = new Class[parameters.length];
+		Class<?>[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++)
 		{
 			if (parameters[i] != null)
@@ -60,8 +76,12 @@ public class ObjectReflection
 		return createInstance(c, parameterTypes, parameters);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T createInstance(Class<T> c, Class @NonNull [] parameterTypes, Object... parameters)
+	public static <T> T createInstance(Class<T> c, Class<?> @NonNull [] parameterTypes, Object... parameters)
 	{
 		try
 		{
@@ -74,6 +94,10 @@ public class ObjectReflection
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T allocateInstance(Class<T> c)
 	{
@@ -87,6 +111,10 @@ public class ObjectReflection
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> void copyFields(@NonNull T from, T to)
 	{

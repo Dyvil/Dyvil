@@ -1,13 +1,20 @@
 package dyvil.reflect;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 public class Caller
 {
 	/**
 	 * Returns the caller {@link Class}.
 	 *
 	 * @return the called class.
+	 *
+	 * @deprecated since v0.47.0
 	 */
-	public static Class getCallerClass()
+	@Deprecated
+	public static Class<?> getCallerClass()
 	{
 		try
 		{
@@ -19,32 +26,38 @@ public class Caller
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns the name of the caller class.
 	 *
 	 * @return the name of the caller class.
+	 *
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	public static String getCallerClassName()
 	{
 		return getCaller().getClassName();
 	}
-	
+
 	/**
 	 * Returns the caller {@link StackTraceElement}.
 	 *
 	 * @return the caller stack trace element
+	 *
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	public static StackTraceElement getCaller()
 	{
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
 		String callerClassName = null;
-		
+
 		for (int i = 1; i < stElements.length; i++)
 		{
 			StackTraceElement ste = stElements[i];
 			String className = ste.getClassName();
-			
+
 			if (!ReflectUtils.class.getName().equals(className) && !className.startsWith("java.lang.Thread"))
 			{
 				if (callerClassName == null)
@@ -57,7 +70,7 @@ public class Caller
 				}
 			}
 		}
-		
+
 		return null;
 	}
 }

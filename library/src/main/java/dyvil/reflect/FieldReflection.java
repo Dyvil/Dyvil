@@ -9,6 +9,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated since v0.47.0
+ */
+@Deprecated
 public class FieldReflection
 {
 	private static final @Nullable Field modifiersField;
@@ -42,7 +46,10 @@ public class FieldReflection
 	 * 	the modifiers
 	 * @param flag
 	 * 	add or remove
+	 *
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
 	public static void setModifier(@NonNull Field field, int mod, boolean flag)
 	{
@@ -66,6 +73,10 @@ public class FieldReflection
 		}
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	@DyvilModifiers(Modifiers.INFIX)
 	public static void setAssignable(@NonNull Field field)
 	{
@@ -81,12 +92,20 @@ public class FieldReflection
 
 	// Fields
 
-	public static @NonNull <T> T[] getStaticObjects(@NonNull Class clazz, @NonNull Class<T> fieldType, boolean subtypes)
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
+	public static @NonNull <T> T[] getStaticObjects(@NonNull Class<?> clazz, @NonNull Class<T> fieldType, boolean subtypes)
 	{
 		return getObjects(clazz, null, fieldType, subtypes);
 	}
 
-	public static @NonNull <T> T[] getObjects(@NonNull Class clazz, Object instance, @NonNull Class<T> fieldType,
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
+	public static @NonNull <T> T[] getObjects(@NonNull Class<?> clazz, Object instance, @NonNull Class<T> fieldType,
 		boolean subtypes)
 	{
 		List<T> list = new ArrayList<>();
@@ -96,7 +115,7 @@ public class FieldReflection
 		{
 			try
 			{
-				Class c = field.getType();
+				Class<?> c = field.getType();
 				Object o = field.get(instance);
 				if (c == fieldType || subtypes && fieldType.isAssignableFrom(c))
 				{
@@ -122,8 +141,10 @@ public class FieldReflection
 	 * 	the field name
 	 *
 	 * @return the field
+	 * @deprecated since v0.47.0
 	 */
-	public static Field getField(@NonNull Class clazz, @NonNull String name)
+	@Deprecated
+	public static Field getField(@NonNull Class<?> clazz, @NonNull String name)
 	{
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields)
@@ -145,8 +166,10 @@ public class FieldReflection
 	 * 	the possible field names
 	 *
 	 * @return the field
+	 * @deprecated since v0.47.0
 	 */
-	public static Field getField(@NonNull Class clazz, @NonNull String... fieldNames)
+	@Deprecated
+	public static Field getField(@NonNull Class<?> clazz, @NonNull String... fieldNames)
 	{
 		Field[] fields = clazz.getDeclaredFields();
 		for (String fieldName : fieldNames)
@@ -171,8 +194,10 @@ public class FieldReflection
 	 * 	the field ID
 	 *
 	 * @return the field
+	 * @deprecated since v0.47.0
 	 */
-	public static Field getField(@NonNull Class clazz, int fieldID)
+	@Deprecated
+	public static Field getField(@NonNull Class<?> clazz, int fieldID)
 	{
 		return clazz.getDeclaredFields()[fieldID];
 	}
@@ -181,16 +206,28 @@ public class FieldReflection
 
 	// Reference
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getStaticValue(@NonNull Class<? super T> clazz, String... fieldNames)
 	{
 		return getValue(clazz, null, fieldNames);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getValue(@NonNull T instance, String... fieldNames)
 	{
 		return getValue((Class<T>) instance.getClass(), instance, fieldNames);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, String... fieldNames)
 	{
 		Field f = getField(clazz, fieldNames);
@@ -199,16 +236,28 @@ public class FieldReflection
 
 	// Field ID
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getStaticValue(@NonNull Class<? super T> clazz, int fieldID)
 	{
 		return getValue(clazz, null, fieldID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getValue(@NonNull T instance, int fieldID)
 	{
 		return getValue((Class<? super T>) instance.getClass(), instance, fieldID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static @Nullable <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, int fieldID)
 	{
 		Field f = getField(clazz, fieldID);
@@ -226,7 +275,9 @@ public class FieldReflection
 	 * 	the instance
 	 *
 	 * @return the value
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	public static <R> R getValue(@NonNull Field field, Object instance)
 	{
 		try
@@ -245,16 +296,28 @@ public class FieldReflection
 
 	// Reference
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setStaticValue(@NonNull Class<? super T> clazz, V value, String... fieldNames)
 	{
 		setValue(clazz, null, value, fieldNames);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setValue(@NonNull T instance, V value, String... fieldNames)
 	{
 		setValue((Class<? super T>) instance.getClass(), instance, value, fieldNames);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setValue(@NonNull Class<? super T> clazz, T instance, V value, String... fieldNames)
 	{
 		Field f = getField(clazz, fieldNames);
@@ -263,16 +326,28 @@ public class FieldReflection
 
 	// Field ID
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setStaticValue(@NonNull Class<? super T> clazz, V value, int fieldID)
 	{
 		setValue(clazz, null, value, fieldID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setValue(@NonNull T instance, V value, int fieldID)
 	{
 		setValue((Class<? super T>) instance.getClass(), instance, value, fieldID);
 	}
 
+	/**
+	 * @deprecated since v0.47.0
+	 */
+	@Deprecated
 	public static <T, V> void setValue(@NonNull Class<? super T> clazz, T instance, V value, int fieldID)
 	{
 		Field f = getField(clazz, fieldID);
@@ -293,7 +368,9 @@ public class FieldReflection
 	 * 	the instance
 	 * @param value
 	 * 	the new value
+	 * @deprecated since v0.47.0
 	 */
+	@Deprecated
 	public static <T, V> void setField(@NonNull Field field, T instance, V value)
 	{
 		try
