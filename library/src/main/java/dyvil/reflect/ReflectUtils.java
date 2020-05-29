@@ -1,8 +1,6 @@
 package dyvil.reflect;
 
 import dyvil.annotation.internal.NonNull;
-import sun.misc.JavaLangAccess;
-import sun.misc.SharedSecrets;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -12,7 +10,6 @@ import java.net.URL;
 
 public final class ReflectUtils
 {
-	public static final JavaLangAccess JAVA_LANG_ACCESS = SharedSecrets.getJavaLangAccess();
 	public static final sun.misc.Unsafe UNSAFE;
 
 	static
