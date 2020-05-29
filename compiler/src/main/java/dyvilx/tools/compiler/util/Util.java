@@ -198,15 +198,15 @@ public final class Util
 
 		if (unqualified.endsWith("_="))
 		{
-			final String newQualified = qualified.substring(0, qualified.length() - 4); // 4 = "_$eq".length
 			final String newUnqualified = unqualified.substring(0, unqualified.length() - 2); // 2 = "_=".length
-			return Name.from(newQualified, newUnqualified);
+			final String newQualified = qualified.substring(0, qualified.length() - 4); // 4 = "_$eq".length
+			return Name.from(newUnqualified, newQualified);
 		}
 		if (unqualified.endsWith("="))
 		{
-			final String newQualified = qualified.substring(0, qualified.length() - 3); // 3 = "$eq".length
 			final String newUnqualified = unqualified.substring(0, unqualified.length() - 1); // 1 = "=".length
-			return Name.from(newQualified, newUnqualified);
+			final String newQualified = qualified.substring(0, qualified.length() - 3); // 3 = "$eq".length
+			return Name.from(newUnqualified, newQualified);
 		}
 		return name;
 	}
