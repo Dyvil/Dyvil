@@ -258,3 +258,19 @@
 # Dyvil GenSrc v0.11.0
 
 - Dropped support for `key=value` command-line arguments. #490
+
+# Dyvil v0.47.1
+
+## Dyvil Library v0.47.0
+
+## Dyvil Compiler v0.47.1
+
+* Fixed an issue that caused compound operator resolution to fail.
+
+# Dyvil REPL v0.29.1
+
+* Updated Dyvil Compiler dependency to v0.47.1.
+
+# Dyvil GenSrc v0.11.1
+
+* Updated Dyvil Compiler dependency to v0.47.1.
