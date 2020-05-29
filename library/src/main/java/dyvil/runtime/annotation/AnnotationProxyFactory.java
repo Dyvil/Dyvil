@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static dyvil.reflect.MethodReflection.LOOKUP;
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
-import static dyvil.reflect.ReflectUtils.UNSAFE;
+import static dyvil.reflect.UnsafeAccess.UNSAFE;
 import static dyvil.runtime.TypeConverter.*;
 
 public final class AnnotationProxyFactory

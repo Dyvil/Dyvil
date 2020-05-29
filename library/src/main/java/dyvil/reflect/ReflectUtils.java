@@ -10,21 +10,11 @@ import java.net.URL;
 
 public final class ReflectUtils
 {
-	public static final sun.misc.Unsafe UNSAFE;
-
-	static
-	{
-		try
-		{
-			Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-			field.setAccessible(true);
-			UNSAFE = (sun.misc.Unsafe) field.get(null);
-		}
-		catch (Exception ex)
-		{
-			throw new Error("Cannot find Unsafe.theUnsafe", ex);
-		}
-	}
+	/**
+	 * @deprecated since v0.47.0; use {@link UnsafeAccess#UNSAFE}
+	 */
+	@Deprecated
+	public static final sun.misc.Unsafe UNSAFE = UnsafeAccess.UNSAFE;
 
 	private ReflectUtils()
 	{

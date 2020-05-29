@@ -79,7 +79,7 @@ public class ObjectReflection
 	{
 		try
 		{
-			return (T) ReflectUtils.UNSAFE.allocateInstance(c);
+			return (T) UnsafeAccess.UNSAFE.allocateInstance(c);
 		}
 		catch (Exception ex)
 		{
