@@ -274,3 +274,19 @@
 # Dyvil GenSrc v0.11.1
 
 * Updated Dyvil Compiler dependency to v0.47.1.
+
+# Dyvil v0.47.2
+
+## Dyvil Library v0.47.0
+
+## Dyvil Compiler v0.47.2
+
+* Fixed incorrect version for the Dyvil Library dependency.
+
+# Dyvil REPL v0.29.2
+
+* Fixed incorrect version for the Dyvil Library dependency.
+
+# Dyvil GenSrc v0.11.2
+
+* Fixed incorrect version for the Dyvil Library dependency.
