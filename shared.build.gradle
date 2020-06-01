@@ -1,0 +1,74 @@
+/*
+ * This base configuration file is inherited by all projects, i.e. the root project and sub-projects.
+ * Configuration common to all of them should be added here.
+ */
+
+// --------------- Plugins ---------------
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'de.clashsoft.simple-publish'
+
+group = 'org.dyvil'
+
+publishInfo {
+	organization = 'dyvil'
+	githubRepo = 'Dyvil/Dyvil'
+
+	license {
+		name = 'BSD 3-Clause'
+		url = 'https://opensource.org/licenses/BSD-3-Clause'
+	}
+
+	developer {
+		id = 'clashsoft'
+		name = 'Adrian Kunz'
+		email = 'clashsoft@hotmail.com'
+	}
+}
+
+// --------------- Dependencies ---------------
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	jcenter()
+}
+
+// --------------- Tasks ---------------
+
+tasks.register('version') {
+	it.doLast {
+		println version
+	}
+}
+
+tasks.named('bintrayUpload') {
+	it.doFirst {
+		if (!System.getenv('DYVIL_RELEASE')) {
+			throw new IllegalStateException('DYVIL_RELEASE environment variable not specified, ' +
+					'refusing to publish potential snapshots')
+		}
+	}
+}
+
+// --------------- Java Compilation ---------------
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs.addAll(
+			'-parameters',          // generates parameter attributes and names
+			'-XDignore.symbol.file' // disables "proprietary API" warnings
+	)
+	options.fork = true
+}
+
+// --------------- Jar ---------------
+
+tasks.withType(Jar) {
+	preserveFileTimestamps = false
+
+	from(rootProject.rootDir) {
+		include '*LICENSE*'
+	}
+}
