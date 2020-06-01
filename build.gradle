@@ -1,4 +1,5 @@
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 // --------------- Plugins ---------------
 
@@ -37,8 +38,12 @@ private static String getTagVersion(String module = '') {
 		module += '/'
 	}
 
-	final Matcher matcher = 'git tag --sort=-version:refname'.execute().text =~ module + 'v(.*)'
-	matcher.find()
+	final String tagOutput = 'git tag --sort=-version:refname'.execute().text
+	final Pattern pattern = Pattern.compile("^${ module }v(.*)\$", Pattern.MULTILINE)
+	final Matcher matcher = pattern.matcher(tagOutput)
+	if (!matcher.find()) {
+		throw new IllegalStateException("failed to find /$pattern/ in output:\n$tagOutput")
+	}
 
 	final String newestTag = matcher.group(0)
 	final String newestVersion = matcher.group(1)
