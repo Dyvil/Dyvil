@@ -21,3 +21,14 @@ sourceSets.main {
 
 	dyvil.srcDir 'src/main/gensrc'
 }
+
+// https://github.com/gradle/gradle/issues/7706#issuecomment-470999724
+def oldGroup = project.group
+try {
+	project.group = 'dummy_group_for_bootstrap'
+	configurations.dyvilc.getFiles()
+	configurations.gensrc.getFiles()
+}
+finally {
+	project.group = oldGroup
+}
