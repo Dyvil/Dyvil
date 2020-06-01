@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 plugins {
 	// https://plugins.gradle.org/plugin/org.dyvil.dyvil-gradle
-	id 'org.dyvil.dyvil-gradle' version '0.4.0' apply false
+	id 'org.dyvil.dyvil-gradle' version '0.5.0' apply false
 	// https://plugins.gradle.org/plugin/com.jfrog.bintray
 	id 'com.jfrog.bintray' version '1.8.5' apply false
 	// https://plugins.gradle.org/plugin/de.clashsoft.simple-publish
