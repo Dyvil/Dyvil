@@ -59,14 +59,6 @@ public class CompilerConfig
 
 	private File outputDir;
 
-	// - - - - - - - - Test - - - - - - - -
-
-	private String mainType;
-
-	public final List<String> mainArgs = new ArrayList<>();
-
-	private File testDir = new File(".");
-
 	// =============== Constructors ===============
 
 	public CompilerConfig(DyvilCompiler compiler)
@@ -220,33 +212,6 @@ public class CompilerConfig
 		this.outputDir = outputDir;
 	}
 
-	// - - - - - - - - Test - - - - - - - -
-
-	public String getMainType()
-	{
-		return this.mainType;
-	}
-
-	public void setMainType(String mainType)
-	{
-		this.mainType = mainType;
-	}
-
-	public List<String> getMainArgs()
-	{
-		return this.mainArgs;
-	}
-
-	public File getTestDir()
-	{
-		return this.testDir;
-	}
-
-	public void setTestDir(File testDir)
-	{
-		this.testDir = testDir;
-	}
-
 	// --------------- Dynamic Property Parsing ---------------
 
 	public void addOptions(Options options)
@@ -307,7 +272,6 @@ public class CompilerConfig
 		{
 			this.setDebug(true);
 			this.compiler.phases.add(ICompilerPhase.PRINT); // print after parse
-			this.compiler.phases.add(ICompilerPhase.TEST);
 		}
 
 		this.setAnsiColors(cmd.hasOption("ansi"));
@@ -388,27 +352,6 @@ public class CompilerConfig
 		if (cmd.hasOption("output-dir"))
 		{
 			this.setOutputDir(new File(cmd.getOptionValue("output-dir")));
-		}
-
-		// Test Options
-		// TODO deprecated, remove in v0.47.0
-
-		if (cmd.hasOption("main-type"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "main-type", "0.47.0"));
-			this.setMainType(cmd.getOptionValue("main-type"));
-		}
-
-		if (cmd.hasOption("main-args"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "main-args", "0.47.0"));
-			Collections.addAll(this.mainArgs, cmd.getOptionValues("main-args"));
-		}
-
-		if (cmd.hasOption("test-dir"))
-		{
-			this.compiler.warn(I18n.get("option.deprecated", "test-dir", "0.47.0"));
-			this.setTestDir(new File(cmd.getOptionValue("test-dir")));
 		}
 	}
 }

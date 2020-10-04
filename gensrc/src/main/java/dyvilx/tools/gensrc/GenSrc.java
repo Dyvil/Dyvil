@@ -40,44 +40,4 @@ public class GenSrc extends DyvilCompiler
 	{
 		this.templates.add(template);
 	}
-
-	@Override
-	public void test()
-	{
-		if (this.config.getMainType() != null)
-		{
-			super.test();
-			return;
-		}
-
-		this.config.setMainType("dyvilx.tools.gensrc.Runner");
-
-		final List<String> mainArgs = this.config.getMainArgs();
-		mainArgs.clear();
-
-		for (File sourceDir : this.config.sourceDirs)
-		{
-			mainArgs.add("source_dir=" + sourceDir);
-		}
-
-		mainArgs.add("output_dir=" + ((GenSrcConfig) this.config).getGenSrcDir());
-
-		for (Template template : this.templates)
-		{
-			final String templateName = template.getTemplateName();
-
-			mainArgs.add("-t");
-			mainArgs.add(template.getFullName());
-
-			for (File spec : this.specs)
-			{
-				final String specName = spec.getPath();
-				if (dyvilx.tools.gensrc.Template.nameMatches(templateName, specName))
-				{
-					mainArgs.add(specName);
-				}
-			}
-		}
-		super.test();
-	}
 }

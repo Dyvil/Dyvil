@@ -12,7 +12,6 @@ import dyvilx.tools.compiler.lang.I18n;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.phase.ICompilerPhase;
 import dyvilx.tools.compiler.sources.FileFinder;
-import dyvilx.tools.compiler.util.TestThread;
 import dyvilx.tools.compiler.util.Util;
 
 import java.io.File;
@@ -185,7 +184,7 @@ public class DyvilCompiler extends BasicTool
 		this.fileFinder.registerFileType(".dyvilh", DYVIL_HEADER); // legacy
 	}
 
-	private boolean applyPhases()
+	protected boolean applyPhases()
 	{
 		if (!this.config.isDebug())
 		{
@@ -231,31 +230,6 @@ public class DyvilCompiler extends BasicTool
 		}
 
 		return true;
-	}
-
-	public void test()
-	{
-		// TODO deprecated, remove in v0.47.0
-		this.warn(I18n.get("phase.deprecated", "test", "0.47.0"));
-
-		if (this.config.getMainType() == null)
-		{
-			if (this.config.isDebug())
-			{
-				this.log(I18n.get("test.skipped"));
-			}
-			return;
-		}
-
-		final TestThread testThread = new TestThread(this);
-		testThread.start();
-		try
-		{
-			testThread.join();
-		}
-		catch (InterruptedException ignored)
-		{
-		}
 	}
 
 	public void clean()
