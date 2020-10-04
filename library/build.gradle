@@ -9,7 +9,7 @@ publishInfo.labels = [ 'dyvil', 'library' ]
 // --------------- Dependencies ---------------
 
 dependencies {
-	compile libraryDependency
+	compileOnly libraryDependency
 	dyvilc compilerDependency
 	gensrc gensrcDependency
 }
