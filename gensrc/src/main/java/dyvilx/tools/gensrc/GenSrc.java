@@ -1,7 +1,6 @@
 package dyvilx.tools.gensrc;
 
 import dyvilx.tools.compiler.DyvilCompiler;
-import dyvilx.tools.compiler.config.CompilerConfig;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 import dyvilx.tools.gensrc.ast.Template;
 import dyvilx.tools.gensrc.sources.GenSrcFileType;
@@ -14,12 +13,6 @@ public class GenSrc extends DyvilCompiler
 {
 	private List<File>     specs     = new ArrayList<>();
 	private List<Template> templates = new ArrayList<>();
-
-	@Override
-	protected CompilerConfig createConfig()
-	{
-		return new GenSrcConfig(this);
-	}
 
 	@Override
 	protected void setupFileFinder()
