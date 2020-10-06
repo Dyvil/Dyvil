@@ -77,11 +77,6 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 */
 	ICompilerPhase COMPILE = new SequentialCompilerPhase(200, "COMPILE", ICompilationUnit::compile);
 
-	/**
-	 * Tests the main type specified in {@link CompilerConfig#mainType}.
-	 */
-	ICompilerPhase TEST = new CompilerPhase(1000, "TEST", DyvilCompiler::test);
-
 	String getName();
 
 	int getID();
