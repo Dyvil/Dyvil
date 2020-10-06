@@ -29,8 +29,16 @@ class Runner {
 				outputDir = new File(arg.substring(11))
 				continue
 			}
+			if arg.startsWith('--output-dir=') {
+				outputDir = new File(arg.substring(13))
+				continue
+			}
 			if arg.startsWith('source_dir=') {
 				Builtins.addSourceDir(arg.substring(11))
+				continue
+			}
+			if arg.startsWith('--source-dir=') {
+				Builtins.addSourceDir(arg.substring(13))
 				continue
 			}
 
