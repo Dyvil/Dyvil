@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 
 plugins {
 	// https://plugins.gradle.org/plugin/org.dyvil.dyvil-gradle
-	id 'org.dyvil.dyvil-gradle' version '0.5.0' apply false
+	id 'org.dyvil.dyvil-gradle' version '0.6.0-alpha.2' apply false
 	// https://plugins.gradle.org/plugin/com.jfrog.bintray
 	id 'com.jfrog.bintray' version '1.8.5' apply false
 	// https://plugins.gradle.org/plugin/de.clashsoft.simple-publish
@@ -19,9 +19,9 @@ wrapper.setDistributionType(Wrapper.DistributionType.ALL)
 // --------------- Constants ---------------
 
 ext {
-	libraryDependency = 'org.dyvil:library:0.47.0'
-	compilerDependency = 'org.dyvil:compiler:0.47.2'
-	gensrcDependency = 'org.dyvil:gensrc:0.11.2'
+	libraryDependency = 'org.dyvil:library:0.48.0-alpha.1'
+	compilerDependency = 'org.dyvil:compiler:0.48.0-alpha.1'
+	gensrcDependency = 'org.dyvil:gensrc:0.12.0-alpha.1'
 
 	versionDir = 'v0.4x'
 	javaFilters = [ '**/*.java' ]
@@ -98,6 +98,11 @@ tasks.named('compileTestDyvil') {
 tasks.named('compileTestDyvilGenSrc') {
 	// override classpath to use the new classes instead of bootstrap
 	dyvilcClasspath = project(':gensrc').sourceSets.main.runtimeClasspath
+}
+
+tasks.named('generateTestDyvilGenSrc') {
+	// override classpath to use the new classes instead of bootstrap
+	classpath = files(tasks.compileTestDyvilGenSrc.destinationDir) + project(':gensrc').sourceSets.main.runtimeClasspath
 }
 
 // --------------- Jar ---------------
