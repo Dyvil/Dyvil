@@ -20,8 +20,8 @@ class Runner {
 	private static func parseTemplates(args: [String]) -> List<Template> {
 		let argc = args.size
 		var outputDir: File = new File('.')
-		var currentTemplate: Template! = null
-		var templates: List<Template> = new ArrayList<Template>()
+		let templates = new ArrayList<Template>()
+		let specFiles = new ArrayList<String>()
 
 		for i <- 0 ..< argc {
 			let arg = args[i]
@@ -34,16 +34,23 @@ class Runner {
 				continue
 			}
 
-			if arg == '-t' && i < argc - 1 {
-				let tempName = args[i + 1]
-				currentTemplate = Class.forName(tempName).newInstance() as Template
+			if arg == '-t' {
+				// legacy, ignore
+			}
+			else if arg.endsWith('.dgs') {
+				specFiles.add(arg)
+			}
+			else {
+				let currentTemplate = Class.forName(arg).newInstance() as Template
 				currentTemplate.outputDir = outputDir
 				templates.add(currentTemplate)
-				i += 1 // skip
-				continue
 			}
+		}
 
-			currentTemplate.addSpec(arg)
+		for currentTemplate <- templates {
+			for specFile <- specFiles {
+				currentTemplate.addSpec(specFile)
+			}
 		}
 
 		return templates
