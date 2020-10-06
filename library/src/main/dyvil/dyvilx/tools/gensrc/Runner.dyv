@@ -1,6 +1,6 @@
 package dyvilx.tools.gensrc
 
-import java.util.{ List, ArrayList }
+import java.util.{ List, ArrayList, TreeSet }
 import java.io.File
 
 class Runner {
@@ -21,7 +21,7 @@ class Runner {
 		let argc = args.size
 		var outputDir: File = new File('.')
 		let templates = new ArrayList<Template>()
-		let specFiles = new ArrayList<String>()
+		let specFiles = new TreeSet<String>()
 
 		for i <- 0 ..< argc {
 			let arg = args[i]
