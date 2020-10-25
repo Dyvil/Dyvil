@@ -20,7 +20,8 @@ extension File {
 			pattern.charAt(i) match {
 				case '?' => builder.append('.')
 				case '*' if i + 1 < length && pattern.charAt(i + 1) == '*' => builder.append('.*')
-				case '*' => builder.append('[^/]*')
+				case '*' => builder.append('[^/\\\\]*')
+				case '/' => builder.append('[/\\\\]')
 				case '(' => builder.append('\\(')
 				case ')' => builder.append('\\)')
 				case '[' => builder.append('\\[')
