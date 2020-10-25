@@ -9,30 +9,57 @@ import java.util.regex.Pattern
 
 @JavaName("Files")
 extension File {
+	private static const SLASHY = '[/\\\\]'
+	private static const NOT_SLASHY = '[^/\\\\]'
 
 	// --------------- Ant File Name Patterns ---------------
+
+	private static func isSlashy(c: char) {
+		return c match {
+			case '/' | '\\' => true
+			case _ => false
+		}
+	}
 
 	static func antPattern(pattern: String) -> Pattern {
 		let length = pattern.length()
 		let builder = new StringBuilder(length)
 
+		// adapted from https://github.com/bndtools/bnd/blob/7b433ba96670ee23fd05fe88d0b61a8737c1f825/aQute.libg/src/aQute/libg/glob/AntGlob.java#L25
 		for i <- 0 ..< length {
-			pattern.charAt(i) match {
-				case '?' => builder.append('.')
-				case '*' if i + 1 < length && pattern.charAt(i + 1) == '*' => builder.append('.*')
-				case '*' => builder.append('[^/\\\\]*')
-				case '/' => builder.append('[/\\\\]')
-				case '(' => builder.append('\\(')
-				case ')' => builder.append('\\)')
-				case '[' => builder.append('\\[')
-				case ']' => builder.append('\\]')
-				case '{' => builder.append('\\{')
-				case '}' => builder.append('\\}')
-				case '.' => builder.append('\\.')
-				case '^' => builder.append('\\^')
-				case '$' => builder.append('\\$')
-				case '|' => builder.append('\\|')
-				case let c => builder.append(c)
+			let c = pattern.charAt(i)
+			c match {
+				case '*' {
+					if ((i == 0 || isSlashy(pattern.charAt(i - 1))) && (i + 1 < length && pattern.charAt(i + 1) == '*') && (i + 2 == length || isSlashy(pattern.charAt(i + 2)))) {
+						if i == 0 && i + 2 < length { // line starts with "**/"
+							builder.append('(?:.*').append(SLASHY).append('|)')
+						}
+						else if i > 1 { // after "x/"
+							builder.setLength(builder.length() - SLASHY.length())
+							builder.append('(?:').append(SLASHY).append('.*|)')
+							i += 1
+						}
+						else {
+							builder.append('.*')
+							i += 1
+						}
+					}
+					else {
+						builder.append(NOT_SLASHY).append('*')
+					}
+				}
+				case '?' => builder.append(NOT_SLASHY)
+				case '/' | '\\' {
+					if i + 1 == length {
+						// ending with "/" is shorthand for ending with "/**"
+						builder.append('(?:').append(SLASHY).append('.*|)')
+					}
+					else {
+						builder.append(SLASHY)
+					}
+				}
+				case '(' | ')' | '[' | ']' | '{' | '}' | '.' | '^' | '$' | '|' | '+' => builder.append('\\').append(c)
+				case _ => builder.append(c)
 			}
 		}
 
