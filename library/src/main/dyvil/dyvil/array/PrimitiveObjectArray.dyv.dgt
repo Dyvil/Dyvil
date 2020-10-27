@@ -12,10 +12,10 @@ abstract class PrimitiveObjectArray {
 		#let(WRAPPER = spec['WRAPPER'])
 		// TYPE_NAME wrapper array methods
 
-		infix func flatten(array: [[PRIMITIVE]]) -> [PRIMITIVE] {
+		final extension func flatten(this: [[PRIMITIVE]]) -> [PRIMITIVE] {
 			// Compute the size of the resulting array
 			var size = 0
-			for nested <- array {
+			for nested <- this {
 				size += nested.size
 			}
 
@@ -23,7 +23,7 @@ abstract class PrimitiveObjectArray {
 			let res = new [PRIMITIVE](size)
 			var index = 0
 
-			for nested <- array {
+			for nested <- this {
 				let nestedSize = nested.size
 				System.arraycopy(nested, 0, res, index, nestedSize)
 				index += nestedSize
@@ -32,11 +32,11 @@ abstract class PrimitiveObjectArray {
 			return res
 		}
 
-		infix func unboxed(array: [WRAPPER]) -> [PRIMITIVE] {
-			let size = array.size
+		final extension func unboxed(this: [WRAPPER]) -> [PRIMITIVE] {
+			let size = this.size
 			let unboxed = new [PRIMITIVE](size)
 			for i <- 0 ..< size {
-				unboxed[i] = array[i]
+				unboxed[i] = this[i]
 			}
 			return unboxed
 		}
