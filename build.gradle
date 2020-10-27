@@ -91,11 +91,15 @@ dependencies {
 // --------------- Test Tasks ---------------
 
 tasks.named('compileTestDyvil') {
+	options.encoding = 'UTF-8'
+
 	// override classpath to use the new compiler instead of bootstrap
 	dyvilcClasspath = project(':compiler').sourceSets.main.runtimeClasspath
 }
 
 tasks.named('compileTestDyvilGenSrc') {
+	options.encoding = 'UTF-8'
+
 	// override classpath to use the new classes instead of bootstrap
 	dyvilcClasspath = project(':gensrc').sourceSets.main.runtimeClasspath
 }
