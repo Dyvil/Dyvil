@@ -79,8 +79,8 @@ abstract class Builtins {
 
 	static func decorate(with process: String -> String, _ body: String) -> String {
 		let result = new StringBuilder
-		for line <- body.split('\n') {
-			result.append(process(line)).append('\n')
+		for line <- body.split('\n|\r\n?') {
+			result.append(process(line)).append(System.lineSeparator)
 		}
 		return result.toString
 	}
