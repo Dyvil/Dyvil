@@ -15,9 +15,9 @@ abstract class Function {
 	interface Of1<type -P1, type +R> {
 		func apply(_ par1: P1) -> R
 
-		infix func compose<A, B, C>(_ f: B -> C, _ g: A -> B) -> (A -> C) = x => f(g(x))
+		final extension func compose<A, B, C>(this: B -> C, _ g: A -> B) -> (A -> C) = x => this(g(x))
 
-		infix func andThen<A, B, C>(_ f: A -> B, _ g: B -> C) -> (A -> C) inline = g.compose(f)
+		final extension func andThen<A, B, C>(this: A -> B, _ g: B -> C) -> (A -> C) inline = g.compose(this)
 
 		// composition operator
 		infix func * <A, B, C>(_ lhs: B -> C, _ rhs: A -> B) -> (A -> C) inline = lhs.compose(rhs)
@@ -49,9 +49,9 @@ abstract class Function {
 	interface Of2<type -P1, type -P2, type +R> {
 		func apply(_ par1: P1, _ par2: P2) -> R
 
-		postfix func curried<A, B, C>(_ f: (A, B) -> C) -> (A -> B -> C) = p1 => p2 => f(p1, p2)
+		final extension func curried<A, B, C>(this: (A, B) -> C) -> (A -> B -> C) = p1 => p2 => this(p1, p2)
 
-		postfix func tupled<A, B, C>(_ f: (A, B) -> C) -> (((A, B)) -> C) = tuple => f(tuple._1, tuple._2)
+		final extension func tupled<A, B, C>(this: (A, B) -> C) -> (((A, B)) -> C) = tuple => this(tuple._1, tuple._2)
 	}
 
 	#for (ARITY <- 3 .. LibraryGenConstants.MAX_ARITY) {
