@@ -46,7 +46,7 @@ tasks.named('compileJava', JavaCompile) {
 	it.source files("$buildDir/src/main/java").builtBy('copyJava')
 	it.exclude {
 		final String path = it.file.path
-		path.contains('repl/src/main/java') && path.endsWith('DyvilREPL.java')
+		return path.endsWith('DyvilREPL.java') && (path.contains('repl/src/main/java') || path.contains('repl\\src\\main\\java'))
 	}
 }
 
