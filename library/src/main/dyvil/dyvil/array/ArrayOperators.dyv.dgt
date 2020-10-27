@@ -8,7 +8,7 @@ abstract class ArrayOperators {
 
 	// --------------- Generic Object Array Operators ---------------
 
-	inline infix func in <T>(value: T, array: [T]) -> boolean = array.contains(value)
+	infix func in <T>(value: T, array: [T]) -> boolean = array.contains(value)
 
 	infix func ? <T>(lhs: [T], rhs: T) -> boolean inline = lhs.contains(rhs)
 
@@ -28,7 +28,7 @@ abstract class ArrayOperators {
 
 		// --------------- TYPE_NAME Array Operators ---------------
 
-		inline infix func in(value: PRIMITIVE, array: [PRIMITIVE]) -> boolean = array.contains(value)
+		final extension func in(this: PRIMITIVE, array: [PRIMITIVE]) -> boolean = array.contains(this)
 
 		infix func ? (lhs: [PRIMITIVE], rhs: PRIMITIVE) -> boolean inline = lhs.contains(rhs)
 
