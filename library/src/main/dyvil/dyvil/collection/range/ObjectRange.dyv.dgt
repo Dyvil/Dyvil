@@ -23,8 +23,7 @@ import java.io.IOException
 case class ObjectRange<type +T: Rangeable<T>>(
 	protected @transient let start: T
 	protected @transient let end: T
-) implements Range<T>
-{
+) implements Range<T> {
 	#if (IS_HALF_OPEN) {
 		override func isHalfOpen() -> boolean = true
 
@@ -57,19 +56,17 @@ case class ObjectRange<type +T: Rangeable<T>>(
 	{
 		var current: T = this<ObjectRange<T>>.start
 
-		override func next() -> T
-		{
-			if (!this.hasNext()) throw new NoSuchElementException("End of Range")
+		override func next() -> T {
+			if !this.hasNext() {
+				throw new NoSuchElementException("End of Range")
+			}
 
 			let c = this.current
 			this.current = this.current.next
 			return c
 		}
 
-		override func hasNext() -> boolean
-		{
-			return this.current LESS_OP this<ObjectRange<T>>.end
-		}
+		override func hasNext() -> boolean = this.current LESS_OP this<ObjectRange<T>>.end
 
 		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"
 	}
@@ -84,15 +81,21 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 	override func forEach(action: T -> void) -> void = #forEach("current"){action(current)}
 
-	override func contains(element: any!)
-	{
-		#forEach('value') { if (element == value) return true }
+	override func contains(element: any!) -> boolean {
+		#forEach('value') {
+			if element == value {
+				return true
+			}
+		}
 		return false
 	}
 
 	override func copy() -> ObjectRange<T> = new ObjectRange<T>(this.start, this.end)
 
-	override func copy(to: [Object!], index: int) -> void = #forEach('value') { to[index] = value; index += 1 }
+	override func copy(to: [Object!], index: int) -> void = #forEach('value') {
+		to[index] = value
+		index += 1
+	}
 
 	override func toString() -> String = "\(this.start) RANGE_OP \(this.end)"
 

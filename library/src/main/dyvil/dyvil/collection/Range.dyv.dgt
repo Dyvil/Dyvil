@@ -14,8 +14,7 @@ import java.util.function.{ Consumer, Function, Predicate }
 
 @LiteralConvertible.FromTuple
 @Immutable
-interface Range<+T> extends Queryable<T>, Serializable
-{
+interface Range<+T> extends Queryable<T>, Serializable {
 	@JavaName("empty")
 	static func apply<T>() -> Range<T> = EmptyRange.instance
 
@@ -68,12 +67,10 @@ interface Range<+T> extends Queryable<T>, Serializable
 
 	override func iterator() -> Iterator<T>
 
-	override func spliterator() -> Spliterator<T>
-	{
+	override func spliterator() -> Spliterator<T> {
 		let size = this.size
 		var characteristics = Spliterator.ORDERED
-		if (size >= 0)
-		{
+		if size >= 0 {
 			characteristics |= Spliterator.SIZED
 		}
 		return Spliterators.spliterator(this.iterator(), size, characteristics)
@@ -95,24 +92,31 @@ interface Range<+T> extends Queryable<T>, Serializable
 	override func filter(predicate: Predicate<-T>) -> void
 		= throw new ImmutableException("filter() on Immutable Range")
 
-	override func mapped<R>(mapper: Function<-T, +R>) -> Queryable<R>
-	{
+	override func mapped<R>(mapper: Function<-T, +R>) -> Queryable<R> {
 		let builder = new immutable.ArrayList.Builder<R>(this.size())
-		for (value <- this) builder.add(mapper(value))
+		for value <- this {
+			builder.add(mapper(value))
+		}
 		return builder.build()
 	}
 
-	override func flatMapped<R>(mapper: Function<-T, +Iterable<+R>>) -> Queryable<R>
-	{
+	override func flatMapped<R>(mapper: Function<-T, +Iterable<+R>>) -> Queryable<R> {
 		let builder = new immutable.ArrayList.Builder<R>(this.size)
-		for (value <- this) for (result <- mapper(value)) builder.add(result)
+		for value <- this {
+			for result <- mapper(value) {
+				builder.add(result)
+			}
+		}
 		return builder.build
 	}
 
-	override func filtered(predicate: Predicate<-T>) -> Queryable<T>
-	{
+	override func filtered(predicate: Predicate<-T>) -> Queryable<T> {
 		let builder = new immutable.ArrayList.Builder<T>(this.size)
-		for (value <- this) if (predicate.test(value)) builder.add(value)
+		for value <- this {
+			if predicate.test(value) {
+				builder.add(value)
+			}
+		}
 		return builder.build()
 	}
 
@@ -120,8 +124,7 @@ interface Range<+T> extends Queryable<T>, Serializable
 
 	func toArray() -> [Object] = new [Object](this.size).{ this.copy($0, 0); $0 }
 
-	func toArray<@Reified(.OBJECT_CLASS) type T: Object!>() -> [T]
-	{
+	func toArray<@Reified(.OBJECT_CLASS) type T: Object!>() -> [T] {
 		let array = Array.newInstance(class T, this.size) as [T]
 		this.copy(array, 0)
 		return array

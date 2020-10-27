@@ -13,8 +13,7 @@ import dyvil.lang.LiteralConvertible
 
 @LiteralConvertible.FromTuple
 @Immutable
-interface #(TYPE_NAME)Range extends Range<PRIMITIVE>
-{
+interface #(TYPE_NAME)Range extends Range<PRIMITIVE> {
 	@JavaName("closed")
 	override static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range
 		= new dyvil.collection.range.closed.#(TYPE_NAME)Range(from, to)
@@ -31,8 +30,7 @@ interface #(TYPE_NAME)Range extends Range<PRIMITIVE>
 
 	override func contains(element: any!) -> boolean = element is Number && this.contains((element as Number).#(PRIMITIVE)Value())
 
-	override func toArray() -> [WRAPPER]
-	{
+	override func toArray() -> [WRAPPER] {
 		let result = new [WRAPPER](this.size)
 		this.copy(to: result)
 		return result
