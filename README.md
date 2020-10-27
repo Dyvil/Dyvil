@@ -1,6 +1,7 @@
 # The Dyvil Programming Language
 
 [![Master Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil)
+![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg)
 [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Clashsoft/Dyvil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 | Module | Link |
@@ -11,11 +12,11 @@
 | REPL | [![Download REPL](https://api.bintray.com/packages/dyvil/maven/repl/images/download.svg) ](https://bintray.com/dyvil/maven/repl/_latestVersion) |
 | GenSrc | [![Download GenSrc](https://api.bintray.com/packages/dyvil/maven/gensrc/images/download.svg) ](https://bintray.com/dyvil/maven/gensrc/_latestVersion) |
 
-| Branch | Status |
-|--------|--------|
-| master | [![Master Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil) |
-| develop | [![Develop Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=develop)](https://travis-ci.org/Dyvil/Dyvil) |
-| bugfix | [![Bugfix Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=bugfix)](https://travis-ci.org/Dyvil/Dyvil) |
+| Branch | Travis CI | GitHub Actions | 
+|--------|-----------|----------------|
+| master | [![Master Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=master) |
+| develop | [![Develop Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=develop)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=develop) |
+| bugfix | [![Bugfix Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=bugfix)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=bugfix) |
 
 **Dyvil** is a multi-paradigm, general purpose programming language that is based on Java and the JVM.
 It is compiled, statically and strongly typed and supports object-oriented, functional and imperative
