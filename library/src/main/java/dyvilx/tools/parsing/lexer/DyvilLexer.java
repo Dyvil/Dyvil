@@ -341,7 +341,8 @@ public final class DyvilLexer extends Lexer
 				// fallthrough
 			case '\n':
 				this.newLine();
-				break;
+				this.buffer.append('\n');
+				continue;
 			case '\t':
 				this.advance();
 				continue;
@@ -424,14 +425,12 @@ public final class DyvilLexer extends Lexer
 			this.parseEscape(this.nextCodePoint());
 			break;
 		case '\r':
-			this.buffer.append('\r');
 			if (this.nextCodePoint() == '\n')
 			{
 				this.advance();
 				this.error("char.verbatim.invalid");
 			}
-			this.newLine();
-			break;
+			// fallthrough
 		case '\n':
 			this.buffer.append('\n');
 			this.newLine();
