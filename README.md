@@ -1,8 +1,6 @@
 # The Dyvil Programming Language
 
 [![Master Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/Dyvil/Dyvil.svg)](http://isitmaintained.com/project/Dyvil/Dyvil "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/Dyvil/Dyvil.svg)](http://isitmaintained.com/project/Dyvil/Dyvil "Percentage of issues still open")
 [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Clashsoft/Dyvil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 | Module | Link |
