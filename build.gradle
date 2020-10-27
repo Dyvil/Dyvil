@@ -19,9 +19,9 @@ wrapper.setDistributionType(Wrapper.DistributionType.ALL)
 // --------------- Constants ---------------
 
 ext {
-	libraryDependency = 'org.dyvil:library:0.48.0-alpha.2'
-	compilerDependency = 'org.dyvil:compiler:0.48.0-alpha.2'
-	gensrcDependency = 'org.dyvil:gensrc:0.12.0-alpha.2'
+	libraryDependency = 'org.dyvil:library:0.48.0-alpha.3'
+	compilerDependency = 'org.dyvil:compiler:0.48.0-alpha.3'
+	gensrcDependency = 'org.dyvil:gensrc:0.12.0-alpha.3'
 
 	versionDir = 'v0.4x'
 	javaFilters = [ '**/*.java' ]
