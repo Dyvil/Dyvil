@@ -157,6 +157,12 @@ public final class DyvilLexer extends Lexer
 		case '9':
 			this.parseNumberLiteral(currentChar);
 			return;
+		case '\r':
+			if (this.nextCodePoint() == '\n')
+			{
+				this.advance();
+			}
+			// fallthrough
 		case '\n':
 			this.newLine();
 			return;
@@ -194,6 +200,12 @@ public final class DyvilLexer extends Lexer
 			final int currentChar = this.codePoint();
 			switch (currentChar)
 			{
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
 				continue;
@@ -245,6 +257,12 @@ public final class DyvilLexer extends Lexer
 			case '\b':
 				this.advance();
 				continue;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
 				this.error("string.single.newline");
@@ -315,9 +333,16 @@ public final class DyvilLexer extends Lexer
 					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, this.line,
 					                startColumn, this.column));
 				return;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
-				break;
+				this.buffer.append('\n');
+				continue;
 			case '\t':
 				this.advance();
 				continue;
@@ -362,6 +387,12 @@ public final class DyvilLexer extends Lexer
 					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, this.line, startColumn,
 					                this.column));
 				return;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
 				continue;
@@ -393,6 +424,13 @@ public final class DyvilLexer extends Lexer
 		case '\\':
 			this.parseEscape(this.nextCodePoint());
 			break;
+		case '\r':
+			if (this.nextCodePoint() == '\n')
+			{
+				this.advance();
+				this.error("char.verbatim.invalid");
+			}
+			// fallthrough
 		case '\n':
 			this.buffer.append('\n');
 			this.newLine();
@@ -685,6 +723,12 @@ public final class DyvilLexer extends Lexer
 			{
 			case EOF:
 				return;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
 				return;
@@ -711,6 +755,12 @@ public final class DyvilLexer extends Lexer
 			case EOF:
 				this.error("comment.block.unclosed");
 				return;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				this.newLine();
 				continue;
@@ -911,6 +961,12 @@ public final class DyvilLexer extends Lexer
 				int codePoint = this.codePoint();
 				switch (codePoint)
 				{
+				case '\r':
+					if (this.nextCodePoint() == '\n')
+					{
+						this.advance();
+					}
+					// fallthrough
 				case '\n':
 					this.error("escape.unicode.newline");
 					this.newLine();

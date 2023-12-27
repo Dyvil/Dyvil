@@ -85,9 +85,6 @@ public final class ArgumentParser
 		case "print":
 			phases.add(ICompilerPhase.PRINT);
 			return;
-		case "test":
-			phases.add(ICompilerPhase.TEST);
-			return;
 		}
 
 		// - - - - - - - - Argument File - - - - - - - -

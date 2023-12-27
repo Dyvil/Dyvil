@@ -1,6 +1,6 @@
 package dyvilx.tools.gensrc
 
-import java.util.{ List, ArrayList }
+import java.util.{ List, ArrayList, TreeSet }
 import java.io.File
 
 class Runner {
@@ -20,8 +20,8 @@ class Runner {
 	private static func parseTemplates(args: [String]) -> List<Template> {
 		let argc = args.size
 		var outputDir: File = new File('.')
-		var currentTemplate: Template! = null
-		var templates: List<Template> = new ArrayList<Template>()
+		let templates = new ArrayList<Template>()
+		let specFiles = new TreeSet<String>()
 
 		for i <- 0 ..< argc {
 			let arg = args[i]
@@ -29,21 +29,36 @@ class Runner {
 				outputDir = new File(arg.substring(11))
 				continue
 			}
+			if arg.startsWith('--output-dir=') {
+				outputDir = new File(arg.substring(13))
+				continue
+			}
 			if arg.startsWith('source_dir=') {
 				Builtins.addSourceDir(arg.substring(11))
 				continue
 			}
-
-			if arg == '-t' && i < argc - 1 {
-				let tempName = args[i + 1]
-				currentTemplate = Class.forName(tempName).newInstance() as Template
-				currentTemplate.outputDir = outputDir
-				templates.add(currentTemplate)
-				i += 1 // skip
+			if arg.startsWith('--source-dir=') {
+				Builtins.addSourceDir(arg.substring(13))
 				continue
 			}
 
-			currentTemplate.addSpec(arg)
+			if arg == '-t' {
+				// legacy, ignore
+			}
+			else if arg.endsWith('.dgs') {
+				specFiles.add(arg)
+			}
+			else {
+				let currentTemplate = Class.forName(arg).newInstance() as Template
+				currentTemplate.outputDir = outputDir
+				templates.add(currentTemplate)
+			}
+		}
+
+		for currentTemplate <- templates {
+			for specFile <- specFiles {
+				currentTemplate.addSpec(specFile)
+			}
 		}
 
 		return templates

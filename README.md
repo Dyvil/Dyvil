@@ -1,23 +1,8 @@
 # The Dyvil Programming Language
 
 [![Master Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/Dyvil/Dyvil.svg)](http://isitmaintained.com/project/Dyvil/Dyvil "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/Dyvil/Dyvil.svg)](http://isitmaintained.com/project/Dyvil/Dyvil "Percentage of issues still open")
+![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg)
 [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Clashsoft/Dyvil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-| Module | Link |
-|--------|------|
-| All |  [![Download All](https://api.bintray.com/packages/dyvil/maven/dyvil/images/download.svg) ](https://bintray.com/dyvil/maven/dyvil/_latestVersion) |
-| Library | [![Download Library](https://api.bintray.com/packages/dyvil/maven/library/images/download.svg) ](https://bintray.com/dyvil/maven/library/_latestVersion) |
-| Compiler | [![Download Compiler](https://api.bintray.com/packages/dyvil/maven/compiler/images/download.svg) ](https://bintray.com/dyvil/maven/compiler/_latestVersion) |
-| REPL | [![Download REPL](https://api.bintray.com/packages/dyvil/maven/repl/images/download.svg) ](https://bintray.com/dyvil/maven/repl/_latestVersion) |
-| GenSrc | [![Download GenSrc](https://api.bintray.com/packages/dyvil/maven/gensrc/images/download.svg) ](https://bintray.com/dyvil/maven/gensrc/_latestVersion) |
-
-| Branch | Status |
-|--------|--------|
-| master | [![Master Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil) |
-| develop | [![Develop Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=develop)](https://travis-ci.org/Dyvil/Dyvil) |
-| bugfix | [![Bugfix Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=bugfix)](https://travis-ci.org/Dyvil/Dyvil) |
 
 **Dyvil** is a multi-paradigm, general purpose programming language that is based on Java and the JVM.
 It is compiled, statically and strongly typed and supports object-oriented, functional and imperative
@@ -38,8 +23,6 @@ components can be found in the [Language Reference][1].
 The syntax and semantics of the language are still highly experimental and are likely to change in upcoming
 releases. Therefore it is not recommended to use Dyvil in any kind of production environment.
 Feature or change requests or bug reports in the form of GitHub Issues or Pull Requests are welcome and encouraged.
-
----
 
 ## Links
 
@@ -67,3 +50,21 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 - [Subreddit](https://www.reddit.com/r/Dyvil/)
 
 [1]: https://dyvil.gitbooks.io/dyvil-language-reference/content/
+
+## Downloads
+
+| Module | Link |
+|--------|------|
+| All |  [![Download All](https://api.bintray.com/packages/dyvil/maven/dyvil/images/download.svg) ](https://bintray.com/dyvil/maven/dyvil/_latestVersion) |
+| Library | [![Download Library](https://api.bintray.com/packages/dyvil/maven/library/images/download.svg) ](https://bintray.com/dyvil/maven/library/_latestVersion) |
+| Compiler | [![Download Compiler](https://api.bintray.com/packages/dyvil/maven/compiler/images/download.svg) ](https://bintray.com/dyvil/maven/compiler/_latestVersion) |
+| REPL | [![Download REPL](https://api.bintray.com/packages/dyvil/maven/repl/images/download.svg) ](https://bintray.com/dyvil/maven/repl/_latestVersion) |
+| GenSrc | [![Download GenSrc](https://api.bintray.com/packages/dyvil/maven/gensrc/images/download.svg) ](https://bintray.com/dyvil/maven/gensrc/_latestVersion) |
+
+## Build Status
+
+| Branch | Travis CI | GitHub Actions | 
+|--------|-----------|----------------|
+| master | [![Master Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=master) |
+| develop | [![Develop Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=develop)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=develop) |
+| bugfix | [![Bugfix Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=bugfix)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=bugfix) |

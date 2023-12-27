@@ -111,6 +111,12 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 				}
 				this.braceLevel--;
 				break;
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
 			case '\n':
 				// end at newline, but include it
 				this.newLine();
@@ -213,9 +219,17 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 
 	private void skipNewLine()
 	{
-		if (this.codePoint() == '\n')
+		switch (this.codePoint())
 		{
+		case '\r':
+			if (this.nextCodePoint() == '\n')
+			{
+				this.advance();
+			}
+			// fallthrough
+		case '\n':
 			this.newLine();
+			break;
 		}
 	}
 
@@ -223,13 +237,20 @@ public class GenSrcLexer extends dyvilx.tools.parsing.lexer.Lexer
 	{
 		while (current != 0 && Character.isWhitespace(current))
 		{
-			if (current == '\n')
+			switch (current)
 			{
+			case '\r':
+				if (this.nextCodePoint() == '\n')
+				{
+					this.advance();
+				}
+				// fallthrough
+			case '\n':
 				this.newLine();
-			}
-			else
-			{
+				break;
+			default:
 				this.advance(current);
+				break;
 			}
 
 			current = this.codePoint();
