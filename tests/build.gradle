@@ -1,0 +1,15 @@
+apply plugin: 'org.dyvil.dyvil-gradle'
+
+// --------------- Info ---------------
+
+description = 'Functional tests for the Dyvil compiler'
+
+// --------------- Dependencies ---------------
+
+dependencies {
+	implementation libraryDependency
+	// https://mvnrepository.com/artifact/junit/junit
+	testImplementation(group: 'junit', name: 'junit', version: '4.12')
+	dyvilc project(':compiler')
+	gensrc project(':gensrc')
+}
