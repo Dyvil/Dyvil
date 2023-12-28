@@ -32,6 +32,7 @@ group = 'org.dyvil'
 repositories {
 	mavenLocal()
 	mavenCentral()
+	jcenter()
 }
 
 // --------------- Tasks ---------------
