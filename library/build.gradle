@@ -14,8 +14,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/junit/junit
 	testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-	dyvilc compilerDependency
-	gensrc gensrcDependency
+	dyvilc project(':compiler')
+	gensrc project(':gensrc')
 }
 
 // --------------- Source Sets ---------------
