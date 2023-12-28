@@ -15,7 +15,6 @@ mainClassName = 'dyvilx.tools.gensrc.Main'
 // --------------- Dependencies ---------------
 
 dependencies {
-	compile project(':library')
-	compile project(':compiler')
-	compileOnly libraryDependency
+	implementation libraryDependency
+	implementation project(':compiler')
 }

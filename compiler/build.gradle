@@ -17,8 +17,7 @@ mainClassName = 'dyvilx.tools.compiler.Main'
 // --------------- Dependencies ---------------
 
 dependencies {
-	compile project(':library')
-	compileOnly libraryDependency
+	implementation libraryDependency
 
 	// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
