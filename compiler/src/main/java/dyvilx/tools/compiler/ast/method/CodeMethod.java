@@ -288,29 +288,9 @@ public class CodeMethod extends AbstractMethod
 			markers.add(Markers.semanticError(this.position, "method.extension.this_type.invalid", this.name));
 		}
 
-		if (this.hasModifier(Modifiers.INFIX) || this.hasModifier(Modifiers.PREFIX) || this.hasModifier(Modifiers.POSTFIX))
-		{
-			final int lastCodePoint = this.name.unqualified.codePointBefore(this.name.unqualified.length());
-			if (!CharacterTypes.isIdentifierSymbol(lastCodePoint) && lastCodePoint != '.')
-			{
-				final Marker marker = Markers.semanticWarning(this.position, "method.not_symbolic.deprecated", this.name);
-				marker.addInfo(Markers.getSemantic("method.not_symbolic.deprecated.fix"));
-				markers.add(marker);
-			}
-		}
+		checkSymbolicNameIfFixity(markers);
 
-		if (this.hasModifier(Modifiers.PREFIX) && this.getParameters().explicitSize() != 1)
-		{
-			markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
-		}
-		else if (this.hasModifier(Modifiers.POSTFIX) && this.getParameters().explicitSize() != 1)
-		{
-			markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
-		}
-		else if (this.hasModifier(Modifiers.INFIX) && this.getParameters().explicitSize() != 2)
-		{
-			markers.add(Markers.semanticWarning(this.position, "method.infix.not_2_parameters.deprecated", this.name));
-		}
+		checkExplicitParametersForFixity(markers);
 
 		this.parameters.check(markers, context);
 
@@ -338,6 +318,47 @@ public class CodeMethod extends AbstractMethod
 		ModifierChecks.checkMethodModifiers(markers, this);
 
 		context.pop();
+	}
+
+	private void checkSymbolicNameIfFixity(MarkerList markers)
+	{
+		if (this.hasModifier(Modifiers.INFIX) || this.hasModifier(Modifiers.PREFIX) || this.hasModifier(Modifiers.POSTFIX))
+		{
+			final int lastCodePoint = this.name.unqualified.codePointBefore(this.name.unqualified.length());
+			if (!CharacterTypes.isIdentifierSymbol(lastCodePoint) && lastCodePoint != '.')
+			{
+				final Marker marker = Markers.semanticWarning(this.position, "method.not_symbolic.deprecated", this.name);
+				marker.addInfo(Markers.getSemantic("method.not_symbolic.deprecated.fix"));
+				markers.add(marker);
+			}
+		}
+	}
+
+	private void checkExplicitParametersForFixity(MarkerList markers)
+	{
+		final long fixity = this.getAttributes().flags() & (Modifiers.PREFIX | Modifiers.INFIX | Modifiers.POSTFIX);
+		final int explicitParameters = this.getParameters().explicitSize();
+		if (fixity == Modifiers.PREFIX)
+		{
+			if (explicitParameters != 1)
+			{
+				markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
+			}
+		}
+		else if (fixity == Modifiers.POSTFIX)
+		{
+			if (explicitParameters != 1)
+			{
+				markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
+			}
+		}
+		else if (fixity == Modifiers.INFIX)
+		{
+			if (explicitParameters != 2)
+			{
+				markers.add(Markers.semanticWarning(this.position, "method.infix.not_2_parameters.deprecated", this.name));
+			}
+		}
 	}
 
 	// --------------- Duplicates ---------------
