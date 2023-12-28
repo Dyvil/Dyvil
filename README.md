@@ -40,6 +40,7 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 
 - [GitHub Repository](https://github.com/Dyvil/Dyvil)
 - [Issue Tracker](https://github.com/Dyvil/Dyvil/issues)
+- [Changelog](https://github.com/Dyvil/Dyvil/releases)
 
 ### Community
 
