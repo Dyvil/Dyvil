@@ -7,11 +7,10 @@
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'de.clashsoft.simple-publish'
 
 group = 'org.dyvil'
 
-publishInfo {
+/* TODO publishInfo {
 	organization = 'dyvil'
 	githubRepo = 'Dyvil/Dyvil'
 
@@ -26,6 +25,7 @@ publishInfo {
 		email = 'clashsoft@hotmail.com'
 	}
 }
+*/
 
 // --------------- Dependencies ---------------
 

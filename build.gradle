@@ -6,8 +6,6 @@ import java.util.regex.Pattern
 plugins {
 	// https://plugins.gradle.org/plugin/org.dyvil.dyvil-gradle
 	id 'org.dyvil.dyvil-gradle' version '0.6.0-alpha.2' apply false
-	// https://plugins.gradle.org/plugin/de.clashsoft.simple-publish
-	id 'de.clashsoft.simple-publish' version '0.6.0' apply false
 }
 
 // *************** Shared Configuration ***************
@@ -67,7 +65,7 @@ allprojects {
 
 version = getTagVersion()
 description = 'The Dyvil programming language.'
-publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
+// TODO publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
 
 // --------------- Jar ---------------
 
