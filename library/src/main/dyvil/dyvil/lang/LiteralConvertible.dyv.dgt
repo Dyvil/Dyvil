@@ -1,6 +1,6 @@
 package dyvil.lang
 
-#func(from(TYPE: String)){@interface From#(TYPE){} (let methodName: String = "apply")
+#func(from(TYPE: String) -> String){@interface From#(TYPE){} (let methodName: String = "apply")
 }
 
 abstract class LiteralConvertible {

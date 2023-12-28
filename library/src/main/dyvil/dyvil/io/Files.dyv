@@ -14,7 +14,7 @@ extension File {
 
 	// --------------- Ant File Name Patterns ---------------
 
-	private static func isSlashy(c: char) {
+	private static func isSlashy(c: char) -> boolean {
 		return c match {
 			case '/' | '\\' => true
 			case _ => false
