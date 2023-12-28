@@ -7,7 +7,6 @@
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'de.clashsoft.simple-publish'
 
 group = 'org.dyvil'
@@ -33,7 +32,6 @@ publishInfo {
 repositories {
 	mavenLocal()
 	mavenCentral()
-	jcenter()
 }
 
 // --------------- Tasks ---------------
@@ -44,6 +42,7 @@ tasks.register('version') {
 	}
 }
 
+/* TODO reuse the exception for new publishing
 tasks.named('bintrayUpload') {
 	it.doFirst {
 		if (!System.getenv('DYVIL_RELEASE')) {
@@ -52,6 +51,7 @@ tasks.named('bintrayUpload') {
 		}
 	}
 }
+ */
 
 // --------------- Java Compilation ---------------
 

@@ -34,7 +34,6 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 
 - [GitHub Releases](https://github.com/Dyvil/Dyvil/releases) (up to v0.44.0)
 - [Maven](https://mvnrepository.com/artifact/org.dyvil) (from v0.44.1)
-- [Bintray](https://bintray.com/dyvil/maven) (from v0.44.1)
 - [Release Statistics](https://docs.google.com/spreadsheets/d/13imk47mUlV9nbi2fsGAXuUr1f3cOdWhTyi_AoKlIgqA/edit?usp=sharing)
 
 ### Development
@@ -48,16 +47,6 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 - [Subreddit](https://www.reddit.com/r/Dyvil/)
 
 [1]: https://dyvil.gitbooks.io/dyvil-language-reference/content/
-
-## Downloads
-
-| Module | Link |
-|--------|------|
-| All |  [![Download All](https://api.bintray.com/packages/dyvil/maven/dyvil/images/download.svg) ](https://bintray.com/dyvil/maven/dyvil/_latestVersion) |
-| Library | [![Download Library](https://api.bintray.com/packages/dyvil/maven/library/images/download.svg) ](https://bintray.com/dyvil/maven/library/_latestVersion) |
-| Compiler | [![Download Compiler](https://api.bintray.com/packages/dyvil/maven/compiler/images/download.svg) ](https://bintray.com/dyvil/maven/compiler/_latestVersion) |
-| REPL | [![Download REPL](https://api.bintray.com/packages/dyvil/maven/repl/images/download.svg) ](https://bintray.com/dyvil/maven/repl/_latestVersion) |
-| GenSrc | [![Download GenSrc](https://api.bintray.com/packages/dyvil/maven/gensrc/images/download.svg) ](https://bintray.com/dyvil/maven/gensrc/_latestVersion) |
 
 ## Build Status
 
