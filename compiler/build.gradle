@@ -10,15 +10,14 @@ plugins {
 
 version = getTagVersion('compiler/')
 description = 'The Dyvil Compiler'
-publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
+// TODO publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
 
 mainClassName = 'dyvilx.tools.compiler.Main'
 
 // --------------- Dependencies ---------------
 
 dependencies {
-	compile project(':library')
-	compileOnly libraryDependency
+	implementation libraryDependency
 
 	// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'

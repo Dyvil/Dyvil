@@ -6,10 +6,6 @@ import java.util.regex.Pattern
 plugins {
 	// https://plugins.gradle.org/plugin/org.dyvil.dyvil-gradle
 	id 'org.dyvil.dyvil-gradle' version '0.6.0-alpha.2' apply false
-	// https://plugins.gradle.org/plugin/com.jfrog.bintray
-	id 'com.jfrog.bintray' version '1.8.5' apply false
-	// https://plugins.gradle.org/plugin/de.clashsoft.simple-publish
-	id 'de.clashsoft.simple-publish' version '0.6.0' apply false
 }
 
 // *************** Shared Configuration ***************
@@ -33,12 +29,12 @@ ext {
 	getTagVersion = this.&getTagVersion
 }
 
-private static String getTagVersion(String module = '') {
+private String getTagVersion(String module = '') {
 	if (!module.isEmpty() && !module.endsWith("/")) {
 		module += '/'
 	}
 
-	final String tagOutput = 'git tag --sort=-version:refname'.execute().text
+	final String tagOutput = 'git tag --sort=-version:refname'.execute([], rootDir).text
 	final Pattern pattern = Pattern.compile("^${ module }v(.*)\$", Pattern.MULTILINE)
 	final Matcher matcher = pattern.matcher(tagOutput)
 	if (!matcher.find()) {
@@ -65,49 +61,11 @@ allprojects {
 
 // *************** Configuration for Root Project ***************
 
-// --------------- Plugins ---------------
-
-apply plugin: 'org.dyvil.dyvil-gradle'
-
 // --------------- Info ---------------
 
 version = getTagVersion()
 description = 'The Dyvil programming language.'
-publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
-
-// --------------- Dependencies ---------------
-
-dependencies {
-	compile subprojects
-
-	// --------------- Test ---------------
-
-	// https://mvnrepository.com/artifact/junit/junit
-	testCompile group: 'junit', name: 'junit', version: '4.12'
-
-	testCompile project(':library')
-}
-
-// --------------- Test Tasks ---------------
-
-tasks.named('compileTestDyvil') {
-	options.encoding = 'UTF-8'
-
-	// override classpath to use the new compiler instead of bootstrap
-	dyvilcClasspath = project(':compiler').sourceSets.main.runtimeClasspath
-}
-
-tasks.named('compileTestDyvilGenSrc') {
-	options.encoding = 'UTF-8'
-
-	// override classpath to use the new classes instead of bootstrap
-	dyvilcClasspath = project(':gensrc').sourceSets.main.runtimeClasspath
-}
-
-tasks.named('generateTestDyvilGenSrc') {
-	// override classpath to use the new classes instead of bootstrap
-	classpath = files(tasks.compileTestDyvilGenSrc.destinationDir) + project(':gensrc').sourceSets.main.runtimeClasspath
-}
+// TODO publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
 
 // --------------- Jar ---------------
 

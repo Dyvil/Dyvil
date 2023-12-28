@@ -1,0 +1,65 @@
+package dyvil.test
+
+import org.junit.Test
+import org.junit.Assert
+import static org.junit.Assert._
+import static org.hamcrest.core.IsEqual.equalTo
+import static org.hamcrest.core.IsNot.not
+import static org.hamcrest.core.IsInstanceOf.instanceOf
+
+public header JUnit
+
+infix operator =?= { associativity none, precedence 1 }
+infix operator =!= { associativity none, precedence 1 }
+
+@JavaName("JUnit")
+extension any {
+	// =============== Operators ===============
+
+	infix func =?=(actual: any!, expected: any!) -> void = actual.shouldEqual(expected)
+
+	infix func =!=(actual: any!, expected: any!) -> void = actual.shouldNotEqual(expected)
+
+	// =============== Static Methods ===============
+
+	static func pass() -> void {}
+
+	static func fail() -> void = Assert.fail()
+
+	static func fail(message: String) -> void = Assert.fail(message)
+
+	@JavaName("expect$")
+	static func expect<@Reified(.ANY_CLASS) type E: RuntimeException>(from: () -> void) -> void
+		= expect(class E, from)
+
+	static func expect(exceptionType: Class<+RuntimeException>, from: () -> void) -> void {
+		try {
+			from()
+		}
+		catch ex: RuntimeException {
+			if exceptionType.isInstance(ex) {
+				return
+			}
+			else {
+				caughtInstead(exceptionType, ex)
+			}
+		}
+		catch ex: Throwable {
+			caughtInstead(exceptionType, ex)
+		}
+		fail("did not catch \(exceptionType.getName())")
+	}
+
+	private static func caughtInstead(expected: Class, actual: Throwable) -> void {
+		let message = "caught \(actual.getClass().getName()) instead of \(expected.getName())"
+		throw new AssertionError(message, actual)
+	}
+
+	// =============== Methods ===============
+
+	final func shouldBe<@Reified(.OBJECT_CLASS) type T>() -> void = assertThat(this, instanceOf<T>(class T))
+
+	final func shouldEqual(expected: any!) -> void = assertThat(this, equalTo(expected))
+
+	final func shouldNotEqual(notExpected: any!) -> void = assertThat(this, not(notExpected))
+}

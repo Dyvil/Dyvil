@@ -7,12 +7,10 @@
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'de.clashsoft.simple-publish'
 
 group = 'org.dyvil'
 
-publishInfo {
+/* TODO publishInfo {
 	organization = 'dyvil'
 	githubRepo = 'Dyvil/Dyvil'
 
@@ -27,6 +25,7 @@ publishInfo {
 		email = 'clashsoft@hotmail.com'
 	}
 }
+*/
 
 // --------------- Dependencies ---------------
 
@@ -44,6 +43,7 @@ tasks.register('version') {
 	}
 }
 
+/* TODO reuse the exception for new publishing
 tasks.named('bintrayUpload') {
 	it.doFirst {
 		if (!System.getenv('DYVIL_RELEASE')) {
@@ -52,6 +52,7 @@ tasks.named('bintrayUpload') {
 		}
 	}
 }
+ */
 
 // --------------- Java Compilation ---------------
 
@@ -69,6 +70,7 @@ tasks.withType(Jar) {
 	preserveFileTimestamps = false
 
 	from(rootProject.rootDir) {
-		include '*LICENSE*'
+		include 'LICENSE.md'
+		include 'thirdparty/*LICENSE*'
 	}
 }

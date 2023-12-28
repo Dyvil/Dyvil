@@ -8,14 +8,13 @@ plugins {
 
 version = getTagVersion('gensrc/')
 description = 'The Dyvil GenSrc template source code generator'
-publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
+// TODO publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
 
 mainClassName = 'dyvilx.tools.gensrc.Main'
 
 // --------------- Dependencies ---------------
 
 dependencies {
-	compile project(':library')
-	compile project(':compiler')
-	compileOnly libraryDependency
+	implementation libraryDependency
+	implementation project(':compiler')
 }
