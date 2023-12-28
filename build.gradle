@@ -65,49 +65,11 @@ allprojects {
 
 // *************** Configuration for Root Project ***************
 
-// --------------- Plugins ---------------
-
-apply plugin: 'org.dyvil.dyvil-gradle'
-
 // --------------- Info ---------------
 
 version = getTagVersion()
 description = 'The Dyvil programming language.'
 publishInfo.labels = [ 'dyvil', 'programming-language', 'jvm' ]
-
-// --------------- Dependencies ---------------
-
-dependencies {
-	compile subprojects
-
-	// --------------- Test ---------------
-
-	// https://mvnrepository.com/artifact/junit/junit
-	testCompile group: 'junit', name: 'junit', version: '4.12'
-
-	testCompile project(':library')
-}
-
-// --------------- Test Tasks ---------------
-
-tasks.named('compileTestDyvil') {
-	options.encoding = 'UTF-8'
-
-	// override classpath to use the new compiler instead of bootstrap
-	dyvilcClasspath = project(':compiler').sourceSets.main.runtimeClasspath
-}
-
-tasks.named('compileTestDyvilGenSrc') {
-	options.encoding = 'UTF-8'
-
-	// override classpath to use the new classes instead of bootstrap
-	dyvilcClasspath = project(':gensrc').sourceSets.main.runtimeClasspath
-}
-
-tasks.named('generateTestDyvilGenSrc') {
-	// override classpath to use the new classes instead of bootstrap
-	classpath = files(tasks.compileTestDyvilGenSrc.destinationDir) + project(':gensrc').sourceSets.main.runtimeClasspath
-}
 
 // --------------- Jar ---------------
 
