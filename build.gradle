@@ -33,17 +33,16 @@ ext {
 	getTagVersion = this.&getTagVersion
 }
 
-private static String getTagVersion(String module = '') {
+private String getTagVersion(String module = '') {
 	if (!module.isEmpty() && !module.endsWith("/")) {
 		module += '/'
 	}
 
-	final String tagOutput = 'git tag --sort=-version:refname'.execute().text
+	final String tagOutput = 'git tag --sort=-version:refname'.execute([], rootDir).text
 	final Pattern pattern = Pattern.compile("^${ module }v(.*)\$", Pattern.MULTILINE)
 	final Matcher matcher = pattern.matcher(tagOutput)
 	if (!matcher.find()) {
-		// throw new IllegalStateException("failed to find /$pattern/ in output:\n$tagOutput")
-		return "v0.0.0"
+		throw new IllegalStateException("failed to find /$pattern/ in output:\n$tagOutput")
 	}
 
 	final String newestTag = matcher.group(0)
