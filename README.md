@@ -1,6 +1,5 @@
 # The Dyvil Programming Language
 
-[![Master Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil)
 ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg)
 [![Join the Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Clashsoft/Dyvil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -42,7 +41,6 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 
 - [GitHub Repository](https://github.com/Dyvil/Dyvil)
 - [Issue Tracker](https://github.com/Dyvil/Dyvil/issues)
-- [Travis CI](https://travis-ci.org/Dyvil/Dyvil)
 
 ### Community
 
@@ -63,8 +61,8 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 
 ## Build Status
 
-| Branch | Travis CI | GitHub Actions | 
-|--------|-----------|----------------|
-| master | [![Master Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=master)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=master) |
-| develop | [![Develop Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=develop)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=develop) |
-| bugfix | [![Bugfix Branch Build Status](https://travis-ci.org/Dyvil/Dyvil.svg?branch=bugfix)](https://travis-ci.org/Dyvil/Dyvil) | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=bugfix) |
+| Branch | GitHub Actions | 
+|--------|----------------|
+| master | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=master) |
+| develop | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=develop) |
+| bugfix | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=bugfix) |
