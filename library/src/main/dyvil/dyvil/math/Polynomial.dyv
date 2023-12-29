@@ -85,8 +85,8 @@ class Polynomial private (coefficients: [double]) implements RingCompatible<Poly
 
 	// Unary Operators
 
-	private postfix func mapped(poly: Polynomial, op: double -> double) -> Polynomial {
-		let oldCoeff = poly.coefficients
+	private final func mapped(op: double -> double) -> Polynomial {
+		let oldCoeff = this.coefficients
 		let size = oldCoeff.size
 		let newCoeff = new [double](size)
 		for i <- 0 ..< size {
