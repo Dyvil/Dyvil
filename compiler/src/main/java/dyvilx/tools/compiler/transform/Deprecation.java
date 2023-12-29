@@ -10,6 +10,7 @@ import dyvil.util.MarkerLevel;
 import dyvilx.tools.compiler.ast.attribute.annotation.Annotation;
 import dyvilx.tools.compiler.ast.attribute.annotation.ExternalAnnotation;
 import dyvilx.tools.compiler.ast.classes.IClass;
+import dyvilx.tools.compiler.ast.context.IContext;
 import dyvilx.tools.compiler.ast.expression.ArrayExpr;
 import dyvilx.tools.compiler.ast.expression.IValue;
 import dyvilx.tools.compiler.ast.expression.constant.EnumValue;
@@ -75,9 +76,9 @@ public final class Deprecation
 	private static final IParameter INF_DESC_PARAM  = INF_PARAMS.get(description);
 	private static final IParameter INF_LEVEL_PARAM = INF_PARAMS.get(level);
 
-	public static void checkAnnotations(Member member, SourcePosition position, MarkerList markers)
+	public static void checkAnnotations(Member member, SourcePosition position, MarkerList markers, IContext context)
 	{
-		if (member.hasModifier(Modifiers.DEPRECATED))
+		if (member.hasModifier(Modifiers.DEPRECATED) && context.getCompilationContext().config.hasDeprecatedWarnings())
 		{
 			checkDeprecation(member, position, markers);
 		}

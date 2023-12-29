@@ -12,7 +12,6 @@ import org.apache.commons.cli.Options;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -36,6 +35,7 @@ public class CompilerConfig
 
 	private boolean     debug;
 	private boolean     ansiColors;
+	private boolean deprecatedWarnings = true;
 	private MarkerStyle markerStyle = MarkerStyle.DYVIL;
 
 	// - - - - - - - - Sources - - - - - - - -
@@ -90,6 +90,16 @@ public class CompilerConfig
 	public void setAnsiColors(boolean ansiColors)
 	{
 		this.ansiColors = ansiColors;
+	}
+
+	public boolean hasDeprecatedWarnings()
+	{
+		return deprecatedWarnings;
+	}
+
+	public void setDeprecatedWarnings(boolean deprecationWarnings)
+	{
+		this.deprecatedWarnings = deprecationWarnings;
 	}
 
 	public MarkerStyle getMarkerStyle()
@@ -216,6 +226,7 @@ public class CompilerConfig
 
 	public void addOptions(Options options)
 	{
+		options.addOption(null, "no-deprecated", false, "disables warnings for deprecated symbols");
 		options.addOption("D", "debug", false, "enables debug output");
 		options.addOption("A", "ansi", false, "enables colored output using ANSI color codes");
 		options.addOption("M", "marker-style", true,
@@ -224,6 +235,7 @@ public class CompilerConfig
 		                  "sets the maximum constant depth for constant expression resolution. can be any non-negative integer");
 		options.addOption("F", "max-constant-folding", true,
 		                  "sets the maximum constant folding depth. can be any non-negative integer, 0 = no constant folding");
+
 		// dump-dir is used by REPL
 		// g/gensrc-dir are used by GenSrc
 
@@ -275,6 +287,7 @@ public class CompilerConfig
 		}
 
 		this.setAnsiColors(cmd.hasOption("ansi"));
+		this.setDeprecatedWarnings(!cmd.hasOption("no-deprecated"));
 
 		if (cmd.hasOption("max-constant-folding"))
 		{

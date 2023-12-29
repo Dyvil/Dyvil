@@ -80,7 +80,7 @@ public class ModifierChecks
 
 	public static void checkVisibility(Member member, SourcePosition position, MarkerList markers, IContext context)
 	{
-		Deprecation.checkAnnotations(member, position, markers);
+		Deprecation.checkAnnotations(member, position, markers, context);
 
 		if (!(member instanceof ClassMember))
 		{

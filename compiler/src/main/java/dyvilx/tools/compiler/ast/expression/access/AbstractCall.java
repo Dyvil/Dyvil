@@ -274,7 +274,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
 		    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
 		{
-			Deprecation.checkAnnotations(method, this.position, markers);
+			Deprecation.checkAnnotations(method, this.position, markers, context);
 			intrinsic.setPosition(this.position);
 			return intrinsic;
 		}

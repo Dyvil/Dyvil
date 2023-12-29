@@ -36,3 +36,8 @@ try {
 finally {
 	project.group = oldGroup
 }
+
+
+compileDyvil {
+	extraArgs '--no-deprecated'
+}
