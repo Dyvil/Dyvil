@@ -93,12 +93,12 @@ interface SourcePosition extends Comparable<SourcePosition> {
 		// internally, the end column is not inclusive, so we subtract one for printing
 		let endColumn = this.endColumn - 1
 		if this.startLine != this.endLine {
-			return "\(this.startLine).\(this.startColumn)-\(this.endLine).\(endColumn)"
+			return "\(this.startLine):\(this.startColumn)-\(this.endLine):\(endColumn)"
 		}
 		if this.startColumn != endColumn {
-			return "\(this.startLine).\(this.startColumn)-\(endColumn)"
+			return "\(this.startLine):\(this.startColumn)-\(endColumn)"
 		}
-		return "\(this.startLine).\(this.startColumn)"
+		return "\(this.startLine):\(this.startColumn)"
 	}
 
 	// Base Implementation
