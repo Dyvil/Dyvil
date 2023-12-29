@@ -162,6 +162,16 @@ class ExtensionTest {
 		array.myFirst =?= 3L
 	}
 
+	// --------------- Non-reified Extensions ---------------
+
+	// Ensure there is no [type.var.class] error
+	final extension func stringify<T>(this: T) -> String = this.toString()
+
+	@Test func nonReifiedExtension() {
+		"abc".stringify =?= "abc"
+		123.stringify =?= "123"
+	}
+
 	// --------------- Reified Generic Extensions ---------------
 
 	extension<@Reified(.OBJECT_CLASS) type T> T {
