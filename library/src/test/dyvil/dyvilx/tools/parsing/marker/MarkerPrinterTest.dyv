@@ -52,10 +52,10 @@ class MarkerPrinterTest {
 
 		let result = writer.toString()
 
-		result =?= "<input>:1.1-4: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
-					<input>:1.1-4: note: extra information
-					<input>:2.3-3.3: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
-					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
+		result =?= "<input>:1:1-4: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
+					<input>:1:1-4: note: extra information
+					<input>:2:3-3:3: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
+					<input>:4:5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
 		"
 	}
 
@@ -67,14 +67,14 @@ class MarkerPrinterTest {
 
 		let result = writer.toString()
 
-		result =?= "<input>:1.1-4: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
-					<input>:1.1-4: note: extra information
+		result =?= "<input>:1:1-4: \(Console.ANSI_RED)error: test error\(Console.ANSI_RESET)
+					<input>:1:1-4: note: extra information
 					example
 					 \(Console.ANSI_RED)^^^^\(Console.ANSI_RESET)
-					<input>:2.3-3.3: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
+					<input>:2:3-3:3: \(Console.ANSI_CYAN)info: test info\(Console.ANSI_RESET)
 					file
 					   \(Console.ANSI_CYAN)^\(Console.ANSI_RESET)
-					<input>:4.5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
+					<input>:4:5: \(Console.ANSI_YELLOW)warning: test warning\(Console.ANSI_RESET)
 					 \t .
 					 \t  \(Console.ANSI_YELLOW)^\(Console.ANSI_RESET)
 		"
