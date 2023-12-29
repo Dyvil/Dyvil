@@ -42,38 +42,13 @@ extension String {
 	static func apply(capacity: int, builtBy closure: StringBuilder.() -> void) -> String inline
 		= new StringBuilder(capacity).use(closure).toString!!
 
-	@JavaName("fromShared")
-	@java.lang.Deprecated // moved to UnsafeString
-	static func __apply(sharing array: [final char]) -> String = String(sharing: array)
-
 	// =============== Methods ===============
-
-	@Deprecated(description: "use String.charCount", since: "0.45.0", forRemoval: "v0.46.0",
-	            replacements: [ "String.charCount" ])
-	@java.lang.Deprecated // use String.length
-	final func size() -> int inline = this.length
 
 	// --------------- Char Access ---------------
 
 	final func subscript(index: int) -> char inline = this.charAt(index)
 
 	final func subscript(range: Range<int>) -> String inline = this.substring(range.first, range.last + 1)!!
-
-	@JavaName("getCharArray")
-	@java.lang.Deprecated // moved to UnsafeStrings
-	final func __getCharArray() -> [final char] = this.getCharArray()
-
-	@JavaName("contains")
-	@java.lang.Deprecated // moved to StringChars
-	final func __contains(character: char) -> boolean = this.contains(character)
-
-	@JavaName("count")
-	@java.lang.Deprecated // moved to StringChars
-	final func __count(character: char) -> int = this.count(character)
-
-	@JavaName("split")
-	@java.lang.Deprecated // moved to StringChars
-	final func __split(by delimiter: char) -> [String] = this.split(by: delimiter)
 
 	// --------------- Misc. ---------------
 
