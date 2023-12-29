@@ -41,3 +41,11 @@ finally {
 compileDyvil {
 	extraArgs '--no-deprecated'
 }
+
+compileTestDyvil {
+	options.encoding = 'UTF-8'
+}
+
+compileTestDyvilGenSrc {
+	options.encoding = 'UTF-8'
+}
