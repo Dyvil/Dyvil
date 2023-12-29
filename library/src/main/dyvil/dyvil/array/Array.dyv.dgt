@@ -155,7 +155,7 @@ public abstract class #(TYPE_NAME)Array {
 
 		postfix func deepElementType GENERIC(array: [T]) -> Class<_> {
 			var result: Class<_> = array.getClass()
-			while (true) {
+			while true {
 				let elementType = result.getComponentType()
 				if elementType == null {
 					break
@@ -363,7 +363,7 @@ public abstract class #(TYPE_NAME)Array {
 	infix inline func indexOf GENERIC(array: [T], value: T) -> int = array.indexOf(value, 0)
 
 	infix func indexOf GENERIC(array: [T], value: T, startIndex: int) -> int {
-		while (startIndex < array.size) {
+		while startIndex < array.size {
 			if array[startIndex] == value {
 				return startIndex
 			}
@@ -375,7 +375,7 @@ public abstract class #(TYPE_NAME)Array {
 	infix func lastIndexOf GENERIC(array: [T], value: T) -> int = array.lastIndexOf(value, array.size - 1)
 
 	infix func lastIndexOf GENERIC(array: [T], value: T, startIndex: int) -> int {
-		while (startIndex >= 0) {
+		while startIndex >= 0 {
 			if array[startIndex] == value {
 				return startIndex
 			}
