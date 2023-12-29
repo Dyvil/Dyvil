@@ -22,7 +22,7 @@ interface ObjectRef<T> {
 		#let(WRAPPER = spec['WRAPPER'])
 
 		@JavaName("unbox#(TYPE_NAME)")
-		static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(ref)
+		final extension func unboxed(this: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(this)
 	}
 
 	// =============== Operators ===============
@@ -48,7 +48,7 @@ interface ObjectRef<T> {
 
 		// --------------- Boxing ---------------
 
-		postfix func boxed(ref: #(TYPE_NAME)Ref) -> ObjectRef<WRAPPER> = new Boxed#(TYPE_NAME)Ref(ref)
+		final extension func boxed(this: #(TYPE_NAME)Ref) -> ObjectRef<WRAPPER> = new Boxed#(TYPE_NAME)Ref(this)
 
 		// =============== Operators ===============
 

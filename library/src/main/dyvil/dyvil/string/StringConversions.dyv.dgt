@@ -4,7 +4,7 @@ abstract class StringConversions
 {
 	private init() {} // no instances
 
-	postfix func toBoolean(_ string: String) -> boolean = Boolean.parseBoolean(string)
+	final extension func toBoolean(this: String) -> boolean = Boolean.parseBoolean(this)
 
 	// Number Conversions
 	#for (spec <- LibraryGenConstants.NUMBER_SPECS) {
@@ -12,10 +12,10 @@ abstract class StringConversions
 		#let(PRIMITIVE = spec['PRIMITIVE'])
 		#let(WRAPPER = spec['WRAPPER'])
 
-		postfix func to#(TYPE_NAME)(_ string: String) -> PRIMITIVE? = string.to#(TYPE_NAME)(radix: 10)
+		final extension func to#(TYPE_NAME)(this: String) -> PRIMITIVE? = this.to#(TYPE_NAME)(radix: 10)
 
-		infix func to#(TYPE_NAME)(_ string: String, radix: int) -> PRIMITIVE? {
-			try { return WRAPPER.parse#(TYPE_NAME)(string) } catch ex: NumberFormatException {}
+		final extension func to#(TYPE_NAME)(this: String, radix: int) -> PRIMITIVE? {
+			try { return WRAPPER.parse#(TYPE_NAME)(this) } catch ex: NumberFormatException {}
 			return null
 		}
 	}
