@@ -114,47 +114,47 @@ public abstract class #(TYPE_NAME)Array {
 	// Basic Array Operations
 
 	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
-	postfix func size GENERIC(array: [T]) -> int = array.size
+	final extension func size GENERIC(this: [T]) -> int = this.size
 
 	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
 	static func |_| GENERIC(array: [T]) -> int = array.size
 
 	@Intrinsic([ LOAD_0, ARRAYLENGTH, EQ0 ])
-	postfix func isEmpty GENERIC(array: [T]) -> boolean = array.isEmpty
+	final extension func isEmpty GENERIC(this: [T]) -> boolean = this.isEmpty
 
 	@Intrinsic([ LOAD_0, LOAD_1, ARRAY_LOAD_INSN ])
-	infix func subscript GENERIC(array: [T], index: int) -> T = array[index]
+	final extension func subscript GENERIC(this: [T], index: int) -> T = this[index]
 
 	@Mutating
 	@Intrinsic([ LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN ])
-	infix func subscript_= GENERIC(array: [T], index: int, newValue: T) -> void = array[index] = newValue
+	final extension func subscript_= GENERIC(this: [T], index: int, newValue: T) -> void = this[index] = newValue
 
-	infix func subscript GENERIC(array: [T], range: Range<int>) -> [T] {
+	final extension func subscript GENERIC(this: [T], range: Range<int>) -> [T] {
 		let size = range.size
-		let result = #APPLY{size, of: array.elementType}
+		let result = #APPLY{size, of: this.elementType}
 
-		System.arraycopy(array, range.first, result, 0, size)
+		System.arraycopy(this, range.first, result, 0, size)
 		return result
 	}
 
 	@Mutating
-	infix func subscript_= GENERIC(array: [T], range: Range<int>, newValues: [T]) -> void
-		= System.arraycopy(newValues, 0, array, range.first, range.size)
+	final extension func subscript_= GENERIC(this: [T], range: Range<int>, newValues: [T]) -> void
+		= System.arraycopy(newValues, 0, this, range.first, range.size)
 
 	@Mutating
-	infix func subscript_& GENERIC(array: [T], index: int) -> #(TYPE_NAME)Ref
-		= new #(TYPE_NAME)ArrayRef(array, index)
+	final extension func subscript_& GENERIC(this: [T], index: int) -> #(TYPE_NAME)Ref
+		= new #(TYPE_NAME)ArrayRef(this, index)
 
-	infix func forEach GENERIC(array: [T], action: T -> void) -> void
-		= for value <- array { action(value) }
+	final extension func forEach GENERIC(this: [T], action: T -> void) -> void
+		= for value <- this { action(value) }
 
 	#if (IS_GENERIC) {
 		// Component Types
 
-		postfix func elementType GENERIC(array: [T]) -> Class<T> = array.getClass().getComponentType() as Class<T>
+		final extension func elementType GENERIC(this: [T]) -> Class<T> = this.getClass().getComponentType() as Class<T>
 
-		postfix func deepElementType GENERIC(array: [T]) -> Class<_> {
-			var result: Class<_> = array.getClass()
+		final extension func deepElementType GENERIC(this: [T]) -> Class<_> {
+			var result: Class<_> = this.getClass()
 			while true {
 				let elementType = result.getComponentType()
 				if elementType == null {
@@ -182,50 +182,50 @@ public abstract class #(TYPE_NAME)Array {
 		infix inline func !=(lhs: [T]!, rhs: [T]!) -> boolean = !Arrays.equals(lhs, rhs)
 	}
 
-	infix func added GENERIC(array: [T], value: T) -> [T] {
-		let size = array.size
-		let result = #APPLY{size + 1, of: array.elementType}
+	final extension func added GENERIC(this: [T], value: T) -> [T] {
+		let size = this.size
+		let result = #APPLY{size + 1, of: this.elementType}
 
-		System.arraycopy(array, 0, result, 0, size)
+		System.arraycopy(this, 0, result, 0, size)
 		result[size] = value
 		return result
 	}
 
-	infix func inserted GENERIC(array: [T], at index: int, value: T) -> [T] {
-		let size = array.size
-		let result = #APPLY{size + 1, of: array.elementType}
+	final extension func inserted GENERIC(this: [T], at index: int, value: T) -> [T] {
+		let size = this.size
+		let result = #APPLY{size + 1, of: this.elementType}
 
-		System.arraycopy(array, 0, result, 0, index)
+		System.arraycopy(this, 0, result, 0, index)
 		result[index] = value
-		System.arraycopy(array, index, result, index + 1, size - index)
+		System.arraycopy(this, index, result, index + 1, size - index)
 		return result
 	}
 
-	infix func union GENERIC(array: [T], with: [T]) -> [T] {
-		let size1 = array.size
+	final extension func union GENERIC(this: [T], with: [T]) -> [T] {
+		let size1 = this.size
 		let size2 = with.size
 		let size = size1 + size2
-		let result = #APPLY{size, of: array.elementType}
+		let result = #APPLY{size, of: this.elementType}
 
-		System.arraycopy(array, 0, result, 0, size1)
+		System.arraycopy(this, 0, result, 0, size1)
 		System.arraycopy(with, 0, result, size1, size2)
 		return result
 	}
 
-	infix func removed GENERIC(array: [T], value: T) -> [T] {
-		var size = array.size
+	final extension func removed GENERIC(this: [T], value: T) -> [T] {
+		var size = this.size
 
 		// Calculate number of elements in new array
-		for element <- array {
+		for element <- this {
 			if element == value {
 				size -= 1
 			}
 		}
 
-		let result = #APPLY{size, of: array.elementType}
+		let result = #APPLY{size, of: this.elementType}
 
 		var index = 0
-		for element <- array {
+		for element <- this {
 			if element != value {
 				result[index] = element
 				index += 1
@@ -234,12 +234,12 @@ public abstract class #(TYPE_NAME)Array {
 		return result
 	}
 
-	infix func difference GENERIC(array: [T], from: [T]) -> [T] {
-		let size = array.size
-		let result = #APPLY{size, of: array.elementType}
+	final extension func difference GENERIC(this: [T], from: [T]) -> [T] {
+		let size = this.size
+		let result = #APPLY{size, of: this.elementType}
 
 		var index = 0
-		for v <- array {
+		for v <- this {
 			if !from.contains(v) {
 				result[index] = v
 				index += 1
@@ -248,12 +248,12 @@ public abstract class #(TYPE_NAME)Array {
 		return result.trim(index)
 	}
 
-	infix func intersection GENERIC(array: [T], with: [T]) -> [T] {
-		let size = array.size
-		let result = #APPLY{size, of: array.elementType}
+	final extension func intersection GENERIC(this: [T], with: [T]) -> [T] {
+		let size = this.size
+		let result = #APPLY{size, of: this.elementType}
 
 		var index = 0
-		for v <- array {
+		for v <- this {
 			if with.contains(v) {
 				result[index] = v
 				index += 1
@@ -263,33 +263,33 @@ public abstract class #(TYPE_NAME)Array {
 	}
 
 	#if (!IS_GENERIC /* Object Arrays do not need a specialized mapped method */ ) {
-		infix func mappedTo#(TYPE_NAME)(array: [T], mapper: T -> T) -> [T] {
-			let size = array.size
+		final extension func mappedTo#(TYPE_NAME)(this: [T], mapper: T -> T) -> [T] {
+			let size = this.size
 			let result = #APPLY{size}
 
 			for i <- 0 ..< size {
-				result[i] = mapper(array[i])
+				result[i] = mapper(this[i])
 			}
 			return result
 		}
 	}
 
 	@OverloadPriority
-	infix func mapped GENERIC_2(array: [T], mapper: T -> U) -> [U] {
-		let size = array.size
+	final extension func mapped GENERIC_2(this: [T], mapper: T -> U) -> [U] {
+		let size = this.size
 		let result = ObjectArray<U>(size)
 		for i <- 0 ..< size {
-			result[i] = mapper(array[i])
+			result[i] = mapper(this[i])
 		}
 		return result
 	}
 
 	#if (!IS_GENERIC /* Object Arrays do not need a specialized flatMapped method */) {
-		infix func flatMappedTo#(TYPE_NAME)(array: [T], mapper: T -> [T]) -> [T] {
+		final extension func flatMappedTo#(TYPE_NAME)(this: [T], mapper: T -> [T]) -> [T] {
 			var size = 0
-			var result = #APPLY{array.size << 2}
+			var result = #APPLY{this.size << 2}
 
-			for v <- array {
+			for v <- this {
 				let inner = mapper(v)
 				let newSize = inner.size
 
@@ -306,21 +306,21 @@ public abstract class #(TYPE_NAME)Array {
 	}
 
 	@OverloadPriority
-	infix func flatMapped GENERIC_2(array: [T], mapper: T -> Iterable<+U>) -> [U] {
-		let list = new mutable.ArrayList<U>(array.size << 2)
+	final extension func flatMapped GENERIC_2(this: [T], mapper: T -> Iterable<+U>) -> [U] {
+		let list = new mutable.ArrayList<U>(this.size << 2)
 
-		for value <- array {
+		for value <- this {
 			list.addAll(mapper(value))
 		}
 		return list.toArray<U>(class U)
 	}
 
-	infix func filtered GENERIC(array: [T], condition: T -> boolean) -> [T] {
-		let size = array.size
-		let result = #APPLY{size, of: array.elementType}
+	final extension func filtered GENERIC(this: [T], condition: T -> boolean) -> [T] {
+		let size = this.size
+		let result = #APPLY{size, of: this.elementType}
 
 		var index = 0
-		for v <- array {
+		for v <- this {
 			if condition(v) {
 				result[index] = v
 				index += 1
@@ -329,15 +329,15 @@ public abstract class #(TYPE_NAME)Array {
 		return result.trim(index)
 	}
 
-	infix func sorted GENERIC(array: [T]) -> [T] {
+	final extension func sorted GENERIC(this: [T]) -> [T] {
 		#if (TYPE_NAME == 'Boolean') {
-			let size = array.size
+			let size = this.size
 			let result = new [boolean](size)
 
 			// Count the number of 'false' entries in the array
 			var falseEntries = 0
 
-			for value <- array {
+			for value <- this {
 				if !value {
 					falseEntries += 1
 				}
@@ -350,7 +350,7 @@ public abstract class #(TYPE_NAME)Array {
 			return result
 		}
 		#else {
-			let result = array.copy
+			let result = this.copy
 			Arrays.sort(result)
 			return result
 		}
@@ -358,13 +358,13 @@ public abstract class #(TYPE_NAME)Array {
 
 	// Search Operations
 
-	infix inline func contains GENERIC(array: [T], value: T) -> boolean = array.indexOf(value, 0) >= 0
+	final extension func contains GENERIC(this: [T], value: T) -> boolean inline = this.indexOf(value, 0) >= 0
 
-	infix inline func indexOf GENERIC(array: [T], value: T) -> int = array.indexOf(value, 0)
+	final extension func indexOf GENERIC(this: [T], value: T) -> int inline = this.indexOf(value, 0)
 
-	infix func indexOf GENERIC(array: [T], value: T, startIndex: int) -> int {
-		while startIndex < array.size {
-			if array[startIndex] == value {
+	final extension func indexOf GENERIC(this: [T], value: T, startIndex: int) -> int {
+		while startIndex < this.size {
+			if this[startIndex] == value {
 				return startIndex
 			}
 			startIndex += 1
@@ -372,11 +372,11 @@ public abstract class #(TYPE_NAME)Array {
 		return -1
 	}
 
-	infix func lastIndexOf GENERIC(array: [T], value: T) -> int = array.lastIndexOf(value, array.size - 1)
+	final extension func lastIndexOf GENERIC(this: [T], value: T) -> int = this.lastIndexOf(value, this.size - 1)
 
-	infix func lastIndexOf GENERIC(array: [T], value: T, startIndex: int) -> int {
+	final extension func lastIndexOf GENERIC(this: [T], value: T, startIndex: int) -> int {
 		while startIndex >= 0 {
-			if array[startIndex] == value {
+			if this[startIndex] == value {
 				return startIndex
 			}
 			startIndex -= 1
@@ -386,56 +386,57 @@ public abstract class #(TYPE_NAME)Array {
 
 	// Copying
 
-	infix inline func copy GENERIC(array: [T]) -> [T] = (array as Object).clone() as [T]
+	final extension func copy GENERIC(this: [T]) -> [T] inline = (this as Object).clone() as [T]
 
-	infix func copy GENERIC(array: [T], withSize size: int) -> [T] {
-		let result = #APPLY{size, of: array.elementType}
+	final extension func copy GENERIC(this: [T], withSize size: int) -> [T] {
+		let result = #APPLY{size, of: this.elementType}
 
-		System.arraycopy(array, 0, result, 0, Math.min(size, array.size))
+		System.arraycopy(this, 0, result, 0, Math.min(size, this.size))
 		return result
 	}
 
-	infix func trim GENERIC(array: [T], toSize size: int) -> [T] = array.size <= size ? array : array.copy(size)
+	final extension func trim GENERIC(this: [T], toSize size: int) -> [T] = this.size <= size ? this : this.copy(size)
 
 	#if(!IS_GENERIC /* Object arrays cannot be boxed */) {
-		infix func boxed(array: [T]) -> [WRAPPER] {
-			let size = array.size
+		final extension func boxed(this: [T]) -> [WRAPPER] {
+			let size = this.size
 			let boxed = new [WRAPPER](size)
 
 			for i <- 0 ..< size {
-				boxed[i] = array[i]
+				boxed[i] = this[i]
 			}
 			return boxed
 		}
 	}
 
-	implicit inline infix func asIterable GENERIC(array: [T]) -> Iterable<T> = array.toList
+	// FIXME use "final extension", when the compiler supports "implicit extension"
+	implicit postfix func asIterable GENERIC(array: [T]) -> Iterable<T> inline = array.toList
 
-	implicit inline infix func asList GENERIC(array: [final T]) -> ImmutableList<T> = array.toList
+	implicit postfix func asList GENERIC(array: [final T]) -> ImmutableList<T> inline = array.toList
 
-	infix func toList GENERIC(array: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(#if (TYPE_NAME == 'Object') {array} #else {array.boxed, trusted: true})
+	final extension func toList GENERIC(this: [T]) -> ImmutableList<T> = new immutable.ArrayList<T>(#if (TYPE_NAME == 'Object') {this} #else {this.boxed, trusted: true})
 
 	// equals, hashCode and toString
 
 	#if (IS_GENERIC) {
-		inline infix func equals(array: [ERASURE]!, other: [ERASURE]!) -> boolean = Arrays.deepEquals(array, other)
+		final extension func equals(this: [ERASURE]!, other: [ERASURE]!) -> boolean inline = Arrays.deepEquals(this, other)
 
-		inline postfix func hashCode(array: [ERASURE]!) -> int = Arrays.deepHashCode(array)
+		override final extension func hashCode(this: [ERASURE]!) -> int inline = Arrays.deepHashCode(this)
 
-		infix func arrayEquals(lhs: any!, rhs: any!) -> boolean = [lhs].equals([rhs])
+		final extension func arrayEquals(this: any!, rhs: any!) -> boolean = [this].equals([rhs])
 
-		postfix func arrayHashCode(obj: any!) -> int = [obj].hashCode
+		final extension func arrayHashCode(this: any!) -> int = [this].hashCode
 	}
 	#else {
-		inline infix func equals(array: [T]!, other: [T]!) -> boolean = Arrays.equals(array, other)
+		final extension func equals(this: [T]!, other: [T]!) -> boolean inline = Arrays.equals(this, other)
 
-		inline infix func hashCode(array: [T]!) -> int = Arrays.hashCode(array)
+		override final extension func hashCode(this: [T]!) -> int inline = Arrays.hashCode(this)
 	}
 
 	// toString
 
-	infix func toString(array: [ERASURE]!) -> String {
-		if let array = array {
+	override final extension func toString(this: [ERASURE]!) -> String {
+		if let array = this {
 			let size = array.size
 			if size == 0 {
 				return '[]'
@@ -450,8 +451,8 @@ public abstract class #(TYPE_NAME)Array {
 		}
 	}
 
-	infix func toString(array: [ERASURE]!, builder: StringBuilder) -> void {
-		if let array = array {
+	final extension func toString(this: [ERASURE]!, builder: StringBuilder) -> void {
+		if let array = this {
 			let size = array.size
 			if size == 0 {
 				builder.append('[]')
@@ -485,40 +486,40 @@ public abstract class #(TYPE_NAME)Array {
 	}
 
 	#if (IS_GENERIC) {
-		postfix func arrayToString(obj: ERASURE) -> String {
-			if obj == null {
+		final extension func arrayToString(this: ERASURE) -> String {
+			if this == null {
 				return 'null'
 			}
 
-			let objectClass = obj!!.dynamicClass
+			let objectClass = this!!.dynamicClass
 			if !objectClass.isArray {
-				return obj!!.toString
+				return this!!.toString
 			}
 
 			#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
 				#let(P = spec['PRIMITIVE'])
-				if objectClass === class [P] { return (obj as [P]).toString }
+				if objectClass === class [P] { return (this as [P]).toString }
 			}
-			return (obj as [ERASURE]).toString
+			return (this as [ERASURE]).toString
 		}
 
-		infix func arrayToString(obj: ERASURE, builder: StringBuilder) -> void {
-			if obj == null {
+		final extension func arrayToString(this: ERASURE, builder: StringBuilder) -> void {
+			if this == null {
 				builder.append('null')
 				return
 			}
 
-			let objectClass = obj!!.dynamicClass
+			let objectClass = this!!.dynamicClass
 			if !objectClass.isArray {
-				builder.append(obj)
+				builder.append(this)
 				return
 			}
 
 			#for (spec <- LibraryGenConstants.PRIMITIVE_SPECS) {
 				#let(P = spec['PRIMITIVE'])
-				if objectClass === class [P] { (obj as [P]).toString(builder); return }
+				if objectClass === class [P] { (this as [P]).toString(builder); return }
 			}
-			(obj as [ERASURE]).toString(builder)
+			(this as [ERASURE]).toString(builder)
 		}
 	}
 }
