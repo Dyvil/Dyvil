@@ -164,12 +164,21 @@ class ExtensionTest {
 
 	// --------------- Reified Generic Extensions ---------------
 
+	extension<@Reified(.OBJECT_CLASS) type T> T {
+		func myType() -> Class<+T> = class T
+	}
+
 	extension<@Reified(.OBJECT_CLASS) type T> [T] {
 		func elementType() -> Class<+T> = class T
 	}
 
 	extension<@Reified(.OBJECT_CLASS) type T> [[T]] {
 		func nestedElementType() -> Class<+T> = class T
+	}
+
+	@Test func myTypes() -> void {
+		"a".myType =?= class String
+		123.myType =?= class Int
 	}
 
 	@Test func elementTypes() -> void {
