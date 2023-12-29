@@ -13,3 +13,9 @@ dependencies {
 	dyvilc project(':compiler')
 	gensrc project(':gensrc')
 }
+
+// --------------- Tasks ---------------
+
+tasks.register('compileTestDyvilDebug', JavaExec) {
+	compileTestDyvil.copyTo(it)
+}
