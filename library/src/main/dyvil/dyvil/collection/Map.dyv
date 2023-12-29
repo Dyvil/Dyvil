@@ -74,19 +74,31 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func allMatch(predicate: BiPredicate<-K, -V>) -> boolean
 	{
-		for (e <- this) if (!predicate.test(e.getKey(), e.getValue())) return false
+		for e <- this {
+			if !predicate.test(e.getKey(), e.getValue()) {
+				return false
+			}
+		}
 		return true
 	}
 
 	func exists(predicate: BiPredicate<-K, -V>) -> boolean
 	{
-		for (e <- this) if (predicate.test(e.getKey(), e.getValue())) return true
+		for e <- this {
+			if predicate.test(e.getKey(), e.getValue()) {
+				return true
+			}
+		}
 		return false
 	}
 
 	func find(predicate: BiPredicate<-K, -V>) -> Entry<K, V>?
 	{
-		for (e <- this) if (predicate.test(e.getKey(), e.getValue())) return e
+		for e <- this {
+			if predicate.test(e.getKey(), e.getValue()) {
+				return e
+			}
+		}
 		return null
 	}
 
@@ -96,7 +108,11 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func contains(key: any!, value: any!) -> boolean
 	{
-		for (e <- this) if (key == e.getKey() && value == e.getValue()) return true
+		for e <- this {
+			if key == e.getKey() && value == e.getValue() {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -305,9 +321,16 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	static func mapEquals(map: [_ : _], other: [_ : _]) -> boolean
 	{
-		if (map.size != other.size) return false
+		if map.size != other.size {
+			return false
+		}
 
-		for (e <- map) if (!other.contains(e)) return false
+		for e <- map {
+			// FIXME does not check values
+			if !other.contains(e) {
+				return false
+			}
+		}
 		return true
 	}
 

@@ -124,20 +124,18 @@ interface Set<type E> extends Collection<E>
 
 	static func distinct(array: [Object!], size: int) -> int
 	{
-		if (size < 2) return size
+		if size < 2 {
+			return size
+		}
 
 		var i = 0
-		while (i < size)
-		{
+		while i < size {
 			var j = i + 1
-			while (j < size)
-			{
+			while j < size {
 				if array[i] == array[j] {
 					size -= 1
 					array[j] = array[size]
-				}
-				else
-				{
+				} else {
 					j += 1
 				}
 			}
@@ -149,21 +147,27 @@ interface Set<type E> extends Collection<E>
 
 	static func sortDistinct(array: [Object!], size: int) -> int
 	{
-		if (size < 2) return size
+		if size < 2 {
+			return size
+		}
 		Arrays.sort(array, 0, size)
 		return distinctSorted(array, size)
 	}
 
 	static func sortDistinct<type T>(array: [T], size: int, comparator: Comparator<-T>) -> int
 	{
-		if (size < 2) return size
+		if size < 2 {
+			return size
+		}
 		Arrays.sort(array, 0, size, comparator)
 		return distinctSorted(array, size)
 	}
 
 	static func distinctSorted(array: [Object!], size: int) -> int
 	{
-		if (size < 2) return size
+		if size < 2 {
+			return size
+		}
 
 		var index = 0
 
@@ -179,19 +183,31 @@ interface Set<type E> extends Collection<E>
 
 	static func isDistinct(array: [Object!], size: int) -> boolean
 	{
-		if (size < 2) return true
+		if size < 2 {
+			return true
+		}
 
 		for i <- 0 ..< size {
 			let o = array[i]
-			for (j <- 0 ..< i) if (o == array[j]) return false
+			for j <- 0 ..< i {
+				if o == array[j] {
+					return false
+				}
+			}
 		}
 		return true
 	}
 
 	static func isDistinctSorted(array: [Object!], size: int) -> boolean
 	{
-		if (size < 2) return true
-		for (i <- 1 ..< size) if (array[i - 1] == array[i]) return false
+		if size < 2 {
+			return true
+		}
+		for i <- 1 ..< size {
+			if array[i - 1] == array[i] {
+				return false
+			}
+		}
 		return true
 	}
 }

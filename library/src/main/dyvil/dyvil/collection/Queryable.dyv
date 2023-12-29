@@ -65,7 +65,9 @@ interface Queryable<type E> extends SizedIterable<E>
 	 */
 	func reduce(reducer: BiFunction<-E, -E, +E>) -> E?
 	{
-		if (this.isEmpty) return null
+		if this.isEmpty {
+			return null
+		}
 
 		let iterator = this.iterator
 		var initial = iterator.next
@@ -75,7 +77,9 @@ interface Queryable<type E> extends SizedIterable<E>
 
 	func reduceOption(reducer: BiFunction<-E, -E, +E>) -> Option<E>
 	{
-		if (this.isEmpty) return None
+		if this.isEmpty {
+			return None
+		}
 		return Some(this.reduce(reducer)!!)
 	}
 
@@ -83,13 +87,21 @@ interface Queryable<type E> extends SizedIterable<E>
 
 	func allMatch(predicate: Predicate<-E>) -> boolean
 	{
-		for (e <- this) if (!predicate.test(e)) return false
+		for e <- this {
+			if !predicate.test(e) {
+				return false
+			}
+		}
 		return true
 	}
 
 	func exists(predicate: Predicate<-E>) -> boolean
 	{
-		for (e <- this) if (predicate.test(e)) return true
+		for e <- this {
+			if predicate.test(e) {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -97,13 +109,21 @@ interface Queryable<type E> extends SizedIterable<E>
 
 	func find(predicate: Predicate<-E>) -> E?
 	{
-		for (e <- this) if (predicate.test(e)) return e
+		for e <- this {
+			if predicate.test(e) {
+				return e
+			}
+		}
 		return null
 	}
 
 	func findOption(predicate: Predicate<-E>) -> Option<E>
 	{
-		for (e <- this) if (predicate.test(e)) return Some(e)
+		for e <- this {
+			if predicate.test(e) {
+				return Some(e)
+			}
+		}
 		return None
 	}
 

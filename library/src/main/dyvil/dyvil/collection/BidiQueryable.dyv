@@ -38,9 +38,12 @@ interface BidiQueryable<E> extends Queryable<E>
 		return null
 	}
 
-	func findLastOption(predicate: Predicate<-E>) -> Option<E>
-	{
-		for (e <- this.reverseIterator) if (predicate.test(e)) return Some(e)
+	func findLastOption(predicate: Predicate<-E>) -> Option<E> {
+		for e <- this.reverseIterator {
+			if (predicate.test(e)) {
+				return Some(e)
+			}
+		}
 		return None
 	}
 
@@ -48,9 +51,10 @@ interface BidiQueryable<E> extends Queryable<E>
 
 	func foldLeft<R>(initialValue: R, reducer: BiFunction<-R, -E, +R>) -> R = this.fold<R>(initialValue, reducer)
 
-	func foldRight<R>(initialValue: R, reducer: BiFunction<-E, -R, +R>) -> R
-	{
-		for (e <- this.reverseIterator) initialValue = reducer(e, initialValue)
+	func foldRight<R>(initialValue: R, reducer: BiFunction<-E, -R, +R>) -> R {
+		for e <- this.reverseIterator {
+			initialValue = reducer(e, initialValue)
+		}
 		return initialValue
 	}
 
@@ -60,9 +64,10 @@ interface BidiQueryable<E> extends Queryable<E>
 
 	func reduceLeftOption(reducer: BiFunction<-E, -E, +E>) -> Option<E> = this.reduceOption(reducer)
 
-	func reduceRight(reducer: BiFunction<-E, -E, +E>) -> E?
-	{
-		if (this.isEmpty) return null
+	func reduceRight(reducer: BiFunction<-E, -E, +E>) -> E? {
+		if this.isEmpty {
+			return null
+		}
 
 		let iterator = this.reverseIterator
 		var initialValue = iterator.next
@@ -71,9 +76,10 @@ interface BidiQueryable<E> extends Queryable<E>
 		return initialValue
 	}
 
-	func reduceRightOption(reducer: BiFunction<-E, -E, +E>) -> Option<E>
-	{
-		if (this.isEmpty) return None
+	func reduceRightOption(reducer: BiFunction<-E, -E, +E>) -> Option<E> {
+		if this.isEmpty {
+			return None
+		}
 		return Some(this.reduceRight(reducer)!!)
 	}
 }

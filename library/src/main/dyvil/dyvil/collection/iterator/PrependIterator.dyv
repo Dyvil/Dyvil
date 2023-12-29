@@ -19,7 +19,9 @@ class PrependIterator<type E>(let head: E, let tail: Iterator<+E>) implements It
 
 	override func next() -> E
 	{
-		if (this.returned) return this.tail.next()
+		if this.returned {
+			return this.tail.next()
+		}
 		this.returned = true
 		return this.head
 	}

@@ -78,7 +78,9 @@ interface Collection<type E> extends Queryable<E>
 	func intersects(collection: Collection<_>) -> boolean
 	{
 		if collection.size < this.size {
-			for (e <- this) if (collection.contains(e)) return true
+			for e <- this {
+				if (collection.contains(e)) return true
+			}
 			return false
 		}
 
@@ -215,7 +217,11 @@ interface Collection<type E> extends Queryable<E>
 	func addAll(elements: Iterable<+E>) -> boolean
 	{
 		var changed = false
-		for (e <- elements) if (this.add(e)) changed = true
+		for e <- elements {
+			if this.add(e) {
+				changed = true
+			}
+		}
 		return changed
 	}
 
@@ -282,7 +288,12 @@ interface Collection<type E> extends Queryable<E>
 	{
 		let it = this.iterator
 		var changed = false
-		for (e <- it) if (!elements.contains(e)) { it.remove; changed = true }
+		for e <- it {
+			if !elements.contains(e) {
+				it.remove()
+				changed = true
+			}
+		}
 		return changed
 	}
 
@@ -316,7 +327,11 @@ interface Collection<type E> extends Queryable<E>
 	override func filter(predicate: Predicate<-E>) -> void
 	{
 		let it = this.iterator
-		for (e <- it) if (!predicate.test(e)) it.remove
+		for e <- it {
+			if !predicate.test(e) {
+				it.remove()
+			}
+		}
 	}
 
 	// Copying Operations
@@ -481,17 +496,27 @@ interface Collection<type E> extends Queryable<E>
 	static func iteratorContains(iterator: Iterator<_>, element: any!) -> boolean
 	{
 		if element == null {
-			for (e <- iterator) if (e == null) return true
+			for e <- iterator {
+				if e == null {
+					return true
+				}
+			}
 			return false
 		}
 
-		for (e <- iterator) if (element.equals(e)) return true
+		for e <- iterator {
+			if element.equals(e) {
+				return true
+			}
+		}
 		return false
 	}
 
 	static func collectionToString(collection: Queryable<_>) -> String
 	{
-		if (collection.isEmpty) return EMPTY_STRING
+		if collection.isEmpty {
+			return EMPTY_STRING
+		}
 
 		let builder = new StringBuilder
 		collection.toString(builder)
@@ -500,22 +525,31 @@ interface Collection<type E> extends Queryable<E>
 
 	static func orderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
 	{
-		if (lhs.size != rhs.size) return false
+		if lhs.size != rhs.size {
+			return false
+		}
 
 		let it1 = lhs.iterator
 		let it2 = rhs.iterator
-		while (it1.hasNext)
-		{
-			if (it1.next != it2.next) return false
+		while it1.hasNext {
+			if it1.next != it2.next {
+				return false
+			}
 		}
 		return true
 	}
 
 	static func unorderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
 	{
-		if (lhs.size != rhs.size) return false
+		if lhs.size != rhs.size {
+			return false
+		}
 
-		for (e <- lhs) if (!rhs.contains(e)) return false
+		for e <- lhs {
+			if !rhs.contains(e) {
+				return false
+			}
+		}
 		return true
 	}
 
@@ -533,35 +567,47 @@ interface Collection<type E> extends Queryable<E>
 
 	static func isSorted(array: [Object!], size: int) -> boolean
 	{
-		if (size < 2) return true
+		if size < 2 {
+			return true
+		}
 
 		for i <- 1 ..< size {
 			let left = array[i - 1] as Comparable
 			let right = array[i] as Comparable
-			if (right < left) return false
+			if right < left {
+				return false
+			}
 		}
 		return true
 	}
 
 	static func isSorted<type E>(array: [E], size: int, comparator: Comparator<-E>) -> boolean
 	{
-		if (size < 2) return true
+		if size < 2 {
+			return true
+		}
 
 		for i <- 1 ..< size {
-			if (comparator.compare(array[i - 1], array[i]) > 0) return false
+			if comparator.compare(array[i - 1], array[i]) > 0 {
+				return false
+			}
 		}
 		return true
 	}
 
 	static func iteratorSorted(iterator: Iterator<_>) -> boolean
 	{
-		if (!iterator.hasNext) return true
+		if !iterator.hasNext {
+			return true
+		}
 
 		var curr = iterator.next as Comparable
 		while (iterator.hasNext)
 		{
 			let next = iterator.next as Comparable
-			if (next < curr) return false
+			if next < curr {
+				return false
+			}
 			curr = next
 		}
 
@@ -570,13 +616,17 @@ interface Collection<type E> extends Queryable<E>
 
 	static func iteratorSorted<type E>(iterator: Iterator<E>, comparator: Comparator<-E>) -> boolean
 	{
-		if (!iterator.hasNext) return true
+		if !iterator.hasNext {
+			return true
+		}
 
 		var curr = iterator.next
 		while (iterator.hasNext)
 		{
 			let next = iterator.next
-			if (comparator.compare(curr, next) > 0) return false
+			if comparator.compare(curr, next) > 0 {
+				return false
+			}
 			curr = next
 		}
 

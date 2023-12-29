@@ -14,7 +14,11 @@ class ConcatIterator<type E>(let parts: Iterator<+E>...) implements Iterator<E>
 
 	override func hasNext() -> boolean
 	{
-		for (i <- this.index ..< this.parts.size) if (this.parts[i].hasNext()) return true
+		for i <- this.index ..< this.parts.size {
+			if this.parts[i].hasNext() {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -23,8 +27,7 @@ class ConcatIterator<type E>(let parts: Iterator<+E>...) implements Iterator<E>
 		let size = this.parts.size
 		for i <- this.index ..< size {
 			let part = this.parts[i]
-			if (part.hasNext())
-			{
+			if part.hasNext() {
 				this.index = i
 				return part.next()
 			}

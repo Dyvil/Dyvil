@@ -64,7 +64,9 @@ abstract class AbstractBitSet implements Set<int>
 	protected func bitSet(bit: int) -> boolean
 	{
 		let wordIndex = wordIndex(bit)
-		if (wordIndex >= this.words.size) return false
+		if wordIndex >= this.words.size {
+			return false
+		}
 
 		let bitIndex = bitIndex(bit)
 		let word = this.words[wordIndex]
@@ -107,7 +109,9 @@ abstract class AbstractBitSet implements Set<int>
 	protected func clearBit(bit: int) -> void
 	{
 		let wordIndex = wordIndex(bit)
-		if (wordIndex >= this.words.size) return // bit is already 0
+		if wordIndex >= this.words.size {
+			return // bit is already 0
+		}
 
 		let word = this.words[wordIndex]
 		let newWord = word & ~mask(bitIndex(bit))

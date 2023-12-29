@@ -42,37 +42,46 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 
 	override func added(element: int) -> BitSet
 	{
-		if (this.bitSet(element)) return this
+		if this.bitSet(element) {
+			return this
+		}
 
 		let copy = new BitSet(this)
 		copy.setBit(element)
 		return copy
 	}
 
-	override func removed(element: any!) -> BitSet
-	{
-		if (!(element is Int)) return this
+	override func removed(element: any!) -> BitSet {
+		if !(element is Int) {
+			return this
+		}
 
 		let bit = element as int
-		if (!this.bitSet(bit)) return this
+		if !this.bitSet(bit) {
+			return this
+		}
 
 		let copy = new BitSet(this)
 		copy.clearBit(bit)
 		return copy
 	}
 
-	override func union(collection: Collection<+int>) -> BitSet
-	{
-		if (collection.isEmpty) return this
+	override func union(collection: Collection<+int>) -> BitSet {
+		if collection.isEmpty {
+			return this
+		}
 
 		let copy = new BitSet(this)
-		for (element <- collection) copy.setBit(element)
+		for element <- collection {
+			copy.setBit(element)
+		}
 		return copy
 	}
 
-	override func difference(collection: Collection<_>) -> BitSet
-	{
-		if (collection.isEmpty || this.isEmpty) return this
+	override func difference(collection: Collection<_>) -> BitSet {
+		if collection.isEmpty || this.isEmpty {
+			return this
+		}
 
 		let copy = new BitSet(this)
 		for element <- collection {
@@ -83,14 +92,14 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	override func intersection(collection: Collection<+int>) -> BitSet
-	{
-		if (collection.isEmpty || this.isEmpty) return this
+	override func intersection(collection: Collection<+int>) -> BitSet {
+		if collection.isEmpty || this.isEmpty {
+			return this
+		}
 
 		let copy = new BitSet(this.size)
 		for element <- collection {
-			if (this.bitSet(element))
-			{
+			if this.bitSet(element) {
 				copy.setBit(element)
 			}
 		}
@@ -99,20 +108,22 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 
 	override func symmetricDifference(collection: Collection<+int>) -> BitSet
 	{
-		if (collection.isEmpty) return this
-		if (this.isEmpty) return new BitSet(collection)
+		if collection.isEmpty {
+			return this
+		}
+		if this.isEmpty {
+			return new BitSet(collection)
+		}
 
 		let copy = new BitSet
 		for element <- collection {
-			if (!this.bitSet(element))
-			{
+			if !this.bitSet(element) {
 				copy.setBit(element)
 			}
 		}
 
 		for element <- this {
-			if (!collection.contains(element))
-			{
+			if !collection.contains(element) {
 				copy.setBit(element)
 			}
 		}
@@ -136,7 +147,9 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 	override func filtered(predicate: java.util.function.Predicate<-int>) -> BitSet
 	{
 		let copy = new BitSet(this.size)
-		for (element <- this) if (predicate.test(element)) copy.setBit(element)
+		for element <- this {
+    if (predicate.test(element)) copy.setBit(element)
+}
 		return copy
 	}
 
