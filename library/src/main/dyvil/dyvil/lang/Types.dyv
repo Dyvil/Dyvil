@@ -12,7 +12,7 @@ final class Types {
 	final extension func staticType<@Reified(.TYPE) type T: Object>(this: T) -> Type<T> inline = type T
 
 	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
-	postfix func dynamicClass<type T: Object>(value: T) -> Class<+T> = value.getClass as Class<+T>
+	final extension func dynamicClass<type T: Object>(this: T) -> Class<+T> = this.getClass() as Class<+T>
 
 	// Class Extensions
 

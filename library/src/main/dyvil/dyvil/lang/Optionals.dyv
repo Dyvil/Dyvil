@@ -106,5 +106,5 @@ final class Optionals {
 
 	// --------------- Hash Code ---------------
 
-	postfix func hashCode<type T: any>(optional: T?) -> int = optional?.hashCode ?? 0
+	final extension func hashCode<type T: any>(this: T?) -> int = this?.hashCode ?? 0
 }

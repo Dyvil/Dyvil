@@ -5,5 +5,5 @@ package dyvil.util
  * apply method available that will be called when applying a closure to an instance of this type.
  */
 interface Configurable {
-	infix inline func apply<type T: Configurable>(self: T, f: Configure<T>) -> T = self.use(f)
+	final extension func apply<type T: Configurable>(this: T, f: Configure<T>) -> T inline = this.use(f)
 }

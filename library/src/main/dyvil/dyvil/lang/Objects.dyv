@@ -17,11 +17,11 @@ final class Objects {
 
 	static func run<R>(f: -> R) -> R inline = f()
 
-	inline infix func run<T, R>(self: T, f: T.() -> R) -> R = f(self)
+	final extension func run<T, R>(this: T, f: T.() -> R) -> R inline = f(this)
 
-	inline infix func use<T>(self: T, f: T.() -> void) -> T { f self; self }
+	final extension func use<T>(this: T, f: T.() -> void) -> T inline { f this; this }
 
-	inline static func with<T, R>(receiver: T, f: T -> R) -> R = f(receiver)
+	final extension func with<T, R>(this: T, f: T -> R) -> R inline = f(this)
 
 	@Intrinsic([ LOAD_0 ])
 	static func implicitly<type T>(implicit value: T) -> T = value
