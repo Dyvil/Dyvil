@@ -20,10 +20,10 @@ interface SizedIterable<type E> extends Iterable<E>
 
 	// For Each
 
-	override func forEach(action: Consumer<-E>!) -> void = for (e <- this) action.accept(e)
+	override func forEach(action: Consumer<-E>!) -> void = for e <- this { action.accept(e) }
 
 	@OverloadPriority
-	func forEach(action: E -> void) -> void = for (e <- this) action(e)
+	func forEach(action: E -> void) -> void = for e <- this { action(e) }
 
 	inline static func |_|(it: SizedIterable<_>) -> int = it.size
 }

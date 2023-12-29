@@ -133,14 +133,20 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 	override func mapped<R>(mapper: java.util.function.Function<-int, +R>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
-		for (element <- this) builder.add(mapper(element))
+		for element <- this {
+			builder.add(mapper(element))
+		}
 		return builder.build
 	}
 
 	override func flatMapped<R>(mapper: java.util.function.Function<-int, +Iterable<+R>>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
-		for (element <- this) for (result <- mapper.apply(element)) builder.add(result)
+		for element <- this {
+			for result <- mapper.apply(element) {
+				builder.add(result)
+			}
+		}
 		return builder.build
 	}
 
@@ -148,8 +154,10 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 	{
 		let copy = new BitSet(this.size)
 		for element <- this {
-    if (predicate.test(element)) copy.setBit(element)
-}
+			if predicate.test(element) {
+				copy.setBit(element)
+			}
+		}
 		return copy
 	}
 

@@ -23,7 +23,7 @@ interface Stack<type E> extends Queryable<E>
 	 * @param elements
 	 * 	the elements to add
 	 */
-	func pushAll(elements: Iterable<+E>) -> void = for (e <- elements) this.push(e)
+	func pushAll(elements: Iterable<+E>) -> void = for e <- elements { this.push(e) }
 
 	/**
 	 * Removes and returns the first element from the top of this stack. If this stack is empty, {@code null} is
@@ -40,7 +40,7 @@ interface Stack<type E> extends Queryable<E>
 	 * @param count
 	 * 	the number of elements to remove
 	 */
-	func pop(count: int) -> void = for (i <- 0 ..< count) this.pop()
+	func pop(count: int) -> void = for i <- 0 ..< count { this.pop() }
 
 	/**
 	 * Returns the top element of this stack. Unlike {@link #pop()}, this method does not remove the element from the

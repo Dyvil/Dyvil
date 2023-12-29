@@ -27,7 +27,9 @@ class ArrayIterator<type E>(let array: [E], var index: int, let size: int) imple
 
 	override func next() -> E
 	{
-		if (!this.hasNext()) throw new NoSuchElementException
+		if !this.hasNext() {
+			throw new NoSuchElementException
+		}
 		let element = this.array[this.index]
 		this.index += 1
 		return element

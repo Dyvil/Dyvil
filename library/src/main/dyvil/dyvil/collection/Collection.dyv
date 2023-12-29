@@ -79,7 +79,9 @@ interface Collection<type E> extends Queryable<E>
 	{
 		if collection.size < this.size {
 			for e <- this {
-				if (collection.contains(e)) return true
+				if collection.contains(e) {
+					return true
+				}
 			}
 			return false
 		}
@@ -260,7 +262,9 @@ interface Collection<type E> extends Queryable<E>
 	func removeAll(elements: Iterable<_>) -> boolean
 	{
 		var changed = false
-		for (e <- elements) changed |= this.remove(e)
+		for e <- elements {
+			changed |= this.remove(e)
+		}
 		return changed
 	}
 

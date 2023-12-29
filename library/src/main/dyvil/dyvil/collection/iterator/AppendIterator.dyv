@@ -19,9 +19,13 @@ class AppendIterator<type E>(let head: Iterator<+E>, let tail: E) implements Ite
 
 	override func next() -> E
 	{
-		if (this.head.hasNext()) return this.head.next()
+		if this.head.hasNext() {
+			return this.head.next()
+		}
 
-		if (this.hasReturned) throw new NoSuchElementException
+		if this.hasReturned {
+			throw new NoSuchElementException
+		}
 
 		this.hasReturned = true
 		return this.tail

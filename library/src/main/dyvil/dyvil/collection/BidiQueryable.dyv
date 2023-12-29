@@ -40,7 +40,7 @@ interface BidiQueryable<E> extends Queryable<E>
 
 	func findLastOption(predicate: Predicate<-E>) -> Option<E> {
 		for e <- this.reverseIterator {
-			if (predicate.test(e)) {
+			if predicate.test(e) {
 				return Some(e)
 			}
 		}
@@ -72,7 +72,9 @@ interface BidiQueryable<E> extends Queryable<E>
 		let iterator = this.reverseIterator
 		var initialValue = iterator.next
 
-		for (e <- iterator) initialValue = reducer(e, initialValue)
+		for e <- iterator {
+			initialValue = reducer(e, initialValue)
+		}
 		return initialValue
 	}
 

@@ -19,7 +19,9 @@ class SingletonIterator<type E>(let element: E) implements Iterator<E>
 
 	override func next() -> E
 	{
-		if (this.returned) throw new NoSuchElementException
+		if this.returned {
+			throw new NoSuchElementException
+		}
 		this.returned = true
 		return this.element
 	}

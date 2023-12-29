@@ -47,7 +47,9 @@ class BitSet extends AbstractBitSet implements MutableSet<int>
 
 	override func add(element: int) -> boolean
 	{
-		if (this.bitSet(element)) return false
+		if this.bitSet(element) {
+			return false
+		}
 
 		this.setBit(element)
 		return true
@@ -55,10 +57,14 @@ class BitSet extends AbstractBitSet implements MutableSet<int>
 
 	override func remove(element: any!) -> boolean
 	{
-		if (!(element is Int)) return false
+		if !(element is Int) {
+			return false
+		}
 
 		let bit = element as int
-		if (!this.bitSet(bit)) return false
+		if !this.bitSet(bit) {
+			return false
+		}
 
 		this.clearBit(bit)
 		return true
@@ -70,7 +76,9 @@ class BitSet extends AbstractBitSet implements MutableSet<int>
 	{
 		let ints = this.toIntArray
 		this.clear()
-		for (i <- ints) this.add(mapper(i))
+		for i <- ints {
+			this.add(mapper(i))
+		}
 	}
 
 	override func flatMap(mapper: java.util.function.Function<-int, +Iterable<+int>>)
@@ -78,7 +86,11 @@ class BitSet extends AbstractBitSet implements MutableSet<int>
 		let ints = this.toIntArray
 
 		this.clear()
-		for (i <- ints) for (newValue <- mapper(i)) this.add(newValue)
+		for i <- ints {
+			for newValue <- mapper(i) {
+				this.add(newValue)
+			}
+		}
 	}
 
 	override func copy() -> MutableSet<int> = this.mutableCopy

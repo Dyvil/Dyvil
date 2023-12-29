@@ -50,7 +50,9 @@ interface Queryable<type E> extends SizedIterable<E>
 	 */
 	func fold<R>(initial: R, reducer: BiFunction<-R, -E, +R>) -> R
 	{
-		for (e <- this) initial = reducer(initial, e)
+		for e <- this {
+			initial = reducer(initial, e)
+		}
 		return initial
 	}
 
@@ -71,7 +73,9 @@ interface Queryable<type E> extends SizedIterable<E>
 
 		let iterator = this.iterator
 		var initial = iterator.next
-		for (e <- iterator) initial = reducer(initial, e)
+		for e <- iterator {
+			initial = reducer(initial, e)
+		}
 		return initial
 	}
 
@@ -198,7 +202,9 @@ interface Queryable<type E> extends SizedIterable<E>
 
 		let iterator = this.iterator
 		builder.append(iterator.next) // first
-		for (e <- iterator) builder.append(separator).append(e)
+		for e <- iterator {
+			builder.append(separator).append(e)
+		}
 		builder.append(end)
 	}
 }

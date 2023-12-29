@@ -23,17 +23,23 @@ abstract class AbstractBitSet implements Set<int>
 
 	public init(elements: [int]) : this(elements.size)
 	{
-		for (i <- elements) this.setBit(i)
+		for i <- elements {
+			this.setBit(i)
+		}
 	}
 
 	public init(iterable: Iterable<+int>) : this()
 	{
-		for (i <- iterable) this.setBit(i)
+		for i <- iterable {
+			this.setBit(i)
+		}
 	}
 
 	public init(iterable: SizedIterable<+int>) : this(iterable.size)
 	{
-		for (i <- iterable) this.setBit(i)
+		for i <- iterable {
+			this.setBit(i)
+		}
 	}
 
 	public init(bitSet: AbstractBitSet)
@@ -75,10 +81,8 @@ abstract class AbstractBitSet implements Set<int>
 
 	protected func nextSetBit(start: int) -> int
 	{
-		for (i <- (start + 1) ..< (this.words.size * 64))
-		{
-			if (this.bitSet(i))
-			{
+		for i <- (start + 1) ..< (this.words.size * 64) {
+			if this.bitSet(i) {
 				return i
 			}
 		}
@@ -137,7 +141,9 @@ abstract class AbstractBitSet implements Set<int>
 		override func next() -> int
 		{
 			let current = this.currentBit
-			if (current < 0) throw new NoSuchElementException
+			if current < 0 {
+				throw new NoSuchElementException
+			}
 
 			this.currentBit = this<AbstractBitSet>.nextSetBit(current)
 			return current
@@ -147,7 +153,9 @@ abstract class AbstractBitSet implements Set<int>
 
 		override func remove() -> void
 		{
-			if (this.currentBit < 0) throw new NoSuchElementException
+			if this.currentBit < 0 {
+				throw new NoSuchElementException
+			}
 
 			this<AbstractBitSet>.removeAt(this.currentBit)
 			this.currentBit = this<AbstractBitSet>.nextSetBit(this.currentBit)
@@ -166,8 +174,7 @@ abstract class AbstractBitSet implements Set<int>
 		for wordIndex <- 0 ..< this.words.size {
 			let word = this.words[wordIndex]
 			for bit <- 0 ..< 64 {
-				if (bitSet(word, bit))
-				{
+				if bitSet(word, bit) {
 					store[index] = wordIndex * 64 + bit
 					index += 1
 				}
@@ -189,8 +196,7 @@ abstract class AbstractBitSet implements Set<int>
 		for wordIndex <- 0 ..< this.words.size {
 			let word = this.words[wordIndex]
 			for bit <- 0 ..< 64 {
-				if (bitSet(word, bit))
-				{
+				if bitSet(word, bit) {
 					store[index] = wordIndex * 64 + bit
 					index += 1
 				}
@@ -213,7 +219,9 @@ abstract class AbstractBitSet implements Set<int>
 	override func toJava() -> java.util.Set<int>
 	{
 		let hashSet = new java.util.HashSet<int>
-		for (element <- this) hashSet.add(element)
+		for element <- this {
+			hashSet.add(element)
+		}
 		return hashSet
 	}
 

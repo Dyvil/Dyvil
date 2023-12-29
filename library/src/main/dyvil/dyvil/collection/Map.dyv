@@ -64,13 +64,13 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func parallelValueStream() -> Stream<V> = StreamSupport.stream(this.valueSpliterator, true)
 
-	func forEach(action: Consumer<-Entry<K, V>>) -> void = for (e <- this) action.accept(e)
+	func forEach(action: Consumer<-Entry<K, V>>) -> void = for e <- this { action.accept(e) }
 
-	func forEach(action: BiConsumer<-K, -V>) -> void = for (e <- this) action.accept(e.getKey(), e.getValue())
+	func forEach(action: BiConsumer<-K, -V>) -> void = for e <- this { action.accept(e.getKey(), e.getValue()) }
 
-	func forEachKey(action: Consumer<-K>) -> void = for (e <- this) action.accept(e.getKey())
+	func forEachKey(action: Consumer<-K>) -> void = for e <- this { action.accept(e.getKey()) }
 
-	func forEachValue(action: Consumer<-V>) -> void = for (e <- this) action.accept(e.getValue())
+	func forEachValue(action: Consumer<-V>) -> void = for e <- this { action.accept(e.getValue()) }
 
 	func allMatch(predicate: BiPredicate<-K, -V>) -> boolean
 	{
@@ -127,7 +127,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 		override func set(value: V) -> void = this<Map<K, V>>.put(key, value)
 	}
 
-	func get(key: any!) -> V? = if (let e = this.getEntry(key)) { return e.getValue() } else { return null }
+	func get(key: any!) -> V? = this.getEntry(key)?.getValue()
 
 	abstract func getEntry(key: any!) -> Entry<K, V>?
 
@@ -288,8 +288,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 	func toString(builder: StringBuilder, open: String, entrySeparator: String, keyValueSeparator: String, close: String) -> void
 	{
 		builder.append(open)
-		if (this.isEmpty())
-		{
+		if this.isEmpty() {
 			builder.append(close)
 			return
 		}

@@ -13,7 +13,7 @@ interface ImmutableCollection<type E> extends Collection<E>
 	{
 		func add(element: E) -> void
 
-		func addAll(elements: Iterable<+E>) -> void = for (e <- elements) this.add(e)
+		func addAll(elements: Iterable<+E>) -> void = for e <- elements { this.add(e) }
 
 		func build() -> ImmutableCollection<E>!
 	}

@@ -45,7 +45,7 @@ interface Queue<type E> extends Queryable<E>
 	 * @param elements
 	 * 	the elements to append
 	 */
-	func offerAll(elements: Iterable<+E>) -> void = for (e <- elements) this.offer(e)
+	func offerAll(elements: Iterable<+E>) -> void = for e <- elements { this.offer(e) }
 
 	/**
 	 * Removes and returns the last element in this queue. If this queue is empty, {@code null} is returned.
@@ -61,7 +61,7 @@ interface Queue<type E> extends Queryable<E>
 	 * @param count
 	 * 	the number of elements to remove
 	 */
-	func remove(count: int) -> void = for (i <- 0 ..< count) this.remove()
+	func remove(count: int) -> void = for i <- 0 ..< count { this.remove() }
 
 	/**
 	 * Returns a copy of this queue that contains the same elements as this queue in the same order.
