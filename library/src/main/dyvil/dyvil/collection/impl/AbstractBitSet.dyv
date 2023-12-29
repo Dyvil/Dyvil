@@ -88,8 +88,7 @@ abstract class AbstractBitSet implements Set<int>
 		let wordIndex = wordIndex(bit)
 		let value = mask(bitIndex(bit))
 
-		if (wordIndex >= this.words.size)
-		{
+		if wordIndex >= this.words.size {
 			this.ensureWordCapacity(wordIndex + 1)
 			this.words[wordIndex] = value // no need to OR here, the word is definitely all-0
 			this.size += 1
@@ -99,8 +98,7 @@ abstract class AbstractBitSet implements Set<int>
 		let word = this.words[wordIndex]
 		let newWord = word | value
 
-		if (newWord != word)
-		{
+		if newWord != word {
 			this.words[wordIndex] = newWord
 			this.size += 1
 		}
@@ -114,8 +112,7 @@ abstract class AbstractBitSet implements Set<int>
 		let word = this.words[wordIndex]
 		let newWord = word & ~mask(bitIndex(bit))
 
-		if (newWord != word)
-		{
+		if newWord != word {
 			this.words[wordIndex] = newWord
 			this.size -= 1
 		}
@@ -162,11 +159,9 @@ abstract class AbstractBitSet implements Set<int>
 
 	override func toArray(index: int, store: [Object!])
 	{
-		for (wordIndex <- 0 ..< this.words.size)
-		{
+		for wordIndex <- 0 ..< this.words.size {
 			let word = this.words[wordIndex]
-			for (bit <- 0 ..< 64)
-			{
+			for bit <- 0 ..< 64 {
 				if (bitSet(word, bit))
 				{
 					store[index] = wordIndex * 64 + bit
@@ -187,11 +182,9 @@ abstract class AbstractBitSet implements Set<int>
 
 	func toIntArray(index: int, store: [int]) -> void
 	{
-		for (wordIndex <- 0 ..< this.words.size)
-		{
+		for wordIndex <- 0 ..< this.words.size {
 			let word = this.words[wordIndex]
-			for (bit <- 0 ..< 64)
-			{
+			for bit <- 0 ..< 64 {
 				if (bitSet(word, bit))
 				{
 					store[index] = wordIndex * 64 + bit
@@ -233,8 +226,7 @@ abstract class AbstractBitSet implements Set<int>
 		out.writeInt(this.size)
 		out.writeInt(this.words.size)
 
-		for (word <- this.words)
-		{
+		for word <- this.words {
 			out.writeLong(word)
 		}
 	}
@@ -247,8 +239,7 @@ abstract class AbstractBitSet implements Set<int>
 		let wordCount = in.readInt()
 
 		this.words = new [long](wordCount)
-		for (i <- 0 ..< wordCount)
-		{
+		for i <- 0 ..< wordCount {
 			this.words[i] = in.readLong()
 		}
 	}

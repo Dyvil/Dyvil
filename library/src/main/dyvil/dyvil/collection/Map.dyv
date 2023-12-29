@@ -211,7 +211,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func toArray(store: [Entry<K, V>]) -> void = this.toArray(0, store)
 
-	func toArray(index: int, store: [Entry<K, V>]) -> void = for (e <- this) { store[index] = e; index += 1 }
+	func toArray(index: int, store: [Entry<K, V>]) -> void = for e <- this { store[index] = e; index += 1 }
 
 	func toKeyArray() -> [any!] = new [any!](this.size).{ this.toKeyArray(0, $0); $0 }
 
@@ -219,7 +219,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func toKeyArray(store: [any!]) -> void = this.toKeyArray(0, store)
 
-	func toKeyArray(index: int, store: [any!]) -> void = for (k <- this.keyIterator) { store[index] = k; index += 1 }
+	func toKeyArray(index: int, store: [any!]) -> void = for k <- this.keyIterator { store[index] = k; index += 1 }
 
 	func toValueArray() -> [any!] = new [any!](this.size).{ this.toValueArray(0, $0); $0 }
 
@@ -227,7 +227,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 
 	func toValueArray(store: [any!]) -> void = this.toValueArray(0, store)
 
-	func toValueArray(index: int, store: [any!]) -> void = for (v <- this.valueIterator) { store[index] = v; index += 1 }
+	func toValueArray(index: int, store: [any!]) -> void = for v <- this.valueIterator { store[index] = v; index += 1 }
 
 	abstract func copy() -> [K:V]
 
@@ -315,8 +315,7 @@ interface Map<type K: Object!, type V: Object!> extends SizedIterable<Entry<K, V
 	{
 		var sum = 0
 		var product = 1
-		for (e <- map)
-		{
+		for e <- map {
 			let keyHash = e.getKey()?.hashCode ?? 0
 			let valueHash = e.getValue()?.hashCode ?? 0
 			let hash = keyHash * 31 + valueHash

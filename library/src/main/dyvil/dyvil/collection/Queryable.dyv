@@ -171,8 +171,7 @@ interface Queryable<type E> extends SizedIterable<E>
 	func toString(builder: StringBuilder, start: String, separator: String, end: String) -> void
 	{
 		builder.append(start)
-		if (this.isEmpty)
-		{
+		if this.isEmpty {
 			builder.append(end)
 			return
 		}

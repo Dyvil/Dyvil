@@ -75,10 +75,8 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		if (collection.isEmpty || this.isEmpty) return this
 
 		let copy = new BitSet(this)
-		for (element <- collection)
-		{
-			if (element is Int)
-			{
+		for element <- collection {
+			if element is Int {
 				copy.clearBit(element as int)
 			}
 		}
@@ -90,8 +88,7 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		if (collection.isEmpty || this.isEmpty) return this
 
 		let copy = new BitSet(this.size)
-		for (element <- collection)
-		{
+		for element <- collection {
 			if (this.bitSet(element))
 			{
 				copy.setBit(element)
@@ -106,16 +103,14 @@ class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		if (this.isEmpty) return new BitSet(collection)
 
 		let copy = new BitSet
-		for (element <- collection)
-		{
+		for element <- collection {
 			if (!this.bitSet(element))
 			{
 				copy.setBit(element)
 			}
 		}
 
-		for (element <- this)
-		{
+		for element <- this {
 			if (!collection.contains(element))
 			{
 				copy.setBit(element)

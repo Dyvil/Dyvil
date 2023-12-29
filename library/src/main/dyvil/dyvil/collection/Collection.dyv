@@ -39,8 +39,7 @@ interface Collection<type E> extends Queryable<E>
 	func isDistinct() -> boolean
 	{
 		let size = this.size
-		if (size < 2)
-		{
+		if size < 2 {
 			return true
 		}
 
@@ -78,13 +77,16 @@ interface Collection<type E> extends Queryable<E>
 
 	func intersects(collection: Collection<_>) -> boolean
 	{
-		if (collection.size < this.size)
-		{
+		if collection.size < this.size {
 			for (e <- this) if (collection.contains(e)) return true
 			return false
 		}
 
-		for (e <- collection) if (this.contains(e)) return true
+		for e <- collection {
+			if this.contains(e) {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -368,8 +370,7 @@ interface Collection<type E> extends Queryable<E>
 	 */
 	func toArray(index: int, store: [Object!]) -> void
 	{
-		for (e <- this)
-		{
+		for e <- this {
 			store[index] = e
 			index += 1
 		}
@@ -456,8 +457,7 @@ interface Collection<type E> extends Queryable<E>
 
 	override func toString(builder: StringBuilder) -> void
 	{
-		if (this.isEmpty)
-		{
+		if this.isEmpty {
 			builder.append(EMPTY_STRING)
 			return
 		}
@@ -480,8 +480,7 @@ interface Collection<type E> extends Queryable<E>
 
 	static func iteratorContains(iterator: Iterator<_>, element: any!) -> boolean
 	{
-		if (element == null)
-		{
+		if element == null {
 			for (e <- iterator) if (e == null) return true
 			return false
 		}
@@ -524,8 +523,7 @@ interface Collection<type E> extends Queryable<E>
 	{
 		var sum = 0
 		var product = 0
-		for (e <- collection)
-		{
+		for e <- collection {
 			let hash = e.hashCode
 			sum += hash
 			product *= hash
@@ -537,8 +535,7 @@ interface Collection<type E> extends Queryable<E>
 	{
 		if (size < 2) return true
 
-		for (i <- 1 ..< size)
-		{
+		for i <- 1 ..< size {
 			let left = array[i - 1] as Comparable
 			let right = array[i] as Comparable
 			if (right < left) return false
@@ -550,8 +547,7 @@ interface Collection<type E> extends Queryable<E>
 	{
 		if (size < 2) return true
 
-		for (i <- 1 ..< size)
-		{
+		for i <- 1 ..< size {
 			if (comparator.compare(array[i - 1], array[i]) > 0) return false
 		}
 		return true

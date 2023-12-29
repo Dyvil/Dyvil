@@ -29,9 +29,12 @@ interface BidiQueryable<E> extends Queryable<E>
 
 	func findFirstOption(predicate: Predicate<-E>) -> Option<E> = this.findOption(predicate)
 
-	func findLast(predicate: Predicate<-E>) -> E?
-	{
-		for (e <- this.reverseIterator) if (predicate.test(e)) return e
+	func findLast(predicate: Predicate<-E>) -> E? {
+		for e <- this.reverseIterator {
+			if predicate.test(e) {
+				return e
+			}
+		}
 		return null
 	}
 

@@ -9,7 +9,7 @@ case class FlatMapIterator<type E, type R>(let base: Iterator<+E>, let mapper: F
 	var current: Iterator<+R>?
 
 	override func hasNext() -> boolean {
-		if (let current = this.current, current.hasNext) {
+		if let current = this.current, current.hasNext {
 			return true
 		}
 

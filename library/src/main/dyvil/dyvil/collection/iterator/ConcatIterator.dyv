@@ -21,8 +21,7 @@ class ConcatIterator<type E>(let parts: Iterator<+E>...) implements Iterator<E>
 	override func next() -> E
 	{
 		let size = this.parts.size
-		for (i <- this.index ..< size)
-		{
+		for i <- this.index ..< size {
 			let part = this.parts[i]
 			if (part.hasNext())
 			{
