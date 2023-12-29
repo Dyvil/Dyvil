@@ -20,9 +20,6 @@ case class Marker(
 
 	let info: List<String> = new ArrayList<String>() { public get }
 
-	@Deprecated
-	var isIgnored: boolean { get: this.level == MarkerLevel.IGNORE }
-
 	var isError: boolean { get: this.level.isError }
 
 	var isWarning: boolean { get: this.level.isWarning }
