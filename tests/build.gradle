@@ -16,6 +16,14 @@ dependencies {
 
 // --------------- Tasks ---------------
 
+compileTestDyvil {
+	options.encoding = 'UTF-8'
+}
+
+compileTestDyvilGenSrc {
+	options.encoding = 'UTF-8'
+}
+
 tasks.register('compileTestDyvilDebug', JavaExec) {
 	compileTestDyvil.copyTo(it)
 }
