@@ -3,10 +3,10 @@ package dyvil.util
 enum MarkerLevel(
 	let isError:   boolean { public get }
 	let isWarning: boolean { public get }
-	let color:     String! { public get }
+	let color:     String  { public get }
 ) {
 	@Deprecated
-	case IGNORE  = (false, false, null)
+	case IGNORE  = (false, false, "")
 	case INFO    = (false, false, Console.ANSI_CYAN)
 	case WARNING = (false, true,  Console.ANSI_YELLOW)
 	case ERROR   = (true,  false, Console.ANSI_RED)
