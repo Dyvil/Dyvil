@@ -19,11 +19,10 @@ mainClassName = 'dyvilx.tools.repl.Main'
 
 dependencies {
 	// https://mvnrepository.com/artifact/org.jline/jline
-	compile group: 'org.jline', name: 'jline', version: '3.9.0'
+	implementation group: 'org.jline', name: 'jline', version: '3.9.0'
 
-	compile project(':library')
-	compile project(':compiler')
-	compileOnly libraryDependency
+	implementation libraryDependency
+	implementation project(':compiler')
 }
 
 // --------------- Source Copying ---------------
