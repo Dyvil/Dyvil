@@ -21,7 +21,7 @@ final class Objects {
 
 	final extension func use<T>(this: T, f: T.() -> void) -> T inline { f this; this }
 
-	final extension func with<T, R>(this: T, f: T -> R) -> R inline = f(this)
+	static func with<T, R>(it: T, f: T -> R) -> R inline = f(it)
 
 	@Intrinsic([ LOAD_0 ])
 	static func implicitly<type T>(implicit value: T) -> T = value
