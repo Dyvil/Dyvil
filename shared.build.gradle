@@ -11,23 +11,6 @@ apply plugin: 'signing'
 
 group = 'org.dyvil'
 
-/* TODO publishInfo {
-	organization = 'dyvil'
-	githubRepo = 'Dyvil/Dyvil'
-
-	license {
-		name = 'BSD 3-Clause'
-		url = 'https://opensource.org/licenses/BSD-3-Clause'
-	}
-
-	developer {
-		id = 'clashsoft'
-		name = 'Adrian Kunz'
-		email = 'clashsoft@hotmail.com'
-	}
-}
-*/
-
 // --------------- Dependencies ---------------
 
 repositories {

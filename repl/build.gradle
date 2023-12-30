@@ -12,7 +12,6 @@ plugins {
 
 version = getTagVersion('repl/')
 description = 'The Dyvil REPL interactive shell'
-// TODO publishInfo.labels = [ 'dyvil', 'repl', 'interactive', 'shell' ]
 
 mainClassName = 'dyvilx.tools.repl.Main'
 

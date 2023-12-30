@@ -8,7 +8,6 @@ plugins {
 
 version = getTagVersion('gensrc/')
 description = 'The Dyvil GenSrc template source code generator'
-// TODO publishInfo.labels = [ 'dyvil', 'gensrc', 'template', 'code-generator' ]
 
 mainClassName = 'dyvilx.tools.gensrc.Main'
 

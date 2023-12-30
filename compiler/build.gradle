@@ -10,7 +10,6 @@ plugins {
 
 version = getTagVersion('compiler/')
 description = 'The Dyvil Compiler'
-// TODO publishInfo.labels = [ 'dyvil', 'compiler', 'jvm', 'bytecode' ]
 
 mainClassName = 'dyvilx.tools.compiler.Main'
 
