@@ -22,7 +22,7 @@ ext {
 	getTagVersion = this.&getTagVersion
 }
 
-private String getTagVersion(String module = '') {
+private String getTagVersion(String module = '', boolean release = hasProperty("DYVIL_RELEASE")) {
 	if (!module.isEmpty() && !module.endsWith("/")) {
 		module += '/'
 	}
@@ -36,7 +36,7 @@ private String getTagVersion(String module = '') {
 
 	final String newestTag = matcher.group(0)
 	final String newestVersion = matcher.group(1)
-	if (System.getenv("DYVIL_RELEASE")) {
+	if (release) {
 		return newestVersion
 	}
 
@@ -67,8 +67,15 @@ nexusPublishing {
 version = getTagVersion()
 description = 'The Dyvil programming language.'
 
-// --------------- Jar ---------------
+// --------------- Publication ---------------
 
-jar.doFirst {
-	manifest.attributes("Main-Class": project(':repl').mainClassName)
+project(':repl').afterEvaluate {
+	jar.manifest.attributes("Main-Class": project(':repl').mainClassName)
+}
+
+dependencies {
+	implementation libraryDependency
+	implementation project(':compiler')
+	implementation project(':repl')
+	implementation project(':gensrc')
 }
