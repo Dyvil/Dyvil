@@ -55,7 +55,7 @@ public class FileLibrary extends Library
 	{
 		try
 		{
-			return Files.list(this.getFile(directory).toPath()).filter(Files::isDirectory);
+			return Files.list(this.getFile(directory).toPath());
 		}
 		catch (IOException e)
 		{

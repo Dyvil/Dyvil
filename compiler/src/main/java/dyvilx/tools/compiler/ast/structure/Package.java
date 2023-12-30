@@ -209,10 +209,13 @@ public class Package implements Named, IDefaultContext
 
 		for (Library library : rootPackage.compiler.config.libraries)
 		{
-			// use this approach instead of isSubPackage to protect against case-insensitive matches
-			if (library.listPackageNames(this.getDirectory()).anyMatch(name::equals))
+			try (final Stream<String> stream = library.listPackageNames(this.getDirectory()))
 			{
-				return this.createSubPackage(name);
+				// use this approach instead of isSubPackage to protect against case-insensitive matches
+				if (stream.anyMatch(name::equals))
+				{
+					return this.createSubPackage(name);
+				}
 			}
 		}
 
