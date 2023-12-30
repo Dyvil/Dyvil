@@ -40,7 +40,7 @@ public class FileLibrary extends Library
 	{
 		try
 		{
-			return new FileInputStream(this.getFile(fileName));
+			return new BufferedInputStream(new FileInputStream(this.getFile(fileName)));
 		}
 		catch (FileNotFoundException ignored)
 		{

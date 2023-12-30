@@ -14,6 +14,7 @@ import dyvilx.tools.compiler.backend.classes.ExternalClassVisitor;
 import dyvilx.tools.compiler.library.Library;
 import dyvilx.tools.compiler.sources.DyvilFileType;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -269,14 +270,20 @@ public class Package implements Named, IDefaultContext
 
 	private IHeaderUnit loadHeader(String fileName, Name name, Library library)
 	{
-		InputStream inputStream = library.getInputStream(fileName);
-		if (inputStream != null)
+		try (final InputStream inputStream = library.getInputStream(fileName))
 		{
-			final AbstractHeader header = new ExternalHeader(name, this);
-			this.headers.add(header);
-			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
+			if (inputStream != null)
+			{
+				final AbstractHeader header = new ExternalHeader(name, this);
+				this.headers.add(header);
+				return ObjectFormat.read(rootPackage.compiler, inputStream, header);
+			}
+			return null;
 		}
-		return null;
+		catch (IOException exception)
+		{
+			throw new RuntimeException(exception);
+		}
 	}
 
 	// --------------- Classes ---------------
@@ -385,12 +392,18 @@ public class Package implements Named, IDefaultContext
 		final DyvilCompiler compiler = rootPackage.compiler;
 		for (Library library : compiler.config.libraries)
 		{
-			final InputStream inputStream = library.getInputStream(fileName);
-			if (inputStream != null)
+			try (final InputStream inputStream = library.getInputStream(fileName))
 			{
-				final ExternalClass externalClass = new ExternalClass();
-				consumer.accept(externalClass);
-				return ExternalClassVisitor.loadClass(compiler, externalClass, inputStream);
+				if (inputStream != null)
+				{
+					final ExternalClass externalClass = new ExternalClass();
+					consumer.accept(externalClass);
+					return ExternalClassVisitor.loadClass(compiler, externalClass, inputStream);
+				}
+			}
+			catch (IOException exception)
+			{
+				throw new RuntimeException(exception);
 			}
 		}
 		return null;
