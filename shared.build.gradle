@@ -7,6 +7,7 @@
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 group = 'org.dyvil'
 
@@ -37,14 +38,21 @@ repositories {
 
 // --------------- Publishing ---------------
 
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+signing {
+	sign publishing.publications
+}
 
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create('mavenJava', MavenPublication) {
 			from(components.java)
 			pom {
 				name = project.name
-				description = project.description
 				url = 'https://github.com/Dyvil/Dyvil'
 				inceptionYear = '2014'
 
@@ -68,6 +76,10 @@ publishing {
 			}
 		}
 	}
+}
+
+afterEvaluate {
+	publishing.publications.mavenJava.pom.description.set(project.description)
 }
 
 // --------------- Tasks ---------------

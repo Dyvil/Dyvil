@@ -4,7 +4,6 @@ apply plugin: 'org.dyvil.dyvil-gradle'
 
 version = getTagVersion('library/')
 description = 'The Dyvil Standard Library'
-// TODO publishInfo.labels = [ 'dyvil', 'library' ]
 
 // --------------- Dependencies ---------------
 
