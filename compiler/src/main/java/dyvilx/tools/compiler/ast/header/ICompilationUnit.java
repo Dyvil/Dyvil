@@ -43,8 +43,7 @@ public interface ICompilationUnit extends ASTNode
 	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, FileType fileType, Name name,
 		FileSource source)
 	{
-		final int size = markers.size();
-		if (size <= 0)
+		if (markers.isEmpty())
 		{
 			return false;
 		}
@@ -60,9 +59,8 @@ public interface ICompilationUnit extends ASTNode
 			compiler.log("");
 		}
 
-		// TODO v0.48.0: use style == MarkerStyle.JAVAC
 		final OutputStreamWriter writer = new OutputStreamWriter(
-			"JAVAC".equals(style.name()) ? compiler.getErrorOutput() : compiler.getOutput());
+			style == MarkerStyle.JAVAC ? compiler.getErrorOutput() : compiler.getOutput());
 		printer.print(markers, writer);
 		try
 		{
