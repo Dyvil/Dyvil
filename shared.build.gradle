@@ -35,6 +35,41 @@ repositories {
 	jcenter()
 }
 
+// --------------- Publishing ---------------
+
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from(components.java)
+			pom {
+				name = project.name
+				description = project.description
+				url = 'https://github.com/Dyvil/Dyvil'
+				inceptionYear = '2014'
+
+				scm {
+					url = 'https://github.com/Dyvil/Dyvil'
+				}
+
+				licenses {
+					license {
+						name = 'MIT License'
+						url = 'https://www.opensource.org/licenses/mit-license.php'
+					}
+				}
+
+				developers {
+					developer {
+						id = 'Clashsoft'
+						name = 'Adrian Kunz'
+					}
+				}
+			}
+		}
+	}
+}
+
 // --------------- Tasks ---------------
 
 tasks.register('version') {
@@ -43,23 +78,12 @@ tasks.register('version') {
 	}
 }
 
-/* TODO reuse the exception for new publishing
-tasks.named('bintrayUpload') {
-	it.doFirst {
-		if (!System.getenv('DYVIL_RELEASE')) {
-			throw new IllegalStateException('DYVIL_RELEASE environment variable not specified, ' +
-					'refusing to publish potential snapshots')
-		}
-	}
-}
- */
-
 // --------------- Java Compilation ---------------
 
 tasks.withType(JavaCompile) {
 	options.compilerArgs.addAll(
-			'-parameters',          // generates parameter attributes and names
-			'-XDignore.symbol.file' // disables "proprietary API" warnings
+		'-parameters',          // generates parameter attributes and names
+		'-XDignore.symbol.file' // disables "proprietary API" warnings
 	)
 	options.fork = true
 }
