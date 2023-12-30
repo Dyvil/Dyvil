@@ -9,7 +9,7 @@ insert_final_newline = true
 max_line_length = 120
 tab_width = 4
 
-[{*.json, *.yml, *.yaml}]
+[{*.json, *.yml, *.yaml, *.md}]
 indent_size = 2
 indent_style = space
 tab_width = 2
