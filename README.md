@@ -48,11 +48,3 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 - [Subreddit](https://www.reddit.com/r/Dyvil/)
 
 [1]: https://dyvil.gitbooks.io/dyvil-language-reference/content/
-
-## Build Status
-
-| Branch | GitHub Actions | 
-|--------|----------------|
-| master | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=master) |
-| develop | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=develop) |
-| bugfix | ![Java CI](https://github.com/Dyvil/Dyvil/workflows/Java%20CI/badge.svg?branch=bugfix) |
