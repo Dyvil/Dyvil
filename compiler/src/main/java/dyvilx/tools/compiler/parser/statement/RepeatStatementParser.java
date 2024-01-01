@@ -49,18 +49,18 @@ public class RepeatStatementParser extends Parser
 			this.mode = WHILE;
 			return;
 		case WHILE:
-			if (type == DyvilKeywords.WHILE)
+			switch (type)
 			{
-				this.mode = END;
-				pm.pushParser(new ExpressionParser(this.statement::setCondition));
-				return;
-			}
-			if (type == BaseSymbols.SEMICOLON && token.isInferred() && token.next().type() == DyvilKeywords.WHILE)
-			{
-				this.mode = END;
-				pm.skip(1);
-				pm.pushParser(new ExpressionParser(this.statement::setCondition));
-				return;
+				case BaseSymbols.SEMICOLON:
+					if (token.isInferred() && token.next().type() == DyvilKeywords.WHILE)
+					{
+						return;
+					}
+					break; // end
+				case DyvilKeywords.WHILE:
+					this.mode = END;
+					pm.pushParser(new ExpressionParser(this.statement::setCondition));
+					return;
 			}
 			// fallthrough
 		case END:

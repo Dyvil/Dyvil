@@ -96,16 +96,17 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			pm.pushParser(new StatementListParser(this.statement::setThen), true);
 			return;
 		case ELSE:
-			final IToken next = token.next();
-			if (token.isInferred() && next.type() == DyvilKeywords.ELSE)
+			switch (type)
 			{
-				// inferred semicolon between } and else
-				return;
-			}
-
-			if (type == DyvilKeywords.ELSE)
-			{
-				final int nextType = next.type();
+			case BaseSymbols.SEMICOLON:
+				if (token.isInferred() && token.next().type() == DyvilKeywords.ELSE)
+				{
+					// inferred semicolon between } and else
+					return;
+				}
+				break; // end
+			case DyvilKeywords.ELSE:
+				final int nextType = token.next().type();
 				if (nextType == DyvilKeywords.IF)
 				{
 					pm.pushParser(new IfStatementParser(this.statement::setElse));
