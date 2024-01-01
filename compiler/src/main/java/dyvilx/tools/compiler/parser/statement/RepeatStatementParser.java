@@ -45,12 +45,7 @@ public class RepeatStatementParser extends Parser
 			}
 			return;
 		case ACTION:
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "repeat.single.deprecated");
-			}
-
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = WHILE;
 			return;
 		case WHILE:

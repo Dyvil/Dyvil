@@ -89,13 +89,6 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 		}
 	}
 
-	static void reportSingleStatement(IParserManager pm, IToken token, String key)
-	{
-		final Marker marker = Markers.syntaxWarning(SourcePosition.before(token), key);
-		marker.addInfo(Markers.getSyntax("statement.single.deprecated.fix"));
-		pm.report(marker);
-	}
-
 	@Override
 	public void addDataMember(IVariable dataMember)
 	{

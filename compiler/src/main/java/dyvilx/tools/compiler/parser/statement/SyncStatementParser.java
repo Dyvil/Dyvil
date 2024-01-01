@@ -52,17 +52,7 @@ public class SyncStatementParser extends Parser
 			this.mode = ACTION;
 			return;
 		case ACTION:
-			if (BaseSymbols.isTerminator(type) && !token.isInferred())
-			{
-				pm.popParser(true);
-				return;
-			}
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "synchronized.single.deprecated");
-			}
-
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = END;
 			return;
 		case END:
