@@ -14,28 +14,31 @@ import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
+
+import java.util.function.Consumer;
 
 public class TryStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
 	// =============== Constants ===============
 
-	private static final int ACTION          = 1;
-	private static final int CATCH           = 2;
-	private static final int CATCH_ACTION = 16;
+	private static final int TRY = 1;
+	private static final int ACTION = 2;
+	private static final int CATCH = 3;
+	private static final int CATCH_ACTION = 4;
 
 	// =============== Fields ===============
 
-	protected final TryStatement statement;
+	private final Consumer<? super TryStatement> consumer;
 
+	private TryStatement statement;
 	private CatchBlock catchBlock;
 
 	// =============== Constructors ===============
 
-	public TryStatementParser(TryStatement statement)
+	public TryStatementParser(Consumer<? super TryStatement> consumer)
 	{
-		this.statement = statement;
+		this.consumer = consumer;
 		this.mode = ACTION;
 	}
 
@@ -47,47 +50,59 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 		final int type = token.type();
 		switch (this.mode)
 		{
+		case TRY:
+			if (type != DyvilKeywords.TRY)
+			{
+				pm.report(token, "try.keyword");
+				return;
+			}
+
+			this.mode = ACTION;
+			this.statement = new TryStatement(token.raw());
+			return;
 		case ACTION:
 			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = CATCH;
 			return;
 		case CATCH: // a catch or finally keyword
-			if (type == DyvilKeywords.CATCH)
+			switch (type)
 			{
-				this.statement.addCatchBlock(this.catchBlock = new CatchBlock());
-				this.mode = CATCH_ACTION;
-				pm.pushParser(new DataMemberParser<>(this));
-				return;
-			}
-			if (type == DyvilKeywords.FINALLY)
-			{
-				pm.pushParser(new StatementListParser(this.statement::setFinallyBlock));
-				this.mode = END;
-				return;
-			}
-			if (BaseSymbols.isTerminator(type))
-			{
-				int nextType = token.next().type();
-				if (nextType == Tokens.EOF)
-				{
-					pm.popParser(true);
+				case BaseSymbols.SEMICOLON:
+					if (token.isInferred())
+					{
+						final int nextType = token.next().type();
+						if (nextType == DyvilKeywords.CATCH || nextType == DyvilKeywords.FINALLY)
+						{
+							return;
+						}
+					}
+					break; // end
+				case DyvilKeywords.CATCH:
+					this.statement.addCatchBlock(this.catchBlock = new CatchBlock());
+					this.mode = CATCH_ACTION;
+					pm.pushParser(new DataMemberParser<>(this));
 					return;
-				}
-				if (nextType == DyvilKeywords.CATCH || nextType == DyvilKeywords.FINALLY)
-				{
+				case DyvilKeywords.FINALLY:
+					pm.pushParser(new StatementListParser(this.statement::setFinallyBlock));
+					this.mode = END;
 					return;
-				}
 			}
-			pm.popParser(true);
+			this.end(pm);
 			return;
 		case CATCH_ACTION: // a block { ... } or semicolon
 			this.mode = CATCH;
 			pm.pushParser(new StatementListParser(this.catchBlock::setAction), true);
 			return;
 		case END:
-			pm.popParser(true);
+			this.end(pm);
 			return;
 		}
+	}
+
+	private void end(IParserManager pm)
+	{
+		this.consumer.accept(this.statement);
+		pm.popParser(true);
 	}
 
 	@Override

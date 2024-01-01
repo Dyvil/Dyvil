@@ -988,11 +988,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 		case DyvilKeywords.TRY:
 		{
 			// try ...
-
-			final TryStatement tryStatement = new TryStatement(token.raw());
-			this.value = tryStatement;
-
-			pm.pushParser(new TryStatementParser(tryStatement));
+			pm.pushParser(new TryStatementParser(this));
 			this.mode = END;
 			return true;
 		}
