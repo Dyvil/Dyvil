@@ -75,7 +75,7 @@ public class MethodParser extends AbstractMemberParser
 				return;
 			}
 
-			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.UNKNOWN, this.attributes);
+			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.VOID, this.attributes);
 
 			this.mode = GENERICS;
 			return;
