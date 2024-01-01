@@ -11,7 +11,6 @@ import dyvilx.tools.compiler.ast.statement.exception.TryStatement;
 import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
-import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -48,15 +47,8 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 		final int type = token.type();
 		switch (this.mode)
 		{
-		case END:
-			pm.popParser(true);
-			return;
 		case ACTION:
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "try.single.deprecated");
-			}
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = CATCH;
 			return;
 		case CATCH: // a catch or finally keyword
@@ -69,13 +61,7 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			}
 			if (type == DyvilKeywords.FINALLY)
 			{
-				final IToken next = token.next();
-				if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
-				{
-					ForStatementParser.reportSingleStatement(pm, next, "finally.single.deprecated");
-				}
-
-				pm.pushParser(new ExpressionParser(this.statement::setFinallyBlock));
+				pm.pushParser(new StatementListParser(this.statement::setFinallyBlock));
 				this.mode = END;
 				return;
 			}
@@ -95,21 +81,12 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			pm.popParser(true);
 			return;
 		case CATCH_ACTION: // a block { ... } or semicolon
-			switch (type)
-			{
-			case Tokens.EOF:
-				pm.popParser();
-				return;
-			case BaseSymbols.SEMICOLON:
-				this.mode = CATCH;
-				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				this.mode = CATCH;
-				pm.pushParser(new StatementListParser(this.catchBlock::setAction), true);
-				return;
-			}
-
-			pm.report(token, "try.catch.separator");
+			this.mode = CATCH;
+			pm.pushParser(new StatementListParser(this.catchBlock::setAction), true);
+			return;
+		case END:
+			pm.popParser(true);
+			return;
 		}
 	}
 

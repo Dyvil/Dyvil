@@ -17,8 +17,6 @@ import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
-import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.marker.Marker;
 import dyvilx.tools.parsing.token.IToken;
 
@@ -81,26 +79,10 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				              .withFlags(ExpressionParser.IGNORE_CLOSURE));
 			return;
 		case STATEMENT:
-			switch (type)
-			{
-			case BaseSymbols.SEMICOLON:
-			case BaseSymbols.CLOSE_CURLY_BRACKET:
-				pm.reparse();
-				// Fallthrough
-			case Tokens.EOF:
-				pm.popParser();
-				this.consumer.accept(this.forStatement);
-				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				pm.pushParser(new StatementListParser(this.forStatement::setAction), true);
-				this.mode = END;
-				return;
-			default:
-				reportSingleStatement(pm, token, "for.single.deprecated");
-				pm.pushParser(new ExpressionParser(this.forStatement::setAction), true);
-				this.mode = END;
-				return;
-			}
+			pm.pushParser(new StatementListParser(this.forStatement::setAction), true);
+			this.mode = END;
+			return;
+			// Fallthrough
 		case END:
 			pm.popParser(true);
 			this.consumer.accept(this.forStatement);

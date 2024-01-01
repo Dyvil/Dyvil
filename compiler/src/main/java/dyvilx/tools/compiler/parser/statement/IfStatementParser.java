@@ -16,18 +16,15 @@ import dyvilx.tools.compiler.parser.expression.ExpressionParser;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
-
-import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
 public class IfStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
 	// =============== Constants ===============
 
-	protected static final int IF             = 0;
+	protected static final int IF             = 1;
 	protected static final int CONDITION_PART = 2;
 	protected static final int VARIABLE_VALUE = 3;
 	protected static final int SEPARATOR      = 4;
@@ -46,7 +43,7 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 	public IfStatementParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
-		// this.mode = IF;
+		this.mode = IF;
 	}
 
 	// =============== Methods ===============
@@ -95,68 +92,44 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			}
 			// Fallthrough
 		case THEN:
-			switch (type)
-			{
-			case Tokens.EOF:
-			case BaseSymbols.SEMICOLON:
-				this.end(pm);
-				return;
-			}
-
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "if.single.deprecated");
-			}
-
 			this.mode = ELSE;
-			pm.pushParser(new ExpressionParser(this.statement::setThen), true);
+			pm.pushParser(new StatementListParser(this.statement::setThen), true);
 			return;
 		case ELSE:
 			final IToken next = token.next();
+			if (token.isInferred() && next.type() == DyvilKeywords.ELSE)
+			{
+				// inferred semicolon between } and else
+				return;
+			}
+
 			if (type == DyvilKeywords.ELSE)
 			{
 				final int nextType = next.type();
-				if (nextType != BaseSymbols.OPEN_CURLY_BRACKET && nextType != DyvilKeywords.IF)
+				if (nextType == DyvilKeywords.IF)
 				{
-					ForStatementParser.reportSingleStatement(pm, next, "else.single.deprecated");
+					pm.pushParser(new IfStatementParser(this.statement::setElse));
+				}
+				else
+				{
+					pm.pushParser(new StatementListParser(this.statement::setElse));
 				}
 
-				pm.pushParser(new ExpressionParser(this.statement::setElse));
-				this.mode = END;
-				return;
-			}
-			if (token.isInferred() && next.type() == DyvilKeywords.ELSE)
-			{
-				// ... inferred_semicolon else
-				final IToken nextNext = next.next();
-				final int nextNextType = nextNext.type();
-				if (nextNextType != BaseSymbols.OPEN_CURLY_BRACKET && nextNextType != DyvilKeywords.IF)
-				{
-					ForStatementParser.reportSingleStatement(pm, nextNext, "else.single.deprecated");
-				}
-
-				pm.skip();
-				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
 				return;
 			}
 
 			// Fallthrough
 		case END:
-			this.end(pm);
+			this.consumer.accept(this.statement);
+			pm.popParser(true);
 			return;
 		}
 	}
 
 	private ExpressionParser expressionParser(Consumer<IValue> consumer)
 	{
-		return new ExpressionParser(consumer).withFlags(IGNORE_STATEMENT);
-	}
-
-	private void end(IParserManager pm)
-	{
-		this.consumer.accept(this.statement);
-		pm.popParser(true);
+		return new ExpressionParser(consumer).withFlags(ExpressionParser.IGNORE_STATEMENT);
 	}
 
 	@Override
