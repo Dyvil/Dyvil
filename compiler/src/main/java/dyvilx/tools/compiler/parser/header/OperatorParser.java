@@ -226,11 +226,6 @@ public final class OperatorParser extends Parser
 		{
 			return token.nameValue();
 		}
-		if (type == Tokens.LETTER_IDENTIFIER)
-		{
-			pm.report(Markers.syntaxWarning(token, "operator.identifier.not_symbol"));
-			return token.nameValue();
-		}
 		if ((type & Tokens.SYMBOL) != 0)
 		{
 			return Name.from(DyvilSymbols.INSTANCE.toString(type));
