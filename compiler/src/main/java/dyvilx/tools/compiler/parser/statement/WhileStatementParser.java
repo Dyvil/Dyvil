@@ -14,9 +14,9 @@ public class WhileStatementParser extends Parser
 {
 	// =============== Constants ===============
 
-	protected static final int WHILE     = 0;
-	protected static final int CONDITION = 1;
-	protected static final int ACTION    = 2;
+	private static final int WHILE = 0;
+	private static final int CONDITION = 1;
+	private static final int ACTION = 2;
 
 	// =============== Fields ===============
 
@@ -27,7 +27,7 @@ public class WhileStatementParser extends Parser
 	public WhileStatementParser(WhileStatement statement)
 	{
 		this.statement = statement;
-		this.mode = CONDITION;
+		this.mode = WHILE;
 	}
 
 	// =============== Methods ===============
@@ -39,29 +39,19 @@ public class WhileStatementParser extends Parser
 		switch (this.mode)
 		{
 		case WHILE:
+			this.mode = CONDITION;
 			if (type != DyvilKeywords.WHILE)
 			{
+				pm.reparse();
 				pm.report(token, "while.keyword");
-				return;
 			}
-
-			this.mode = CONDITION;
 			return;
 		case CONDITION:
 			pm.pushParser(new ExpressionParser(this.statement::setCondition).withFlags(IGNORE_STATEMENT), true);
 			this.mode = ACTION;
 			return;
 		case ACTION:
-			if (BaseSymbols.isTerminator(type) && !token.isInferred())
-			{
-				pm.popParser(true);
-				return;
-			}
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "while.single.deprecated");
-			}
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = END;
 			return;
 		case END:

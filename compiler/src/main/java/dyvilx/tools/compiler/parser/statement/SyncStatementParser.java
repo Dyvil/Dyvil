@@ -15,8 +15,8 @@ public class SyncStatementParser extends Parser
 	// =============== Constants ===============
 
 	private static final int SYNCHRONIZED = 0;
-	private static final int LOCK         = 1;
-	private static final int ACTION       = 2;
+	private static final int LOCK = 1;
+	private static final int ACTION = 2;
 
 	// =============== Fields ===============
 
@@ -27,7 +27,7 @@ public class SyncStatementParser extends Parser
 	public SyncStatementParser(SyncStatement statement)
 	{
 		this.statement = statement;
-		this.mode = LOCK;
+		this.mode = SYNCHRONIZED;
 	}
 
 	// =============== Methods ===============
@@ -39,30 +39,19 @@ public class SyncStatementParser extends Parser
 		switch (this.mode)
 		{
 		case SYNCHRONIZED:
+			this.mode = LOCK;
 			if (type != DyvilKeywords.SYNCHRONIZED)
 			{
+				pm.reparse();
 				pm.report(token, "synchronized.keyword");
-				return;
 			}
-
-			this.mode = LOCK;
 			return;
 		case LOCK:
 			pm.pushParser(new ExpressionParser(this.statement::setLock).withFlags(IGNORE_STATEMENT), true);
 			this.mode = ACTION;
 			return;
 		case ACTION:
-			if (BaseSymbols.isTerminator(type) && !token.isInferred())
-			{
-				pm.popParser(true);
-				return;
-			}
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "synchronized.single.deprecated");
-			}
-
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = END;
 			return;
 		case END:

@@ -75,7 +75,7 @@ public class MethodParser extends AbstractMemberParser
 				return;
 			}
 
-			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.UNKNOWN, this.attributes);
+			this.method = this.consumer.createMethod(token.raw(), token.nameValue(), Types.VOID, this.attributes);
 
 			this.mode = GENERICS;
 			return;
@@ -98,12 +98,8 @@ public class MethodParser extends AbstractMemberParser
 			}
 			// Fallthrough
 		case TYPE:
-			switch (type)
+			if (type == DyvilSymbols.ARROW_RIGHT)
 			{
-			case BaseSymbols.COLON:
-				pm.report(Markers.syntaxWarning(token, "method.type.colon.deprecated"));
-				// Fallthrough
-			case DyvilSymbols.ARROW_RIGHT:
 				pm.pushParser(new TypeParser(this.method::setType));
 				this.mode = EXCEPTIONS;
 				return;

@@ -172,40 +172,10 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.value = this.value.resolve(markers, context);
 
-			boolean inferType = false;
-			if (this.type == Types.UNKNOWN || this.type == null)
-			{
-				inferType = true;
-				this.type = this.value.getType();
-				if (this.type == Types.UNKNOWN && this.value.isResolved())
-				{
-					markers.add(Markers.semanticError(this.position, "method.type.infer", this.name.unqualified));
-				}
-			}
-
 			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.type.incompatible",
 			                                                                             "method.type", "value.type",
 			                                                                             this.name);
 			this.value = TypeChecker.convertValue(this.value, this.type, null, markers, context, markerSupplier);
-
-			if (inferType)
-			{
-				this.type = this.value.getType();
-
-				if (this.type.getTypecode() != PrimitiveType.VOID_CODE)
-				{
-					final Marker marker = Markers.semanticWarning(this.position, "method.type.infer.deprecated");
-					final StringBuilder typeString = new StringBuilder();
-					this.type.toString("", typeString);
-					marker.addInfo(Markers.getSemantic("method.type.infer.deprecated.fix", typeString.toString()));
-					markers.add(marker);
-				}
-			}
-		}
-		else if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semanticError(this.position, "method.type.abstract", this.name.unqualified));
-			this.type = Types.ANY;
 		}
 
 		context.pop();
@@ -342,21 +312,21 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (explicitParameters != 1)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.prefix.not_unary", this.name));
 			}
 		}
 		else if (fixity == Modifiers.POSTFIX)
 		{
 			if (explicitParameters != 1)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.postfix.not_unary", this.name));
 			}
 		}
 		else if (fixity == Modifiers.INFIX)
 		{
 			if (explicitParameters != 2)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.infix.not_2_parameters.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.infix.not_binary", this.name));
 			}
 		}
 	}

@@ -12,9 +12,9 @@ public class RepeatStatementParser extends Parser
 {
 	// =============== Constants ===============
 
-	protected static final int REPEAT = 1;
-	protected static final int ACTION = 2;
-	protected static final int WHILE  = 3;
+	private static final int REPEAT = 1;
+	private static final int ACTION = 2;
+	private static final int WHILE = 3;
 
 	// =============== Fields ===============
 
@@ -25,7 +25,7 @@ public class RepeatStatementParser extends Parser
 	public RepeatStatementParser(RepeatStatement statement)
 	{
 		this.statement = statement;
-		this.mode = ACTION;
+		this.mode = REPEAT;
 	}
 
 	// =============== Methods ===============
@@ -45,27 +45,22 @@ public class RepeatStatementParser extends Parser
 			}
 			return;
 		case ACTION:
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "repeat.single.deprecated");
-			}
-
-			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
+			pm.pushParser(new StatementListParser(this.statement::setAction), true);
 			this.mode = WHILE;
 			return;
 		case WHILE:
-			if (type == DyvilKeywords.WHILE)
+			switch (type)
 			{
-				this.mode = END;
-				pm.pushParser(new ExpressionParser(this.statement::setCondition));
-				return;
-			}
-			if (type == BaseSymbols.SEMICOLON && token.isInferred() && token.next().type() == DyvilKeywords.WHILE)
-			{
-				this.mode = END;
-				pm.skip(1);
-				pm.pushParser(new ExpressionParser(this.statement::setCondition));
-				return;
+				case BaseSymbols.SEMICOLON:
+					if (token.isInferred() && token.next().type() == DyvilKeywords.WHILE)
+					{
+						return;
+					}
+					break; // end
+				case DyvilKeywords.WHILE:
+					this.mode = END;
+					pm.pushParser(new ExpressionParser(this.statement::setCondition));
+					return;
 			}
 			// fallthrough
 		case END:

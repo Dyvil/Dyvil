@@ -5,7 +5,6 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
@@ -14,23 +13,18 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
-import dyvilx.tools.parsing.lexer.Tokens;
 import dyvilx.tools.parsing.token.IToken;
 
 import java.util.function.Consumer;
-
-import static dyvilx.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
 public class IfStatementParser extends Parser implements IDataMemberConsumer<IVariable>
 {
 	// =============== Constants ===============
 
-	protected static final int IF             = 0;
-	protected static final int OPEN_PAREN     = 1;
+	protected static final int IF             = 1;
 	protected static final int CONDITION_PART = 2;
 	protected static final int VARIABLE_VALUE = 3;
 	protected static final int SEPARATOR      = 4;
@@ -43,14 +37,13 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 
 	protected IfStatement statement;
 	protected IVariable   lastVariable;
-	protected boolean     parentheses;
 
 	// =============== Constructors ===============
 
 	public IfStatementParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
-		// this.mode = IF;
+		this.mode = IF;
 	}
 
 	// =============== Methods ===============
@@ -62,24 +55,14 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		switch (this.mode)
 		{
 		case IF:
+			this.mode = CONDITION_PART;
+			this.statement = new IfStatement(token.raw());
 			if (type != DyvilKeywords.IF)
 			{
+				pm.reparse();
 				pm.report(token, "if.keyword");
-				return;
 			}
-
-			this.mode = OPEN_PAREN;
-			this.statement = new IfStatement(token.raw());
 			return;
-		case OPEN_PAREN:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.parentheses = true;
-				this.mode = CONDITION_PART;
-				pm.report(Markers.syntaxWarning(token, "if.paren.deprecated"));
-				return;
-			}
-			// Fallthrough
 		case CONDITION_PART:
 			if (type == DyvilKeywords.LET)
 			{
@@ -101,103 +84,52 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			pm.report(token, "if.binding.assignment");
 			// Fallthrough
 		case SEPARATOR:
-			switch (type)
+			if (type == BaseSymbols.COMMA)
 			{
-			case BaseSymbols.COMMA:
 				this.mode = CONDITION_PART;
 				return;
-			case BaseSymbols.SEMICOLON:
-				// semicolon only allowed within parentheses, otherwise treated as end of if statements / empty action
-				if (this.parentheses)
-				{
-					this.mode = CONDITION_PART;
-					return;
-				}
-				break; // then
-			case BaseSymbols.CLOSE_PARENTHESIS:
-				if (this.parentheses)
-				{
-					this.mode = THEN;
-					return;
-				}
-				break; // then
-			default:
-				if (this.parentheses)
-				{
-					pm.report(token, "if.close_paren");
-				}
 			}
-
 			// Fallthrough
 		case THEN:
-			switch (type)
-			{
-			case Tokens.EOF:
-			case BaseSymbols.SEMICOLON:
-				this.end(pm);
-				return;
-			}
-
-			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, token, "if.single.deprecated");
-			}
-
 			this.mode = ELSE;
-			pm.pushParser(new ExpressionParser(this.statement::setThen), true);
+			pm.pushParser(new StatementListParser(this.statement::setThen), true);
 			return;
 		case ELSE:
-			final IToken next = token.next();
-			if (type == DyvilKeywords.ELSE)
+			switch (type)
 			{
-				final int nextType = next.type();
-				if (nextType != BaseSymbols.OPEN_CURLY_BRACKET && nextType != DyvilKeywords.IF)
+			case BaseSymbols.SEMICOLON:
+				if (token.isInferred() && token.next().type() == DyvilKeywords.ELSE)
 				{
-					ForStatementParser.reportSingleStatement(pm, next, "else.single.deprecated");
+					// inferred semicolon between } and else
+					return;
+				}
+				break; // end
+			case DyvilKeywords.ELSE:
+				final int nextType = token.next().type();
+				if (nextType == DyvilKeywords.IF)
+				{
+					pm.pushParser(new IfStatementParser(this.statement::setElse));
+				}
+				else
+				{
+					pm.pushParser(new StatementListParser(this.statement::setElse));
 				}
 
-				pm.pushParser(new ExpressionParser(this.statement::setElse));
-				this.mode = END;
-				return;
-			}
-			if (token.isInferred() && next.type() == DyvilKeywords.ELSE)
-			{
-				// ... inferred_semicolon else
-				final IToken nextNext = next.next();
-				final int nextNextType = nextNext.type();
-				if (nextNextType != BaseSymbols.OPEN_CURLY_BRACKET && nextNextType != DyvilKeywords.IF)
-				{
-					ForStatementParser.reportSingleStatement(pm, nextNext, "else.single.deprecated");
-				}
-
-				pm.skip();
-				pm.pushParser(new ExpressionParser(this.statement::setElse));
 				this.mode = END;
 				return;
 			}
 
 			// Fallthrough
 		case END:
-			this.end(pm);
+			this.consumer.accept(this.statement);
+			pm.popParser(true);
 			return;
 		}
 	}
 
-	private boolean hasCondition()
-	{
-		final IValue condition = this.statement.getCondition();
-		return condition != null && condition != BooleanValue.TRUE;
-	}
-
 	private ExpressionParser expressionParser(Consumer<IValue> consumer)
 	{
-		return new ExpressionParser(consumer).withFlags(this.parentheses ? 0 : IGNORE_STATEMENT);
-	}
-
-	private void end(IParserManager pm)
-	{
-		this.consumer.accept(this.statement);
-		pm.popParser(true);
+		return new ExpressionParser(consumer).withFlags(ExpressionParser.IGNORE_STATEMENT);
 	}
 
 	@Override
