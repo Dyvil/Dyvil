@@ -15,8 +15,8 @@ public class SyncStatementParser extends Parser
 	// =============== Constants ===============
 
 	private static final int SYNCHRONIZED = 0;
-	private static final int LOCK         = 1;
-	private static final int ACTION       = 2;
+	private static final int LOCK = 1;
+	private static final int ACTION = 2;
 
 	// =============== Fields ===============
 
@@ -27,7 +27,7 @@ public class SyncStatementParser extends Parser
 	public SyncStatementParser(SyncStatement statement)
 	{
 		this.statement = statement;
-		this.mode = LOCK;
+		this.mode = SYNCHRONIZED;
 	}
 
 	// =============== Methods ===============

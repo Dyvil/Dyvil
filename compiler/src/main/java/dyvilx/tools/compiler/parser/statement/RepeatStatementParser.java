@@ -12,9 +12,9 @@ public class RepeatStatementParser extends Parser
 {
 	// =============== Constants ===============
 
-	protected static final int REPEAT = 1;
-	protected static final int ACTION = 2;
-	protected static final int WHILE  = 3;
+	private static final int REPEAT = 1;
+	private static final int ACTION = 2;
+	private static final int WHILE = 3;
 
 	// =============== Fields ===============
 
@@ -25,7 +25,7 @@ public class RepeatStatementParser extends Parser
 	public RepeatStatementParser(RepeatStatement statement)
 	{
 		this.statement = statement;
-		this.mode = ACTION;
+		this.mode = REPEAT;
 	}
 
 	// =============== Methods ===============

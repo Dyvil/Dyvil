@@ -14,9 +14,9 @@ public class WhileStatementParser extends Parser
 {
 	// =============== Constants ===============
 
-	protected static final int WHILE     = 0;
-	protected static final int CONDITION = 1;
-	protected static final int ACTION    = 2;
+	private static final int WHILE = 0;
+	private static final int CONDITION = 1;
+	private static final int ACTION = 2;
 
 	// =============== Fields ===============
 
@@ -27,7 +27,7 @@ public class WhileStatementParser extends Parser
 	public WhileStatementParser(WhileStatement statement)
 	{
 		this.statement = statement;
-		this.mode = CONDITION;
+		this.mode = WHILE;
 	}
 
 	// =============== Methods ===============

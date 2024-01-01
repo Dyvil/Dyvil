@@ -919,7 +919,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 			final WhileStatement whileStatement = new WhileStatement(token.raw());
 			this.value = whileStatement;
 
-			pm.pushParser(new WhileStatementParser(whileStatement));
+			pm.pushParser(new WhileStatementParser(whileStatement), true);
 			this.mode = END;
 			return true;
 		}
@@ -930,7 +930,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 			final RepeatStatement repeatStatement = new RepeatStatement(token.raw());
 			this.value = repeatStatement;
 
-			pm.pushParser(new RepeatStatementParser(repeatStatement));
+			pm.pushParser(new RepeatStatementParser(repeatStatement), true);
 			this.mode = END;
 			return true;
 		}
@@ -988,7 +988,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 		case DyvilKeywords.TRY:
 		{
 			// try ...
-			pm.pushParser(new TryStatementParser(this));
+			pm.pushParser(new TryStatementParser(this), true);
 			this.mode = END;
 			return true;
 		}
@@ -1032,7 +1032,7 @@ public class ExpressionParser extends Parser implements Consumer<IValue>
 			final SyncStatement syncStatement = new SyncStatement(token.raw());
 			this.value = syncStatement;
 
-			pm.pushParser(new SyncStatementParser(syncStatement));
+			pm.pushParser(new SyncStatementParser(syncStatement), true);
 			this.mode = END;
 			return true;
 		}

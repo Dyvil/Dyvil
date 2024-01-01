@@ -39,7 +39,7 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 	public TryStatementParser(Consumer<? super TryStatement> consumer)
 	{
 		this.consumer = consumer;
-		this.mode = ACTION;
+		this.mode = TRY;
 	}
 
 	// =============== Methods ===============

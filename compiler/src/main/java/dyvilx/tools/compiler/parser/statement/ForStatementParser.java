@@ -26,10 +26,10 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 {
 	// =============== Constants ===============
 
-	private static final int FOR                = 0;
-	private static final int VARIABLE           = 1 << 1;
-	private static final int VARIABLE_SEPARATOR = 1 << 2;
-	private static final int STATEMENT          = 1 << 7;
+	private static final int FOR = 1;
+	private static final int VARIABLE = 2;
+	private static final int VARIABLE_SEPARATOR = 3;
+	private static final int STATEMENT = 4;
 
 	// =============== Fields ===============
 
@@ -42,7 +42,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 	public ForStatementParser(Consumer<IValue> consumer)
 	{
 		this.consumer = consumer;
-		// this.mode = FOR;
+		this.mode = FOR;
 	}
 
 	// =============== Methods ===============
