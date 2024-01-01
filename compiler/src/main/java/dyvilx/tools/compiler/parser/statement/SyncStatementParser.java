@@ -39,13 +39,12 @@ public class SyncStatementParser extends Parser
 		switch (this.mode)
 		{
 		case SYNCHRONIZED:
+			this.mode = LOCK;
 			if (type != DyvilKeywords.SYNCHRONIZED)
 			{
+				pm.reparse();
 				pm.report(token, "synchronized.keyword");
-				return;
 			}
-
-			this.mode = LOCK;
 			return;
 		case LOCK:
 			pm.pushParser(new ExpressionParser(this.statement::setLock).withFlags(IGNORE_STATEMENT), true);

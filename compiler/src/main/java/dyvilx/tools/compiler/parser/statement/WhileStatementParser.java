@@ -39,13 +39,12 @@ public class WhileStatementParser extends Parser
 		switch (this.mode)
 		{
 		case WHILE:
+			this.mode = CONDITION;
 			if (type != DyvilKeywords.WHILE)
 			{
+				pm.reparse();
 				pm.report(token, "while.keyword");
-				return;
 			}
-
-			this.mode = CONDITION;
 			return;
 		case CONDITION:
 			pm.pushParser(new ExpressionParser(this.statement::setCondition).withFlags(IGNORE_STATEMENT), true);

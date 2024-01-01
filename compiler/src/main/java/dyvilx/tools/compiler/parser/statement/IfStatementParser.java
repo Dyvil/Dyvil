@@ -55,14 +55,13 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		switch (this.mode)
 		{
 		case IF:
-			if (type != DyvilKeywords.IF)
-			{
-				pm.report(token, "if.keyword");
-				return;
-			}
-
 			this.mode = CONDITION_PART;
 			this.statement = new IfStatement(token.raw());
+			if (type != DyvilKeywords.IF)
+			{
+				pm.reparse();
+				pm.report(token, "if.keyword");
+			}
 			return;
 		case CONDITION_PART:
 			if (type == DyvilKeywords.LET)

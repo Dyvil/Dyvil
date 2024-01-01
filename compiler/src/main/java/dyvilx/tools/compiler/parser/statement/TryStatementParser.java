@@ -51,14 +51,13 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 		switch (this.mode)
 		{
 		case TRY:
-			if (type != DyvilKeywords.TRY)
-			{
-				pm.report(token, "try.keyword");
-				return;
-			}
-
 			this.mode = ACTION;
 			this.statement = new TryStatement(token.raw());
+			if (type != DyvilKeywords.TRY)
+			{
+				pm.reparse();
+				pm.report(token, "try.keyword");
+			}
 			return;
 		case ACTION:
 			pm.pushParser(new StatementListParser(this.statement::setAction), true);
