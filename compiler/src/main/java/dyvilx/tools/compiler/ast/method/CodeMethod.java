@@ -312,21 +312,21 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (explicitParameters != 1)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.prefix.not_1_parameter.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.prefix.not_unary", this.name));
 			}
 		}
 		else if (fixity == Modifiers.POSTFIX)
 		{
 			if (explicitParameters != 1)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.postfix.not_1_parameter.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.postfix.not_unary", this.name));
 			}
 		}
 		else if (fixity == Modifiers.INFIX)
 		{
 			if (explicitParameters != 2)
 			{
-				markers.add(Markers.semanticWarning(this.position, "method.infix.not_2_parameters.deprecated", this.name));
+				markers.add(Markers.semanticError(this.position, "method.infix.not_binary", this.name));
 			}
 		}
 	}
