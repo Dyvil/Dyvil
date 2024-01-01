@@ -12,7 +12,6 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -25,9 +24,7 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 
 	private static final int ACTION          = 1;
 	private static final int CATCH           = 2;
-	private static final int CATCH_OPEN      = 4;
-	private static final int CATCH_CLOSE     = 8;
-	private static final int CATCH_SEPARATOR = 16;
+	private static final int CATCH_ACTION = 16;
 
 	// =============== Fields ===============
 
@@ -62,11 +59,12 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			pm.pushParser(new ExpressionParser(this.statement::setAction), true);
 			this.mode = CATCH;
 			return;
-		case CATCH:
+		case CATCH: // a catch or finally keyword
 			if (type == DyvilKeywords.CATCH)
 			{
 				this.statement.addCatchBlock(this.catchBlock = new CatchBlock());
-				this.mode = CATCH_OPEN;
+				this.mode = CATCH_ACTION;
+				pm.pushParser(new DataMemberParser<>(this));
 				return;
 			}
 			if (type == DyvilKeywords.FINALLY)
@@ -96,35 +94,7 @@ public class TryStatementParser extends Parser implements IDataMemberConsumer<IV
 			}
 			pm.popParser(true);
 			return;
-		case CATCH_OPEN:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.mode = CATCH_CLOSE;
-				pm.report(Markers.syntaxWarning(token, "catch.paren.deprecated"));
-				pm.pushParser(new DataMemberParser<>(this));
-			}
-			else
-			{
-				this.mode = CATCH_SEPARATOR;
-				pm.pushParser(new DataMemberParser<>(this), true);
-			}
-			return;
-		case CATCH_CLOSE:
-			final IToken next = token.next();
-			if (next.type() != BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				ForStatementParser.reportSingleStatement(pm, next, "catch.single.deprecated");
-			}
-
-			this.mode = CATCH;
-			pm.pushParser(new ExpressionParser(this.catchBlock::setAction));
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "catch.close_paren");
-			}
-			return;
-		case CATCH_SEPARATOR:
+		case CATCH_ACTION: // a block { ... } or semicolon
 			switch (type)
 			{
 			case Tokens.EOF:

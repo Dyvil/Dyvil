@@ -5,7 +5,6 @@ import dyvil.source.position.SourcePosition;
 import dyvilx.tools.compiler.ast.attribute.AttributeList;
 import dyvilx.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvilx.tools.compiler.ast.expression.IValue;
-import dyvilx.tools.compiler.ast.expression.constant.BooleanValue;
 import dyvilx.tools.compiler.ast.field.IVariable;
 import dyvilx.tools.compiler.ast.field.Variable;
 import dyvilx.tools.compiler.ast.statement.BindingIfStatement;
@@ -14,7 +13,6 @@ import dyvilx.tools.compiler.ast.type.IType;
 import dyvilx.tools.compiler.parser.DyvilKeywords;
 import dyvilx.tools.compiler.parser.classes.DataMemberParser;
 import dyvilx.tools.compiler.parser.expression.ExpressionParser;
-import dyvilx.tools.compiler.util.Markers;
 import dyvilx.tools.parsing.IParserManager;
 import dyvilx.tools.parsing.Parser;
 import dyvilx.tools.parsing.lexer.BaseSymbols;
@@ -30,7 +28,6 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 	// =============== Constants ===============
 
 	protected static final int IF             = 0;
-	protected static final int OPEN_PAREN     = 1;
 	protected static final int CONDITION_PART = 2;
 	protected static final int VARIABLE_VALUE = 3;
 	protected static final int SEPARATOR      = 4;
@@ -43,7 +40,6 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 
 	protected IfStatement statement;
 	protected IVariable   lastVariable;
-	protected boolean     parentheses;
 
 	// =============== Constructors ===============
 
@@ -68,18 +64,9 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 				return;
 			}
 
-			this.mode = OPEN_PAREN;
+			this.mode = CONDITION_PART;
 			this.statement = new IfStatement(token.raw());
 			return;
-		case OPEN_PAREN:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.parentheses = true;
-				this.mode = CONDITION_PART;
-				pm.report(Markers.syntaxWarning(token, "if.paren.deprecated"));
-				return;
-			}
-			// Fallthrough
 		case CONDITION_PART:
 			if (type == DyvilKeywords.LET)
 			{
@@ -101,33 +88,11 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 			pm.report(token, "if.binding.assignment");
 			// Fallthrough
 		case SEPARATOR:
-			switch (type)
+			if (type == BaseSymbols.COMMA)
 			{
-			case BaseSymbols.COMMA:
 				this.mode = CONDITION_PART;
 				return;
-			case BaseSymbols.SEMICOLON:
-				// semicolon only allowed within parentheses, otherwise treated as end of if statements / empty action
-				if (this.parentheses)
-				{
-					this.mode = CONDITION_PART;
-					return;
-				}
-				break; // then
-			case BaseSymbols.CLOSE_PARENTHESIS:
-				if (this.parentheses)
-				{
-					this.mode = THEN;
-					return;
-				}
-				break; // then
-			default:
-				if (this.parentheses)
-				{
-					pm.report(token, "if.close_paren");
-				}
 			}
-
 			// Fallthrough
 		case THEN:
 			switch (type)
@@ -183,15 +148,9 @@ public class IfStatementParser extends Parser implements IDataMemberConsumer<IVa
 		}
 	}
 
-	private boolean hasCondition()
-	{
-		final IValue condition = this.statement.getCondition();
-		return condition != null && condition != BooleanValue.TRUE;
-	}
-
 	private ExpressionParser expressionParser(Consumer<IValue> consumer)
 	{
-		return new ExpressionParser(consumer).withFlags(this.parentheses ? 0 : IGNORE_STATEMENT);
+		return new ExpressionParser(consumer).withFlags(IGNORE_STATEMENT);
 	}
 
 	private void end(IParserManager pm)

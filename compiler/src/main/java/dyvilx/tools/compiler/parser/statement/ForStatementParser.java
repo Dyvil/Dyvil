@@ -29,10 +29,8 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 	// =============== Constants ===============
 
 	private static final int FOR                = 0;
-	private static final int FOR_START          = 1;
 	private static final int VARIABLE           = 1 << 1;
 	private static final int VARIABLE_SEPARATOR = 1 << 2;
-	private static final int FOR_EACH_END       = 1 << 6;
 	private static final int STATEMENT          = 1 << 7;
 
 	// =============== Fields ===============
@@ -40,8 +38,6 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 	protected final Consumer<IValue> consumer;
 
 	private IForStatement forStatement;
-
-	private boolean parenthesis;
 
 	// =============== Constructors ===============
 
@@ -60,7 +56,7 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 		switch (this.mode)
 		{
 		case FOR:
-			this.mode = FOR_START;
+			this.mode = VARIABLE;
 			this.forStatement = new ForEachStatement(token.raw());
 			if (type != DyvilKeywords.FOR)
 			{
@@ -68,15 +64,6 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				pm.report(token, "for.keyword");
 			}
 			return;
-		case FOR_START:
-			this.mode = VARIABLE;
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.parenthesis = true;
-				pm.report(Markers.syntaxWarning(token, "for.paren.deprecated"));
-				return;
-			}
-			// Fallthrough
 		case VARIABLE:
 			pm.pushParser(new DataMemberParser<>(this), true);
 			this.mode = VARIABLE_SEPARATOR;
@@ -88,23 +75,11 @@ public class ForStatementParser extends Parser implements IDataMemberConsumer<IV
 				pm.report(token, "for.variable.separator");
 			}
 
-			this.mode = FOR_EACH_END;
+			this.mode = STATEMENT;
 
 			pm.pushParser(new ExpressionParser(this.forStatement.getVariable()::setValue)
-				              .withFlags(this.parenthesis ? 0 : ExpressionParser.IGNORE_CLOSURE));
+				              .withFlags(ExpressionParser.IGNORE_CLOSURE));
 			return;
-		case FOR_EACH_END:
-			this.mode = STATEMENT;
-			if (this.parenthesis)
-			{
-				if (type != BaseSymbols.CLOSE_PARENTHESIS)
-				{
-					pm.reparse();
-					pm.report(token, "for.close_paren");
-				}
-				return;
-			}
-			// Fallthrough
 		case STATEMENT:
 			switch (type)
 			{
