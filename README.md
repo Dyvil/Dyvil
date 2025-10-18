@@ -23,6 +23,31 @@ The syntax and semantics of the language are still highly experimental and are l
 releases. Therefore it is not recommended to use Dyvil in any kind of production environment.
 Feature or change requests or bug reports in the form of GitHub Issues or Pull Requests are welcome and encouraged.
 
+## Platform and Runtime
+
+Dyvil compiles to JVM bytecode and runs on the Java Virtual Machine. Programs written in Dyvil benefit from the JVM's automatic memory management and garbage collection. The language is compatible with Java 8 and later versions and can be used on any platform that supports the JVM, including Windows, macOS, Linux, and other Unix-like systems.
+
+## Use Cases
+
+Dyvil is a general-purpose programming language with full Java interoperability. It supports all Java APIs and libraries, making it suitable for any application domain where Java is used, including backend services, desktop applications, command-line tools, and Android development.
+
+## Language Features
+
+Dyvil provides modern language features designed to reduce boilerplate and improve code readability:
+
+- **Type Inference:** Variable types can be inferred using the `let` and `var` keywords
+- **Lambda Expressions:** Concise syntax for functional programming with closures and higher-order functions
+- **Extension Methods:** Add methods to existing classes without inheritance
+- **Pattern Matching:** Powerful `match` expressions for control flow and data extraction
+- **String Interpolation:** Embed expressions directly in string literals
+- **Operator Overloading:** Define custom operators and customize existing ones
+- **Properties:** Built-in property syntax with customizable getters and setters
+- **Tuples:** First-class support for tuple types and destructuring
+- **Optional Types:** Nullable and non-nullable type annotations for better null safety
+- **Class Extensions:** Extend existing classes with new functionality including operators and properties
+
+For a complete list of features and detailed documentation, see the [Language Reference][1].
+
 ## Links
 
 ### Info
