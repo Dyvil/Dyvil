@@ -25,30 +25,28 @@ Feature or change requests or bug reports in the form of GitHub Issues or Pull R
 
 ## Platform and Runtime
 
-Dyvil compiles to JVM bytecode and runs on the Java Virtual Machine. Programs written in Dyvil benefit from the JVM's automatic memory management and garbage collection. The language is compatible with Java 8 and later versions.
-
-**Supported Operating Systems:** Dyvil can be used on any platform that supports the JVM, including Windows, macOS, Linux, and other Unix-like systems.
-
-**Mobile Platforms:** As a JVM-based language, Dyvil can target Android through standard Android development tools and workflows.
+Dyvil compiles to JVM bytecode and runs on the Java Virtual Machine. Programs written in Dyvil benefit from the JVM's automatic memory management and garbage collection. The language is compatible with Java 8 and later versions and can be used on any platform that supports the JVM, including Windows, macOS, Linux, and other Unix-like systems.
 
 ## Use Cases
 
-Dyvil is a general-purpose language suitable for a variety of application domains:
-
-- **Backend and Server Applications:** Full JVM ecosystem compatibility makes it suitable for server-side development
-- **Desktop Applications:** Can be used with JavaFX, Swing, or other JVM-based UI frameworks
-- **Command-Line Tools:** The language's concise syntax is well-suited for utility and automation scripts
-- **Library Development:** Full Java interoperability allows creating libraries usable from Java and other JVM languages
+Dyvil is a general-purpose programming language with full Java interoperability. It supports all Java APIs and libraries, making it suitable for any application domain where Java is used, including backend services, desktop applications, command-line tools, and Android development.
 
 ## Language Features
 
-**Standard Library:** Includes an extensive collection framework, I/O utilities, and general-purpose APIs. The standard library is designed to integrate seamlessly with Java's standard library.
+Dyvil provides modern language features designed to reduce boilerplate and improve code readability:
 
-**Concurrency:** Dyvil has access to the full range of Java concurrency utilities, including threads, executors, and concurrent collections, supporting Java's standard threading and parallelization approaches.
+- **Type Inference:** Variable types can be inferred using the `let` and `var` keywords
+- **Lambda Expressions:** Concise syntax for functional programming with closures and higher-order functions
+- **Extension Methods:** Add methods to existing classes without inheritance
+- **Pattern Matching:** Powerful `match` expressions for control flow and data extraction
+- **String Interpolation:** Embed expressions directly in string literals
+- **Operator Overloading:** Define custom operators and customize existing ones
+- **Properties:** Built-in property syntax with customizable getters and setters
+- **Tuples:** First-class support for tuple types and destructuring
+- **Optional Types:** Nullable and non-nullable type annotations for better null safety
+- **Class Extensions:** Extend existing classes with new functionality including operators and properties
 
-**Networking:** Network programming is supported through Java's networking APIs (java.net, java.nio) and can use any JVM-based networking libraries and frameworks.
-
-**Interoperability:** Full bidirectional compatibility with Java allows using existing Java libraries and frameworks, and Dyvil code can be called from Java without special considerations.
+For a complete list of features and detailed documentation, see the [Language Reference][1].
 
 ## Links
 
