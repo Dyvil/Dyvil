@@ -23,6 +23,44 @@ The syntax and semantics of the language are still highly experimental and are l
 releases. Therefore it is not recommended to use Dyvil in any kind of production environment.
 Feature or change requests or bug reports in the form of GitHub Issues or Pull Requests are welcome and encouraged.
 
+## Platform and Runtime
+
+Dyvil compiles to JVM bytecode and runs on the Java Virtual Machine. Programs written in Dyvil benefit from the JVM's
+automatic memory management and garbage collection. The language is compatible with Java 8 and later versions.
+
+**Supported Operating Systems:** Dyvil can be used on any platform that supports the JVM, including Windows, macOS,
+Linux, and other Unix-like systems.
+
+**Mobile Platforms:** As a JVM-based language, Dyvil can target Android through standard Android development tools
+and workflows. Targeting iOS or other non-JVM mobile platforms is not directly supported.
+
+## Use Cases
+
+Dyvil is a general-purpose language suitable for a variety of application domains:
+
+- **Backend and Server Applications:** Full JVM ecosystem compatibility makes it suitable for server-side development
+- **Desktop Applications:** Can be used with JavaFX, Swing, or other JVM-based UI frameworks
+- **Command-Line Tools:** The language's concise syntax is well-suited for utility and automation scripts
+- **Library Development:** Full Java interoperability allows creating libraries usable from Java and other JVM languages
+
+Dyvil is not specifically designed for web frontend development (browser-based JavaScript), though it can generate
+code for JVM-based web frameworks.
+
+## Language Features
+
+**Standard Library:** Includes an extensive collection framework, I/O utilities, and general-purpose APIs. The standard
+library is designed to integrate seamlessly with Java's standard library.
+
+**Concurrency:** Dyvil has access to the full range of Java concurrency utilities, including threads, executors,
+and concurrent collections. The language does not provide a built-in concurrency model like Go's goroutines, but
+supports Java's standard threading and parallelization approaches.
+
+**Networking:** Network programming is supported through Java's networking APIs (java.net, java.nio) and can use
+any JVM-based networking libraries and frameworks.
+
+**Interoperability:** Full bidirectional compatibility with Java allows using existing Java libraries and frameworks,
+and Dyvil code can be called from Java without special considerations.
+
 ## Links
 
 ### Info
